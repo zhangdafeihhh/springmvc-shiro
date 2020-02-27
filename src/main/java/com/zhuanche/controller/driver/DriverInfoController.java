@@ -482,238 +482,238 @@ public class DriverInfoController {
      * @param bankCardNumber //银行卡卡号
      * @return
      */
-    @ResponseBody
-    @RequestMapping(value = "/saveDriver")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
-    } )
-    public AjaxResponse saveDriver(Integer driverId, Integer passwordReset,
-                                   @Verify(param = "phone",rule="required") String phone,
-                                   @Verify(param = "gender",rule="required") Integer gender,
-                                   @Verify(param = "name",rule="required") String name,
-                                   @Verify(param = "idCardNo",rule="required") String idCardNo,
-                                   @Verify(param = "serviceCity",rule="required") Integer serviceCity,
-                                   @Verify(param = "supplierId",rule="required") Integer supplierId,
-                                   @Verify(param = "licensePlates",rule="required") String licensePlates,
-                                   @Verify(param = "status",rule="required") Integer status,
-                                   @Verify(param = "groupId",rule="required") Integer groupId,
-                                   @Verify(param = "age",rule="required|min(18)") Integer age,
-                                   String emergencyContactNumber, String currentAddress, String emergencyContactPerson,
-                                   String superintendNo, String superintendUrl, String drivingLicenseType, Integer drivingYears,
-                                   String archivesNo, String issueDateStr, String expireDateStr, String photosrct, String driverlicensenumber,
-                                   String drivinglicenseimg, String nationality, String householdregister, String nation, String marriage,
-                                   String foreignlanguage, String education, String firstdrivinglicensedate,
-                                   String firstmeshworkdrivinglicensedate, String corptype,  String signdate, String signdateend,
-                                   String contractdate, Integer isxydriver, String xyDriverNumber, String parttimejobdri, String phonetype,
-                                   String phonecorp, String maptype, String emergencycontactaddr, String assessment,
-                                   String driverlicenseissuingdatestart, String driverlicenseissuingdateend, String driverlicenseissuingcorp,
-                                   String driverlicenseissuingnumber, String driverLicenseIssuingRegisterDate, String driverLicenseIssuingFirstDate,
-                                   String driverLicenseIssuingGrantDate, String birthDay, String houseHoldRegisterPermanent,
-                                   String memo, String bankCardBank,String bankCardNumber) {
-
-        if(StringUtils.isNotEmpty(emergencyContactNumber) && emergencyContactNumber.length()>11){
-            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"紧急联系方式不可超过11位");
-        }
-
-        //判断一些基础信息是否正确
-        AjaxResponse ajaxResponse = carBizDriverInfoService.validateCarDriverInfo(driverId, phone, idCardNo, bankCardNumber, bankCardBank);
-        if(ajaxResponse.getCode()!=0){
-            return ajaxResponse;
-        }
-        // 根据供应商ID查询供应商名称以及加盟类型
-        CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(supplierId);
-        if (carBizSupplier == null) {
-            return AjaxResponse.fail(RestErrorCode.SUPPLIER_NOT_EXIST, supplierId);
-        }
-        if(!carBizSupplier.getSupplierCity().equals(serviceCity)){
-            return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_DIFFER);
-        }
-        Boolean had = carBizCarInfoService.checkLicensePlates(licensePlates);
-        if (!had) {//查看车牌号是否在车辆表存在
-            return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
-        } else {
-            if(driverId == null){
-                had = carBizDriverInfoService.checkLicensePlates(licensePlates);
-                if (had) {//查看车辆是否已被绑定
-                    return AjaxResponse.fail(RestErrorCode.CAR_HAS_BIND);
-                }
-            }
-        }
-        had = carBizCarInfoService.validateCityAndSupplier(serviceCity, supplierId, licensePlates);
-        if (!had) {
-            return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_CAR_DIFFER);
-        }
-        // 根据服务类型查找服务类型名称
-        CarBizCarGroup carBizCarGroup = carBizCarGroupService.selectByPrimaryKey(groupId);
-        if (carBizCarGroup == null) {
-            return AjaxResponse.fail(RestErrorCode.GROUP_NOT_EXIST);
-        }
-        Integer cooperationType = carBizSupplier.getCooperationType();
-        if(cooperationType!=null && cooperationType==5){
-            if(age==null || StringUtils.isEmpty(currentAddress) || StringUtils.isEmpty(emergencyContactPerson)
-                    || StringUtils.isEmpty(emergencyContactNumber) || StringUtils.isEmpty(superintendNo)
-                    || StringUtils.isEmpty(drivingLicenseType) || drivingYears==null || StringUtils.isEmpty(archivesNo)
-                    || StringUtils.isEmpty(issueDateStr) || StringUtils.isEmpty(expireDateStr) || StringUtils.isEmpty(driverlicensenumber) || StringUtils.isEmpty(nationality)
-                    || StringUtils.isEmpty(householdregister) || StringUtils.isEmpty(nation) || StringUtils.isEmpty(marriage) || StringUtils.isEmpty(foreignlanguage)
-                    || StringUtils.isEmpty(education) || StringUtils.isEmpty(firstdrivinglicensedate) || StringUtils.isEmpty(firstmeshworkdrivinglicensedate)
-                    || StringUtils.isEmpty(corptype) || StringUtils.isEmpty(signdate) || StringUtils.isEmpty(signdateend) || StringUtils.isEmpty(contractdate)
-                    || isxydriver==null || StringUtils.isEmpty(xyDriverNumber) || StringUtils.isEmpty(parttimejobdri) || StringUtils.isEmpty(phonetype)
-                    || StringUtils.isEmpty(phonecorp) || StringUtils.isEmpty(emergencycontactaddr) || StringUtils.isEmpty(driverlicenseissuingdatestart)
-                    || StringUtils.isEmpty(driverlicenseissuingdateend) || StringUtils.isEmpty(driverlicenseissuingcorp) || StringUtils.isEmpty(driverlicenseissuingnumber)
-                    || StringUtils.isEmpty(driverLicenseIssuingRegisterDate) || StringUtils.isEmpty(driverLicenseIssuingFirstDate) || StringUtils.isEmpty(driverLicenseIssuingGrantDate)
-                    || StringUtils.isEmpty(birthDay) || StringUtils.isEmpty(houseHoldRegisterPermanent) || groupId == null){
-                return AjaxResponse.fail(RestErrorCode.INFORMATION_NOT_COMPLETE);
-            }
-
-        }
-        CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
-        carBizDriverInfoDTO.setDriverId(driverId);
-        carBizDriverInfoDTO.setPasswordReset(passwordReset);
-        carBizDriverInfoDTO.setPhone(phone);
-        carBizDriverInfoDTO.setGender(gender);
-        carBizDriverInfoDTO.setName(name);
-        carBizDriverInfoDTO.setIdCardNo(idCardNo);
-        carBizDriverInfoDTO.setServiceCity(serviceCity);
-        carBizDriverInfoDTO.setSupplierId(supplierId);
-        carBizDriverInfoDTO.setLicensePlates(licensePlates);
-        carBizDriverInfoDTO.setStatus(status);
-        carBizDriverInfoDTO.setAge(age);
-        carBizDriverInfoDTO.setCurrentAddress(currentAddress);
-        carBizDriverInfoDTO.setEmergencyContactPerson(emergencyContactPerson);
-        carBizDriverInfoDTO.setEmergencyContactNumber(emergencyContactNumber);
-        carBizDriverInfoDTO.setSuperintendNo(superintendNo);
-        carBizDriverInfoDTO.setSuperintendUrl(superintendUrl);
-        carBizDriverInfoDTO.setDrivingLicenseType(drivingLicenseType);
-        carBizDriverInfoDTO.setDrivingYears(drivingYears);
-        carBizDriverInfoDTO.setArchivesNo(archivesNo);
-        try {
-            if(StringUtils.isNotEmpty(issueDateStr)){
-                carBizDriverInfoDTO.setIssueDate(new SimpleDateFormat("yyyy-MM-dd").parse(issueDateStr));
-            }
-            if(StringUtils.isNotEmpty(expireDateStr)){
-                carBizDriverInfoDTO.setExpireDate(new SimpleDateFormat("yyyy-MM-dd").parse(expireDateStr));
-            }
-        } catch (ParseException e) {
-            logger.info(LOGTAG + "司机driverId={},修改,时间转换异常={}", driverId, e.getMessage());
-        }
-//        carBizDriverInfoDTO.setIssueDate(issueDate);
-//        carBizDriverInfoDTO.setExpireDate(expireDate);
-        carBizDriverInfoDTO.setPhotosrct(photosrct);
-        carBizDriverInfoDTO.setDriverlicensenumber(driverlicensenumber);
-        carBizDriverInfoDTO.setDrivinglicenseimg(drivinglicenseimg);
-        carBizDriverInfoDTO.setNationality(nationality);
-        carBizDriverInfoDTO.setHouseholdregister(householdregister);
-        carBizDriverInfoDTO.setNation(nation);
-        carBizDriverInfoDTO.setMarriage(marriage);
-        carBizDriverInfoDTO.setForeignlanguage(foreignlanguage);
-        carBizDriverInfoDTO.setEducation(education);
-        carBizDriverInfoDTO.setFirstdrivinglicensedate(firstdrivinglicensedate);
-        carBizDriverInfoDTO.setFirstmeshworkdrivinglicensedate(firstmeshworkdrivinglicensedate);
-        carBizDriverInfoDTO.setCorptype(corptype);
-        carBizDriverInfoDTO.setSigndate(signdate);
-        carBizDriverInfoDTO.setSigndateend(signdateend);
-        carBizDriverInfoDTO.setContractdate(contractdate);
-        carBizDriverInfoDTO.setIsxydriver(isxydriver);
-        carBizDriverInfoDTO.setXyDriverNumber(xyDriverNumber);
-        carBizDriverInfoDTO.setParttimejobdri(parttimejobdri);
-        carBizDriverInfoDTO.setPhonetype(phonetype);
-        carBizDriverInfoDTO.setPhonecorp(phonecorp);
-        carBizDriverInfoDTO.setMaptype(maptype);
-        carBizDriverInfoDTO.setEmergencycontactaddr(emergencycontactaddr);
-        carBizDriverInfoDTO.setAssessment(assessment);
-        carBizDriverInfoDTO.setDriverlicenseissuingdatestart(driverlicenseissuingdatestart);
-        carBizDriverInfoDTO.setDriverlicenseissuingdateend(driverlicenseissuingdateend);
-        carBizDriverInfoDTO.setDriverlicenseissuingcorp(driverlicenseissuingcorp);
-        carBizDriverInfoDTO.setDriverlicenseissuingnumber(driverlicenseissuingnumber);
-        carBizDriverInfoDTO.setDriverLicenseIssuingRegisterDate(driverLicenseIssuingRegisterDate);
-        carBizDriverInfoDTO.setDriverLicenseIssuingFirstDate(driverLicenseIssuingFirstDate);
-        carBizDriverInfoDTO.setDriverlicenseissuingnumber(driverlicenseissuingnumber);
-        carBizDriverInfoDTO.setDriverLicenseIssuingRegisterDate(driverLicenseIssuingRegisterDate);
-        carBizDriverInfoDTO.setDriverLicenseIssuingFirstDate(driverLicenseIssuingFirstDate);
-        carBizDriverInfoDTO.setDriverLicenseIssuingGrantDate(driverLicenseIssuingGrantDate);
-        carBizDriverInfoDTO.setBirthDay(birthDay);
-        carBizDriverInfoDTO.setHouseHoldRegisterPermanent(houseHoldRegisterPermanent);
-        carBizDriverInfoDTO.setGroupId(groupId);
-        carBizDriverInfoDTO.setMemo(memo);
-        carBizDriverInfoDTO.setBankCardBank(bankCardBank);
-        carBizDriverInfoDTO.setBankCardNumber(bankCardNumber);
-
-        Map<String, Object> resultMap = Maps.newHashMap();
-        if (driverId != null) {
-            logger.info(LOGTAG + "操作方式：编辑");
-            // 司机获取派单的接口，是否可以修改
-            Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, phone);
-//            if(updateDriverMap!=null && "2".equals(updateDriverMap.get("result").toString())){
-//                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, updateDriverMap.get("msg").toString());
+//    @ResponseBody
+//    @RequestMapping(value = "/saveDriver")
+//    @MasterSlaveConfigs(configs={
+//            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+//    } )
+//    public AjaxResponse saveDriver(Integer driverId, Integer passwordReset,
+//                                   @Verify(param = "phone",rule="required") String phone,
+//                                   @Verify(param = "gender",rule="required") Integer gender,
+//                                   @Verify(param = "name",rule="required") String name,
+//                                   @Verify(param = "idCardNo",rule="required") String idCardNo,
+//                                   @Verify(param = "serviceCity",rule="required") Integer serviceCity,
+//                                   @Verify(param = "supplierId",rule="required") Integer supplierId,
+//                                   @Verify(param = "licensePlates",rule="required") String licensePlates,
+//                                   @Verify(param = "status",rule="required") Integer status,
+//                                   @Verify(param = "groupId",rule="required") Integer groupId,
+//                                   @Verify(param = "age",rule="required|min(18)") Integer age,
+//                                   String emergencyContactNumber, String currentAddress, String emergencyContactPerson,
+//                                   String superintendNo, String superintendUrl, String drivingLicenseType, Integer drivingYears,
+//                                   String archivesNo, String issueDateStr, String expireDateStr, String photosrct, String driverlicensenumber,
+//                                   String drivinglicenseimg, String nationality, String householdregister, String nation, String marriage,
+//                                   String foreignlanguage, String education, String firstdrivinglicensedate,
+//                                   String firstmeshworkdrivinglicensedate, String corptype,  String signdate, String signdateend,
+//                                   String contractdate, Integer isxydriver, String xyDriverNumber, String parttimejobdri, String phonetype,
+//                                   String phonecorp, String maptype, String emergencycontactaddr, String assessment,
+//                                   String driverlicenseissuingdatestart, String driverlicenseissuingdateend, String driverlicenseissuingcorp,
+//                                   String driverlicenseissuingnumber, String driverLicenseIssuingRegisterDate, String driverLicenseIssuingFirstDate,
+//                                   String driverLicenseIssuingGrantDate, String birthDay, String houseHoldRegisterPermanent,
+//                                   String memo, String bankCardBank,String bankCardNumber) {
+//
+//        if(StringUtils.isNotEmpty(emergencyContactNumber) && emergencyContactNumber.length()>11){
+//            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"紧急联系方式不可超过11位");
+//        }
+//
+//        //判断一些基础信息是否正确
+//        AjaxResponse ajaxResponse = carBizDriverInfoService.validateCarDriverInfo(driverId, phone, idCardNo, bankCardNumber, bankCardBank);
+//        if(ajaxResponse.getCode()!=0){
+//            return ajaxResponse;
+//        }
+//        // 根据供应商ID查询供应商名称以及加盟类型
+//        CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(supplierId);
+//        if (carBizSupplier == null) {
+//            return AjaxResponse.fail(RestErrorCode.SUPPLIER_NOT_EXIST, supplierId);
+//        }
+//        if(!carBizSupplier.getSupplierCity().equals(serviceCity)){
+//            return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_DIFFER);
+//        }
+//        Boolean had = carBizCarInfoService.checkLicensePlates(licensePlates);
+//        if (!had) {//查看车牌号是否在车辆表存在
+//            return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
+//        } else {
+//            if(driverId == null){
+//                had = carBizDriverInfoService.checkLicensePlates(licensePlates);
+//                if (had) {//查看车辆是否已被绑定
+//                    return AjaxResponse.fail(RestErrorCode.CAR_HAS_BIND);
+//                }
 //            }
-            try {
-                // 调用接口清除，key
-                carBizDriverInfoService.flashDriverInfo(driverId);
-            } catch (Exception e) {
-                logger.info(LOGTAG + "司机driverId={},修改,调用清除接口异常={}", driverId, e.getMessage());
-            }
-            resultMap = carBizDriverInfoService.updateDriver(carBizDriverInfoDTO);
-        }else{
-            logger.info(LOGTAG + "操作方式：新建");
-            resultMap = carBizDriverInfoService.saveDriver(carBizDriverInfoDTO);
-        }
-        if(resultMap!=null && "1".equals(resultMap.get("result").toString())){
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, resultMap.get("msg").toString());
-        }
-        return AjaxResponse.success(resultMap);
-    }
+//        }
+//        had = carBizCarInfoService.validateCityAndSupplier(serviceCity, supplierId, licensePlates);
+//        if (!had) {
+//            return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_CAR_DIFFER);
+//        }
+//        // 根据服务类型查找服务类型名称
+//        CarBizCarGroup carBizCarGroup = carBizCarGroupService.selectByPrimaryKey(groupId);
+//        if (carBizCarGroup == null) {
+//            return AjaxResponse.fail(RestErrorCode.GROUP_NOT_EXIST);
+//        }
+//        Integer cooperationType = carBizSupplier.getCooperationType();
+//        if(cooperationType!=null && cooperationType==5){
+//            if(age==null || StringUtils.isEmpty(currentAddress) || StringUtils.isEmpty(emergencyContactPerson)
+//                    || StringUtils.isEmpty(emergencyContactNumber) || StringUtils.isEmpty(superintendNo)
+//                    || StringUtils.isEmpty(drivingLicenseType) || drivingYears==null || StringUtils.isEmpty(archivesNo)
+//                    || StringUtils.isEmpty(issueDateStr) || StringUtils.isEmpty(expireDateStr) || StringUtils.isEmpty(driverlicensenumber) || StringUtils.isEmpty(nationality)
+//                    || StringUtils.isEmpty(householdregister) || StringUtils.isEmpty(nation) || StringUtils.isEmpty(marriage) || StringUtils.isEmpty(foreignlanguage)
+//                    || StringUtils.isEmpty(education) || StringUtils.isEmpty(firstdrivinglicensedate) || StringUtils.isEmpty(firstmeshworkdrivinglicensedate)
+//                    || StringUtils.isEmpty(corptype) || StringUtils.isEmpty(signdate) || StringUtils.isEmpty(signdateend) || StringUtils.isEmpty(contractdate)
+//                    || isxydriver==null || StringUtils.isEmpty(xyDriverNumber) || StringUtils.isEmpty(parttimejobdri) || StringUtils.isEmpty(phonetype)
+//                    || StringUtils.isEmpty(phonecorp) || StringUtils.isEmpty(emergencycontactaddr) || StringUtils.isEmpty(driverlicenseissuingdatestart)
+//                    || StringUtils.isEmpty(driverlicenseissuingdateend) || StringUtils.isEmpty(driverlicenseissuingcorp) || StringUtils.isEmpty(driverlicenseissuingnumber)
+//                    || StringUtils.isEmpty(driverLicenseIssuingRegisterDate) || StringUtils.isEmpty(driverLicenseIssuingFirstDate) || StringUtils.isEmpty(driverLicenseIssuingGrantDate)
+//                    || StringUtils.isEmpty(birthDay) || StringUtils.isEmpty(houseHoldRegisterPermanent) || groupId == null){
+//                return AjaxResponse.fail(RestErrorCode.INFORMATION_NOT_COMPLETE);
+//            }
+//
+//        }
+//        CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
+//        carBizDriverInfoDTO.setDriverId(driverId);
+//        carBizDriverInfoDTO.setPasswordReset(passwordReset);
+//        carBizDriverInfoDTO.setPhone(phone);
+//        carBizDriverInfoDTO.setGender(gender);
+//        carBizDriverInfoDTO.setName(name);
+//        carBizDriverInfoDTO.setIdCardNo(idCardNo);
+//        carBizDriverInfoDTO.setServiceCity(serviceCity);
+//        carBizDriverInfoDTO.setSupplierId(supplierId);
+//        carBizDriverInfoDTO.setLicensePlates(licensePlates);
+//        carBizDriverInfoDTO.setStatus(status);
+//        carBizDriverInfoDTO.setAge(age);
+//        carBizDriverInfoDTO.setCurrentAddress(currentAddress);
+//        carBizDriverInfoDTO.setEmergencyContactPerson(emergencyContactPerson);
+//        carBizDriverInfoDTO.setEmergencyContactNumber(emergencyContactNumber);
+//        carBizDriverInfoDTO.setSuperintendNo(superintendNo);
+//        carBizDriverInfoDTO.setSuperintendUrl(superintendUrl);
+//        carBizDriverInfoDTO.setDrivingLicenseType(drivingLicenseType);
+//        carBizDriverInfoDTO.setDrivingYears(drivingYears);
+//        carBizDriverInfoDTO.setArchivesNo(archivesNo);
+//        try {
+//            if(StringUtils.isNotEmpty(issueDateStr)){
+//                carBizDriverInfoDTO.setIssueDate(new SimpleDateFormat("yyyy-MM-dd").parse(issueDateStr));
+//            }
+//            if(StringUtils.isNotEmpty(expireDateStr)){
+//                carBizDriverInfoDTO.setExpireDate(new SimpleDateFormat("yyyy-MM-dd").parse(expireDateStr));
+//            }
+//        } catch (ParseException e) {
+//            logger.info(LOGTAG + "司机driverId={},修改,时间转换异常={}", driverId, e.getMessage());
+//        }
+////        carBizDriverInfoDTO.setIssueDate(issueDate);
+////        carBizDriverInfoDTO.setExpireDate(expireDate);
+//        carBizDriverInfoDTO.setPhotosrct(photosrct);
+//        carBizDriverInfoDTO.setDriverlicensenumber(driverlicensenumber);
+//        carBizDriverInfoDTO.setDrivinglicenseimg(drivinglicenseimg);
+//        carBizDriverInfoDTO.setNationality(nationality);
+//        carBizDriverInfoDTO.setHouseholdregister(householdregister);
+//        carBizDriverInfoDTO.setNation(nation);
+//        carBizDriverInfoDTO.setMarriage(marriage);
+//        carBizDriverInfoDTO.setForeignlanguage(foreignlanguage);
+//        carBizDriverInfoDTO.setEducation(education);
+//        carBizDriverInfoDTO.setFirstdrivinglicensedate(firstdrivinglicensedate);
+//        carBizDriverInfoDTO.setFirstmeshworkdrivinglicensedate(firstmeshworkdrivinglicensedate);
+//        carBizDriverInfoDTO.setCorptype(corptype);
+//        carBizDriverInfoDTO.setSigndate(signdate);
+//        carBizDriverInfoDTO.setSigndateend(signdateend);
+//        carBizDriverInfoDTO.setContractdate(contractdate);
+//        carBizDriverInfoDTO.setIsxydriver(isxydriver);
+//        carBizDriverInfoDTO.setXyDriverNumber(xyDriverNumber);
+//        carBizDriverInfoDTO.setParttimejobdri(parttimejobdri);
+//        carBizDriverInfoDTO.setPhonetype(phonetype);
+//        carBizDriverInfoDTO.setPhonecorp(phonecorp);
+//        carBizDriverInfoDTO.setMaptype(maptype);
+//        carBizDriverInfoDTO.setEmergencycontactaddr(emergencycontactaddr);
+//        carBizDriverInfoDTO.setAssessment(assessment);
+//        carBizDriverInfoDTO.setDriverlicenseissuingdatestart(driverlicenseissuingdatestart);
+//        carBizDriverInfoDTO.setDriverlicenseissuingdateend(driverlicenseissuingdateend);
+//        carBizDriverInfoDTO.setDriverlicenseissuingcorp(driverlicenseissuingcorp);
+//        carBizDriverInfoDTO.setDriverlicenseissuingnumber(driverlicenseissuingnumber);
+//        carBizDriverInfoDTO.setDriverLicenseIssuingRegisterDate(driverLicenseIssuingRegisterDate);
+//        carBizDriverInfoDTO.setDriverLicenseIssuingFirstDate(driverLicenseIssuingFirstDate);
+//        carBizDriverInfoDTO.setDriverlicenseissuingnumber(driverlicenseissuingnumber);
+//        carBizDriverInfoDTO.setDriverLicenseIssuingRegisterDate(driverLicenseIssuingRegisterDate);
+//        carBizDriverInfoDTO.setDriverLicenseIssuingFirstDate(driverLicenseIssuingFirstDate);
+//        carBizDriverInfoDTO.setDriverLicenseIssuingGrantDate(driverLicenseIssuingGrantDate);
+//        carBizDriverInfoDTO.setBirthDay(birthDay);
+//        carBizDriverInfoDTO.setHouseHoldRegisterPermanent(houseHoldRegisterPermanent);
+//        carBizDriverInfoDTO.setGroupId(groupId);
+//        carBizDriverInfoDTO.setMemo(memo);
+//        carBizDriverInfoDTO.setBankCardBank(bankCardBank);
+//        carBizDriverInfoDTO.setBankCardNumber(bankCardNumber);
+//
+//        Map<String, Object> resultMap = Maps.newHashMap();
+//        if (driverId != null) {
+//            logger.info(LOGTAG + "操作方式：编辑");
+//            // 司机获取派单的接口，是否可以修改
+//            Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, phone);
+////            if(updateDriverMap!=null && "2".equals(updateDriverMap.get("result").toString())){
+////                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, updateDriverMap.get("msg").toString());
+////            }
+//            try {
+//                // 调用接口清除，key
+//                carBizDriverInfoService.flashDriverInfo(driverId);
+//            } catch (Exception e) {
+//                logger.info(LOGTAG + "司机driverId={},修改,调用清除接口异常={}", driverId, e.getMessage());
+//            }
+//            resultMap = carBizDriverInfoService.updateDriver(carBizDriverInfoDTO);
+//        }else{
+//            logger.info(LOGTAG + "操作方式：新建");
+//            resultMap = carBizDriverInfoService.saveDriver(carBizDriverInfoDTO);
+//        }
+//        if(resultMap!=null && "1".equals(resultMap.get("result").toString())){
+//            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, resultMap.get("msg").toString());
+//        }
+//        return AjaxResponse.success(resultMap);
+//    }
 
     /**
      * 修改司机状态信息 ,司机设置为无效后释放其绑定的车辆
      * @param driverId
      * @return
      */
-    @ResponseBody
-    @RequestMapping(value = "/setInvalidDriver")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
-    } )
-    public AjaxResponse setInvalidDriver(@Verify(param = "driverId", rule = "required") Integer driverId) {
-
-        logger.info(LOGTAG + "司机driverId={},置为无效", driverId);
-        CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
-        if(carBizDriverInfo==null){
-            return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
-        }
-        // 司机获取派单的接口，是否可以修改
-        Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, carBizDriverInfo.getPhone());
-//        if(updateDriverMap!=null && (int)updateDriverMap.get("result")==2){
-//            return AjaxResponse.fail(RestErrorCode.CAR_API_ERROR, updateDriverMap.get("msg").toString());
+//    @ResponseBody
+//    @RequestMapping(value = "/setInvalidDriver")
+//    @MasterSlaveConfigs(configs={
+//            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+//    } )
+//    public AjaxResponse setInvalidDriver(@Verify(param = "driverId", rule = "required") Integer driverId) {
+//
+//        logger.info(LOGTAG + "司机driverId={},置为无效", driverId);
+//        CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
+//        if(carBizDriverInfo==null){
+//            return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
 //        }
-        try {
-            // 调用接口清除，key
-            carBizDriverInfoService.flashDriverInfo(driverId);
-        } catch (Exception e) {
-            logger.info(LOGTAG + "司机driverId={},置为无效,调用清除接口异常={}", driverId, e.getMessage());
-        }
-        //允许修改
-        // 获取当前用户Id
-        carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
-        carBizDriverInfo.setStatus(0);
-        CarBizDriverInfoDTO carBizDriverInfoDTO = BeanUtil.copyObject(carBizDriverInfo, CarBizDriverInfoDTO.class);
-        int rtn = 0;
-        try {
-            rtn = carBizDriverInfoService.updateDriverByXiao(carBizDriverInfoDTO);
-        } catch (Exception e) {
-           logger.info(LOGTAG + "司机driverId={},置为无效error={}", driverId, e.getMessage());
-        }
-        if (rtn == 0) {
-            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
-        }
-        try {
-            // 查询城市名称，供应商名称，服务类型，加盟类型
-            carBizDriverInfoDTO = carBizDriverInfoService.getBaseStatis(carBizDriverInfoDTO);
-            carBizDriverInfoService.sendDriverToMq(carBizDriverInfoDTO, "DELETE");
-        } catch (Exception e) {
-            logger.info(LOGTAG + "司机driverId={},置为无效error={}", driverId, e.getMessage());
-        }
-        return AjaxResponse.success(null);
-    }
+//        // 司机获取派单的接口，是否可以修改
+//        Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, carBizDriverInfo.getPhone());
+////        if(updateDriverMap!=null && (int)updateDriverMap.get("result")==2){
+////            return AjaxResponse.fail(RestErrorCode.CAR_API_ERROR, updateDriverMap.get("msg").toString());
+////        }
+//        try {
+//            // 调用接口清除，key
+//            carBizDriverInfoService.flashDriverInfo(driverId);
+//        } catch (Exception e) {
+//            logger.info(LOGTAG + "司机driverId={},置为无效,调用清除接口异常={}", driverId, e.getMessage());
+//        }
+//        //允许修改
+//        // 获取当前用户Id
+//        carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+//        carBizDriverInfo.setStatus(0);
+//        CarBizDriverInfoDTO carBizDriverInfoDTO = BeanUtil.copyObject(carBizDriverInfo, CarBizDriverInfoDTO.class);
+//        int rtn = 0;
+//        try {
+//            rtn = carBizDriverInfoService.updateDriverByXiao(carBizDriverInfoDTO);
+//        } catch (Exception e) {
+//           logger.info(LOGTAG + "司机driverId={},置为无效error={}", driverId, e.getMessage());
+//        }
+//        if (rtn == 0) {
+//            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+//        }
+//        try {
+//            // 查询城市名称，供应商名称，服务类型，加盟类型
+//            carBizDriverInfoDTO = carBizDriverInfoService.getBaseStatis(carBizDriverInfoDTO);
+//            carBizDriverInfoService.sendDriverToMq(carBizDriverInfoDTO, "DELETE");
+//        } catch (Exception e) {
+//            logger.info(LOGTAG + "司机driverId={},置为无效error={}", driverId, e.getMessage());
+//        }
+//        return AjaxResponse.success(null);
+//    }
 
     /**
      * 重置IMEI
@@ -747,34 +747,34 @@ public class DriverInfoController {
      * @param request
      * @return
      */
-    @ResponseBody
-    @RequestMapping(value = "/batchInputDriverInfo")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
-    } )
-    @RequestFunction(menu = DRIVER_INFO_LIST_IMPORT)
-    public AjaxResponse batchInputDriverInfo(@Verify(param = "cityId", rule = "required") Integer cityId,
-                                             @Verify(param = "supplierId", rule = "required") Integer supplierId,
-                                             Integer teamId, Integer teamGroupId,
-                                             MultipartFile fileName,
-                                             HttpServletRequest request, HttpServletResponse response) {
-
-        if (fileName.isEmpty()) {
-            logger.info("file is empty!");
-            return AjaxResponse.fail(RestErrorCode.FILE_ERROR);
-        }
-
-        Map<String, Object> resultMap = Maps.newHashMap();
-        resultMap = carBizDriverInfoService.batchInputDriverInfo(cityId, supplierId, teamId, teamGroupId, fileName, request, response);
-        //模板错误
-        if(resultMap!=null && "-1".equals(resultMap.get("result").toString())){
-            return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
-        }
-        if(resultMap!=null && "0".equals(resultMap.get("result").toString())){
-            return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, resultMap.get("msg").toString());
-        }
-        return AjaxResponse.success(resultMap);
-    }
+//    @ResponseBody
+//    @RequestMapping(value = "/batchInputDriverInfo")
+//    @MasterSlaveConfigs(configs={
+//            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+//    } )
+//    @RequestFunction(menu = DRIVER_INFO_LIST_IMPORT)
+//    public AjaxResponse batchInputDriverInfo(@Verify(param = "cityId", rule = "required") Integer cityId,
+//                                             @Verify(param = "supplierId", rule = "required") Integer supplierId,
+//                                             Integer teamId, Integer teamGroupId,
+//                                             MultipartFile fileName,
+//                                             HttpServletRequest request, HttpServletResponse response) {
+//
+//        if (fileName.isEmpty()) {
+//            logger.info("file is empty!");
+//            return AjaxResponse.fail(RestErrorCode.FILE_ERROR);
+//        }
+//
+//        Map<String, Object> resultMap = Maps.newHashMap();
+//        resultMap = carBizDriverInfoService.batchInputDriverInfo(cityId, supplierId, teamId, teamGroupId, fileName, request, response);
+//        //模板错误
+//        if(resultMap!=null && "-1".equals(resultMap.get("result").toString())){
+//            return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
+//        }
+//        if(resultMap!=null && "0".equals(resultMap.get("result").toString())){
+//            return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, resultMap.get("msg").toString());
+//        }
+//        return AjaxResponse.success(resultMap);
+//    }
 
     @ResponseBody
     @RequestMapping(value = "/selectByPhone")

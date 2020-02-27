@@ -341,131 +341,131 @@ public class CarBizDriverInfoService {
         return i;
     }
 
-    /**
-     * 修改司机信息
-     *
-     * @param carBizDriverInfo
-     * @return
-     */
+//    /**
+//     * 修改司机信息
+//     *
+//     * @param carBizDriverInfo
+//     * @return
+//     */
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER)
     })
-    public Map<String, Object> updateDriver(CarBizDriverInfoDTO carBizDriverInfo) {
-        Map<String, Object> resultMap = Maps.newHashMap();
-        try {
-            try {
-                logger.info(LOGTAG + "操作方式：编辑,新数据:" + JSON.toJSONString(carBizDriverInfo));
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            // 查询城市名称，供应商名称，服务类型，加盟类型
-            carBizDriverInfo = this.getBaseStatis(carBizDriverInfo);
-            // 驾驶员合同（或协议）签署公司在协议公司 验证
-            if(carBizDriverInfo.getCooperationType()!=null && carBizDriverInfo.getCooperationType()==5){
-                CarBizAgreementCompany company = carBizAgreementCompanyExMapper.selectByName(carBizDriverInfo.getCorptype());
-                if(company==null){
-                    resultMap.put("result", 1);
-                    resultMap.put("msg", " 驾驶员合同（或协议）签署公司在协议公司中不存在");
-                    return resultMap;
-                }
-            }
-
-            // 获取当前用户Id
-            carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
-            carBizDriverInfo.setUpdateDate(new Date());
-            //
-            String idCardNo = carBizDriverInfo.getIdCardNo();
-            if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
-                idCardNo = idCardNo.toLowerCase();
-            }
-            carBizDriverInfo.setIdCardNo(idCardNo);
-            carBizDriverInfo.setDriverlicensenumber(idCardNo);//机动车驾驶证号
-
-            if (carBizDriverInfo.getPasswordReset()!=null && carBizDriverInfo.getPasswordReset() == 1) {//重置密码
-                carBizDriverInfo.setPassword(getPassword(idCardNo));
-            }
-
-            //根据司机ID查询数据
-            CarBizDriverInfo orginDriverInfo = carBizDriverInfoMapper.selectByPrimaryKey(carBizDriverInfo.getDriverId());
-            if (orginDriverInfo != null) {
-                carBizDriverInfo.setOldPhone(orginDriverInfo.getPhone());//手机号
-                carBizDriverInfo.setOldIdCardNo(orginDriverInfo.getIdCardNo());//身份证
-                carBizDriverInfo.setOldDriverLicenseNumber(orginDriverInfo.getDriverlicensenumber());//机动车驾驶证号
-                carBizDriverInfo.setOldDriverLicenseIssuingNumber(orginDriverInfo.getDriverlicenseissuingnumber());//网络预约出租汽车驾驶员资格证号
-                carBizDriverInfo.setOldLicensePlates(orginDriverInfo.getLicensePlates());//车牌号
-                carBizDriverInfo.setOldCity(orginDriverInfo.getServiceCity());//城市
-                carBizDriverInfo.setOldSupplier(orginDriverInfo.getSupplierId());//供应商
-            }
-            try {
-                logger.info(LOGTAG + "操作方式：编辑,原始数据:" + JSON.toJSONString(carBizDriverInfo));
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            //更新司机信息
-            DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
-            int n = this.updateDriverInfo(carBizDriverInfo);
-
-            // 更新车辆信息 根据 车牌号更新车辆 信息（更换车辆所属人）
-            if (n > 0) {
-                logger.info("****************根据 车牌号更新车辆 信息（更换车辆所属人）");
-//                if(carInfo!=null){
-                carBizCarInfoExMapper.updateCarLicensePlates(carBizDriverInfo.getLicensePlates(), carBizDriverInfo.getDriverId());
+//    public Map<String, Object> updateDriver(CarBizDriverInfoDTO carBizDriverInfo) {
+//        Map<String, Object> resultMap = Maps.newHashMap();
+//        try {
+//            try {
+//                logger.info(LOGTAG + "操作方式：编辑,新数据:" + JSON.toJSONString(carBizDriverInfo));
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//            }
+//            // 查询城市名称，供应商名称，服务类型，加盟类型
+//            carBizDriverInfo = this.getBaseStatis(carBizDriverInfo);
+//            // 驾驶员合同（或协议）签署公司在协议公司 验证
+//            if(carBizDriverInfo.getCooperationType()!=null && carBizDriverInfo.getCooperationType()==5){
+//                CarBizAgreementCompany company = carBizAgreementCompanyExMapper.selectByName(carBizDriverInfo.getCorptype());
+//                if(company==null){
+//                    resultMap.put("result", 1);
+//                    resultMap.put("msg", " 驾驶员合同（或协议）签署公司在协议公司中不存在");
+//                    return resultMap;
 //                }
-            }
-
-            // 更新mongoDB
-            DriverMongo driverMongo = driverMongoService.findByDriverId(carBizDriverInfo.getDriverId());
-            if (driverMongo != null) {
-                driverMongoService.updateDriverMongo(carBizDriverInfo);
-            } else {
-                driverMongoService.saveDriverMongo(carBizDriverInfo);
-            }
-
-            String method = "UPDATE";
-            // 将司机置为无效状态需释放车辆资源
-            if (carBizDriverInfo.getStatus().intValue() == 0) {
-                method = "DELETE";
-                this.updateDriverByXiao(carBizDriverInfo);
-            }
-
-            //城市或者供应商是否更换
-            if ((carBizDriverInfo.getOldCity() != null && !carBizDriverInfo.getOldCity().equals(carBizDriverInfo.getServiceCity()))
-                    || (carBizDriverInfo.getOldSupplier() != null && !carBizDriverInfo.getOldSupplier().equals(carBizDriverInfo.getSupplierId()))) {
-                logger.info("修改司机driverId=" + carBizDriverInfo.getDriverId() + "的城市或者供应商，需将司机移除车队小组");
-                // 移除司机车队小组信息
-                carRelateTeamExMapper.deleteByDriverId(carBizDriverInfo.getDriverId());
-                carRelateGroupExMapper.deleteByDriverId(carBizDriverInfo.getDriverId());
-                carBizDriverInfo.setTeamId(null);
-                carBizDriverInfo.setTeamName("");
-                carBizDriverInfo.setTeamGroupId(null);
-                carBizDriverInfo.setTeamGroupName("");
-            }
-
-            carBizDriverInfo.setCreateDate(orginDriverInfo.getCreateDate());
-            //发送MQ
-            if (carBizDriverInfo.getStatus() == 0) {
-                sendDriverToMq(carBizDriverInfo, "DELETE");
-            } else {
-                sendDriverToMq(carBizDriverInfo, "UPDATE");
-            }
-
-            try {
-                // 司机变更部分信息，需要记录
-                driverUpdate(carBizDriverInfo);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            resultMap.put("result", 0);
-            resultMap.put("msg", "成功");
-        } catch (Exception e) {
-            resultMap.put("result", 1);
-            resultMap.put("msg", e.getMessage());
-            e.printStackTrace();
-        }
-        return resultMap;
-    }
+//            }
+//
+//            // 获取当前用户Id
+//            carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+//            carBizDriverInfo.setUpdateDate(new Date());
+//            //
+//            String idCardNo = carBizDriverInfo.getIdCardNo();
+//            if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
+//                idCardNo = idCardNo.toLowerCase();
+//            }
+//            carBizDriverInfo.setIdCardNo(idCardNo);
+//            carBizDriverInfo.setDriverlicensenumber(idCardNo);//机动车驾驶证号
+//
+//            if (carBizDriverInfo.getPasswordReset()!=null && carBizDriverInfo.getPasswordReset() == 1) {//重置密码
+//                carBizDriverInfo.setPassword(getPassword(idCardNo));
+//            }
+//
+//            //根据司机ID查询数据
+//            CarBizDriverInfo orginDriverInfo = carBizDriverInfoMapper.selectByPrimaryKey(carBizDriverInfo.getDriverId());
+//            if (orginDriverInfo != null) {
+//                carBizDriverInfo.setOldPhone(orginDriverInfo.getPhone());//手机号
+//                carBizDriverInfo.setOldIdCardNo(orginDriverInfo.getIdCardNo());//身份证
+//                carBizDriverInfo.setOldDriverLicenseNumber(orginDriverInfo.getDriverlicensenumber());//机动车驾驶证号
+//                carBizDriverInfo.setOldDriverLicenseIssuingNumber(orginDriverInfo.getDriverlicenseissuingnumber());//网络预约出租汽车驾驶员资格证号
+//                carBizDriverInfo.setOldLicensePlates(orginDriverInfo.getLicensePlates());//车牌号
+//                carBizDriverInfo.setOldCity(orginDriverInfo.getServiceCity());//城市
+//                carBizDriverInfo.setOldSupplier(orginDriverInfo.getSupplierId());//供应商
+//            }
+//            try {
+//                logger.info(LOGTAG + "操作方式：编辑,原始数据:" + JSON.toJSONString(carBizDriverInfo));
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//            }
+//
+//            //更新司机信息
+//            DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
+//            int n = this.updateDriverInfo(carBizDriverInfo);
+//
+//            // 更新车辆信息 根据 车牌号更新车辆 信息（更换车辆所属人）
+//            if (n > 0) {
+//                logger.info("****************根据 车牌号更新车辆 信息（更换车辆所属人）");
+////                if(carInfo!=null){
+//                carBizCarInfoExMapper.updateCarLicensePlates(carBizDriverInfo.getLicensePlates(), carBizDriverInfo.getDriverId());
+////                }
+//            }
+//
+//            // 更新mongoDB
+//            DriverMongo driverMongo = driverMongoService.findByDriverId(carBizDriverInfo.getDriverId());
+//            if (driverMongo != null) {
+//                driverMongoService.updateDriverMongo(carBizDriverInfo);
+//            } else {
+//                driverMongoService.saveDriverMongo(carBizDriverInfo);
+//            }
+//
+//            String method = "UPDATE";
+//            // 将司机置为无效状态需释放车辆资源
+//            if (carBizDriverInfo.getStatus().intValue() == 0) {
+//                method = "DELETE";
+//                this.updateDriverByXiao(carBizDriverInfo);
+//            }
+//
+//            //城市或者供应商是否更换
+//            if ((carBizDriverInfo.getOldCity() != null && !carBizDriverInfo.getOldCity().equals(carBizDriverInfo.getServiceCity()))
+//                    || (carBizDriverInfo.getOldSupplier() != null && !carBizDriverInfo.getOldSupplier().equals(carBizDriverInfo.getSupplierId()))) {
+//                logger.info("修改司机driverId=" + carBizDriverInfo.getDriverId() + "的城市或者供应商，需将司机移除车队小组");
+//                // 移除司机车队小组信息
+//                carRelateTeamExMapper.deleteByDriverId(carBizDriverInfo.getDriverId());
+//                carRelateGroupExMapper.deleteByDriverId(carBizDriverInfo.getDriverId());
+//                carBizDriverInfo.setTeamId(null);
+//                carBizDriverInfo.setTeamName("");
+//                carBizDriverInfo.setTeamGroupId(null);
+//                carBizDriverInfo.setTeamGroupName("");
+//            }
+//
+//            carBizDriverInfo.setCreateDate(orginDriverInfo.getCreateDate());
+//            //发送MQ
+//            if (carBizDriverInfo.getStatus() == 0) {
+//                sendDriverToMq(carBizDriverInfo, "DELETE");
+//            } else {
+//                sendDriverToMq(carBizDriverInfo, "UPDATE");
+//            }
+//
+//            try {
+//                // 司机变更部分信息，需要记录
+//                driverUpdate(carBizDriverInfo);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            resultMap.put("result", 0);
+//            resultMap.put("msg", "成功");
+//        } catch (Exception e) {
+//            resultMap.put("result", 1);
+//            resultMap.put("msg", e.getMessage());
+//            e.printStackTrace();
+//        }
+//        return resultMap;
+//    }
 
     /**
      * 保存司机信息
@@ -473,82 +473,82 @@ public class CarBizDriverInfoService {
      * @param carBizDriverInfo
      * @return
      */
-    public Map<String, Object> saveDriver(CarBizDriverInfoDTO carBizDriverInfo) {
-        Map<String, Object> resultMap = Maps.newHashMap();
-
-        try {
-            logger.info(LOGTAG + "操作方式：新建,数据:" + JSON.toJSONString(carBizDriverInfo));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        try {
-            // 查询城市名称，供应商名称，服务类型，加盟类型
-            carBizDriverInfo = this.getBaseStatis(carBizDriverInfo);
-            // 驾驶员合同（或协议）签署公司在协议公司 验证
-            if(carBizDriverInfo.getCooperationType()!=null && carBizDriverInfo.getCooperationType()==5){
-                CarBizAgreementCompany company = carBizAgreementCompanyExMapper.selectByName(carBizDriverInfo.getCorptype());
-                if(company==null){
-                    resultMap.put("result", 1);
-                    resultMap.put("msg", " 驾驶员合同（或协议）签署公司在协议公司中不存在");
-                    return resultMap;
-                }
-            }
-
-            // 获取当前用户Id
-            carBizDriverInfo.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
-            carBizDriverInfo.setCreateDate(new Date());
-            carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
-            carBizDriverInfo.setUpdateDate(new Date());
-            carBizDriverInfo.setStatus(1);
-            //
-            String idCardNo = carBizDriverInfo.getIdCardNo();
-            if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
-                idCardNo = idCardNo.toLowerCase();
-            }
-            carBizDriverInfo.setIdCardNo(idCardNo);
-            carBizDriverInfo.setDriverlicensenumber(idCardNo);//机动车驾驶证号
-            carBizDriverInfo.setPassword(getPassword(carBizDriverInfo.getIdCardNo()));
-
-            // 插入司机信息到mysql，mongo
-            DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
-            int n = this.saveDriverInfo(carBizDriverInfo);
-            driverMongoService.saveDriverMongo(carBizDriverInfo);
-
-            if (n > 0) {
-                // 根据 车牌号更新车辆 信息（更换车辆所属人）
-//                if(carBizCarInfo!=null){
-                carBizCarInfoExMapper.updateCarLicensePlates(carBizDriverInfo.getLicensePlates(), carBizDriverInfo.getDriverId());
+//    public Map<String, Object> saveDriver(CarBizDriverInfoDTO carBizDriverInfo) {
+//        Map<String, Object> resultMap = Maps.newHashMap();
+//
+//        try {
+//            logger.info(LOGTAG + "操作方式：新建,数据:" + JSON.toJSONString(carBizDriverInfo));
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//
+//        try {
+//            // 查询城市名称，供应商名称，服务类型，加盟类型
+//            carBizDriverInfo = this.getBaseStatis(carBizDriverInfo);
+//            // 驾驶员合同（或协议）签署公司在协议公司 验证
+//            if(carBizDriverInfo.getCooperationType()!=null && carBizDriverInfo.getCooperationType()==5){
+//                CarBizAgreementCompany company = carBizAgreementCompanyExMapper.selectByName(carBizDriverInfo.getCorptype());
+//                if(company==null){
+//                    resultMap.put("result", 1);
+//                    resultMap.put("msg", " 驾驶员合同（或协议）签署公司在协议公司中不存在");
+//                    return resultMap;
 //                }
-            }
-            carBizChatUserService.insertChat(carBizDriverInfo.getDriverId());
-
-            // teamId teamGroupId 存在，则新增车队与司机的关联表
-            if(carBizDriverInfo.getTeamId()!=null){//新增车队
-                CarRelateTeam record = new CarRelateTeam();
-                record.setTeamId(carBizDriverInfo.getTeamId());
-                record.setDriverId(carBizDriverInfo.getDriverId());
-                carRelateTeamMapper.insertSelective(record);
-            }
-            if(carBizDriverInfo.getTeamGroupId()!=null){//新增小组
-                CarRelateGroup record = new CarRelateGroup();
-                record.setGroupId(carBizDriverInfo.getTeamGroupId());
-                record.setDriverId(carBizDriverInfo.getDriverId());
-                carRelateGroupMapper.insertSelective(record);
-            }
-
-            //发送MQ
-            sendDriverToMq(carBizDriverInfo, "INSERT");
-
-            resultMap.put("result", 0);
-            resultMap.put("msg", "成功");
-        } catch (Exception e) {
-            resultMap.put("result", 1);
-            resultMap.put("msg", e.getMessage());
-            e.printStackTrace();
-        }
-        return resultMap;
-    }
+//            }
+//
+//            // 获取当前用户Id
+//            carBizDriverInfo.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+//            carBizDriverInfo.setCreateDate(new Date());
+//            carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+//            carBizDriverInfo.setUpdateDate(new Date());
+//            carBizDriverInfo.setStatus(1);
+//            //
+//            String idCardNo = carBizDriverInfo.getIdCardNo();
+//            if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
+//                idCardNo = idCardNo.toLowerCase();
+//            }
+//            carBizDriverInfo.setIdCardNo(idCardNo);
+//            carBizDriverInfo.setDriverlicensenumber(idCardNo);//机动车驾驶证号
+//            carBizDriverInfo.setPassword(getPassword(carBizDriverInfo.getIdCardNo()));
+//
+//            // 插入司机信息到mysql，mongo
+//            DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
+//            int n = this.saveDriverInfo(carBizDriverInfo);
+//            driverMongoService.saveDriverMongo(carBizDriverInfo);
+//
+//            if (n > 0) {
+//                // 根据 车牌号更新车辆 信息（更换车辆所属人）
+////                if(carBizCarInfo!=null){
+//                carBizCarInfoExMapper.updateCarLicensePlates(carBizDriverInfo.getLicensePlates(), carBizDriverInfo.getDriverId());
+////                }
+//            }
+//            carBizChatUserService.insertChat(carBizDriverInfo.getDriverId());
+//
+//            // teamId teamGroupId 存在，则新增车队与司机的关联表
+//            if(carBizDriverInfo.getTeamId()!=null){//新增车队
+//                CarRelateTeam record = new CarRelateTeam();
+//                record.setTeamId(carBizDriverInfo.getTeamId());
+//                record.setDriverId(carBizDriverInfo.getDriverId());
+//                carRelateTeamMapper.insertSelective(record);
+//            }
+//            if(carBizDriverInfo.getTeamGroupId()!=null){//新增小组
+//                CarRelateGroup record = new CarRelateGroup();
+//                record.setGroupId(carBizDriverInfo.getTeamGroupId());
+//                record.setDriverId(carBizDriverInfo.getDriverId());
+//                carRelateGroupMapper.insertSelective(record);
+//            }
+//
+//            //发送MQ
+//            sendDriverToMq(carBizDriverInfo, "INSERT");
+//
+//            resultMap.put("result", 0);
+//            resultMap.put("msg", "成功");
+//        } catch (Exception e) {
+//            resultMap.put("result", 1);
+//            resultMap.put("msg", e.getMessage());
+//            e.printStackTrace();
+//        }
+//        return resultMap;
+//    }
 
     /**
      * 新增司机信息
@@ -556,35 +556,35 @@ public class CarBizDriverInfoService {
      * @param carBizDriverInfoDTO
      * @return
      */
-    public int saveDriverInfo(CarBizDriverInfoDTO carBizDriverInfoDTO) {
-        if (carBizDriverInfoDTO.getExpireDate().equals("")) {
-            carBizDriverInfoDTO.setExpireDate(null);
-        }
-        if (carBizDriverInfoDTO.getIssueDate().equals("")) {
-            carBizDriverInfoDTO.setIssueDate(null);
-        }
-        carBizDriverInfoExMapper.insertCarBizDriverInfoDTO(carBizDriverInfoDTO);
-        int driverId = carBizDriverInfoDTO.getDriverId();
-
-        //司机信息扩展表，司机银行卡号
-        CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
-        carBizDriverInfoDetail.setBankCardBank(carBizDriverInfoDTO.getBankCardBank());
-        carBizDriverInfoDetail.setBankCardNumber(carBizDriverInfoDTO.getBankCardNumber());
-        carBizDriverInfoDetail.setDriverId(carBizDriverInfoDTO.getDriverId());
-        carBizDriverInfoDetail.setExt1(2);//司机停运状态  1停运 2正常  司机新建是默认为2
-        carBizDriverInfoDetailService.insertSelective(carBizDriverInfoDetail);
-
-        // 新增司机帐号
-        CarBizDriverAccount accountPojo = new CarBizDriverAccount();
-        accountPojo.setAccountAmount(new BigDecimal(0.0));
-        accountPojo.setCreditBalance(new BigDecimal(0.0));
-        accountPojo.setDriverId(driverId);
-        accountPojo.setFrozenAmount(new BigDecimal(0.0));
-        accountPojo.setSettleAccount(new BigDecimal(0.0));
-        accountPojo.setWithdrawDeposit(new BigDecimal(0.0));
-        carBizDriverAccountMapper.insertSelective(accountPojo);
-        return driverId;
-    }
+//    public int saveDriverInfo(CarBizDriverInfoDTO carBizDriverInfoDTO) {
+//        if (carBizDriverInfoDTO.getExpireDate().equals("")) {
+//            carBizDriverInfoDTO.setExpireDate(null);
+//        }
+//        if (carBizDriverInfoDTO.getIssueDate().equals("")) {
+//            carBizDriverInfoDTO.setIssueDate(null);
+//        }
+//        carBizDriverInfoExMapper.insertCarBizDriverInfoDTO(carBizDriverInfoDTO);
+//        int driverId = carBizDriverInfoDTO.getDriverId();
+//
+//        //司机信息扩展表，司机银行卡号
+//        CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
+//        carBizDriverInfoDetail.setBankCardBank(carBizDriverInfoDTO.getBankCardBank());
+//        carBizDriverInfoDetail.setBankCardNumber(carBizDriverInfoDTO.getBankCardNumber());
+//        carBizDriverInfoDetail.setDriverId(carBizDriverInfoDTO.getDriverId());
+//        carBizDriverInfoDetail.setExt1(2);//司机停运状态  1停运 2正常  司机新建是默认为2
+//        carBizDriverInfoDetailService.insertSelective(carBizDriverInfoDetail);
+//
+//        // 新增司机帐号
+//        CarBizDriverAccount accountPojo = new CarBizDriverAccount();
+//        accountPojo.setAccountAmount(new BigDecimal(0.0));
+//        accountPojo.setCreditBalance(new BigDecimal(0.0));
+//        accountPojo.setDriverId(driverId);
+//        accountPojo.setFrozenAmount(new BigDecimal(0.0));
+//        accountPojo.setSettleAccount(new BigDecimal(0.0));
+//        accountPojo.setWithdrawDeposit(new BigDecimal(0.0));
+//        carBizDriverAccountMapper.insertSelective(accountPojo);
+//        return driverId;
+//    }
 
     /**
      * 修改司机信息，操作司机信息扩展表
@@ -592,37 +592,37 @@ public class CarBizDriverInfoService {
      * @param carBizDriverInfoDTO
      * @return
      */
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER)
-    })
-    public int updateDriverInfo(CarBizDriverInfoDTO carBizDriverInfoDTO) {
-        if (carBizDriverInfoDTO.getExpireDate() != null) {
-            if (carBizDriverInfoDTO.getExpireDate().equals("")) {
-                carBizDriverInfoDTO.setExpireDate(null);
-            }
-        }
-        if (carBizDriverInfoDTO.getIssueDate() != null) {
-            if (carBizDriverInfoDTO.getIssueDate().equals("")) {
-                carBizDriverInfoDTO.setIssueDate(null);
-            }
-        }
-        carBizDriverInfoExMapper.updateCarBizDriverInfoDTO(carBizDriverInfoDTO);
-        int id = carBizDriverInfoDTO.getDriverId();
-
-        //司机信息扩展表，司机银行卡号
-        CarBizDriverInfoDetailDTO infoDetail = carBizDriverInfoDetailService.selectByDriverId(carBizDriverInfoDTO.getDriverId());
-        CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
-        carBizDriverInfoDetail.setBankCardBank(carBizDriverInfoDTO.getBankCardBank());
-        carBizDriverInfoDetail.setBankCardNumber(carBizDriverInfoDTO.getBankCardNumber());
-        carBizDriverInfoDetail.setDriverId(carBizDriverInfoDTO.getDriverId());
-        if (infoDetail != null) {
-            carBizDriverInfoDetailService.updateByPrimaryKeySelective(carBizDriverInfoDetail);
-        } else {
-            carBizDriverInfoDetail.setExt1(2);//司机停运状态  1停运 2正常  司机新建是默认为2
-            carBizDriverInfoDetailService.insertSelective(carBizDriverInfoDetail);
-        }
-        return id;
-    }
+//    @MasterSlaveConfigs(configs = {
+//            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER)
+//    })
+//    public int updateDriverInfo(CarBizDriverInfoDTO carBizDriverInfoDTO) {
+//        if (carBizDriverInfoDTO.getExpireDate() != null) {
+//            if (carBizDriverInfoDTO.getExpireDate().equals("")) {
+//                carBizDriverInfoDTO.setExpireDate(null);
+//            }
+//        }
+//        if (carBizDriverInfoDTO.getIssueDate() != null) {
+//            if (carBizDriverInfoDTO.getIssueDate().equals("")) {
+//                carBizDriverInfoDTO.setIssueDate(null);
+//            }
+//        }
+//        carBizDriverInfoExMapper.updateCarBizDriverInfoDTO(carBizDriverInfoDTO);
+//        int id = carBizDriverInfoDTO.getDriverId();
+//
+//        //司机信息扩展表，司机银行卡号
+//        CarBizDriverInfoDetailDTO infoDetail = carBizDriverInfoDetailService.selectByDriverId(carBizDriverInfoDTO.getDriverId());
+//        CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
+//        carBizDriverInfoDetail.setBankCardBank(carBizDriverInfoDTO.getBankCardBank());
+//        carBizDriverInfoDetail.setBankCardNumber(carBizDriverInfoDTO.getBankCardNumber());
+//        carBizDriverInfoDetail.setDriverId(carBizDriverInfoDTO.getDriverId());
+//        if (infoDetail != null) {
+//            carBizDriverInfoDetailService.updateByPrimaryKeySelective(carBizDriverInfoDetail);
+//        } else {
+//            carBizDriverInfoDetail.setExt1(2);//司机停运状态  1停运 2正常  司机新建是默认为2
+//            carBizDriverInfoDetailService.insertSelective(carBizDriverInfoDetail);
+//        }
+//        return id;
+//    }
 
     /**
      * 更新司机状态，如果将司机置为无效则释放车辆资源
@@ -630,34 +630,34 @@ public class CarBizDriverInfoService {
      * @param carBizDriverInfoDTO
      * @return
      */
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER)
-    })
-    public int updateDriverByXiao(CarBizDriverInfoDTO carBizDriverInfoDTO) {
-        int rtn = 0;
-        try {
-            rtn = carBizDriverInfoExMapper.updateDriverByXiao(carBizDriverInfoDTO.getDriverId());
-            if (rtn > 0) {
-                // 将司机置为无效
-                if (carBizDriverInfoDTO.getStatus().intValue() == 0) {
-                    //根据车牌号更新车辆信息
-                    carBizCarInfoExMapper.updateCarLicensePlates(carBizDriverInfoDTO.getLicensePlates(), 0);
-                }
-                //更新司机mongo
-                driverMongoService.updateByDriverId(carBizDriverInfoDTO.getDriverId(), carBizDriverInfoDTO.getStatus());
-
-                try {
-                    carBizDriverUpdateService.insert(carBizDriverInfoDTO.getLicensePlates(), "", carBizDriverInfoDTO.getDriverId(), 1);
-                    carBizDriverUpdateService.insert(carBizDriverInfoDTO.getPhone(), "", carBizDriverInfoDTO.getDriverId(), 2);
-                } catch (Exception e) {
-                    logger.info("updateDriverByXiao error:" + e);
-                }
-            }
-        } catch (Exception e) {
-            logger.info("updateDriverByXiao error:" + e);
-        }
-        return rtn;
-    }
+//    @MasterSlaveConfigs(configs = {
+//            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER)
+//    })
+//    public int updateDriverByXiao(CarBizDriverInfoDTO carBizDriverInfoDTO) {
+//        int rtn = 0;
+//        try {
+//            rtn = carBizDriverInfoExMapper.updateDriverByXiao(carBizDriverInfoDTO.getDriverId());
+//            if (rtn > 0) {
+//                // 将司机置为无效
+//                if (carBizDriverInfoDTO.getStatus().intValue() == 0) {
+//                    //根据车牌号更新车辆信息
+//                    carBizCarInfoExMapper.updateCarLicensePlates(carBizDriverInfoDTO.getLicensePlates(), 0);
+//                }
+//                //更新司机mongo
+//                driverMongoService.updateByDriverId(carBizDriverInfoDTO.getDriverId(), carBizDriverInfoDTO.getStatus());
+//
+//                try {
+//                    carBizDriverUpdateService.insert(carBizDriverInfoDTO.getLicensePlates(), "", carBizDriverInfoDTO.getDriverId(), 1);
+//                    carBizDriverUpdateService.insert(carBizDriverInfoDTO.getPhone(), "", carBizDriverInfoDTO.getDriverId(), 2);
+//                } catch (Exception e) {
+//                    logger.info("updateDriverByXiao error:" + e);
+//                }
+//            }
+//        } catch (Exception e) {
+//            logger.info("updateDriverByXiao error:" + e);
+//        }
+//        return rtn;
+//    }
 
     /**
      * 发送MQ
@@ -944,1702 +944,1702 @@ public class CarBizDriverInfoService {
         return carBizDriverInfo;
     }
 
-    public Map<String, Object> batchInputDriverInfo(Integer cityId, Integer supplierId, Integer teamId,
-                                                    Integer teamGroupId, MultipartFile file,
-                                                    HttpServletRequest request,
-                                                    HttpServletResponse response) {
-
-        Map<String, Object> resultMap = Maps.newHashMap();
-
-        String resultError1 = "-1";//模板错误
-        String resultErrorMag1 = "导入模板格式错误!";
-        List<CarImportExceptionEntity> listException = Lists.newArrayList(); // 数据错误原因
-        int count = 0;
-
-        String fileName = file.getOriginalFilename();
-        String suffixName = fileName.substring(fileName.lastIndexOf("."));
-        logger.info("上传的文件名为:{},上传的后缀名为:{}", fileName, suffixName);
-        InputStream is = null;
-        try {
-            is = file.getInputStream();
-
-            Workbook workbook = null;
-            String fileType = fileName.split("\\.")[1];
-            if (fileType.equals("xls")) {
-                workbook = new HSSFWorkbook(is);
-            } else if (fileType.equals("xlsx")) {
-                workbook = new XSSFWorkbook(is);
-            }
-            Sheet sheet = workbook.getSheetAt(0);
-            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-            // 检查模板是否正确
-            Row row1 = sheet.getRow(0);
-            if (row1 == null) {
-                resultMap.put("result", resultError1);
-                resultMap.put("msg", resultErrorMag1);
-                return resultMap;
-            }
-            for (int colIx = 0; colIx < 50; colIx++) {
-                Cell cell = row1.getCell(colIx); // 获取列对象
-                CellValue cellValue = evaluator.evaluate(cell); // 获取列属性
-                if (cell == null || cellValue == null) {
-                    resultMap.put("result", resultError1);
-                    resultMap.put("msg", resultErrorMag1);
-                    return resultMap;
-                } else {
-                    switch ((colIx + 1)) {
-                        case 1:
-                            if (!cellValue.getStringValue().contains("车牌号")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 2:
-                            if (!cellValue.getStringValue().contains("机动车驾驶员姓名")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 3:
-                            if (!cellValue.getStringValue().contains("驾驶员身份证号")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 4:
-                            if (!cellValue.getStringValue().contains("驾驶员手机号")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 5:
-                            if (!cellValue.getStringValue().contains("司机手机型号")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 6:
-                            if (!cellValue.getStringValue().contains("司机手机运营商")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-
-                        case 7:
-                            if (!cellValue.getStringValue().contains("驾驶员性别")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 8:
-                            if (!cellValue.getStringValue().contains("出生日期")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 9:
-                            if (!cellValue.getStringValue().contains("年龄")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 10:
-                            if (!cellValue.getStringValue().contains("服务监督号码")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 11:
-                            if (!cellValue.getStringValue().contains("服务监督链接")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 12:
-                            if (!cellValue.getStringValue().contains("车型类别")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 13:
-                            if (!cellValue.getStringValue().contains("驾照类型")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 14:
-                            if (!cellValue.getStringValue().contains("驾照领证日期")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 15:
-                            if (!cellValue.getStringValue().contains("驾龄")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 16:
-                            if (!cellValue.getStringValue().contains("驾照到期时间")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 17:
-                            if (!cellValue.getStringValue().contains("档案编号")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 18:
-                            if (!cellValue.getStringValue().contains("国籍")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 19:
-                            if (!cellValue.getStringValue().contains("驾驶员民族")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 20:
-                            if (!cellValue.getStringValue().contains("驾驶员婚姻状况")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 21:
-                            if (!cellValue.getStringValue().contains("驾驶员外语能力")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 22:
-                            if (!cellValue.getStringValue().contains("驾驶员学历")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 23:
-                            if (!cellValue.getStringValue().contains("户口登记机关名称")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 24:
-                            if (!cellValue.getStringValue().contains("户口住址或长住地址")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 25:
-                            if (!cellValue.getStringValue().contains("驾驶员通信地址")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 26:
-                            if (!cellValue.getStringValue().contains("驾驶员照片文件编号")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 27:
-                            if (!cellValue.getStringValue().contains("机动车驾驶证号")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 28:
-                            if (!cellValue.getStringValue().contains("机动车驾驶证扫描件文件编号")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 29:
-                            if (!cellValue.getStringValue().contains("初次领取驾驶证日期")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 30:
-                            if (!cellValue.getStringValue().contains("是否巡游出租汽车驾驶员")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 31:
-                            if (!cellValue.getStringValue().contains("网络预约出租汽车驾驶员资格证号")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 32:
-                            if (!cellValue.getStringValue().contains("网络预约出租汽车驾驶员证初领日期")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 33:
-                            if (!cellValue.getStringValue().contains("巡游出租汽车驾驶员资格证号")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 34:
-                            if (!cellValue.getStringValue().contains("网络预约出租汽车驾驶员证发证机构")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 35:
-                            if (!cellValue.getStringValue().contains("资格证发证日期")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 36:
-                            if (!cellValue.getStringValue().contains("初次领取资格证日期")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 37:
-                            if (!cellValue.getStringValue().contains("资格证有效起始日期")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 38:
-                            if (!cellValue.getStringValue().contains("资格证有效截止日期")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 39:
-                            if (!cellValue.getStringValue().contains("注册日期")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 40:
-                            if (!cellValue.getStringValue().contains("是否专职驾驶员")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 41:
-                            if (!cellValue.getStringValue().contains("是否在驾驶员黑名单内")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 42:
-                            if (!cellValue.getStringValue().contains("驾驶员合同（或协议）签署公司")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 43:
-                            if (!cellValue.getStringValue().contains("有效合同时间")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 44:
-                            if (!cellValue.getStringValue().contains("合同（或协议）有效期起")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 45:
-                            if (!cellValue.getStringValue().contains("合同（或协议）有效期止")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 46:
-                            if (!cellValue.getStringValue().contains("紧急情况联系人")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 47:
-                            if (!cellValue.getStringValue().contains("紧急情况联系人电话")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 48:
-                            if (!cellValue.getStringValue().contains("紧急情况联系人通讯地址")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 49:
-                            if (!cellValue.getStringValue().contains("银行卡卡号")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                        case 50:
-                            if (!cellValue.getStringValue().contains("银行卡开户行")) {
-                                resultMap.put("result", resultError1);
-                                resultMap.put("msg", resultErrorMag1);
-                                return resultMap;
-                            }
-                            break;
-                    }
-                }
-            }
-
-            int minRowIx = 1;// 过滤掉标题，从第一行开始导入数据
-            int maxRowIx = sheet.getLastRowNum(); // 要导入数据的总条数
-
-            for (int rowIx = minRowIx; rowIx <= maxRowIx; rowIx++) {
-                count ++;
-                Row row = sheet.getRow(rowIx); // 获取行对象
-                if (row == null) {
-                    continue;
-                }
-                CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
-
-                // 根据供应商ID查询供应商名称以及加盟类型
-                CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(supplierId);
-                if (carBizSupplier != null) {
-                    carBizDriverInfoDTO.setSupplierName(carBizSupplier.getSupplierFullName());
-                    carBizDriverInfoDTO.setCooperationType(carBizSupplier.getCooperationType());
-                }
-
-                boolean isTrue = true;// 标识是否为有效数据
-                String bankCardNumber = "";
-                StringBuffer rePhone = new StringBuffer();//手机号
-                StringBuffer reLicensePlates = new StringBuffer(); //车牌号
-                StringBuffer reIdCarNo = new StringBuffer(); //身份证号
-
-                // 司机导入模板总共50列
-                for (int colIx = 0; colIx < 50; colIx++) {
-                    Cell cell = row.getCell(colIx); // 获取列对象
-                    CellValue cellValue = evaluator.evaluate(cell); // 获取列属性
-                    switch ((colIx + 1)) {
-                        // 车牌号
-                        case 1:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【车牌号】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                // 去除车牌号空格，并且全部大写
-                                String licensePlates = Common.replaceBlank(cellValue.getStringValue());
-                                if (reLicensePlates.indexOf(licensePlates) > 0) {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                            + (colIx + 1) + "列 【车牌号】:" + licensePlates + "有重复车牌号");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                    colIx = 100;// 结束本行数据
-                                } else {
-                                    reLicensePlates.append(licensePlates);
-                                    Integer carCount = carBizCarInfoExMapper.checkLicensePlates(licensePlates);
-                                    if (carCount == null || carCount == 0) {
-                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                                + (colIx + 1) + "列 无效的【车牌号】");
-                                        listException.add(returnVO);
-                                        isTrue = false;
-                                    } else {
-                                        Integer driverCount = carBizDriverInfoExMapper.checkLicensePlates(licensePlates);
-                                        if (driverCount == null || driverCount > 0) {
-                                            CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                            returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                                    + (colIx + 1) + "列 【车牌号】:" + licensePlates + "已被绑定");
-                                            listException.add(returnVO);
-                                            isTrue = false;
-                                        }
-                                    }
-                                    Integer cityCount = carBizCarInfoExMapper.validateCityAndSupplier(cityId, supplierId, licensePlates);
-                                    if (cityCount == null || cityCount == 0) {
-                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                                + (colIx + 1) + "列 【车牌号】:" + licensePlates + "不在所选的城市或厂商");
-                                        listException.add(returnVO);
-                                        isTrue = false;
-                                    } else {
-                                        carBizDriverInfoDTO.setLicensePlates(licensePlates);
-                                    }
-                                }
-                            }
-                            break;
-                        // 机动车驾驶员姓名
-                        case 2:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【机动车驾驶员姓名】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String name = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setName(name);
-                            }
-                            break;
-                        // 驾驶员身份证号
-                        case 3:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【驾驶员身份证号】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String idCardNo = Common.replaceBlankNoUpper(cellValue.getStringValue());
-                                if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
-                                    idCardNo = idCardNo.toLowerCase();
-                                }
-                                if (reIdCarNo.indexOf(idCardNo) > 0) {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                            + (colIx + 1) + "列 【驾驶员身份证号】:" + idCardNo + "有重复身份证号");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                    colIx = 100;// 结束本行数据
-                                } else {
-                                    reIdCarNo.append(idCardNo);
-                                    if (StringUtils.isEmpty(idCardNo) || !ValidateUtils.validateIdCarNo(idCardNo)) {
-                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                                + "列 【驾驶员身份证号】不合法");
-                                        listException.add(returnVO);
-                                        isTrue = false;
-                                    } else if (this.checkIdCardNo(idCardNo, null)) {
-                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                                + (colIx + 1) + "列 已存在【驾驶员身份证号为："
-                                                + idCardNo
-                                                + "】的信息");
-                                        listException.add(returnVO);
-                                        isTrue = false;
-                                    } else {
-                                        carBizDriverInfoDTO.setIdCardNo(idCardNo);
-                                    }
-                                }
-                            }
-                            break;
-                        // 驾驶员手机
-                        case 4:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【驾驶员手机】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String phone = Common.replaceBlank(cellValue.getStringValue());
-                                if (rePhone.indexOf(phone) > 0) {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                            + (colIx + 1) + "列 【驾驶员手机】:" + phone + "有重复手机号");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                    colIx = 100;// 结束本行数据
-                                } else {
-                                    rePhone.append(phone);
-                                    if (StringUtils.isEmpty(phone) || !ValidateUtils.validatePhone(phone)) {
-                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                                + "列 【驾驶员手机】不合法");
-                                        listException.add(returnVO);
-                                        isTrue = false;
-                                    } else if (this.checkPhone(phone, null)) {
-                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                                + (colIx + 1) + "列 已存在【手机号为："
-                                                + phone
-                                                + "】的信息");
-                                        listException.add(returnVO);
-                                        colIx = 100;// 结束本行数据
-                                        isTrue = false;
-                                    } else {
-                                        carBizDriverInfoDTO.setPhone(phone);
-                                    }
-                                }
-                            }
-                            break;
-                        // 司机手机型号
-                        case 5:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【司机手机型号】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String phoneType = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setPhonetype(phoneType);
-                            }
-                            break;
-                        // 司机手机运营商
-                        case 6:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【司机手机运营商】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String phoneCorp = Common.replaceBlank(cellValue.getStringValue());
-                                if ("中国移动".equals(phoneCorp) ||
-                                        "中国联通".equals(phoneCorp) ||
-                                        "中国电信".equals(phoneCorp) ||
-                                        "其他".equals(phoneCorp)) {
-                                    carBizDriverInfoDTO.setPhonecorp(phoneCorp);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1)
-                                            + "行数据，第" + (colIx + 1)
-                                            + "列 请输入正确的【司机手机运营商】；中国移动、中国联通 或者 中国电信、其他");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        // 性别
-                        case 7:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【性别】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String gender = Common.replaceBlank(cellValue.getStringValue());
-                                if ("男".equals(gender)) {
-                                    carBizDriverInfoDTO.setGender(1);
-                                } else if ("女".equals(gender)) {
-                                    carBizDriverInfoDTO.setGender(0);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1)
-                                            + "行数据，第" + (colIx + 1)
-                                            + "列 请输入正确的【性别】；男 或者 女");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        // 出生日期
-                        case 8:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【出生日期】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                    carBizDriverInfoDTO.setBirthDay(d);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【出生日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        // 年龄
-                        case 9:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【年龄】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String age = Common.replaceBlank(cellValue.getStringValue());
-                                if (ValidateUtils.isRegular(age, ValidateUtils.NUMBER_PATTERN)) {
-                                    carBizDriverInfoDTO.setAge(Integer.valueOf(age));
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                            + (colIx + 1) + "列 【年龄】只能有数字");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        // 服务监督号码
-                        case 10:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【服务监督号码】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String superintendNo = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setSuperintendNo(superintendNo);
-                            }
-                            break;
-                        // 服务监督链接
-                        case 11:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【服务监督链接】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String superintendUrl = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setSuperintendUrl(superintendUrl);
-                            }
-                            break;
-                        // 车型类别
-                        case 12:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【车型类别】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String groupName = Common.replaceBlank(cellValue.getStringValue());
-                                CarBizCarGroup carBizCarGroup = carBizCarGroupService.queryGroupByGroupName(groupName);
-                                if (carBizCarGroup == null) {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                            + "列 【车型类别】没有" + groupName);
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                } else {
-                                    carBizDriverInfoDTO.setGroupId(carBizCarGroup.getGroupId());
-                                }
-                            }
-                            break;
-                        // 驾照类型
-                        case 13:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【驾照类型】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String driverType = "A1、A2、A3、B1、B2、C1、C2、N、P";
-                                String drivingLicenseType = Common.replaceBlank(cellValue.getStringValue());
-                                String yuandrivingTypeString = "C1";
-                                if (driverType.indexOf(drivingLicenseType) > 0) {
-                                    yuandrivingTypeString = drivingLicenseType;
-                                }
-                                carBizDriverInfoDTO.setDrivingLicenseType(yuandrivingTypeString);
-                            }
-                            break;
-                        // 驾照领证日期
-                        case 14:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【驾照领证时间】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    Date issueDate = DATE_FORMAT.parse(d);
-                                    carBizDriverInfoDTO.setIssueDate(issueDate);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【驾照领证时间】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        // 驾龄
-                        case 15:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【驾龄】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String drivingYears = Common.replaceBlank(cellValue.getStringValue());
-                                if (ValidateUtils.isRegular(drivingYears, ValidateUtils.NUMBER_PATTERN)){
-                                    carBizDriverInfoDTO.setDrivingYears(Integer.valueOf(drivingYears));
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                            + (colIx + 1) + "列 【驾龄】只能有数字");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        // 驾照到期时间
-                        case 16:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【驾照到期时间】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    String datetime = DATE_FORMAT.format(new Date());
-                                    if (DATE_FORMAT.parse(d).getTime() < DATE_FORMAT.parse(datetime).getTime()) {
-                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                                + (colIx + 1) + "列 【驾照到期时间】应该大于当前时间");
-                                        listException.add(returnVO);
-                                        isTrue = false;
-                                    } else {
-                                        Date expireDate = DATE_FORMAT.parse(d);
-                                        carBizDriverInfoDTO.setExpireDate(expireDate);
-                                    }
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【驾照到期时间】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        // 档案编号
-                        case 17:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【档案编号】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String archivesNo = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setArchivesNo(archivesNo);
-                            }
-                            break;
-                        // 国籍
-                        case 18:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【国籍】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String nationAlity = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setNationality(nationAlity);
-                            }
-                            break;
-                        // 驾驶员民族
-                        case 19:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【驾驶员民族】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String nation = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setNation(nation);
-                            }
-                            break;
-                        // 驾驶员婚姻状况
-                        case 20:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【驾驶员婚姻状况】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String marriage = Common.replaceBlank(cellValue.getStringValue());
-                                if ("已婚".equals(marriage) || "未婚".equals(marriage) || "离异".equals(marriage)) {
-                                    carBizDriverInfoDTO.setMarriage(marriage);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                            + "列 【驾驶员婚姻状况】，请输入已婚、未婚、离异");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        // 驾驶员外语能力
-                        case 21:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【驾驶员外语能力】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String foreignLanguage = Common.replaceBlank(cellValue.getStringValue());
-                                if ("英语".equals(foreignLanguage)) {
-                                    carBizDriverInfoDTO.setForeignlanguage("1");
-                                } else if ("德语".equals(foreignLanguage)) {
-                                    carBizDriverInfoDTO.setForeignlanguage("2");
-                                } else if ("法语".equals(foreignLanguage)) {
-                                    carBizDriverInfoDTO.setForeignlanguage("3");
-                                } else if ("其他".equals(foreignLanguage)) {
-                                    carBizDriverInfoDTO.setForeignlanguage("4");
-                                } else if ("无".equals(foreignLanguage)) {
-                                    carBizDriverInfoDTO.setForeignlanguage("0");
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                            + "列 【驾驶员外语能力】，请填写英语、德语、法语、其他或者无");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        // 驾驶员学历
-                        case 22:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【驾驶员学历】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String education = Common.replaceBlank(cellValue.getStringValue());
-                                if ("研究生".equals(education) || "本科".equals(education) || "大专".equals(education) ||
-                                        "中专".equals(education) || "高中".equals(education) || "初中".equals(education) ||
-                                        "小学".equals(education) || "其他".equals(education)) {
-                                    carBizDriverInfoDTO.setEducation(education);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                            + "列 【驾驶员学历】，请填写研究生、本科、大专、中专、高中、 初中、 中学、其他");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        // 户口登记机关名称
-                        case 23:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【户口登记机关名称】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String houseHoldRegisterPermanent = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setHouseHoldRegisterPermanent(houseHoldRegisterPermanent);
-                            }
-                            break;
-                        // 户口住址或长住地址
-                        case 24:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【户口住址或长住地址】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String houseHoldRegister = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setHouseholdregister(houseHoldRegister);
-                            }
-                            break;
-                        // 驾驶员通信地址
-                        case 25:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【驾驶员通信地址】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String currentAddress = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setCurrentAddress(currentAddress);
-                            }
-                            break;
-                        // 驾驶员照片文件编号
-                        case 26:
-                            if (cellValue != null && !StringUtils.isEmpty(cellValue.getStringValue())) {
-                                String photosrct = Common.replaceBlank(cellValue.getStringValue());
-                                if (photosrct.contains("http://pupload.01zhuanche.com/")) {
-                                    carBizDriverInfoDTO.setPhotosrct(photosrct);
-                                }
-                            }
-                            break;
-                        // 机动车驾驶证号
-                        case 27:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【机动车驾驶证号】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String driverLicenseNumber = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setDriverlicensenumber(driverLicenseNumber);
-                            }
-                            break;
-                        // 机动车驾驶证扫描件文件编号
-                        case 28:
-                            if (cellValue != null && !StringUtils.isEmpty(cellValue.getStringValue())) {
-                                String drivingLicenseImg = Common.replaceBlank(cellValue.getStringValue());
-                                if (drivingLicenseImg.contains("http://pupload.01zhuanche.com/")) {
-                                    carBizDriverInfoDTO.setDrivinglicenseimg(drivingLicenseImg);
-                                }
-                            }
-                            break;
-                        //初次领取驾驶证日期
-                        case 29:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【初次领取驾驶证日期】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    String datetime = DATE_FORMAT.format(new Date());
-                                    if (DATE_FORMAT.parse(d).getTime() > DATE_FORMAT.parse(datetime).getTime()) {
-                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                                + (colIx + 1) + "列 【初次领取驾驶证日期】应该小于当前时间");
-                                        listException.add(returnVO);
-                                        isTrue = false;
-                                    } else {
-                                        d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                        carBizDriverInfoDTO.setFirstdrivinglicensedate(d);
-                                    }
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【初次领取驾驶证日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        //是否巡游出租汽车驾驶员
-                        case 30:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【是否巡游出租汽车驾驶员】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String isXyDriver = Common.replaceBlank(cellValue.getStringValue());
-                                if ("是".equals(isXyDriver)) {
-                                    carBizDriverInfoDTO.setIsxydriver(1);
-                                } else if ("否".equals(isXyDriver)) {
-                                    carBizDriverInfoDTO.setIsxydriver(0);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1)
-                                            + "行数据，第" + (colIx + 1)
-                                            + "列 请输入正确的【是否巡游出租汽车驾驶员】；是 或者 否");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        //网络预约出租汽车驾驶员资格证号
-                        case 31:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【网络预约出租汽车驾驶员资格证号】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String driverLicenseIssuingNumber = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setDriverlicenseissuingnumber(driverLicenseIssuingNumber);
-                            }
-                            break;
-                        //网络预约出租汽车驾驶员证初领日期
-                        case 32:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【网络预约出租汽车驾驶员证初领日期】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    String datetime = DATE_FORMAT.format(new Date());
-                                    if (DATE_FORMAT.parse(d).getTime() > DATE_FORMAT.parse(datetime).getTime()) {
-                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                                + (colIx + 1) + "列 【网络预约出租汽车驾驶员证初领日期】应该小于当前时间");
-                                        listException.add(returnVO);
-                                        isTrue = false;
-                                    } else {
-                                        d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                        carBizDriverInfoDTO.setFirstmeshworkdrivinglicensedate(d);
-                                    }
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【网络预约出租汽车驾驶员证初领日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        //巡游出租汽车驾驶员资格证号
-                        case 33:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【巡游出租汽车驾驶员资格证号】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String xyDriverNumber = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setXyDriverNumber(xyDriverNumber);
-                            }
-                            break;
-                        //网络预约出租汽车驾驶员证发证机构
-                        case 34:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【网络预约出租汽车驾驶员证发证机构】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String driverLicenseIssuingCorp = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setDriverlicenseissuingcorp(driverLicenseIssuingCorp);
-                            }
-                            break;
-                        //资格证发证日期
-                        case 35:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【资格证发证日期】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                    carBizDriverInfoDTO.setDriverLicenseIssuingGrantDate(d);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【资格证发证日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        //初次领取资格证日期
-                        case 36:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【初次领取资格证日期】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                    carBizDriverInfoDTO.setDriverLicenseIssuingFirstDate(d);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【初次领取资格证日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        //资格证有效起始日期
-                        case 37:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【资格证有效起始日期】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                    carBizDriverInfoDTO.setDriverlicenseissuingdatestart(d);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【资格证有效起始日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        //资格证有效截止日期
-                        case 38:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【资格证有效截止日期】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                    carBizDriverInfoDTO.setDriverlicenseissuingdateend(d);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【资格证有效截止日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        //注册日期
-                        case 39:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【注册日期】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    String datetime = DATE_FORMAT.format(new Date());
-                                    if (DATE_FORMAT.parse(d).getTime() > DATE_FORMAT.parse(datetime).getTime()) {
-                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                                + (colIx + 1) + "列 【注册日期】应该小于当前时间");
-                                        listException.add(returnVO);
-                                        isTrue = false;
-                                    } else {
-                                        d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                        carBizDriverInfoDTO.setDriverLicenseIssuingRegisterDate(d);
-                                    }
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【注册日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        //是否专职驾驶员
-                        case 40:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【是否专职驾驶员】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String partTimeJobDri = Common.replaceBlank(cellValue.getStringValue());
-                                if ("是".equals(partTimeJobDri) ||
-                                        "否".equals(partTimeJobDri)) {
-                                    carBizDriverInfoDTO.setParttimejobdri(partTimeJobDri);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1)
-                                            + "行数据，第" + (colIx + 1)
-                                            + "列 请输入正确的【是否专职驾驶员】；是 或者 否");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        //是否在驾驶员黑名单内
-                        case 41:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【是否在驾驶员黑名单内】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String isDriverBlack = Common.replaceBlank(cellValue.getStringValue());
-                                if ("是".equals(isDriverBlack) || "否".equals(isDriverBlack)) {
-//                                    carBizDriverInfoDTO.setIsDriverBlack(isDriverBlack);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1)
-                                            + "行数据，第" + (colIx + 1)
-                                            + "列 请输入正确的【是否在驾驶员黑名单内】；是 或者 否");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        //驾驶员合同（或协议）签署公司
-                        case 42:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【驾驶员合同（或协议）签署公司】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String corpType = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setCorptype(corpType);
-                            }
-                            break;
-                        //有效合同时间
-                        case 43:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【有效合同时间】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    String datetime = DATE_FORMAT.format(new Date());
-                                    if (DATE_FORMAT.parse(d).getTime() < DATE_FORMAT.parse(datetime).getTime()) {
-                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                                + (colIx + 1) + "列 【有效合同时间】应该大于当前时间");
-                                        listException.add(returnVO);
-                                        isTrue = false;
-                                    } else {
-                                        d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                        carBizDriverInfoDTO.setContractdate(d);
-                                    }
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【有效合同时间】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        //合同（或协议）有效期起
-                        case 44:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【合同（或协议）有效期起】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    String datetime = DATE_FORMAT.format(new Date());
-                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                    carBizDriverInfoDTO.setSigndate(d);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【合同（或协议）有效期起】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        //合同（或协议）有效期止
-                        case 45:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【合同（或协议）有效期止】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String d = cellValue.getStringValue()
-                                        .replace("年", "-")
-                                        .replace("月", "-")
-                                        .replace("日", "-")
-                                        .replace(".", "-").trim();
-                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
-                                    if (d.substring(d.length() - 1).equals("-")) {
-                                        d = d.substring(0, d.length() - 1);
-                                    }
-                                }
-                                if (ValidateUtils.isValidDate(d)) {
-                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                    carBizDriverInfoDTO.setSigndateend(d);
-                                } else {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第"
-                                            + (rowIx + 1)
-                                            + "行数据，第"
-                                            + (colIx + 1)
-                                            + "列 【合同（或协议）有效期止】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                        // 紧急联系人
-                        case 46:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【紧急联系人】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String emergencyContactPerson = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setEmergencyContactPerson(emergencyContactPerson);
-                            }
-                            break;
-                        // 紧急联系方式
-                        case 47:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【紧急联系方式】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String emergencyContactNumber = Common.replaceBlank(cellValue.getStringValue()).trim();
-                                if (emergencyContactNumber.length() > 11) {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                            + "列 【紧急联系方式】最多11位");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                } else {
-                                    carBizDriverInfoDTO.setEmergencyContactNumber(emergencyContactNumber);
-                                }
-                            }
-                            break;
-                        // 紧急情况联系人通讯地址
-                        case 48:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                        + "列 【紧急情况联系人通讯地址】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String emergencyContactAddr = Common.replaceBlank(cellValue.getStringValue());
-                                carBizDriverInfoDTO.setEmergencycontactaddr(emergencyContactAddr);
-                            }
-                            break;
-                        // 银行卡卡号
-                        case 49:
-                            if (cellValue != null && !StringUtils.isEmpty(cellValue.getStringValue())) {
-                                bankCardNumber = Common.replaceBlank(cellValue.getStringValue());
-                                if (StringUtils.isNotEmpty(bankCardNumber) && !ValidateUtils.isRegular(bankCardNumber, ValidateUtils.BANK_CARD_NUMBER)) {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
-                                            + "列 【银行卡卡号】为16~19位数字组合");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                } else if (carBizDriverInfoDetailService.checkBankCardBank(bankCardNumber, null)) {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                            + (colIx + 1) + "列 【银行卡卡号】:" + cellValue.getStringValue() + "已被绑定");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                } else {
-                                    carBizDriverInfoDTO.setBankCardNumber(bankCardNumber);
-                                }
-                            }
-                            break;
-                        // 银行卡开户行
-                        case 50:
-                            if (cellValue != null && !StringUtils.isEmpty(cellValue.getStringValue())) {
-                                String bankCardBank = Common.replaceBlank(cellValue.getStringValue());
-                                if (bankCardBank.length() > 100) {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                            + (colIx + 1) + "列 【银行卡卡号】:银行卡开户行不能超过100字，请检查后重新输入");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                } else if (StringUtils.isNotEmpty(bankCardBank) && StringUtils.isEmpty(bankCardNumber)) {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                            + (colIx + 1) + "列 【银行卡卡号】:请填写银行卡信息");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                } else {
-                                    carBizDriverInfoDTO.setBankCardBank(bankCardBank);
-                                }
-                            } else {
-                                if (StringUtils.isNotEmpty(bankCardNumber)) {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
-                                            + (colIx + 1) + "列 【银行卡开户行】:请填写银行卡开户行信息");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
-                            }
-                            break;
-                    }// switch end
-                }// 循环列结束
-                if (isTrue && carBizDriverInfoDTO != null) {
-                    carBizDriverInfoDTO.setServiceCity(cityId);
-                    carBizDriverInfoDTO.setSupplierId(supplierId);
-                    carBizDriverInfoDTO.setTeamId(teamId);
-                    carBizDriverInfoDTO.setTeamGroupId(teamGroupId);
-
-                    if(teamId!=null){//车队名称
-                        CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(teamId);
-                        if(carDriverTeam!=null){
-                            carBizDriverInfoDTO.setTeamName(carDriverTeam.getTeamName());
-                        }
-                    }
-                    if(teamGroupId!=null){//小组名称
-                        CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(teamGroupId);
-                        if(carDriverTeam!=null){
-                            carBizDriverInfoDTO.setTeamGroupName(carDriverTeam.getTeamName());
-                        }
-                    }
-
-                    //保存司机信息
-                    Map<String, Object> stringObjectMap = this.saveDriver(carBizDriverInfoDTO);
-                    if (stringObjectMap != null && stringObjectMap.containsKey("result") && (int)stringObjectMap.get("result")==1) {
-                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                        returnVO.setReson( "手机号=" + carBizDriverInfoDTO.getPhone() + "保存出错，错误=" + stringObjectMap.get("msg").toString());
-                        logger.info(LOGTAG + returnVO.getReson());
-                        listException.add(returnVO);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        try {
-            // 将错误列表导出
-            if(listException.size() > 0) {
-                StringBuilder errorMsg = new StringBuilder();
-                for (CarImportExceptionEntity entity:listException){
-                    errorMsg.append(entity.getReson()).append(";");
-                }
-                resultMap.put("result", "0");
-                resultMap.put("msg", errorMsg);
-                return resultMap;
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        if(count==0){
-            resultMap.put("result", "0");
-            resultMap.put("msg", "表中没有数据，请检查");
-        }else {
-            resultMap.put("result", "1");
-            resultMap.put("msg", "成功");
-        }
-        return resultMap;
-    }
+//    public Map<String, Object> batchInputDriverInfo(Integer cityId, Integer supplierId, Integer teamId,
+//                                                    Integer teamGroupId, MultipartFile file,
+//                                                    HttpServletRequest request,
+//                                                    HttpServletResponse response) {
+//
+//        Map<String, Object> resultMap = Maps.newHashMap();
+//
+//        String resultError1 = "-1";//模板错误
+//        String resultErrorMag1 = "导入模板格式错误!";
+//        List<CarImportExceptionEntity> listException = Lists.newArrayList(); // 数据错误原因
+//        int count = 0;
+//
+//        String fileName = file.getOriginalFilename();
+//        String suffixName = fileName.substring(fileName.lastIndexOf("."));
+//        logger.info("上传的文件名为:{},上传的后缀名为:{}", fileName, suffixName);
+//        InputStream is = null;
+//        try {
+//            is = file.getInputStream();
+//
+//            Workbook workbook = null;
+//            String fileType = fileName.split("\\.")[1];
+//            if (fileType.equals("xls")) {
+//                workbook = new HSSFWorkbook(is);
+//            } else if (fileType.equals("xlsx")) {
+//                workbook = new XSSFWorkbook(is);
+//            }
+//            Sheet sheet = workbook.getSheetAt(0);
+//            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+//            // 检查模板是否正确
+//            Row row1 = sheet.getRow(0);
+//            if (row1 == null) {
+//                resultMap.put("result", resultError1);
+//                resultMap.put("msg", resultErrorMag1);
+//                return resultMap;
+//            }
+//            for (int colIx = 0; colIx < 50; colIx++) {
+//                Cell cell = row1.getCell(colIx); // 获取列对象
+//                CellValue cellValue = evaluator.evaluate(cell); // 获取列属性
+//                if (cell == null || cellValue == null) {
+//                    resultMap.put("result", resultError1);
+//                    resultMap.put("msg", resultErrorMag1);
+//                    return resultMap;
+//                } else {
+//                    switch ((colIx + 1)) {
+//                        case 1:
+//                            if (!cellValue.getStringValue().contains("车牌号")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 2:
+//                            if (!cellValue.getStringValue().contains("机动车驾驶员姓名")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 3:
+//                            if (!cellValue.getStringValue().contains("驾驶员身份证号")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 4:
+//                            if (!cellValue.getStringValue().contains("驾驶员手机号")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 5:
+//                            if (!cellValue.getStringValue().contains("司机手机型号")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 6:
+//                            if (!cellValue.getStringValue().contains("司机手机运营商")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//
+//                        case 7:
+//                            if (!cellValue.getStringValue().contains("驾驶员性别")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 8:
+//                            if (!cellValue.getStringValue().contains("出生日期")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 9:
+//                            if (!cellValue.getStringValue().contains("年龄")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 10:
+//                            if (!cellValue.getStringValue().contains("服务监督号码")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 11:
+//                            if (!cellValue.getStringValue().contains("服务监督链接")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 12:
+//                            if (!cellValue.getStringValue().contains("车型类别")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 13:
+//                            if (!cellValue.getStringValue().contains("驾照类型")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 14:
+//                            if (!cellValue.getStringValue().contains("驾照领证日期")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 15:
+//                            if (!cellValue.getStringValue().contains("驾龄")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 16:
+//                            if (!cellValue.getStringValue().contains("驾照到期时间")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 17:
+//                            if (!cellValue.getStringValue().contains("档案编号")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 18:
+//                            if (!cellValue.getStringValue().contains("国籍")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 19:
+//                            if (!cellValue.getStringValue().contains("驾驶员民族")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 20:
+//                            if (!cellValue.getStringValue().contains("驾驶员婚姻状况")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 21:
+//                            if (!cellValue.getStringValue().contains("驾驶员外语能力")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 22:
+//                            if (!cellValue.getStringValue().contains("驾驶员学历")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 23:
+//                            if (!cellValue.getStringValue().contains("户口登记机关名称")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 24:
+//                            if (!cellValue.getStringValue().contains("户口住址或长住地址")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 25:
+//                            if (!cellValue.getStringValue().contains("驾驶员通信地址")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 26:
+//                            if (!cellValue.getStringValue().contains("驾驶员照片文件编号")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 27:
+//                            if (!cellValue.getStringValue().contains("机动车驾驶证号")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 28:
+//                            if (!cellValue.getStringValue().contains("机动车驾驶证扫描件文件编号")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 29:
+//                            if (!cellValue.getStringValue().contains("初次领取驾驶证日期")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 30:
+//                            if (!cellValue.getStringValue().contains("是否巡游出租汽车驾驶员")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 31:
+//                            if (!cellValue.getStringValue().contains("网络预约出租汽车驾驶员资格证号")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 32:
+//                            if (!cellValue.getStringValue().contains("网络预约出租汽车驾驶员证初领日期")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 33:
+//                            if (!cellValue.getStringValue().contains("巡游出租汽车驾驶员资格证号")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 34:
+//                            if (!cellValue.getStringValue().contains("网络预约出租汽车驾驶员证发证机构")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 35:
+//                            if (!cellValue.getStringValue().contains("资格证发证日期")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 36:
+//                            if (!cellValue.getStringValue().contains("初次领取资格证日期")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 37:
+//                            if (!cellValue.getStringValue().contains("资格证有效起始日期")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 38:
+//                            if (!cellValue.getStringValue().contains("资格证有效截止日期")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 39:
+//                            if (!cellValue.getStringValue().contains("注册日期")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 40:
+//                            if (!cellValue.getStringValue().contains("是否专职驾驶员")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 41:
+//                            if (!cellValue.getStringValue().contains("是否在驾驶员黑名单内")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 42:
+//                            if (!cellValue.getStringValue().contains("驾驶员合同（或协议）签署公司")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 43:
+//                            if (!cellValue.getStringValue().contains("有效合同时间")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 44:
+//                            if (!cellValue.getStringValue().contains("合同（或协议）有效期起")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 45:
+//                            if (!cellValue.getStringValue().contains("合同（或协议）有效期止")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 46:
+//                            if (!cellValue.getStringValue().contains("紧急情况联系人")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 47:
+//                            if (!cellValue.getStringValue().contains("紧急情况联系人电话")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 48:
+//                            if (!cellValue.getStringValue().contains("紧急情况联系人通讯地址")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 49:
+//                            if (!cellValue.getStringValue().contains("银行卡卡号")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                        case 50:
+//                            if (!cellValue.getStringValue().contains("银行卡开户行")) {
+//                                resultMap.put("result", resultError1);
+//                                resultMap.put("msg", resultErrorMag1);
+//                                return resultMap;
+//                            }
+//                            break;
+//                    }
+//                }
+//            }
+//
+//            int minRowIx = 1;// 过滤掉标题，从第一行开始导入数据
+//            int maxRowIx = sheet.getLastRowNum(); // 要导入数据的总条数
+//
+//            for (int rowIx = minRowIx; rowIx <= maxRowIx; rowIx++) {
+//                count ++;
+//                Row row = sheet.getRow(rowIx); // 获取行对象
+//                if (row == null) {
+//                    continue;
+//                }
+//                CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
+//
+//                // 根据供应商ID查询供应商名称以及加盟类型
+//                CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(supplierId);
+//                if (carBizSupplier != null) {
+//                    carBizDriverInfoDTO.setSupplierName(carBizSupplier.getSupplierFullName());
+//                    carBizDriverInfoDTO.setCooperationType(carBizSupplier.getCooperationType());
+//                }
+//
+//                boolean isTrue = true;// 标识是否为有效数据
+//                String bankCardNumber = "";
+//                StringBuffer rePhone = new StringBuffer();//手机号
+//                StringBuffer reLicensePlates = new StringBuffer(); //车牌号
+//                StringBuffer reIdCarNo = new StringBuffer(); //身份证号
+//
+//                // 司机导入模板总共50列
+//                for (int colIx = 0; colIx < 50; colIx++) {
+//                    Cell cell = row.getCell(colIx); // 获取列对象
+//                    CellValue cellValue = evaluator.evaluate(cell); // 获取列属性
+//                    switch ((colIx + 1)) {
+//                        // 车牌号
+//                        case 1:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【车牌号】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                // 去除车牌号空格，并且全部大写
+//                                String licensePlates = Common.replaceBlank(cellValue.getStringValue());
+//                                if (reLicensePlates.indexOf(licensePlates) > 0) {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                            + (colIx + 1) + "列 【车牌号】:" + licensePlates + "有重复车牌号");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                    colIx = 100;// 结束本行数据
+//                                } else {
+//                                    reLicensePlates.append(licensePlates);
+//                                    Integer carCount = carBizCarInfoExMapper.checkLicensePlates(licensePlates);
+//                                    if (carCount == null || carCount == 0) {
+//                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                                + (colIx + 1) + "列 无效的【车牌号】");
+//                                        listException.add(returnVO);
+//                                        isTrue = false;
+//                                    } else {
+//                                        Integer driverCount = carBizDriverInfoExMapper.checkLicensePlates(licensePlates);
+//                                        if (driverCount == null || driverCount > 0) {
+//                                            CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                            returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                                    + (colIx + 1) + "列 【车牌号】:" + licensePlates + "已被绑定");
+//                                            listException.add(returnVO);
+//                                            isTrue = false;
+//                                        }
+//                                    }
+//                                    Integer cityCount = carBizCarInfoExMapper.validateCityAndSupplier(cityId, supplierId, licensePlates);
+//                                    if (cityCount == null || cityCount == 0) {
+//                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                                + (colIx + 1) + "列 【车牌号】:" + licensePlates + "不在所选的城市或厂商");
+//                                        listException.add(returnVO);
+//                                        isTrue = false;
+//                                    } else {
+//                                        carBizDriverInfoDTO.setLicensePlates(licensePlates);
+//                                    }
+//                                }
+//                            }
+//                            break;
+//                        // 机动车驾驶员姓名
+//                        case 2:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【机动车驾驶员姓名】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String name = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setName(name);
+//                            }
+//                            break;
+//                        // 驾驶员身份证号
+//                        case 3:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【驾驶员身份证号】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String idCardNo = Common.replaceBlankNoUpper(cellValue.getStringValue());
+//                                if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
+//                                    idCardNo = idCardNo.toLowerCase();
+//                                }
+//                                if (reIdCarNo.indexOf(idCardNo) > 0) {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                            + (colIx + 1) + "列 【驾驶员身份证号】:" + idCardNo + "有重复身份证号");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                    colIx = 100;// 结束本行数据
+//                                } else {
+//                                    reIdCarNo.append(idCardNo);
+//                                    if (StringUtils.isEmpty(idCardNo) || !ValidateUtils.validateIdCarNo(idCardNo)) {
+//                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                                + "列 【驾驶员身份证号】不合法");
+//                                        listException.add(returnVO);
+//                                        isTrue = false;
+//                                    } else if (this.checkIdCardNo(idCardNo, null)) {
+//                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                                + (colIx + 1) + "列 已存在【驾驶员身份证号为："
+//                                                + idCardNo
+//                                                + "】的信息");
+//                                        listException.add(returnVO);
+//                                        isTrue = false;
+//                                    } else {
+//                                        carBizDriverInfoDTO.setIdCardNo(idCardNo);
+//                                    }
+//                                }
+//                            }
+//                            break;
+//                        // 驾驶员手机
+//                        case 4:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【驾驶员手机】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String phone = Common.replaceBlank(cellValue.getStringValue());
+//                                if (rePhone.indexOf(phone) > 0) {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                            + (colIx + 1) + "列 【驾驶员手机】:" + phone + "有重复手机号");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                    colIx = 100;// 结束本行数据
+//                                } else {
+//                                    rePhone.append(phone);
+//                                    if (StringUtils.isEmpty(phone) || !ValidateUtils.validatePhone(phone)) {
+//                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                                + "列 【驾驶员手机】不合法");
+//                                        listException.add(returnVO);
+//                                        isTrue = false;
+//                                    } else if (this.checkPhone(phone, null)) {
+//                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                                + (colIx + 1) + "列 已存在【手机号为："
+//                                                + phone
+//                                                + "】的信息");
+//                                        listException.add(returnVO);
+//                                        colIx = 100;// 结束本行数据
+//                                        isTrue = false;
+//                                    } else {
+//                                        carBizDriverInfoDTO.setPhone(phone);
+//                                    }
+//                                }
+//                            }
+//                            break;
+//                        // 司机手机型号
+//                        case 5:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【司机手机型号】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String phoneType = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setPhonetype(phoneType);
+//                            }
+//                            break;
+//                        // 司机手机运营商
+//                        case 6:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【司机手机运营商】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String phoneCorp = Common.replaceBlank(cellValue.getStringValue());
+//                                if ("中国移动".equals(phoneCorp) ||
+//                                        "中国联通".equals(phoneCorp) ||
+//                                        "中国电信".equals(phoneCorp) ||
+//                                        "其他".equals(phoneCorp)) {
+//                                    carBizDriverInfoDTO.setPhonecorp(phoneCorp);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1)
+//                                            + "行数据，第" + (colIx + 1)
+//                                            + "列 请输入正确的【司机手机运营商】；中国移动、中国联通 或者 中国电信、其他");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        // 性别
+//                        case 7:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【性别】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String gender = Common.replaceBlank(cellValue.getStringValue());
+//                                if ("男".equals(gender)) {
+//                                    carBizDriverInfoDTO.setGender(1);
+//                                } else if ("女".equals(gender)) {
+//                                    carBizDriverInfoDTO.setGender(0);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1)
+//                                            + "行数据，第" + (colIx + 1)
+//                                            + "列 请输入正确的【性别】；男 或者 女");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        // 出生日期
+//                        case 8:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【出生日期】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
+//                                    carBizDriverInfoDTO.setBirthDay(d);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【出生日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        // 年龄
+//                        case 9:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【年龄】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String age = Common.replaceBlank(cellValue.getStringValue());
+//                                if (ValidateUtils.isRegular(age, ValidateUtils.NUMBER_PATTERN)) {
+//                                    carBizDriverInfoDTO.setAge(Integer.valueOf(age));
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                            + (colIx + 1) + "列 【年龄】只能有数字");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        // 服务监督号码
+//                        case 10:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【服务监督号码】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String superintendNo = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setSuperintendNo(superintendNo);
+//                            }
+//                            break;
+//                        // 服务监督链接
+//                        case 11:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【服务监督链接】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String superintendUrl = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setSuperintendUrl(superintendUrl);
+//                            }
+//                            break;
+//                        // 车型类别
+//                        case 12:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【车型类别】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String groupName = Common.replaceBlank(cellValue.getStringValue());
+//                                CarBizCarGroup carBizCarGroup = carBizCarGroupService.queryGroupByGroupName(groupName);
+//                                if (carBizCarGroup == null) {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                            + "列 【车型类别】没有" + groupName);
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                } else {
+//                                    carBizDriverInfoDTO.setGroupId(carBizCarGroup.getGroupId());
+//                                }
+//                            }
+//                            break;
+//                        // 驾照类型
+//                        case 13:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【驾照类型】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String driverType = "A1、A2、A3、B1、B2、C1、C2、N、P";
+//                                String drivingLicenseType = Common.replaceBlank(cellValue.getStringValue());
+//                                String yuandrivingTypeString = "C1";
+//                                if (driverType.indexOf(drivingLicenseType) > 0) {
+//                                    yuandrivingTypeString = drivingLicenseType;
+//                                }
+//                                carBizDriverInfoDTO.setDrivingLicenseType(yuandrivingTypeString);
+//                            }
+//                            break;
+//                        // 驾照领证日期
+//                        case 14:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【驾照领证时间】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    Date issueDate = DATE_FORMAT.parse(d);
+//                                    carBizDriverInfoDTO.setIssueDate(issueDate);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【驾照领证时间】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        // 驾龄
+//                        case 15:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【驾龄】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String drivingYears = Common.replaceBlank(cellValue.getStringValue());
+//                                if (ValidateUtils.isRegular(drivingYears, ValidateUtils.NUMBER_PATTERN)){
+//                                    carBizDriverInfoDTO.setDrivingYears(Integer.valueOf(drivingYears));
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                            + (colIx + 1) + "列 【驾龄】只能有数字");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        // 驾照到期时间
+//                        case 16:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【驾照到期时间】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    String datetime = DATE_FORMAT.format(new Date());
+//                                    if (DATE_FORMAT.parse(d).getTime() < DATE_FORMAT.parse(datetime).getTime()) {
+//                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                                + (colIx + 1) + "列 【驾照到期时间】应该大于当前时间");
+//                                        listException.add(returnVO);
+//                                        isTrue = false;
+//                                    } else {
+//                                        Date expireDate = DATE_FORMAT.parse(d);
+//                                        carBizDriverInfoDTO.setExpireDate(expireDate);
+//                                    }
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【驾照到期时间】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        // 档案编号
+//                        case 17:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【档案编号】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String archivesNo = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setArchivesNo(archivesNo);
+//                            }
+//                            break;
+//                        // 国籍
+//                        case 18:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【国籍】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String nationAlity = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setNationality(nationAlity);
+//                            }
+//                            break;
+//                        // 驾驶员民族
+//                        case 19:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【驾驶员民族】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String nation = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setNation(nation);
+//                            }
+//                            break;
+//                        // 驾驶员婚姻状况
+//                        case 20:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【驾驶员婚姻状况】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String marriage = Common.replaceBlank(cellValue.getStringValue());
+//                                if ("已婚".equals(marriage) || "未婚".equals(marriage) || "离异".equals(marriage)) {
+//                                    carBizDriverInfoDTO.setMarriage(marriage);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                            + "列 【驾驶员婚姻状况】，请输入已婚、未婚、离异");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        // 驾驶员外语能力
+//                        case 21:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【驾驶员外语能力】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String foreignLanguage = Common.replaceBlank(cellValue.getStringValue());
+//                                if ("英语".equals(foreignLanguage)) {
+//                                    carBizDriverInfoDTO.setForeignlanguage("1");
+//                                } else if ("德语".equals(foreignLanguage)) {
+//                                    carBizDriverInfoDTO.setForeignlanguage("2");
+//                                } else if ("法语".equals(foreignLanguage)) {
+//                                    carBizDriverInfoDTO.setForeignlanguage("3");
+//                                } else if ("其他".equals(foreignLanguage)) {
+//                                    carBizDriverInfoDTO.setForeignlanguage("4");
+//                                } else if ("无".equals(foreignLanguage)) {
+//                                    carBizDriverInfoDTO.setForeignlanguage("0");
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                            + "列 【驾驶员外语能力】，请填写英语、德语、法语、其他或者无");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        // 驾驶员学历
+//                        case 22:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【驾驶员学历】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String education = Common.replaceBlank(cellValue.getStringValue());
+//                                if ("研究生".equals(education) || "本科".equals(education) || "大专".equals(education) ||
+//                                        "中专".equals(education) || "高中".equals(education) || "初中".equals(education) ||
+//                                        "小学".equals(education) || "其他".equals(education)) {
+//                                    carBizDriverInfoDTO.setEducation(education);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                            + "列 【驾驶员学历】，请填写研究生、本科、大专、中专、高中、 初中、 中学、其他");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        // 户口登记机关名称
+//                        case 23:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【户口登记机关名称】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String houseHoldRegisterPermanent = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setHouseHoldRegisterPermanent(houseHoldRegisterPermanent);
+//                            }
+//                            break;
+//                        // 户口住址或长住地址
+//                        case 24:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【户口住址或长住地址】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String houseHoldRegister = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setHouseholdregister(houseHoldRegister);
+//                            }
+//                            break;
+//                        // 驾驶员通信地址
+//                        case 25:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【驾驶员通信地址】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String currentAddress = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setCurrentAddress(currentAddress);
+//                            }
+//                            break;
+//                        // 驾驶员照片文件编号
+//                        case 26:
+//                            if (cellValue != null && !StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                String photosrct = Common.replaceBlank(cellValue.getStringValue());
+//                                if (photosrct.contains("http://pupload.01zhuanche.com/")) {
+//                                    carBizDriverInfoDTO.setPhotosrct(photosrct);
+//                                }
+//                            }
+//                            break;
+//                        // 机动车驾驶证号
+//                        case 27:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【机动车驾驶证号】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String driverLicenseNumber = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setDriverlicensenumber(driverLicenseNumber);
+//                            }
+//                            break;
+//                        // 机动车驾驶证扫描件文件编号
+//                        case 28:
+//                            if (cellValue != null && !StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                String drivingLicenseImg = Common.replaceBlank(cellValue.getStringValue());
+//                                if (drivingLicenseImg.contains("http://pupload.01zhuanche.com/")) {
+//                                    carBizDriverInfoDTO.setDrivinglicenseimg(drivingLicenseImg);
+//                                }
+//                            }
+//                            break;
+//                        //初次领取驾驶证日期
+//                        case 29:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【初次领取驾驶证日期】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    String datetime = DATE_FORMAT.format(new Date());
+//                                    if (DATE_FORMAT.parse(d).getTime() > DATE_FORMAT.parse(datetime).getTime()) {
+//                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                                + (colIx + 1) + "列 【初次领取驾驶证日期】应该小于当前时间");
+//                                        listException.add(returnVO);
+//                                        isTrue = false;
+//                                    } else {
+//                                        d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
+//                                        carBizDriverInfoDTO.setFirstdrivinglicensedate(d);
+//                                    }
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【初次领取驾驶证日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        //是否巡游出租汽车驾驶员
+//                        case 30:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【是否巡游出租汽车驾驶员】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String isXyDriver = Common.replaceBlank(cellValue.getStringValue());
+//                                if ("是".equals(isXyDriver)) {
+//                                    carBizDriverInfoDTO.setIsxydriver(1);
+//                                } else if ("否".equals(isXyDriver)) {
+//                                    carBizDriverInfoDTO.setIsxydriver(0);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1)
+//                                            + "行数据，第" + (colIx + 1)
+//                                            + "列 请输入正确的【是否巡游出租汽车驾驶员】；是 或者 否");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        //网络预约出租汽车驾驶员资格证号
+//                        case 31:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【网络预约出租汽车驾驶员资格证号】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String driverLicenseIssuingNumber = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setDriverlicenseissuingnumber(driverLicenseIssuingNumber);
+//                            }
+//                            break;
+//                        //网络预约出租汽车驾驶员证初领日期
+//                        case 32:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【网络预约出租汽车驾驶员证初领日期】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    String datetime = DATE_FORMAT.format(new Date());
+//                                    if (DATE_FORMAT.parse(d).getTime() > DATE_FORMAT.parse(datetime).getTime()) {
+//                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                                + (colIx + 1) + "列 【网络预约出租汽车驾驶员证初领日期】应该小于当前时间");
+//                                        listException.add(returnVO);
+//                                        isTrue = false;
+//                                    } else {
+//                                        d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
+//                                        carBizDriverInfoDTO.setFirstmeshworkdrivinglicensedate(d);
+//                                    }
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【网络预约出租汽车驾驶员证初领日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        //巡游出租汽车驾驶员资格证号
+//                        case 33:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【巡游出租汽车驾驶员资格证号】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String xyDriverNumber = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setXyDriverNumber(xyDriverNumber);
+//                            }
+//                            break;
+//                        //网络预约出租汽车驾驶员证发证机构
+//                        case 34:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【网络预约出租汽车驾驶员证发证机构】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String driverLicenseIssuingCorp = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setDriverlicenseissuingcorp(driverLicenseIssuingCorp);
+//                            }
+//                            break;
+//                        //资格证发证日期
+//                        case 35:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【资格证发证日期】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
+//                                    carBizDriverInfoDTO.setDriverLicenseIssuingGrantDate(d);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【资格证发证日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        //初次领取资格证日期
+//                        case 36:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【初次领取资格证日期】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
+//                                    carBizDriverInfoDTO.setDriverLicenseIssuingFirstDate(d);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【初次领取资格证日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        //资格证有效起始日期
+//                        case 37:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【资格证有效起始日期】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
+//                                    carBizDriverInfoDTO.setDriverlicenseissuingdatestart(d);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【资格证有效起始日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        //资格证有效截止日期
+//                        case 38:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【资格证有效截止日期】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
+//                                    carBizDriverInfoDTO.setDriverlicenseissuingdateend(d);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【资格证有效截止日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        //注册日期
+//                        case 39:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【注册日期】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    String datetime = DATE_FORMAT.format(new Date());
+//                                    if (DATE_FORMAT.parse(d).getTime() > DATE_FORMAT.parse(datetime).getTime()) {
+//                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                                + (colIx + 1) + "列 【注册日期】应该小于当前时间");
+//                                        listException.add(returnVO);
+//                                        isTrue = false;
+//                                    } else {
+//                                        d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
+//                                        carBizDriverInfoDTO.setDriverLicenseIssuingRegisterDate(d);
+//                                    }
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【注册日期】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        //是否专职驾驶员
+//                        case 40:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【是否专职驾驶员】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String partTimeJobDri = Common.replaceBlank(cellValue.getStringValue());
+//                                if ("是".equals(partTimeJobDri) ||
+//                                        "否".equals(partTimeJobDri)) {
+//                                    carBizDriverInfoDTO.setParttimejobdri(partTimeJobDri);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1)
+//                                            + "行数据，第" + (colIx + 1)
+//                                            + "列 请输入正确的【是否专职驾驶员】；是 或者 否");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        //是否在驾驶员黑名单内
+//                        case 41:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【是否在驾驶员黑名单内】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String isDriverBlack = Common.replaceBlank(cellValue.getStringValue());
+//                                if ("是".equals(isDriverBlack) || "否".equals(isDriverBlack)) {
+////                                    carBizDriverInfoDTO.setIsDriverBlack(isDriverBlack);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1)
+//                                            + "行数据，第" + (colIx + 1)
+//                                            + "列 请输入正确的【是否在驾驶员黑名单内】；是 或者 否");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        //驾驶员合同（或协议）签署公司
+//                        case 42:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【驾驶员合同（或协议）签署公司】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String corpType = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setCorptype(corpType);
+//                            }
+//                            break;
+//                        //有效合同时间
+//                        case 43:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【有效合同时间】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    String datetime = DATE_FORMAT.format(new Date());
+//                                    if (DATE_FORMAT.parse(d).getTime() < DATE_FORMAT.parse(datetime).getTime()) {
+//                                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                        returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                                + (colIx + 1) + "列 【有效合同时间】应该大于当前时间");
+//                                        listException.add(returnVO);
+//                                        isTrue = false;
+//                                    } else {
+//                                        d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
+//                                        carBizDriverInfoDTO.setContractdate(d);
+//                                    }
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【有效合同时间】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        //合同（或协议）有效期起
+//                        case 44:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【合同（或协议）有效期起】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    String datetime = DATE_FORMAT.format(new Date());
+//                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
+//                                    carBizDriverInfoDTO.setSigndate(d);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【合同（或协议）有效期起】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        //合同（或协议）有效期止
+//                        case 45:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【合同（或协议）有效期止】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String d = cellValue.getStringValue()
+//                                        .replace("年", "-")
+//                                        .replace("月", "-")
+//                                        .replace("日", "-")
+//                                        .replace(".", "-").trim();
+//                                if (StringUtils.isNotEmpty(d) && d.length() >= 1) {
+//                                    if (d.substring(d.length() - 1).equals("-")) {
+//                                        d = d.substring(0, d.length() - 1);
+//                                    }
+//                                }
+//                                if (ValidateUtils.isValidDate(d)) {
+//                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
+//                                    carBizDriverInfoDTO.setSigndateend(d);
+//                                } else {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第"
+//                                            + (rowIx + 1)
+//                                            + "行数据，第"
+//                                            + (colIx + 1)
+//                                            + "列 【合同（或协议）有效期止】格式错误，正确格式为：xxxx-xx-xx 或 xxxx年xx月xx日");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                        // 紧急联系人
+//                        case 46:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【紧急联系人】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String emergencyContactPerson = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setEmergencyContactPerson(emergencyContactPerson);
+//                            }
+//                            break;
+//                        // 紧急联系方式
+//                        case 47:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【紧急联系方式】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String emergencyContactNumber = Common.replaceBlank(cellValue.getStringValue()).trim();
+//                                if (emergencyContactNumber.length() > 11) {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                            + "列 【紧急联系方式】最多11位");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                } else {
+//                                    carBizDriverInfoDTO.setEmergencyContactNumber(emergencyContactNumber);
+//                                }
+//                            }
+//                            break;
+//                        // 紧急情况联系人通讯地址
+//                        case 48:
+//                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                        + "列 【紧急情况联系人通讯地址】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String emergencyContactAddr = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizDriverInfoDTO.setEmergencycontactaddr(emergencyContactAddr);
+//                            }
+//                            break;
+//                        // 银行卡卡号
+//                        case 49:
+//                            if (cellValue != null && !StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                bankCardNumber = Common.replaceBlank(cellValue.getStringValue());
+//                                if (StringUtils.isNotEmpty(bankCardNumber) && !ValidateUtils.isRegular(bankCardNumber, ValidateUtils.BANK_CARD_NUMBER)) {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
+//                                            + "列 【银行卡卡号】为16~19位数字组合");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                } else if (carBizDriverInfoDetailService.checkBankCardBank(bankCardNumber, null)) {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                            + (colIx + 1) + "列 【银行卡卡号】:" + cellValue.getStringValue() + "已被绑定");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                } else {
+//                                    carBizDriverInfoDTO.setBankCardNumber(bankCardNumber);
+//                                }
+//                            }
+//                            break;
+//                        // 银行卡开户行
+//                        case 50:
+//                            if (cellValue != null && !StringUtils.isEmpty(cellValue.getStringValue())) {
+//                                String bankCardBank = Common.replaceBlank(cellValue.getStringValue());
+//                                if (bankCardBank.length() > 100) {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                            + (colIx + 1) + "列 【银行卡卡号】:银行卡开户行不能超过100字，请检查后重新输入");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                } else if (StringUtils.isNotEmpty(bankCardBank) && StringUtils.isEmpty(bankCardNumber)) {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                            + (colIx + 1) + "列 【银行卡卡号】:请填写银行卡信息");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                } else {
+//                                    carBizDriverInfoDTO.setBankCardBank(bankCardBank);
+//                                }
+//                            } else {
+//                                if (StringUtils.isNotEmpty(bankCardNumber)) {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
+//                                            + (colIx + 1) + "列 【银行卡开户行】:请填写银行卡开户行信息");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                }
+//                            }
+//                            break;
+//                    }// switch end
+//                }// 循环列结束
+//                if (isTrue && carBizDriverInfoDTO != null) {
+//                    carBizDriverInfoDTO.setServiceCity(cityId);
+//                    carBizDriverInfoDTO.setSupplierId(supplierId);
+//                    carBizDriverInfoDTO.setTeamId(teamId);
+//                    carBizDriverInfoDTO.setTeamGroupId(teamGroupId);
+//
+//                    if(teamId!=null){//车队名称
+//                        CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(teamId);
+//                        if(carDriverTeam!=null){
+//                            carBizDriverInfoDTO.setTeamName(carDriverTeam.getTeamName());
+//                        }
+//                    }
+//                    if(teamGroupId!=null){//小组名称
+//                        CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(teamGroupId);
+//                        if(carDriverTeam!=null){
+//                            carBizDriverInfoDTO.setTeamGroupName(carDriverTeam.getTeamName());
+//                        }
+//                    }
+//
+//                    //保存司机信息
+//                    Map<String, Object> stringObjectMap = this.saveDriver(carBizDriverInfoDTO);
+//                    if (stringObjectMap != null && stringObjectMap.containsKey("result") && (int)stringObjectMap.get("result")==1) {
+//                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                        returnVO.setReson( "手机号=" + carBizDriverInfoDTO.getPhone() + "保存出错，错误=" + stringObjectMap.get("msg").toString());
+//                        logger.info(LOGTAG + returnVO.getReson());
+//                        listException.add(returnVO);
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }finally {
+//            if (is != null) {
+//                try {
+//                    is.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//        try {
+//            // 将错误列表导出
+//            if(listException.size() > 0) {
+//                StringBuilder errorMsg = new StringBuilder();
+//                for (CarImportExceptionEntity entity:listException){
+//                    errorMsg.append(entity.getReson()).append(";");
+//                }
+//                resultMap.put("result", "0");
+//                resultMap.put("msg", errorMsg);
+//                return resultMap;
+//            }
+//        }catch(Exception e){
+//            e.printStackTrace();
+//        }
+//        if(count==0){
+//            resultMap.put("result", "0");
+//            resultMap.put("msg", "表中没有数据，请检查");
+//        }else {
+//            resultMap.put("result", "1");
+//            resultMap.put("msg", "成功");
+//        }
+//        return resultMap;
+//    }
 
     /*
      * 导出司机信息操作
@@ -3808,7 +3808,7 @@ public class CarBizDriverInfoService {
 	 * @Title: updateDriverCooperationTypeBySupplierId
 	 * @Description: 更新司机的加盟类型
 	 * @param supplierId
-	 * @param cooperationType 
+	 * @param cooperationType
 	 * @return void
 	 * @throws
 	 */
@@ -3816,7 +3816,7 @@ public class CarBizDriverInfoService {
 	public void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType){
 		// 更新mongo
 		driverMongoService.updateDriverCooperationTypeBySupplierId(supplierId, cooperationType);
-		
+
 		// 更新司机表
 		Map<String, Object> map = new HashMap<>();
 		map.put("supplierId", supplierId);

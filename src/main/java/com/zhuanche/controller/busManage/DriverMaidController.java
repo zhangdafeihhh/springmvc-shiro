@@ -22,6 +22,8 @@ import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.CarBizCityService;
 import com.zhuanche.serv.mongo.DriverMongoService;
+import com.zhuanche.serv.rentcar.IDriverService;
+import com.zhuanche.serv.rentcar.impl.DriverServiceImpl;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.vo.busManage.AccountBalanceVO;
 import com.zhuanche.vo.busManage.MaidVO;
@@ -111,7 +113,8 @@ public class DriverMaidController {
     @Autowired
     private DriverMongoService driverMongoService;
 
-
+    @Autowired
+    private IDriverService driverService;
     /**
      * @Description: 查询司机分佣明细,
      * @Param: [dto]
@@ -545,11 +548,12 @@ public class DriverMaidController {
 
 
     private String getDriverIdsByName(String name) {
-        List<DriverMongo> drivers = driverMongoService.queryDriverByName(name);
+
+        List<Integer> drivers = driverService.queryDriverIdsByName(name);
         if (drivers == null || drivers.size() == 0) {
             return StringUtils.EMPTY;
         }
-        String ids = drivers.stream().map(o -> String.valueOf(o.getDriverId())).collect(Collectors.joining(","));
+        String ids = drivers.stream().map(o -> String.valueOf(o)).collect(Collectors.joining(","));
         return ids;
     }
 

@@ -200,8 +200,8 @@ public class BusCarBizDriverInfoService implements BusConst {
     @Autowired
     private BusCommonService commonService;
 
-    @Resource(name = "driverMongoTemplate")
-    private MongoTemplate driverMongoTemplate;
+//    @Resource(name = "driverMongoTemplate")
+//    private MongoTemplate driverMongoTemplate;
     @Resource(name = "busMongoTemplate")
     private MongoTemplate busMongoTemplate;
 
@@ -266,7 +266,6 @@ public class BusCarBizDriverInfoService implements BusConst {
 
     /**
      * @param list
-     * @param csvDataList
      * @return void
      * @throws
      * @Title: completeDriverExportList
@@ -550,7 +549,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                     carBizCarInfoExMapper.updateCarLicensePlates(saveDTO.getLicensePlates(), 0);
                 }
                 // 更新司机mongo
-                driverMongoService.updateByDriverId(saveDTO.getDriverId(), saveDTO.getStatus());
+                driverMongoService.disableDriverMongo(saveDTO.getDriverId());
 
                 try {
                     carBizDriverUpdateService.insert(saveDTO.getLicensePlates(), "", saveDTO.getDriverId(), 1);

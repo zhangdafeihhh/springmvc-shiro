@@ -198,4 +198,10 @@ public interface CarBizDriverInfoExMapper {
     List<DriverComplianceDTO> queryDriverComplianceDTOListByDriverIdSet(@Param("driverIdSet") Set<Integer> driverIdSet);
 
     List<DriverEntity> queryDriverIdBySupplierId(DriverEntity driverEntity);
+
+    List<Integer> findAllDriverIdsBySupplierId(Map<String, Object> param);
+
+    List<Integer> queryDriverIdsByName(String name);
+
+    List<Integer> queryDriverIdsByPhone(String phone);
 }

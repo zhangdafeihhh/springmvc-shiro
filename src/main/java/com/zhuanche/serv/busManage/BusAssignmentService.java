@@ -23,6 +23,7 @@ import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.mongo.BusDriverMongoService;
+import com.zhuanche.serv.rentcar.IDriverService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.*;
@@ -124,6 +125,8 @@ public class BusAssignmentService {
     private static String COMPANY_SUPPLIER_URL="/api/v1/inside/company/supplier/findCompanyAll";
 
 
+    @Autowired
+    private IDriverService driverService;
 
     /**
      * @param params
@@ -430,15 +433,16 @@ public class BusAssignmentService {
         // 补充司机信息
         Set<Integer> driverIds = new HashSet<>();
         if (StringUtils.isNotBlank(params.getDriverName())) {
-            List<DriverMongo> driversByName = busDriverMongoService.queryDriverByName(params.getDriverName());
+            List<DriverMongo> driversByName = driverService.queryDriverIdsByName(params.getDriverName());
             if (driversByName != null) {
                 driverIds.addAll(driversByName.stream().map(driver -> driver.getDriverId()).collect(Collectors.toList()));
             }
         }
         if (StringUtils.isNotBlank(params.getDriverPhone())) {
-            List<DriverMongo> driversByPhone = busDriverMongoService.queryDriverByPhone(params.getDriverPhone());
+//            List<Integer> drivers = driverService.queryDriverIdsByName(name);
+            List<Integer> driversByPhone = driverService.queryDriverIdsByPhone(params.getDriverPhone());
             if (driversByPhone != null) {
-                driverIds.addAll(driversByPhone.stream().map(driver -> driver.getDriverId()).collect(Collectors.toList()));
+                driverIds.addAll(driversByPhone.stream().map(driver -> driver).collect(Collectors.toList()));
             }
         }
         if (driverIds.size() == 1) {
