@@ -215,7 +215,7 @@
         public_range = #{publicRange,jdbcType=INTEGER},
       </if>
       <if test="messageGroupIds != null" >
-        message_groupIds = #{messageGroupIds,jdbcType=VARCHAR},
+        message_group_ids = #{messageGroupIds,jdbcType=VARCHAR},
       </if>
 
     </set>
