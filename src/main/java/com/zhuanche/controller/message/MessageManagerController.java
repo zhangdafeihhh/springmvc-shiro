@@ -457,24 +457,70 @@ public class MessageManagerController {
     }
 
 
-    //回复操作
-    /*@RequestMapping(value = "/replyMessage")
+    /**
+     * 根据消息id查询回复、接收人等详情
+     * @param messageId
+     * @param senderName
+     * @param status
+     * @param noticeStartTime
+     * @param noticeEndTime
+     * @param createStartTime
+     * @param createEndTime
+     * @param replyStartTime
+     * @param replyEndTime
+     * @param pageSize
+     * @param pageNum
+     * @return
+     */
+    @RequestMapping(value = "/replyQueryList",method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
-    public AjaxResponse replyMessage(@Verify(param = "replyContent",rule = "required") String replyContent,
-                                     @Verify(param = "id",rule = "id")Integer id){
-        logger.info(MessageFormat.format("replyMessage入参:replyContent:{0},id:{1}",replyContent,id));
-        try {
-            Integer code = receiverExMapper.replyMessage(replyContent,id);
-            if (code != null && code>0){
-                return AjaxResponse.success(null);
-            }else {
-                return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
-             }
-        } catch (MessageException e) {
-            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+    public AjaxResponse replyQueryList(@Verify(param = "messageId",rule = "required") Integer messageId,
+                                         String senderName,Integer status,
+                                         String noticeStartTime,String noticeEndTime,
+                                         String createStartTime,String createEndTime,
+                                         String replyStartTime,String replyEndTime,
+                                         @RequestParam(value = "pageSize",defaultValue = "10") Integer pageSize,
+                                         @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum) {
+        logger.info(MessageFormat.format("查询消息详情入参:messageId:{0},senderName:{1}," +
+                "noticeStartTime:{2},noticeEndTime:{3},createStartTime:{4},createEndTime:{5}," +
+                "replyStartTime:{6},replyEndTIme:{7},status:[8]",messageId,senderName,noticeStartTime,
+                noticeEndTime,createStartTime,createEndTime,replyStartTime,replyEndTime,status));
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        Integer userId = loginUser.getId();
+        List<Integer> idList = null;
+        if (StringUtils.isNotBlank(senderName)){
+            idList = carAdmUserExMapper.queryIdListByName(senderName);
         }
-    }*/
+        PageDTO pageDTO = messageService.replyQueryList(idList,status,noticeStartTime,noticeEndTime,
+                createStartTime,createEndTime,replyStartTime,replyEndTime,pageSize,pageNum,messageId,
+                senderName);
+        return AjaxResponse.success(pageDTO);
+    }
+
+
+    @RequestMapping(value = "/messageReceiveQueryList",method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public AjaxResponse messageReceiveQueryList(String messageTitle,
+                                      Integer status,String senderName,
+                                      String createStartTime,String createEndTime,
+                                      @RequestParam(value = "pageSize",defaultValue = "10") Integer pageSize,
+                                      @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum) {
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        Integer userId = loginUser.getId();
+
+        List<Integer> idList = null;
+        if (StringUtils.isNotBlank(senderName)){
+            idList = carAdmUserExMapper.queryIdListByName(senderName);
+        }
+        PageDTO pageDTO = messageService.messageReceiveQueryList(status, messageTitle,
+                createStartTime, createEndTime, idList, pageSize, pageNum, userId);
+        return AjaxResponse.success(pageDTO);
+    }
+
 }

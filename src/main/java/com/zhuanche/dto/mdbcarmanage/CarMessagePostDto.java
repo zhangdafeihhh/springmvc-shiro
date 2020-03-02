@@ -34,6 +34,9 @@ public class CarMessagePostDto {
     /**接收者id**/
     private Integer receiveId;
 
+    /**回复内容**/
+    private String replyContent;
+
 
     public Long getId() {
         return id;
@@ -129,5 +132,13 @@ public class CarMessagePostDto {
 
     public void setReceiveId(Integer receiveId) {
         this.receiveId = receiveId;
+    }
+
+    public String getReplyContent() {
+        return replyContent;
+    }
+
+    public void setReplyContent(String replyContent) {
+        this.replyContent = replyContent;
     }
 }

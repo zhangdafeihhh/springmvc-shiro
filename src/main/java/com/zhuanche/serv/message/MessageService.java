@@ -5,10 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
-import com.zhuanche.dto.mdbcarmanage.CarMessageDetailDto;
-import com.zhuanche.dto.mdbcarmanage.CarMessagePostDto;
-import com.zhuanche.dto.mdbcarmanage.MessageDocDto;
-import com.zhuanche.dto.mdbcarmanage.ReadRecordDto;
+import com.zhuanche.dto.mdbcarmanage.*;
 import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
@@ -559,6 +556,7 @@ public class MessageService {
         } catch (Exception e) {
             throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));
         }
+        return null;
     }
 
 
@@ -846,6 +844,44 @@ public class MessageService {
 
 
 
+    public PageDTO replyQueryList(List<Integer> idList,Integer status,
+                                    String noticeStartTime,String noticeEndTime,
+                                    String createStartTime,String createEndTime,
+                                    String replyStartTime,String replyEndTime,
+                                    Integer pageSize,Integer pageNum,Integer messageId,
+                                  String receiveName) {
+        try {
+            int count = 0;
+
+            List<CarMessageReplyDto> data = new ArrayList<>();
+
+
+            Page page = PageHelper.startPage(pageNum,pageSize);
+            CarMessageReplyDto carMessageReplyDto = new CarMessageReplyDto();
+            carMessageReplyDto.setMessageId(messageId);
+            carMessageReplyDto.setNoticeStartTime(noticeStartTime);
+            carMessageReplyDto.setNoticeEndTime(noticeEndTime);
+            carMessageReplyDto.setCreateStartTime(createStartTime);
+            carMessageReplyDto.setCreateEndTime(createEndTime);
+            carMessageReplyDto.setReplyStartTime(replyStartTime);
+            carMessageReplyDto.setReplyEndTime(replyEndTime);
+            carMessageReplyDto.setStatus(status);
+            carMessageReplyDto.setReceiveUserIds(idList);
+            if (idList != null && idList.size() == 0){
+                carMessageReplyDto.setReceiveUserIds(idList);
+            }
+            data = receiverExMapper.replyQueryList(carMessageReplyDto);
+
+            count = (int) page.getTotal();
+
+            return new PageDTO(pageNum, pageSize, count, data);
+        } catch (Exception e) {
+            logger.error("查询异常" + e);
+        }
+        return new PageDTO(pageNum, pageSize, 0, null);
+    }
+
+
     /**
      * 判断查询回复用户是否是消息发布者
      * @param userId
@@ -862,4 +898,35 @@ public class MessageService {
         Integer queryUserId = carMessagePost.getUserId();
         return userId.equals(queryUserId);
     }
+
+
+    public PageDTO messageReceiveQueryList(Integer status,String messageTitle, String startDate,
+                                    String endDate, List<Integer> idList, Integer pageSize, Integer pageNum, Integer userId) {
+        try {
+            int count = 0;
+            List<CarMessagePostDto> data = new ArrayList<>();
+            if (idList != null && idList.size() == 0){
+                return new PageDTO(pageNum, pageSize, count, data);
+            }
+
+            Page page = PageHelper.startPage(pageNum,pageSize);
+            data = receiverExMapper.messageReceiveQueryList(status,messageTitle , startDate, endDate, idList, userId);
+
+            SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+
+            data.forEach(dto ->{
+                if (dto.getMessageStatus().equals(CarMessagePost.Status.publish.getMessageStatus())){
+                    dto.setMessageStatus(user.getId().equals(dto.getCreateId()) ?
+                            CarMessagePost.Status.publish.getMessageStatus() : CarMessagePost.Status.receive.getMessageStatus());
+                }
+            });
+            count = (int) page.getTotal();
+
+            return new PageDTO(pageNum, pageSize, count, data);
+        } catch (Exception e) {
+            logger.error("查询异常" + e);
+        }
+        return new PageDTO(pageNum, pageSize, 0, null);
+    }
+
 }
