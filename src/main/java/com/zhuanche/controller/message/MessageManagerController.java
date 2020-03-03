@@ -501,6 +501,17 @@ public class MessageManagerController {
     }
 
 
+    /**
+     * 收件箱
+     * @param messageTitle
+     * @param status
+     * @param senderName
+     * @param createStartTime
+     * @param createEndTime
+     * @param pageSize
+     * @param pageNum
+     * @return
+     */
     @RequestMapping(value = "/messageReceiveQueryList",method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
