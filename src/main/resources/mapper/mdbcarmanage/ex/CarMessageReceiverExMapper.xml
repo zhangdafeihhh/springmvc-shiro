@@ -360,7 +360,7 @@
     </if>
     <if test="userId != null" >
       <!--注意此处是发件箱-->
-      AND (cmp.user_id=#{userId}
+      AND cmp.user_id=#{userId}
     </if>
     GROUP BY cmp.id,mesage_title,cmp.create_time,message_content
   </select>
@@ -469,9 +469,10 @@ WHERE
   </foreach>
 </if>
 <if test="userId != null" >
-  AND  cmr.receive_user_id=#{userId})
+  AND  cmr.receive_user_id=#{userId}
 </if>
-GROUP BY id,mesage_title,create_time,message_content
+GROUP BY cmp.id,cmp.mesage_title,
+  cmp.create_time,cmp.message_content
 </select>
 
 </mapper>
