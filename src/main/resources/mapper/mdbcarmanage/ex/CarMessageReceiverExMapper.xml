@@ -331,7 +331,7 @@
     cmr.status as status, cmp.create_time as create_time,
     cmp.message_content as message_content,
     cmp.status as message_status,
-    IFNULL(GROUP_CONCAT(cmd.doc_name),'') as docName
+    IFNULL(GROUP_CONCAT(DISTINCT cmd.doc_name),'') as docName
     FROM car_message_post cmp
     LEFT JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
     INNER JOIN car_adm_user cdu ON cmp.user_id = cdu.user_id
@@ -361,7 +361,7 @@
     <if test="userId != null" >
       AND (cmp.user_id=#{userId} OR cmr.receive_user_id=#{userId})
     </if>
-    GROUP BY id,mesage_title,create_time,message_content
+    GROUP BY cmp.id,mesage_title,cmp.create_time,message_content
   </select>
 
 
