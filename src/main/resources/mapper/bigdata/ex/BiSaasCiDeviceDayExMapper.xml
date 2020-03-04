@@ -7,7 +7,7 @@
         select
             DATE_FORMAT(data_date,'%Y/%m/%d') as date,
             DATE_FORMAT(data_date,'%Y-%m-%d') as date2,
-            IFNULL(FORMAT(sum(ci_order_num)/sum(ci_driver_num)*sum(driver_num),0),0) as value,
+            IFNULL(CONVERT(sum(ci_order_num)/sum(ci_driver_num)*sum(driver_num),decimal(12,0)),0) as value,
             IFNULL(FORMAT(sum(ci_order_num)/sum(ci_driver_num)*sum(driver_num)-sum(order_num),0),0) as specialValue,
             IFNULL(sum(driver_num),0) as driverNum
         from bi_saas_ci_device_day
