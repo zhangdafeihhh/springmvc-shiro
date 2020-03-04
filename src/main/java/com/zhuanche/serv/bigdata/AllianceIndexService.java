@@ -211,7 +211,7 @@ public class AllianceIndexService{
                     }
                     //车均订单
                     BigDecimal ciOrderNumb = new BigDecimal(p.getCiOrderNum());
-                    BigDecimal orderPerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getOrderPerVehicle());
+                    BigDecimal orderPerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getOrderPerVehicle().equals("0")?"3.0":saasCoreIndexDtoList.get(0).getOrderPerVehicle());
                     BigDecimal vehTotalFlag =  ciOrderNumb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP);
                     BigDecimal vehTotalSub = vehTotalFlag.subtract(orderPerVehicle);
                     if(vehTotalFlag.compareTo(orderPerVehicle)==1){
@@ -226,7 +226,7 @@ public class AllianceIndexService{
 
                     //车均流水
                     BigDecimal ciIncomeFactOverAmountb = new BigDecimal(p.getCiFactOverAmount());
-                    BigDecimal incomePerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getIncomePerVehicle());
+                    BigDecimal incomePerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getIncomePerVehicle().equals("0")?"171":saasCoreIndexDtoList.get(0).getIncomePerVehicle());
                     BigDecimal incomeFlag = ciIncomeFactOverAmountb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP);
                     BigDecimal incomeSub = incomeFlag.subtract(incomePerVehicle);
                     if(incomeFlag.compareTo(incomePerVehicle)==1){
@@ -240,7 +240,7 @@ public class AllianceIndexService{
                     }
 
                     //差评单量
-                    BigDecimal badEvaluateAllNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateAllNum());
+                    BigDecimal badEvaluateAllNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateAllNum().equals("0")?"479":saasCoreIndexDtoList.get(0).getBadEvaluateAllNum());
                     BigDecimal ciBadEvaluateCountAllb = new BigDecimal(p.getCiBadEvaluateAllNum());
                     BigDecimal ciBadEvaluateAllFlag = ciBadEvaluateCountAllb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
                     BigDecimal ciBadEvaluateAllSub  = ciBadEvaluateAllFlag.subtract(badEvaluateAllNum);
@@ -255,7 +255,7 @@ public class AllianceIndexService{
                     }
 
                     //有效差评单量
-                    BigDecimal badEvaluateNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateNum());
+                    BigDecimal badEvaluateNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateNum().equals("0")?"253":saasCoreIndexDtoList.get(0).getBadEvaluateNum());
                     BigDecimal ciBadEvaluateCountb = new BigDecimal(p.getCiBadEvaluateNum());
                     BigDecimal ciBadEvaluateFlag = ciBadEvaluateCountb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
                     BigDecimal ciBadEvaluateSub  = ciBadEvaluateFlag.subtract(badEvaluateNum);
@@ -304,7 +304,7 @@ public class AllianceIndexService{
                     p.setIncomeAmountPercent(amountTotalSub.multiply(new BigDecimal(100)).divide(factOverAmountb, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
 
                     //车均订单
-                    BigDecimal orderPerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getOrderPerVehicle());
+                    BigDecimal orderPerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getOrderPerVehicle().equals("0")?"3.0":saasCoreIndexDtoList.get(0).getOrderPerVehicle());
                     BigDecimal eciOrderNumb = new BigDecimal(allList.get(0).getCiOrderNum());
                     BigDecimal vehTotalFlag = eciOrderNumb.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP);
                     BigDecimal vehTotalSub = vehTotalFlag.subtract(orderPerVehicle);
@@ -312,7 +312,7 @@ public class AllianceIndexService{
 
 
                     //车均流水
-                    BigDecimal incomePerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getIncomePerVehicle());
+                    BigDecimal incomePerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getIncomePerVehicle().equals("0")?"171":saasCoreIndexDtoList.get(0).getIncomePerVehicle());
                     BigDecimal eciIncomeFactOverAmountb = new BigDecimal(allList.get(0).getCiFactOverAmount());
                     BigDecimal incomeFlag = eciIncomeFactOverAmountb.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP);
                     BigDecimal incomeSub =  incomeFlag.subtract(incomePerVehicle);
@@ -320,7 +320,7 @@ public class AllianceIndexService{
 
 
                     //差评单量
-                    BigDecimal badEvaluateAllNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateAllNum());
+                    BigDecimal badEvaluateAllNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateAllNum().equals("0")?"479":saasCoreIndexDtoList.get(0).getBadEvaluateAllNum());
                     BigDecimal ebadEvaluateAllNum =   new BigDecimal(allList.get(0).getCiBadEvaluateAllNum());
                     BigDecimal ciBadEvaluateAllFlag = ebadEvaluateAllNum.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
                     BigDecimal ciBadEvaluateAllSub =  ciBadEvaluateAllFlag.subtract(badEvaluateAllNum);
@@ -328,7 +328,7 @@ public class AllianceIndexService{
 
 
                     //有效差评单量
-                    BigDecimal badEvaluateNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateNum());
+                    BigDecimal badEvaluateNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateNum().equals("0")?"253":saasCoreIndexDtoList.get(0).getBadEvaluateNum());
                     BigDecimal ebadEvaluateNum =   new BigDecimal(allList.get(0).getCiBadEvaluateNum());
                     BigDecimal ciBadEvaluateFlag = ebadEvaluateNum.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
                     BigDecimal ciBadEvaluateSub =  ciBadEvaluateFlag.subtract(badEvaluateNum);
