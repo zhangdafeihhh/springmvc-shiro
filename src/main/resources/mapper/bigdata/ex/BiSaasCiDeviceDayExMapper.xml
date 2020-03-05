@@ -178,4 +178,62 @@
     </where>
   </select>
 
+
+  <select id="getCiServiceNegativeRate"  resultType="com.zhuanche.entity.bigdata.StatisticSection">
+    <![CDATA[
+        select
+            DATE_FORMAT(data_date,'%Y/%m/%d') as date,
+            DATE_FORMAT(data_date,'%Y-%m-%d') as date2,
+            CONCAT(IFNULL(FORMAT(sum(ci_bad_evaluate_num)*100/sum(ci_order_cnt_notchannel),2),0),'%') as value
+        from bi_saas_ci_device_day
+        ]]>
+    <where>
+      data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+      <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+        <if test="allianceId == null or allianceId == ''">
+          and supplier_id in
+          <foreach item="item" index="index" collection="visibleAllianceIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleAllianceIds == null or visibleAllianceIds.size ==0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+      </if>
+
+      <if test="visibleMotocadeIds != null and visibleMotocadeIds.size >0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+        <if test="motorcadeId == null or motorcadeId == ''">
+          and team_id in
+          <foreach item="item" index="index" collection="visibleMotocadeIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleMotocadeIds == null or visibleMotocadeIds.size ==0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+      </if>
+      group by data_date
+    </where>
+  </select>
+
+  <select id="getAllCiServiceNegativeRate"  resultType="com.zhuanche.entity.bigdata.CiServiceBadEvaluateAllStatisticSection">
+    <![CDATA[
+        select
+            IFNULL(sum(ci_bad_evaluate_num),0) as ciBadEvaluateNm,
+            IFNULL(sum(ci_order_cnt_notchannel),0) as ciOrderCntNotChannel
+        from bi_saas_ci_device_day
+        ]]>
+      where data_date = #{findDate,jdbcType=VARCHAR}
+  </select>
+
 </mapper>

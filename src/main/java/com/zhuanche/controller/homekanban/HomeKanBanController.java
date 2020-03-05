@@ -476,6 +476,79 @@ public class HomeKanBanController {
 		}
 	}
 
+	/** 服务差评率统计(含ci预测) **/
+	@RequestMapping("/serviceAndCiEvaluationRateStatistics")
+	@ResponseBody
+	public AjaxResponse serviceAndCiEvaluationRateStatistics(
+			@Verify(param = "startDate", rule = "required") String startDate,
+			@Verify(param = "endDate", rule = "required") String endDate, String allianceId, String motorcadeId) {
+
+		// 如果加盟商ID为空，不允许传入车队ID
+		if (StringUtils.isNotBlank(motorcadeId) && StringUtils.isBlank(allianceId)) {
+			logger.warn("如果加盟商ID为空，不允许传入车队ID");
+			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+		}
+		/*// 从大数据仓库获取统计数据
+		Map<String, Object> paramMap = Maps.newHashMap();
+		paramMap.put("startDate", startDate);
+		paramMap.put("endDate", endDate);
+		paramMap.put("allianceId", allianceId);
+		paramMap.put("motorcadeId", motorcadeId);
+		return parseResult(statisticsEvaluationUrl, paramMap);*/
+
+
+		String key = null;
+
+		try {
+			//如果城市权限为空（说明是全国的权限），且数据权限为全国 则缓存一天数据。如果不是，缓存key值为当前登录用户+时间+allianceId+motorcadeId
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+
+			key = "";
+			StringBuffer stringBuffer = new StringBuffer();
+
+
+			if(CollectionUtils.isEmpty(currentLoginUser.getCityIds()) && currentLoginUser.getLevel().equals(PermissionLevelEnum.ALL.getCode())){
+				//
+				key = RedisKeyUtils.SERVICE_RATE_STATISTIS + stringBuffer.append(startDate).append(endDate).append(allianceId).append(motorcadeId).toString().replaceAll("null","");
+				Map<String,Object>  resultList = RedisCacheUtil.get(key,Map.class);
+				if(RedisCacheUtil.exist(key) && resultList != null){
+					//return  AjaxResponse.success(resultList);
+				}
+			}else {
+				key = RedisKeyUtils.SERVICE_RATE_STATISTIS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate)
+						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
+				Map<String,Object>  resultList = RedisCacheUtil.get(key,Map.class);
+				if(RedisCacheUtil.exist(key) && resultList != null){
+					//return AjaxResponse.success(resultList);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("缓存查询错误",e);
+		}
+
+		List<Map> rateList = new ArrayList<>();
+		List<Map> ciRateList = new ArrayList<>();
+		Map<String,Object> map = new HashedMap<>();
+
+		try{
+			SAASIndexQuery saas = setVisibleData();
+			saas.setStartDate(startDate);
+			saas.setEndDate(endDate);
+			saas.setAllianceId(allianceId);
+			saas.setMotorcadeId(motorcadeId);
+			rateList = allianceIndexService.getServiceNegativeRate(saas);
+			ciRateList = allianceIndexService.getCiServiceBadEvaNumStatistic(saas);
+			map.put("rateList",rateList);
+			map.put("ciRateList",ciRateList);
+			RedisCacheUtil.set(key,map,3600*24);
+
+			return AjaxResponse.success(map);
+		}catch (Exception e){
+			logger.error("查询首页订单数量统计错误异常", e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
+	}
+
 	/** 在线时长统计 **/
 	@RequestMapping("/onlineTimeStatistics")
 	@ResponseBody

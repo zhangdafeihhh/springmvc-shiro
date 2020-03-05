@@ -29,5 +29,6 @@ public interface BiSaasCiDeviceDayExMapper {
 
     List<SAASAllCoreIndexPercentDto> getCiAllCoreIndexStatistic(@Param("startDate") String startDate, @Param("endDate")String endDate);
 
-
+    List<CiOrderStatisticSection> getCiServiceNegativeRate(SAASIndexQuery saasIndexQuery);
+    CiServiceBadEvaluateAllStatisticSection getAllCiServiceNegativeRate(@Param("findDate")String findDate);
 }

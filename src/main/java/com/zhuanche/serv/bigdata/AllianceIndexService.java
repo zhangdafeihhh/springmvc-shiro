@@ -151,7 +151,9 @@ public class AllianceIndexService{
                         CiOrderAllStatisticSection cAll = biSaasCiDeviceDayExMapper.getAllCiOrderNumStatistic(all.getDate2());
                         BigDecimal orderNum = new BigDecimal(cAll.getOrderNum());
                         BigDecimal driverNum = new BigDecimal(cAll.getDriverNum());
-                        map.put(all.getDate(),orderNum.divide(driverNum, 0, BigDecimal.ROUND_HALF_UP).intValue()*all.getDriverNum());
+                        if(orderNum.compareTo(BigDecimal.ZERO)==1){
+                            map.put(all.getDate(),orderNum.divide(driverNum, 0, BigDecimal.ROUND_HALF_UP).intValue()*all.getDriverNum());
+                        }
                     }
                 }
             }
@@ -161,6 +163,83 @@ public class AllianceIndexService{
             return new ArrayList<>();
         }
     }
+
+
+
+    /**
+     * 查询服务差评率CI预测统计
+     * @param saasIndexQuery
+     * @return
+     */
+    public List<Map> getCiServiceBadEvaNumStatistic(SAASIndexQuery saasIndexQuery){
+        try {
+            List<Map> result = new ArrayList();
+            Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery);
+            if(supplierDriverCount>0){//查询加盟商下是否有安装ci的司机  有
+                List<CiOrderStatisticSection> rateList = biSaasCiDeviceDayExMapper.getCiServiceNegativeRate(saasIndexQuery);
+                List<StatisticSection> rateListOld = carMeasureDayExMapper.getServiceNegativeRate(saasIndexQuery);
+                if(rateList.size()!=rateList.size()){
+                    if (!CollectionUtils.isEmpty(rateList)){
+                        for(CiOrderStatisticSection s : rateList){
+                            Map map = new HashMap<>(2);
+                            map.put(s.getDate(),s.getValue());
+                            result.add(map);
+                        }
+                    }
+                    return result;
+                }
+                if (!CollectionUtils.isEmpty(rateList)){
+                    for(int i=0;i<rateList.size();i++){
+                        Map map = new HashMap<>(2);
+                        if(rateList.get(i)!=null && rateListOld.get(i)!=null){
+                            CiOrderStatisticSection statisticSection = rateList.get(i);
+                            StatisticSection statisticSectionOld = rateListOld.get(i);
+                            if(statisticSection.getValue()!=null && rateListOld.get(i).getValue()!=null){
+                                String newValueStr = statisticSection.getValue();
+                                String oldValueStr = statisticSectionOld.getValue();
+                                BigDecimal newValue = new BigDecimal(newValueStr.substring(0,newValueStr.length()-1));
+                                BigDecimal oldValue = new BigDecimal(oldValueStr.substring(0,oldValueStr.length()-1));
+                                if(newValue.compareTo(oldValue)==1){//安装全途宝司机有效差评总量/非渠道单-差评率大于0，则取所有加盟商安装全途宝的数据；
+                                    CiServiceBadEvaluateAllStatisticSection all = biSaasCiDeviceDayExMapper.getAllCiServiceNegativeRate(statisticSection.getDate2());
+                                    if(all!=null){
+                                        BigDecimal ciBadEvaluateNm = new BigDecimal(all.getCiBadEvaluateNm());
+                                        BigDecimal ciOrderCntNotChannel = new BigDecimal(all.getCiOrderCntNotChannel());
+                                        map.put(statisticSection.getDate(),ciBadEvaluateNm.multiply(new BigDecimal(100)).divide(ciOrderCntNotChannel, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                                    }
+                                }else{
+                                    map.put(statisticSection.getDate(),statisticSection.getValue());
+                                }
+                            }else{
+                                map.put(rateList.get(i).getDate(),rateList.get(i).getValue());
+                            }
+                        }else{
+                            map.put(rateList.get(i).getDate(),rateList.get(i).getValue());
+                        }
+                        result.add(map);
+                    }
+                }
+            }else{////查询加盟商下是否有安装ci的司机  无安装ci的司机，去全部加盟商
+                Map map = new HashMap<>(2);
+                List<CiOrderStatisticSection> rateListAll = biSaasCiDeviceDayExMapper.getCiServiceNegativeRate(saasIndexQuery);
+                if (!CollectionUtils.isEmpty(rateListAll)){
+                    for(CiOrderStatisticSection allCi : rateListAll){
+                        CiServiceBadEvaluateAllStatisticSection all = biSaasCiDeviceDayExMapper.getAllCiServiceNegativeRate(allCi.getDate2());
+                        BigDecimal ciBadEvaluateNm = new BigDecimal(all.getCiBadEvaluateNm());
+                        BigDecimal ciOrderCntNotChannel = new BigDecimal(all.getCiOrderCntNotChannel());
+                        if(ciBadEvaluateNm.compareTo(BigDecimal.ZERO)==1){
+                            map.put(allCi.getDate(),ciBadEvaluateNm.multiply(new BigDecimal(100)).divide(ciOrderCntNotChannel, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                        }
+                    }
+                }
+            }
+            return result;
+        }catch (Exception e){
+            logger.error("查询服务差评率CI预测数量统计", e);
+            return new ArrayList<>();
+        }
+    }
+
+
 
     /**
      * 查询CI预测数量统计百分比
