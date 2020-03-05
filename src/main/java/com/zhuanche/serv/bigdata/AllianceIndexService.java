@@ -266,166 +266,230 @@ public class AllianceIndexService{
                if (!CollectionUtils.isEmpty(list)) {
                    for (SAASCoreIndexPercentDto p : list) {
                        //完成总量
-                       BigDecimal ciFactEndNumb = new BigDecimal(p.getCiFactEndNum());
                        BigDecimal ciDriverNumb = new BigDecimal(p.getCiDriverNum());
-                       BigDecimal driverNumb  = new BigDecimal(p.getDriverNum());
-                       BigDecimal completeOrderAmountb = new BigDecimal(p.getCompleteOrderAmount());
-                       BigDecimal orderTotalFlag =  ciFactEndNumb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
-                       BigDecimal orderTotalSub =  ciFactEndNumb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(completeOrderAmountb);
-                       if(orderTotalFlag.subtract(completeOrderAmountb).compareTo(BigDecimal.ZERO)==1){
-                           p.setCompleteOrderAmountPerecnt(orderTotalSub.multiply(new BigDecimal(100)).divide(completeOrderAmountb, 0, BigDecimal.ROUND_HALF_UP).toString()+"%");
-                       }else{
-                           BigDecimal eciFactEndNumb = new BigDecimal(allList.get(0).getCiFactEndNum());
-                           BigDecimal eciDriverNumb = new BigDecimal(allList.get(0).getCiDriverNum());
-                           orderTotalSub =  eciFactEndNumb.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(completeOrderAmountb);
-                           p.setCompleteOrderAmountPerecnt(orderTotalSub.multiply(new BigDecimal(100)).divide(completeOrderAmountb, 0, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                       BigDecimal driverNumb = new BigDecimal(p.getDriverNum());
+                       try {
+                           BigDecimal ciFactEndNumb = new BigDecimal(p.getCiFactEndNum());
+                           BigDecimal completeOrderAmountb = new BigDecimal(p.getCompleteOrderAmount());
+                           BigDecimal orderTotalFlag = ciFactEndNumb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                           BigDecimal orderTotalSub = ciFactEndNumb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(completeOrderAmountb);
+                           if (orderTotalFlag.subtract(completeOrderAmountb).compareTo(BigDecimal.ZERO) == 1) {
+                               p.setCompleteOrderAmountPerecnt(orderTotalSub.multiply(new BigDecimal(100)).divide(completeOrderAmountb, 0, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           } else {
+                               BigDecimal eciFactEndNumb = new BigDecimal(allList.get(0).getCiFactEndNum());
+                               BigDecimal eciDriverNumb = new BigDecimal(allList.get(0).getCiDriverNum());
+                               orderTotalSub = eciFactEndNumb.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(completeOrderAmountb);
+                               p.setCompleteOrderAmountPerecnt(orderTotalSub.multiply(new BigDecimal(100)).divide(completeOrderAmountb, 0, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           }
+                       }catch (Exception e){
+                           logger.info("计算完成总量百分比，分母为0",e);
+                           p.setCompleteOrderAmountPerecnt("0%");
                        }
                        //司机端总流水
-                       BigDecimal ciFactOverAmountb = new BigDecimal(p.getCiFactOverAmount());
-                       BigDecimal factOverAmountb = new BigDecimal(p.getFactOverAmount());
-                       BigDecimal amountTotalFlag =  ciFactOverAmountb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
-                       BigDecimal amountTotalSub =  ciFactOverAmountb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(factOverAmountb);
-                       if(amountTotalFlag.subtract(factOverAmountb).compareTo(BigDecimal.ZERO)==1){
-                           p.setIncomeAmountPercent(amountTotalSub.multiply(new BigDecimal(100)).divide(factOverAmountb, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
-                       }else{
-                           BigDecimal eciFactOverAmountb = new BigDecimal(allList.get(0).getCiFactOverAmount());
-                           BigDecimal eciDriverNumb2 = new BigDecimal(allList.get(0).getCiDriverNum());
-                           amountTotalSub =  eciFactOverAmountb.divide(eciDriverNumb2, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(factOverAmountb);
-                           p.setIncomeAmountPercent(amountTotalSub.multiply(new BigDecimal(100)).divide(factOverAmountb, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                       try {
+                           BigDecimal ciFactOverAmountb = new BigDecimal(p.getCiFactOverAmount());
+                           BigDecimal factOverAmountb = new BigDecimal(p.getFactOverAmount());
+                           BigDecimal amountTotalFlag = ciFactOverAmountb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                           BigDecimal amountTotalSub = ciFactOverAmountb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(factOverAmountb);
+                           if (amountTotalFlag.subtract(factOverAmountb).compareTo(BigDecimal.ZERO) == 1) {
+                               p.setIncomeAmountPercent(amountTotalSub.multiply(new BigDecimal(100)).divide(factOverAmountb, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           } else {
+                               BigDecimal eciFactOverAmountb = new BigDecimal(allList.get(0).getCiFactOverAmount());
+                               BigDecimal eciDriverNumb2 = new BigDecimal(allList.get(0).getCiDriverNum());
+                               amountTotalSub = eciFactOverAmountb.divide(eciDriverNumb2, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(factOverAmountb);
+                               p.setIncomeAmountPercent(amountTotalSub.multiply(new BigDecimal(100)).divide(factOverAmountb, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           }
+                       }catch (Exception e){
+                           logger.info("计算司机端总流水百分比，分母为0",e);
+                           p.setIncomeAmountPercent("0%");
                        }
                        //车均订单
-                       BigDecimal ciOrderNumb = new BigDecimal(p.getCiOrderNum());
-                       BigDecimal orderPerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getOrderPerVehicle().equals("0")?"3.0":saasCoreIndexDtoList.get(0).getOrderPerVehicle());
-                       BigDecimal vehTotalFlag =  ciOrderNumb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP);
-                       BigDecimal vehTotalSub = vehTotalFlag.subtract(orderPerVehicle);
-                       if(vehTotalFlag.compareTo(orderPerVehicle)==1){
-                           p.setOrderPerVehiclePercent(vehTotalSub.multiply(new BigDecimal(100)).divide(orderPerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
-                       }else{
-                           BigDecimal eciOrderNumb = new BigDecimal(allList.get(0).getCiOrderNum());
-                           BigDecimal eciDriverNumb3 = new BigDecimal(allList.get(0).getCiDriverNum());
-                           vehTotalFlag = eciOrderNumb.divide(eciDriverNumb3, 2, BigDecimal.ROUND_HALF_UP);
-                           vehTotalSub = vehTotalFlag.subtract(orderPerVehicle);
-                           p.setOrderPerVehiclePercent(vehTotalSub.multiply(new BigDecimal(100)).divide(orderPerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                       try {
+                           BigDecimal ciOrderNumb = new BigDecimal(p.getCiOrderNum());
+                           BigDecimal orderPerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getOrderPerVehicle().equals("0") ? "3.0" : saasCoreIndexDtoList.get(0).getOrderPerVehicle());
+                           BigDecimal vehTotalFlag = ciOrderNumb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP);
+                           BigDecimal vehTotalSub = vehTotalFlag.subtract(orderPerVehicle);
+                           if (vehTotalFlag.compareTo(orderPerVehicle) == 1) {
+                               p.setOrderPerVehiclePercent(vehTotalSub.multiply(new BigDecimal(100)).divide(orderPerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           } else {
+                               BigDecimal eciOrderNumb = new BigDecimal(allList.get(0).getCiOrderNum());
+                               BigDecimal eciDriverNumb3 = new BigDecimal(allList.get(0).getCiDriverNum());
+                               vehTotalFlag = eciOrderNumb.divide(eciDriverNumb3, 2, BigDecimal.ROUND_HALF_UP);
+                               vehTotalSub = vehTotalFlag.subtract(orderPerVehicle);
+                               p.setOrderPerVehiclePercent(vehTotalSub.multiply(new BigDecimal(100)).divide(orderPerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           }
+                       }catch (Exception e){
+                           logger.info("计算车均订单百分比，分母为0",e);
+                           p.setOrderPerVehiclePercent("0%");
                        }
 
                        //车均流水
-                       BigDecimal ciIncomeFactOverAmountb = new BigDecimal(p.getCiFactOverAmount());
-                       BigDecimal incomePerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getIncomePerVehicle().equals("0")?"171":saasCoreIndexDtoList.get(0).getIncomePerVehicle());
-                       BigDecimal incomeFlag = ciIncomeFactOverAmountb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP);
-                       BigDecimal incomeSub = incomeFlag.subtract(incomePerVehicle);
-                       if(incomeFlag.compareTo(incomePerVehicle)==1){
-                           p.setIncomePerVehiclePercent(incomeSub.multiply(new BigDecimal(100)).divide(incomePerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
-                       }else{
-                           BigDecimal eciIncomeFactOverAmountb = new BigDecimal(allList.get(0).getCiFactOverAmount());
-                           BigDecimal eciDriverNumb4 = new BigDecimal(allList.get(0).getCiDriverNum());
-                           incomeFlag = eciIncomeFactOverAmountb.divide(eciDriverNumb4, 2, BigDecimal.ROUND_HALF_UP);
-                           incomeSub =  incomeFlag.subtract(incomePerVehicle);
-                           p.setIncomePerVehiclePercent(incomeSub.multiply(new BigDecimal(100)).divide(incomePerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                       try {
+                           BigDecimal ciIncomeFactOverAmountb = new BigDecimal(p.getCiFactOverAmount());
+                           BigDecimal incomePerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getIncomePerVehicle().equals("0") ? "171" : saasCoreIndexDtoList.get(0).getIncomePerVehicle());
+                           BigDecimal incomeFlag = ciIncomeFactOverAmountb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP);
+                           BigDecimal incomeSub = incomeFlag.subtract(incomePerVehicle);
+                           if (incomeFlag.compareTo(incomePerVehicle) == 1) {
+                               p.setIncomePerVehiclePercent(incomeSub.multiply(new BigDecimal(100)).divide(incomePerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           } else {
+                               BigDecimal eciIncomeFactOverAmountb = new BigDecimal(allList.get(0).getCiFactOverAmount());
+                               BigDecimal eciDriverNumb4 = new BigDecimal(allList.get(0).getCiDriverNum());
+                               incomeFlag = eciIncomeFactOverAmountb.divide(eciDriverNumb4, 2, BigDecimal.ROUND_HALF_UP);
+                               incomeSub = incomeFlag.subtract(incomePerVehicle);
+                               p.setIncomePerVehiclePercent(incomeSub.multiply(new BigDecimal(100)).divide(incomePerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           }
+                       }catch (Exception e){
+                           logger.info("计算车均流水百分比，分母为0",e);
+                           p.setIncomePerVehiclePercent("0%");
                        }
 
                        //差评单量
-                       BigDecimal badEvaluateAllNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateAllNum().equals("0")?"479":saasCoreIndexDtoList.get(0).getBadEvaluateAllNum());
-                       BigDecimal ciBadEvaluateCountAllb = new BigDecimal(p.getCiBadEvaluateAllNum());
-                       BigDecimal ciBadEvaluateAllFlag = ciBadEvaluateCountAllb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
-                       BigDecimal ciBadEvaluateAllSub  = ciBadEvaluateAllFlag.subtract(badEvaluateAllNum);
-                       if(ciBadEvaluateAllFlag.compareTo(badEvaluateAllNum)==-1){
-                           p.setBadEvaluateAllNumPercent(ciBadEvaluateAllSub.multiply(new BigDecimal(100)).divide(badEvaluateAllNum, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
-                       }else{
-                           BigDecimal ebadEvaluateAllNum =   new BigDecimal(allList.get(0).getCiBadEvaluateAllNum());
-                           BigDecimal eciDriverNumb5 = new BigDecimal(allList.get(0).getCiDriverNum());
-                           ciBadEvaluateAllFlag = ebadEvaluateAllNum.divide(eciDriverNumb5, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
-                           ciBadEvaluateAllSub =  ciBadEvaluateAllFlag.subtract(badEvaluateAllNum);
-                           p.setBadEvaluateAllNumPercent(ciBadEvaluateAllSub.multiply(new BigDecimal(100)).divide(badEvaluateAllNum, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                       try {
+                           BigDecimal badEvaluateAllNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateAllNum().equals("0") ? "479" : saasCoreIndexDtoList.get(0).getBadEvaluateAllNum());
+                           BigDecimal ciBadEvaluateCountAllb = new BigDecimal(p.getCiBadEvaluateAllNum());
+                           BigDecimal ciBadEvaluateAllFlag = ciBadEvaluateCountAllb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                           BigDecimal ciBadEvaluateAllSub = ciBadEvaluateAllFlag.subtract(badEvaluateAllNum);
+                           if (ciBadEvaluateAllFlag.compareTo(badEvaluateAllNum) == -1) {
+                               p.setBadEvaluateAllNumPercent(ciBadEvaluateAllSub.multiply(new BigDecimal(100)).divide(badEvaluateAllNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           } else {
+                               BigDecimal ebadEvaluateAllNum = new BigDecimal(allList.get(0).getCiBadEvaluateAllNum());
+                               BigDecimal eciDriverNumb5 = new BigDecimal(allList.get(0).getCiDriverNum());
+                               ciBadEvaluateAllFlag = ebadEvaluateAllNum.divide(eciDriverNumb5, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                               ciBadEvaluateAllSub = ciBadEvaluateAllFlag.subtract(badEvaluateAllNum);
+                               p.setBadEvaluateAllNumPercent(ciBadEvaluateAllSub.multiply(new BigDecimal(100)).divide(badEvaluateAllNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           }
+                       }catch (Exception e){
+                           logger.info("计算差评单量百分比，分母为0",e);
+                           p.setBadEvaluateAllNumPercent("0%");
                        }
 
                        //有效差评单量
-                       BigDecimal badEvaluateNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateNum().equals("0")?"253":saasCoreIndexDtoList.get(0).getBadEvaluateNum());
                        BigDecimal ciBadEvaluateCountb = new BigDecimal(p.getCiBadEvaluateNum());
-                       BigDecimal ciBadEvaluateFlag = ciBadEvaluateCountb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
-                       BigDecimal ciBadEvaluateSub  = ciBadEvaluateFlag.subtract(badEvaluateNum);
-                       if(ciBadEvaluateFlag.compareTo(badEvaluateNum)==-1){
-                           p.setBadEvaluateNumPercent(ciBadEvaluateSub.multiply(new BigDecimal(100)).divide(badEvaluateNum, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
-                       }else{
-                           BigDecimal ebadEvaluateNum =   new BigDecimal(allList.get(0).getCiBadEvaluateNum());
-                           BigDecimal eciDriverNumb6 = new BigDecimal(allList.get(0).getCiDriverNum());
-                           ciBadEvaluateFlag = ebadEvaluateNum.divide(eciDriverNumb6, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
-                           ciBadEvaluateSub =  ciBadEvaluateFlag.subtract(badEvaluateNum);
-                           p.setBadEvaluateNumPercent(ciBadEvaluateSub.multiply(new BigDecimal(100)).divide(badEvaluateNum, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                       try {
+                           BigDecimal badEvaluateNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateNum().equals("0") ? "253" : saasCoreIndexDtoList.get(0).getBadEvaluateNum());
+                           BigDecimal ciBadEvaluateFlag = ciBadEvaluateCountb.divide(ciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                           BigDecimal ciBadEvaluateSub = ciBadEvaluateFlag.subtract(badEvaluateNum);
+                           if (ciBadEvaluateFlag.compareTo(badEvaluateNum) == -1) {
+                               p.setBadEvaluateNumPercent(ciBadEvaluateSub.multiply(new BigDecimal(100)).divide(badEvaluateNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           } else {
+                               BigDecimal ebadEvaluateNum = new BigDecimal(allList.get(0).getCiBadEvaluateNum());
+                               BigDecimal eciDriverNumb6 = new BigDecimal(allList.get(0).getCiDriverNum());
+                               ciBadEvaluateFlag = ebadEvaluateNum.divide(eciDriverNumb6, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                               ciBadEvaluateSub = ciBadEvaluateFlag.subtract(badEvaluateNum);
+                               p.setBadEvaluateNumPercent(ciBadEvaluateSub.multiply(new BigDecimal(100)).divide(badEvaluateNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           }
+                       }catch (Exception e){
+                           logger.info("计算有效差评单量百分比，分母为0",e);
+                           p.setBadEvaluateNumPercent("0%");
                        }
 
                        //差评率
-                       BigDecimal badEvaluateNoChannelRate = new BigDecimal(p.getCriticismRate());
-                       BigDecimal ciBadEvaluateNoChannel = new BigDecimal(p.getCiOrderCntNotChannel());
-                       BigDecimal badEvaluateNoChannelFlag = ciBadEvaluateCountb.divide(ciBadEvaluateNoChannel, 2, BigDecimal.ROUND_HALF_UP);
-                       BigDecimal badEvaluateNoChannelSub = badEvaluateNoChannelFlag.subtract(badEvaluateNoChannelRate);
-                       if(badEvaluateNoChannelFlag.compareTo(badEvaluateNoChannelRate)==-1){
-                           p.setCriticismRatePercent(badEvaluateNoChannelSub.multiply(new BigDecimal(100)).divide(badEvaluateNoChannelRate, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
-                       }else{
-                           BigDecimal ebadEvaluateNum2 =   new BigDecimal(allList.get(0).getCiBadEvaluateNum());
-                           BigDecimal eciBadEvaluateNoChannel = new BigDecimal(allList.get(0).getCiOrderCntNotChannel());
-                           badEvaluateNoChannelFlag = ebadEvaluateNum2.divide(eciBadEvaluateNoChannel, 2, BigDecimal.ROUND_HALF_UP);
-                           badEvaluateNoChannelSub = badEvaluateNoChannelFlag.subtract(badEvaluateNoChannelRate);
-                           p.setCriticismRatePercent(badEvaluateNoChannelSub.multiply(new BigDecimal(100)).divide(badEvaluateNoChannelRate, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                       try{
+                           BigDecimal badEvaluateNoChannelRate = new BigDecimal(p.getCriticismRate());
+                           BigDecimal ciBadEvaluateNoChannel = new BigDecimal(p.getCiOrderCntNotChannel());
+                           BigDecimal badEvaluateNoChannelFlag = ciBadEvaluateCountb.divide(ciBadEvaluateNoChannel, 2, BigDecimal.ROUND_HALF_UP);
+                           BigDecimal badEvaluateNoChannelSub = badEvaluateNoChannelFlag.subtract(badEvaluateNoChannelRate);
+                           if(badEvaluateNoChannelFlag.compareTo(badEvaluateNoChannelRate)==-1){
+                               p.setCriticismRatePercent(badEvaluateNoChannelSub.multiply(new BigDecimal(100)).divide(badEvaluateNoChannelRate, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                           }else{
+                               BigDecimal ebadEvaluateNum2 =   new BigDecimal(allList.get(0).getCiBadEvaluateNum());
+                               BigDecimal eciBadEvaluateNoChannel = new BigDecimal(allList.get(0).getCiOrderCntNotChannel());
+                               badEvaluateNoChannelFlag = ebadEvaluateNum2.divide(eciBadEvaluateNoChannel, 2, BigDecimal.ROUND_HALF_UP);
+                               badEvaluateNoChannelSub = badEvaluateNoChannelFlag.subtract(badEvaluateNoChannelRate);
+                               p.setCriticismRatePercent(badEvaluateNoChannelSub.multiply(new BigDecimal(100)).divide(badEvaluateNoChannelRate, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                           }
+                       }catch (Exception e){
+                           logger.info("计算差评率百分比，分母为0",e);
+                           p.setCriticismRatePercent("0%");
                        }
+
                    }
                }
            }else{////查询加盟商下是否有安装ci的司机  无安装ci的司机，去全部加盟商
                if (!CollectionUtils.isEmpty(list)) {
                    for (SAASCoreIndexPercentDto p : list) {
-                       //完成总量
-                       BigDecimal driverNumb  = new BigDecimal(p.getDriverNum());
-                       BigDecimal completeOrderAmountb = new BigDecimal(p.getCompleteOrderAmount());
-                       BigDecimal eciFactEndNumb = new BigDecimal(allList.get(0).getCiFactEndNum());
                        BigDecimal eciDriverNumb = new BigDecimal(allList.get(0).getCiDriverNum());
-                       BigDecimal orderTotalSub =  eciFactEndNumb.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(completeOrderAmountb);
-                       p.setCompleteOrderAmountPerecnt(orderTotalSub.multiply(new BigDecimal(100)).divide(completeOrderAmountb, 0, BigDecimal.ROUND_HALF_UP).toString()+"%");
-
+                       BigDecimal driverNumb = new BigDecimal(p.getDriverNum());
+                       //完成总量
+                       try {
+                           BigDecimal completeOrderAmountb = new BigDecimal(p.getCompleteOrderAmount());
+                           BigDecimal eciFactEndNumb = new BigDecimal(allList.get(0).getCiFactEndNum());
+                           BigDecimal orderTotalSub = eciFactEndNumb.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(completeOrderAmountb);
+                           p.setCompleteOrderAmountPerecnt(orderTotalSub.multiply(new BigDecimal(100)).divide(completeOrderAmountb, 0, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                       }catch (Exception e){
+                           logger.info("全部加盟ci计算计算完成总量百分比，分母为0",e);
+                           p.setCompleteOrderAmountPerecnt("0%");
+                       }
                        //司机端总流水
-
-                       BigDecimal eciFactOverAmountb = new BigDecimal(allList.get(0).getCiFactOverAmount());
-                       BigDecimal factOverAmountb = new BigDecimal(p.getFactOverAmount());
-                       BigDecimal amountTotalSub =  eciFactOverAmountb.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(factOverAmountb);
-                       p.setIncomeAmountPercent(amountTotalSub.multiply(new BigDecimal(100)).divide(factOverAmountb, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
-
+                       try {
+                           BigDecimal eciFactOverAmountb = new BigDecimal(allList.get(0).getCiFactOverAmount());
+                           BigDecimal factOverAmountb = new BigDecimal(p.getFactOverAmount());
+                           BigDecimal amountTotalSub = eciFactOverAmountb.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(factOverAmountb);
+                           p.setIncomeAmountPercent(amountTotalSub.multiply(new BigDecimal(100)).divide(factOverAmountb, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                       }catch (Exception e){
+                           logger.info("全部加盟ci计算计算司机端总流水百分比，分母为0",e);
+                           p.setIncomeAmountPercent("0%");
+                       }
                        //车均订单
-                       BigDecimal orderPerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getOrderPerVehicle().equals("0")?"3.0":saasCoreIndexDtoList.get(0).getOrderPerVehicle());
-                       BigDecimal eciOrderNumb = new BigDecimal(allList.get(0).getCiOrderNum());
-                       BigDecimal vehTotalFlag = eciOrderNumb.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP);
-                       BigDecimal vehTotalSub = vehTotalFlag.subtract(orderPerVehicle);
-                       p.setOrderPerVehiclePercent(vehTotalSub.multiply(new BigDecimal(100)).divide(orderPerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
-
+                       try {
+                           BigDecimal orderPerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getOrderPerVehicle().equals("0") ? "3.0" : saasCoreIndexDtoList.get(0).getOrderPerVehicle());
+                           BigDecimal eciOrderNumb = new BigDecimal(allList.get(0).getCiOrderNum());
+                           BigDecimal vehTotalFlag = eciOrderNumb.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP);
+                           BigDecimal vehTotalSub = vehTotalFlag.subtract(orderPerVehicle);
+                           p.setOrderPerVehiclePercent(vehTotalSub.multiply(new BigDecimal(100)).divide(orderPerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                       }catch (Exception e){
+                           logger.info("全部加盟ci计算计算车均订单百分比，分母为0",e);
+                           p.setOrderPerVehiclePercent("0%");
+                       }
 
                        //车均流水
-                       BigDecimal incomePerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getIncomePerVehicle().equals("0")?"171":saasCoreIndexDtoList.get(0).getIncomePerVehicle());
-                       BigDecimal eciIncomeFactOverAmountb = new BigDecimal(allList.get(0).getCiFactOverAmount());
-                       BigDecimal incomeFlag = eciIncomeFactOverAmountb.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP);
-                       BigDecimal incomeSub =  incomeFlag.subtract(incomePerVehicle);
-                       p.setIncomePerVehiclePercent(incomeSub.multiply(new BigDecimal(100)).divide(incomePerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
-
+                       try {
+                           BigDecimal incomePerVehicle = new BigDecimal(saasCoreIndexDtoList.get(0).getIncomePerVehicle().equals("0") ? "171" : saasCoreIndexDtoList.get(0).getIncomePerVehicle());
+                           BigDecimal eciIncomeFactOverAmountb = new BigDecimal(allList.get(0).getCiFactOverAmount());
+                           BigDecimal incomeFlag = eciIncomeFactOverAmountb.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP);
+                           BigDecimal incomeSub = incomeFlag.subtract(incomePerVehicle);
+                           p.setIncomePerVehiclePercent(incomeSub.multiply(new BigDecimal(100)).divide(incomePerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                       }catch (Exception e){
+                           logger.info("全部加盟ci计算计算车均流水百分比，分母为0",e);
+                           p.setIncomePerVehiclePercent("0%");
+                       }
 
                        //差评单量
-                       BigDecimal badEvaluateAllNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateAllNum().equals("0")?"479":saasCoreIndexDtoList.get(0).getBadEvaluateAllNum());
-                       BigDecimal ebadEvaluateAllNum =   new BigDecimal(allList.get(0).getCiBadEvaluateAllNum());
-                       BigDecimal ciBadEvaluateAllFlag = ebadEvaluateAllNum.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
-                       BigDecimal ciBadEvaluateAllSub =  ciBadEvaluateAllFlag.subtract(badEvaluateAllNum);
-                       p.setBadEvaluateAllNumPercent(ciBadEvaluateAllSub.multiply(new BigDecimal(100)).divide(badEvaluateAllNum, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
-
+                       try {
+                           BigDecimal badEvaluateAllNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateAllNum().equals("0") ? "479" : saasCoreIndexDtoList.get(0).getBadEvaluateAllNum());
+                           BigDecimal ebadEvaluateAllNum = new BigDecimal(allList.get(0).getCiBadEvaluateAllNum());
+                           BigDecimal ciBadEvaluateAllFlag = ebadEvaluateAllNum.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                           BigDecimal ciBadEvaluateAllSub = ciBadEvaluateAllFlag.subtract(badEvaluateAllNum);
+                           p.setBadEvaluateAllNumPercent(ciBadEvaluateAllSub.multiply(new BigDecimal(100)).divide(badEvaluateAllNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                       }catch (Exception e){
+                           logger.info("全部加盟ci计算计算差评单量百分比，分母为0",e);
+                           p.setBadEvaluateAllNumPercent("0%");
+                       }
 
                        //有效差评单量
-                       BigDecimal badEvaluateNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateNum().equals("0")?"253":saasCoreIndexDtoList.get(0).getBadEvaluateNum());
-                       BigDecimal ebadEvaluateNum =   new BigDecimal(allList.get(0).getCiBadEvaluateNum());
-                       BigDecimal ciBadEvaluateFlag = ebadEvaluateNum.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
-                       BigDecimal ciBadEvaluateSub =  ciBadEvaluateFlag.subtract(badEvaluateNum);
-                       p.setBadEvaluateNumPercent(ciBadEvaluateSub.multiply(new BigDecimal(100)).divide(badEvaluateNum, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
-
+                       try {
+                           BigDecimal badEvaluateNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateNum().equals("0") ? "253" : saasCoreIndexDtoList.get(0).getBadEvaluateNum());
+                           BigDecimal ebadEvaluateNum = new BigDecimal(allList.get(0).getCiBadEvaluateNum());
+                           BigDecimal ciBadEvaluateFlag = ebadEvaluateNum.divide(eciDriverNumb, 2, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                           BigDecimal ciBadEvaluateSub = ciBadEvaluateFlag.subtract(badEvaluateNum);
+                           p.setBadEvaluateNumPercent(ciBadEvaluateSub.multiply(new BigDecimal(100)).divide(badEvaluateNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                       }catch (Exception e){
+                           logger.info("全部加盟ci计算计算有效差评单量百分比，分母为0",e);
+                           p.setBadEvaluateNumPercent("0%");
+                       }
 
                        //差评率
-                       BigDecimal badEvaluateNoChannelRate = new BigDecimal(p.getCriticismRate());
-                       BigDecimal ebadEvaluateNum2 =   new BigDecimal(allList.get(0).getCiBadEvaluateNum());
-                       BigDecimal eciBadEvaluateNoChannel = new BigDecimal(allList.get(0).getCiOrderCntNotChannel());
-                       BigDecimal badEvaluateNoChannelFlag = ebadEvaluateNum2.divide(eciBadEvaluateNoChannel, 2, BigDecimal.ROUND_HALF_UP);
-                       BigDecimal badEvaluateNoChannelSub = badEvaluateNoChannelFlag.subtract(badEvaluateNoChannelRate);
-                       p.setCriticismRatePercent(badEvaluateNoChannelSub.multiply(new BigDecimal(100)).divide(badEvaluateNoChannelRate, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                       try {
+                           BigDecimal badEvaluateNoChannelRate = new BigDecimal(p.getCriticismRate());
+                           BigDecimal ebadEvaluateNum2 = new BigDecimal(allList.get(0).getCiBadEvaluateNum());
+                           BigDecimal eciBadEvaluateNoChannel = new BigDecimal(allList.get(0).getCiOrderCntNotChannel());
+                           BigDecimal badEvaluateNoChannelFlag = ebadEvaluateNum2.divide(eciBadEvaluateNoChannel, 2, BigDecimal.ROUND_HALF_UP);
+                           BigDecimal badEvaluateNoChannelSub = badEvaluateNoChannelFlag.subtract(badEvaluateNoChannelRate);
+                           p.setCriticismRatePercent(badEvaluateNoChannelSub.multiply(new BigDecimal(100)).divide(badEvaluateNoChannelRate, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                       }catch (Exception e){
+                           logger.info("全部加盟ci计算计算差评率百分比，分母为0",e);
+                           p.setCriticismRatePercent("0%");
+                       }
                    }
                }
            }
