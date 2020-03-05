@@ -179,7 +179,7 @@
   </select>
 
 
-  <select id="getCiServiceNegativeRate"  resultType="com.zhuanche.entity.bigdata.StatisticSection">
+  <select id="getCiServiceNegativeRate"  resultType="com.zhuanche.entity.bigdata.CiOrderStatisticSection">
     <![CDATA[
         select
             DATE_FORMAT(data_date,'%Y/%m/%d') as date,

@@ -178,7 +178,7 @@ public class AllianceIndexService{
             if(supplierDriverCount>0){//查询加盟商下是否有安装ci的司机  有
                 List<CiOrderStatisticSection> rateList = biSaasCiDeviceDayExMapper.getCiServiceNegativeRate(saasIndexQuery);
                 List<StatisticSection> rateListOld = carMeasureDayExMapper.getServiceNegativeRate(saasIndexQuery);
-                if(rateList.size()!=rateList.size()){
+                if(rateList.size()!=rateListOld.size()){
                     if (!CollectionUtils.isEmpty(rateList)){
                         for(CiOrderStatisticSection s : rateList){
                             Map map = new HashMap<>(2);
