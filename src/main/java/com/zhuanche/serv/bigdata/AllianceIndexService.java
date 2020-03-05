@@ -131,7 +131,7 @@ public class AllianceIndexService{
                                     if(c!=null){
                                         BigDecimal orderNum = new BigDecimal(c.getOrderNum());
                                         BigDecimal driverNum = new BigDecimal(c.getDriverNum());
-                                        map.put(statisticSection.getDate(),orderNum.divide(driverNum, 0, BigDecimal.ROUND_HALF_UP).intValue()*statisticSection.getDriverNum());
+                                        map.put(statisticSection.getDate(),orderNum.divide(driverNum, 5, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(statisticSection.getDriverNum())).setScale(0,BigDecimal.ROUND_HALF_UP));
                                     }
                                 }
                             }else{
@@ -144,16 +144,19 @@ public class AllianceIndexService{
                     }
                 }
             }else{////查询加盟商下是否有安装ci的司机  无安装ci的司机，去全部加盟商
-                Map map = new HashMap<>(2);
                 List<CiOrderStatisticSection> statisticSectionsAll = biSaasCiDeviceDayExMapper.getCiOrderNumStatistic(saasIndexQuery);
                 if (!CollectionUtils.isEmpty(statisticSectionsAll)){
                     for(CiOrderStatisticSection all : statisticSectionsAll){
+                        Map map = new HashMap<>(2);
                         CiOrderAllStatisticSection cAll = biSaasCiDeviceDayExMapper.getAllCiOrderNumStatistic(all.getDate2());
                         BigDecimal orderNum = new BigDecimal(cAll.getOrderNum());
                         BigDecimal driverNum = new BigDecimal(cAll.getDriverNum());
-                        if(orderNum.compareTo(BigDecimal.ZERO)==1){
-                            map.put(all.getDate(),orderNum.divide(driverNum, 0, BigDecimal.ROUND_HALF_UP).intValue()*all.getDriverNum());
+                        if(driverNum.compareTo(BigDecimal.ZERO)==1){
+                            map.put(all.getDate(),orderNum.divide(driverNum, 5, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(all.getDriverNum())).setScale(0,BigDecimal.ROUND_HALF_UP));
+                        }else{
+                            map.put(all.getDate(),"1700");
                         }
+                        result.add(map);
                     }
                 }
             }
@@ -219,18 +222,22 @@ public class AllianceIndexService{
                     }
                 }
             }else{////查询加盟商下是否有安装ci的司机  无安装ci的司机，去全部加盟商
-                Map map = new HashMap<>(2);
                 List<CiOrderStatisticSection> rateListAll = biSaasCiDeviceDayExMapper.getCiServiceNegativeRate(saasIndexQuery);
                 if (!CollectionUtils.isEmpty(rateListAll)){
                     for(CiOrderStatisticSection allCi : rateListAll){
+                        Map map = new HashMap<>(2);
                         CiServiceBadEvaluateAllStatisticSection all = biSaasCiDeviceDayExMapper.getAllCiServiceNegativeRate(allCi.getDate2());
                         BigDecimal ciBadEvaluateNm = new BigDecimal(all.getCiBadEvaluateNm());
                         BigDecimal ciOrderCntNotChannel = new BigDecimal(all.getCiOrderCntNotChannel());
-                        if(ciBadEvaluateNm.compareTo(BigDecimal.ZERO)==1){
+                        if(ciOrderCntNotChannel.compareTo(BigDecimal.ZERO)==1){
                             map.put(allCi.getDate(),ciBadEvaluateNm.multiply(new BigDecimal(100)).divide(ciOrderCntNotChannel, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                        }else{
+                            map.put(allCi.getDate(),"0%");
                         }
+                        result.add(map);
                     }
                 }
+
             }
             return result;
         }catch (Exception e){
