@@ -1,20 +1,30 @@
 package com.zhuanche.controller.homekanban;
 
-import java.time.LocalDate;
-import java.util.*;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.common.util.RedisKeyUtils;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
-import com.zhuanche.entity.bigdata.*;
+import com.zhuanche.entity.bigdata.SAASCoreIndexDto;
+import com.zhuanche.entity.bigdata.SAASCoreIndexPercentDto;
+import com.zhuanche.entity.bigdata.SAASDriverRankingDto;
+import com.zhuanche.entity.bigdata.SAASIndexQuery;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.bigdata.AllianceIndexService;
+import com.zhuanche.serv.common.CitySupplierTeamService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
 import mapper.bigdata.ex.CarMeasureDayExMapper;
 import mapper.bigdata.ex.DriverRankDetaiExlMapper;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.entity.ContentType;
@@ -26,18 +36,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Maps;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.Verify;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.http.HttpClientUtil;
-import com.zhuanche.serv.common.CitySupplierTeamService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * 首页看板数据提供 
@@ -272,7 +272,7 @@ public class HomeKanBanController {
 		}
 		List<Map> orderList = new ArrayList<>();
 		List<Map> ciOrderList = new ArrayList<>();
-		Map<String,Object> map = new HashedMap<>();
+		Map<String,Object> map = new HashMap<>();
 		try{
 			SAASIndexQuery saas = setVisibleData();
 			saas.setStartDate(startDate);
@@ -332,7 +332,7 @@ public class HomeKanBanController {
 		} catch (Exception e) {
 			logger.error("缓存查询错误",e);
 		}
-		Map<String,Object> map = new HashedMap<>();
+		Map<String,Object> map = new HashMap<>();
 
 		try{
 			SAASIndexQuery saas = setVisibleData();
@@ -528,7 +528,7 @@ public class HomeKanBanController {
 
 		List<Map> rateList = new ArrayList<>();
 		List<Map> ciRateList = new ArrayList<>();
-		Map<String,Object> map = new HashedMap<>();
+		Map<String,Object> map = new HashMap<>();
 
 		try{
 			SAASIndexQuery saas = setVisibleData();
