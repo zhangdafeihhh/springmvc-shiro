@@ -376,6 +376,16 @@ public class HomeKanBanController {
 
 			long dateDiff = DateUtil.calDateDiff(startDate, endDate);
 			List<SAASCoreIndexPercentDto> list = allianceIndexService.getCiCoreIndexStatistic(saas,startDate,endDate,allianceId,motorcadeId,visibleList,visibleMotoIdsList,dateDiff);
+			if(list==null || list.size()==0){
+				map.put("completeOrderAmountPercent","1%");
+				map.put("incomeAmountPercent","1%");
+				map.put("orderPerVehiclePercent","1%");
+				map.put("incomePerVehiclePercent","1%");
+				map.put("badEvaluateAllNumPercent","-1%");
+				map.put("badEvaluateNumPercent","-1%");
+				map.put("criticismRatePercent","-1%");
+				return AjaxResponse.success(map);
+			}
 			map.put("completeOrderAmountPercent",list.get(0).getCompleteOrderAmountPerecnt());
 			map.put("incomeAmountPercent",list.get(0).getIncomeAmountPercent());
 			map.put("orderPerVehiclePercent",list.get(0).getOrderPerVehiclePercent());
