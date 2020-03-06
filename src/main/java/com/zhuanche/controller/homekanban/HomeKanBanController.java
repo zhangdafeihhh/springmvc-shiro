@@ -257,14 +257,14 @@ public class HomeKanBanController {
 				key = RedisKeyUtils.ORDER_STATISTICS_CI + stringBuffer.append(startDate).append(endDate).append(allianceId).append(motorcadeId).toString().replaceAll("null","");
 				Map<String,Object> resultList = RedisCacheUtil.get(key,Map.class);
 				if(RedisCacheUtil.exist(key) && resultList != null){
-					return  AjaxResponse.success(resultList);
+					//return  AjaxResponse.success(resultList);
 				}
 			}else {
 				key = RedisKeyUtils.ORDER_STATISTICS_CI + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate)
 						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
 				Map<String,Object> resultList = RedisCacheUtil.get(key,Map.class);
 				if(RedisCacheUtil.exist(key) && resultList != null){
-					return AjaxResponse.success(resultList);
+					//return AjaxResponse.success(resultList);
 				}
 			}
 		} catch (Exception e) {
@@ -319,14 +319,14 @@ public class HomeKanBanController {
 				key = RedisKeyUtils.CORE_STATISTICS_CI + stringBuffer.append(startDate).append(endDate).append(allianceId).append(motorcadeId).toString().replaceAll("null","");
 				Map<String,Object> resultList = RedisCacheUtil.get(key,Map.class);
 				if(RedisCacheUtil.exist(key) && resultList != null){
-					return  AjaxResponse.success(resultList);
+					//return  AjaxResponse.success(resultList);
 				}
 			}else {
 				key = RedisKeyUtils.CORE_STATISTICS_CI + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate)
 						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
 				Map<String,Object> resultList = RedisCacheUtil.get(key,Map.class);
 				if(RedisCacheUtil.exist(key) && resultList != null){
-					return AjaxResponse.success(resultList);
+					//return AjaxResponse.success(resultList);
 				}
 			}
 		} catch (Exception e) {
@@ -512,14 +512,14 @@ public class HomeKanBanController {
 				key = RedisKeyUtils.SERVICE_RATE_STATISTIS_CI + stringBuffer.append(startDate).append(endDate).append(allianceId).append(motorcadeId).toString().replaceAll("null","");
 				Map<String,Object>  resultList = RedisCacheUtil.get(key,Map.class);
 				if(RedisCacheUtil.exist(key) && resultList != null){
-					return  AjaxResponse.success(resultList);
+					//return  AjaxResponse.success(resultList);
 				}
 			}else {
 				key = RedisKeyUtils.SERVICE_RATE_STATISTIS_CI + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate)
 						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
 				Map<String,Object>  resultList = RedisCacheUtil.get(key,Map.class);
 				if(RedisCacheUtil.exist(key) && resultList != null){
-					return AjaxResponse.success(resultList);
+					//return AjaxResponse.success(resultList);
 				}
 			}
 		} catch (Exception e) {

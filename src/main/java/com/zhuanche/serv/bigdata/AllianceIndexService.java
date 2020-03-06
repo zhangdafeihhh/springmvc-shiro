@@ -202,7 +202,7 @@ public class AllianceIndexService{
                                 String oldValueStr = statisticSectionOld.getValue();
                                 BigDecimal newValue = new BigDecimal(newValueStr.substring(0,newValueStr.length()-1));
                                 BigDecimal oldValue = new BigDecimal(oldValueStr.substring(0,oldValueStr.length()-1));
-                                if(oldValue.equals("0.00%")){
+                                if(oldValue.equals("0.00%") || oldValue.equals("0%") || oldValue.equals("0.0%")){
                                     map.put(statisticSection.getDate(),oldValue);
                                 }else{
                                     if(newValue.compareTo(oldValue)==1){//安装全途宝司机有效差评总量/非渠道单-差评率大于0，则取所有加盟商安装全途宝的数据；
@@ -233,7 +233,7 @@ public class AllianceIndexService{
                         Map map = new HashMap<>(2);
                         CiOrderStatisticSection allCi = rateListAll.get(i);
                         StatisticSection s = statisticSections.get(i);
-                        if(s.getValue().equals("0.00%")){
+                        if(s.getValue().equals("0.00%")|| s.getValue().equals("0%") || s.getValue().equals("0.0%") ){
                             map.put(allCi.getDate(),s.getValue());
                         }else{
                             CiServiceBadEvaluateAllStatisticSection all = biSaasCiDeviceDayExMapper.getAllCiServiceNegativeRate(allCi.getDate2());
@@ -242,7 +242,7 @@ public class AllianceIndexService{
                             if(ciOrderCntNotChannel.compareTo(BigDecimal.ZERO)==1){
                                 map.put(allCi.getDate(),ciBadEvaluateNm.multiply(new BigDecimal(100)).divide(ciOrderCntNotChannel, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
                             }else{
-                                map.put(allCi.getDate(),"0%");
+                                map.put(allCi.getDate(),"0.00%");
                             }
                         }
                         result.add(map);
@@ -375,14 +375,14 @@ public class AllianceIndexService{
                        try {
                            BigDecimal badEvaluateAllNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateAllNum());
                            BigDecimal ciBadEvaluateCountAllb = new BigDecimal(p.getCiBadEvaluateAllNum());
-                           BigDecimal ciBadEvaluateAllFlag = ciBadEvaluateCountAllb.divide(ciDriverNumb, 5, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                           BigDecimal ciBadEvaluateAllFlag = ciBadEvaluateCountAllb.divide(ciDriverNumb, 10, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
                            BigDecimal ciBadEvaluateAllSub = ciBadEvaluateAllFlag.subtract(badEvaluateAllNum);
                            if (ciBadEvaluateAllFlag.compareTo(badEvaluateAllNum) == -1) {
                                p.setBadEvaluateAllNumPercent(ciBadEvaluateAllSub.multiply(new BigDecimal(100)).divide(badEvaluateAllNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
                            } else {
                                BigDecimal ebadEvaluateAllNum = new BigDecimal(allList.get(0).getCiBadEvaluateAllNum());
                                BigDecimal eciDriverNumb5 = new BigDecimal(allList.get(0).getCiDriverNum());
-                               ciBadEvaluateAllFlag = ebadEvaluateAllNum.divide(eciDriverNumb5, 5, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                               ciBadEvaluateAllFlag = ebadEvaluateAllNum.divide(eciDriverNumb5, 10, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
                                ciBadEvaluateAllSub = ciBadEvaluateAllFlag.subtract(badEvaluateAllNum);
                                p.setBadEvaluateAllNumPercent(ciBadEvaluateAllSub.multiply(new BigDecimal(100)).divide(badEvaluateAllNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
                            }
@@ -395,14 +395,14 @@ public class AllianceIndexService{
                        BigDecimal ciBadEvaluateCountb = new BigDecimal(p.getCiBadEvaluateNum());
                        try {
                            BigDecimal badEvaluateNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateNum());
-                           BigDecimal ciBadEvaluateFlag = ciBadEvaluateCountb.divide(ciDriverNumb, 5, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                           BigDecimal ciBadEvaluateFlag = ciBadEvaluateCountb.divide(ciDriverNumb, 10, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
                            BigDecimal ciBadEvaluateSub = ciBadEvaluateFlag.subtract(badEvaluateNum);
                            if (ciBadEvaluateFlag.compareTo(badEvaluateNum) == -1) {
                                p.setBadEvaluateNumPercent(ciBadEvaluateSub.multiply(new BigDecimal(100)).divide(badEvaluateNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
                            } else {
                                BigDecimal ebadEvaluateNum = new BigDecimal(allList.get(0).getCiBadEvaluateNum());
                                BigDecimal eciDriverNumb6 = new BigDecimal(allList.get(0).getCiDriverNum());
-                               ciBadEvaluateFlag = ebadEvaluateNum.divide(eciDriverNumb6, 5, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                               ciBadEvaluateFlag = ebadEvaluateNum.divide(eciDriverNumb6, 10, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
                                ciBadEvaluateSub = ciBadEvaluateFlag.subtract(badEvaluateNum);
                                p.setBadEvaluateNumPercent(ciBadEvaluateSub.multiply(new BigDecimal(100)).divide(badEvaluateNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
                            }
@@ -415,7 +415,7 @@ public class AllianceIndexService{
                        try{
                            BigDecimal badEvaluateNoChannelRate = new BigDecimal(saasCoreIndexDtoList.get(0).getCriticismRate().substring(0,saasCoreIndexDtoList.get(0).getCriticismRate().length()-1)).divide(new BigDecimal(100),10, BigDecimal.ROUND_HALF_UP);
                            BigDecimal ciBadEvaluateNoChannel = new BigDecimal(p.getCiOrderCntNotChannel());
-                           BigDecimal badEvaluateNoChannelFlag = ciBadEvaluateCountb.divide(ciBadEvaluateNoChannel, 5, BigDecimal.ROUND_HALF_UP);
+                           BigDecimal badEvaluateNoChannelFlag = ciBadEvaluateCountb.divide(ciBadEvaluateNoChannel, 10, BigDecimal.ROUND_HALF_UP);
                            BigDecimal badEvaluateNoChannelSub = badEvaluateNoChannelFlag.subtract(badEvaluateNoChannelRate);
                            if(badEvaluateNoChannelFlag.compareTo(badEvaluateNoChannelRate)==-1){
                                p.setCriticismRatePercent(badEvaluateNoChannelSub.multiply(new BigDecimal(100)).divide(badEvaluateNoChannelRate, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
@@ -486,7 +486,7 @@ public class AllianceIndexService{
                        try {
                            BigDecimal badEvaluateAllNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateAllNum());
                            BigDecimal ebadEvaluateAllNum = new BigDecimal(allList.get(0).getCiBadEvaluateAllNum());
-                           BigDecimal ciBadEvaluateAllFlag = ebadEvaluateAllNum.divide(eciDriverNumb, 5, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                           BigDecimal ciBadEvaluateAllFlag = ebadEvaluateAllNum.divide(eciDriverNumb, 10, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
                            BigDecimal ciBadEvaluateAllSub = ciBadEvaluateAllFlag.subtract(badEvaluateAllNum);
                            p.setBadEvaluateAllNumPercent(ciBadEvaluateAllSub.multiply(new BigDecimal(100)).divide(badEvaluateAllNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
                        }catch (Exception e){
@@ -498,7 +498,7 @@ public class AllianceIndexService{
                        try {
                            BigDecimal badEvaluateNum = new BigDecimal(saasCoreIndexDtoList.get(0).getBadEvaluateNum());
                            BigDecimal ebadEvaluateNum = new BigDecimal(allList.get(0).getCiBadEvaluateNum());
-                           BigDecimal ciBadEvaluateFlag = ebadEvaluateNum.divide(eciDriverNumb, 5, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
+                           BigDecimal ciBadEvaluateFlag = ebadEvaluateNum.divide(eciDriverNumb, 10, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
                            BigDecimal ciBadEvaluateSub = ciBadEvaluateFlag.subtract(badEvaluateNum);
                            p.setBadEvaluateNumPercent(ciBadEvaluateSub.multiply(new BigDecimal(100)).divide(badEvaluateNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
                        }catch (Exception e){
