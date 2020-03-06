@@ -119,7 +119,7 @@
             IFNULL(sum(ci_bad_evaluate_all_num),0) as ciBadEvaluateAllNum,
             IFNULL(sum(ci_bad_evaluate_num),0) as ciBadEvaluateNum,
             IFNULL(sum(ci_order_cnt_notchannel),0) as ciOrderCntNotChannel,
-            IFNULL(FORMAT(sum(bad_evaluate_num)*100/sum(order_cnt_notchannel),2),0) as criticismRate
+            IFNULL(FORMAT(sum(bad_evaluate_num)/sum(order_cnt_notchannel),4),0) as criticismRate
         from bi_saas_ci_device_day
         ]]>
     <where>
