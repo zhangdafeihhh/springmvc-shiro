@@ -202,15 +202,19 @@ public class AllianceIndexService{
                                 String oldValueStr = statisticSectionOld.getValue();
                                 BigDecimal newValue = new BigDecimal(newValueStr.substring(0,newValueStr.length()-1));
                                 BigDecimal oldValue = new BigDecimal(oldValueStr.substring(0,oldValueStr.length()-1));
-                                if(newValue.compareTo(oldValue)==1){//安装全途宝司机有效差评总量/非渠道单-差评率大于0，则取所有加盟商安装全途宝的数据；
-                                    CiServiceBadEvaluateAllStatisticSection all = biSaasCiDeviceDayExMapper.getAllCiServiceNegativeRate(statisticSection.getDate2());
-                                    if(all!=null){
-                                        BigDecimal ciBadEvaluateNm = new BigDecimal(all.getCiBadEvaluateNm());
-                                        BigDecimal ciOrderCntNotChannel = new BigDecimal(all.getCiOrderCntNotChannel());
-                                        map.put(statisticSection.getDate(),ciBadEvaluateNm.multiply(new BigDecimal(100)).divide(ciOrderCntNotChannel, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
-                                    }
+                                if(oldValue.equals("0.00%")){
+                                    map.put(statisticSection.getDate(),oldValue);
                                 }else{
-                                    map.put(statisticSection.getDate(),statisticSection.getValue());
+                                    if(newValue.compareTo(oldValue)==1){//安装全途宝司机有效差评总量/非渠道单-差评率大于0，则取所有加盟商安装全途宝的数据；
+                                        CiServiceBadEvaluateAllStatisticSection all = biSaasCiDeviceDayExMapper.getAllCiServiceNegativeRate(statisticSection.getDate2());
+                                        if(all!=null){
+                                            BigDecimal ciBadEvaluateNm = new BigDecimal(all.getCiBadEvaluateNm());
+                                            BigDecimal ciOrderCntNotChannel = new BigDecimal(all.getCiOrderCntNotChannel());
+                                            map.put(statisticSection.getDate(),ciBadEvaluateNm.multiply(new BigDecimal(100)).divide(ciOrderCntNotChannel, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                                        }
+                                    }else{
+                                        map.put(statisticSection.getDate(),statisticSection.getValue());
+                                    }
                                 }
                             }else{
                                 map.put(rateList.get(i).getDate(),rateList.get(i).getValue());
@@ -222,17 +226,24 @@ public class AllianceIndexService{
                     }
                 }
             }else{////查询加盟商下是否有安装ci的司机  无安装ci的司机，去全部加盟商
+                List<StatisticSection> statisticSections = carMeasureDayExMapper.getServiceNegativeRate(saasIndexQuery);
                 List<CiOrderStatisticSection> rateListAll = biSaasCiDeviceDayExMapper.getCiServiceNegativeRate(saasIndexQuery);
                 if (!CollectionUtils.isEmpty(rateListAll)){
-                    for(CiOrderStatisticSection allCi : rateListAll){
+                    for(int i =0 ;i<rateListAll.size();i++){
                         Map map = new HashMap<>(2);
-                        CiServiceBadEvaluateAllStatisticSection all = biSaasCiDeviceDayExMapper.getAllCiServiceNegativeRate(allCi.getDate2());
-                        BigDecimal ciBadEvaluateNm = new BigDecimal(all.getCiBadEvaluateNm());
-                        BigDecimal ciOrderCntNotChannel = new BigDecimal(all.getCiOrderCntNotChannel());
-                        if(ciOrderCntNotChannel.compareTo(BigDecimal.ZERO)==1){
-                            map.put(allCi.getDate(),ciBadEvaluateNm.multiply(new BigDecimal(100)).divide(ciOrderCntNotChannel, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                        CiOrderStatisticSection allCi = rateListAll.get(i);
+                        StatisticSection s = statisticSections.get(i);
+                        if(s.getValue().equals("0.00%")){
+                            map.put(allCi.getDate(),s.getValue());
                         }else{
-                            map.put(allCi.getDate(),"0%");
+                            CiServiceBadEvaluateAllStatisticSection all = biSaasCiDeviceDayExMapper.getAllCiServiceNegativeRate(allCi.getDate2());
+                            BigDecimal ciBadEvaluateNm = new BigDecimal(all.getCiBadEvaluateNm());
+                            BigDecimal ciOrderCntNotChannel = new BigDecimal(all.getCiOrderCntNotChannel());
+                            if(ciOrderCntNotChannel.compareTo(BigDecimal.ZERO)==1){
+                                map.put(allCi.getDate(),ciBadEvaluateNm.multiply(new BigDecimal(100)).divide(ciOrderCntNotChannel, 2, BigDecimal.ROUND_HALF_UP).toString()+"%");
+                            }else{
+                                map.put(allCi.getDate(),"0%");
+                            }
                         }
                         result.add(map);
                     }
@@ -265,8 +276,18 @@ public class AllianceIndexService{
            Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery);
            List<SAASCoreIndexPercentDto> list = biSaasCiDeviceDayExMapper.getCiCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff);
            if("0".equals(list.get(0).getDriverNum())){
+               List<SAASCoreIndexPercentDto> zeroList = new ArrayList<>();
                logger.error("加盟商下面没有司机============");
-               return new ArrayList<>();
+               SAASCoreIndexPercentDto s = new SAASCoreIndexPercentDto();
+               s.setCompleteOrderAmountPerecnt("0%");
+               s.setIncomeAmountPercent("0%");
+               s.setOrderPerVehiclePercent("0%");
+               s.setIncomePerVehiclePercent("0%");
+               s.setBadEvaluateAllNumPercent("0%");
+               s.setBadEvaluateNumPercent("0%");
+               s.setCriticismRatePercent("0%");
+               zeroList.add(s);
+               return zeroList;
            }
            List<SAASAllCoreIndexPercentDto> allList = biSaasCiDeviceDayExMapper.getCiAllCoreIndexStatistic(startDate,endDate);
            if(supplierDriverCount>0) {//查询加盟商下是否有安装ci的司机  有
