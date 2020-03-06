@@ -30,4 +30,6 @@ public class RedisKeyUtils {
 
     public static final String MP_ORDER_APPRAISAL = "mp_order_appraisal_"; //司机评价查询
 
+    public static final String SERVICE_RATE_STATISTIS_CI = "service_evaluation_rate_statistics_ci_"; //服务差评率
+
 }
