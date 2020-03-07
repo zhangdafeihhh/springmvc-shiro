@@ -131,7 +131,7 @@ public class AllianceIndexService{
                                     if(c!=null){
                                         BigDecimal orderNum = new BigDecimal(c.getOrderNum());
                                         BigDecimal driverNum = new BigDecimal(c.getDriverNum());
-                                        map.put(statisticSection.getDate(),orderNum.divide(driverNum, 5, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(statisticSection.getDriverNum())).setScale(0,BigDecimal.ROUND_HALF_UP));
+                                        map.put(statisticSection.getDate(),orderNum.divide(driverNum, 5, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(statisticSection.getDriverNum())).setScale(0,BigDecimal.ROUND_HALF_UP).toString());
                                     }
                                 }
                             }else{
@@ -152,7 +152,7 @@ public class AllianceIndexService{
                         BigDecimal orderNum = new BigDecimal(cAll.getOrderNum());
                         BigDecimal driverNum = new BigDecimal(cAll.getDriverNum());
                         if(driverNum.compareTo(BigDecimal.ZERO)==1){
-                            map.put(all.getDate(),orderNum.divide(driverNum, 5, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(all.getDriverNum())).setScale(0,BigDecimal.ROUND_HALF_UP));
+                            map.put(all.getDate(),orderNum.divide(driverNum, 5, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(all.getDriverNum())).setScale(0,BigDecimal.ROUND_HALF_UP).toString());
                         }else{
                             map.put(all.getDate(),"1700");
                         }
