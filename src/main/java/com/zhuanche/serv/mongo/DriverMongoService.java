@@ -70,8 +70,8 @@ public class DriverMongoService {
 	//	http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=43156150
 	private static final String UPDATE_COOPERATION="/v1/driver/update/cooperationType/supplierId";
 
-	@Resource(name = "driverMongoTemplate")
-	private MongoTemplate driverMongoTemplate;
+//	@Resource(name = "driverMongoTemplate")
+//	private MongoTemplate driverMongoTemplate;
 
 	/**
 	 * 查询司机mongo
@@ -79,26 +79,22 @@ public class DriverMongoService {
 	 * @return
 	 */
 	public DriverMongo findByDriverId(Integer driverId) {
-		if(Dicts.getBoolean("DRIVERMONGO_QUERY_FLAG",false)){
-			DriverMongo driverMongo = new DriverMongo();
-			Map<String,Object> params = new HashMap<String,Object>();
-			params.put("businessId", Common.DRIVER_MONGO_HTTP_BUSINESSID);
-			params.put("transId", Md5Util.md5(UUID.randomUUID().toString()));
-			params.put("driverId",driverId);
-			logger.info("{},params:{}",QUERY_DRIVERID,params);
-			JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(driverMongoUrl + QUERY_DRIVERID, params, 3000,"vehicleManage");
-			logger.info("{},result:{}",QUERY_DRIVERID,jsonObject);
-			int code = jsonObject.getIntValue("code");
-			if(code == 0){
-				jsonObject.getJSONObject("data");
-				driverMongo = JSONObject.toJavaObject(jsonObject, DriverMongo.class);
-			}
-			return driverMongo;
+		DriverMongo driverMongo = new DriverMongo();
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("businessId", Common.DRIVER_MONGO_HTTP_BUSINESSID);
+		params.put("transId", Md5Util.md5(UUID.randomUUID().toString()));
+		params.put("driverId",driverId);
+		logger.info("{},params:{}",QUERY_DRIVERID,params);
+		JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(driverMongoUrl + QUERY_DRIVERID, params, 3000,"vehicleManage");
+		logger.info("{},result:{}",QUERY_DRIVERID,jsonObject);
+		int code = jsonObject.getIntValue("code");
+		if(code == 0){
+			jsonObject.getJSONObject("data");
+			driverMongo = JSONObject.toJavaObject(jsonObject, DriverMongo.class);
 		}else{
-			Query query = new Query(Criteria.where("driverId").is(driverId));
-			DriverMongo  driverMongo = driverMongoTemplate.findOne(query, DriverMongo.class);
-			return driverMongo;
+			logger.error(QUERY_DRIVERID+" faild,code={}",code);
 		}
+		return null;
 	}
 
 	/**
@@ -223,23 +219,23 @@ public class DriverMongoService {
 	}
 
 	/**
-	 * 更新司机信用卡信息
+	 * 更新司机信用卡信息  已废弃
 	 * @param map
 	 */
 	public void updateDriverCardInfo (Map<String, Object> map) {
 		// 更新mongoDB
-		Query query = new Query(Criteria.where("driverId").is(Integer.parseInt((String)map.get("driverId"))));
-		Update update = new Update();
-		update.set("updateBy", map.get("updateBy"));
-		update.set("creditOpenAccountBank", map.get("creditOpenAccountBank"));
-		update.set("shortCardNo", map.get("shortCardNo"));
-		update.set("isBindingCreditCard", map.get("isBindingCreditCard"));
-		update.set("creditCardNo", map.get("creditCardNo"));
-		update.set("CVN2", map.get("CVN2"));
-		update.set("phone", map.get("phone"));
-		update.set("bindTime", map.get("bindTime"));
-		update.set("expireDate", map.get("expireDate"));
-		driverMongoTemplate.updateFirst(query, update,DriverMongo.class);
+//		Query query = new Query(Criteria.where("driverId").is(Integer.parseInt((String)map.get("driverId"))));
+//		Update update = new Update();
+//		update.set("updateBy", map.get("updateBy"));
+//		update.set("creditOpenAccountBank", map.get("creditOpenAccountBank"));
+//		update.set("shortCardNo", map.get("shortCardNo"));
+//		update.set("isBindingCreditCard", map.get("isBindingCreditCard"));
+//		update.set("creditCardNo", map.get("creditCardNo"));
+//		update.set("CVN2", map.get("CVN2"));
+//		update.set("phone", map.get("phone"));
+//		update.set("bindTime", map.get("bindTime"));
+//		update.set("expireDate", map.get("expireDate"));
+//		driverMongoTemplate.updateFirst(query, update,DriverMongo.class);
 	}
 
 	@Autowired
