@@ -34,7 +34,7 @@ public class CarBizCustomerAppraisalExServiceImpl implements CarBizCustomerAppra
         params.setCreateDateEnd(params.getCreateDateEnd() + " 23:59:59");
 
         //乘客评价司机迁移配置中心 开关控制 customer_appraisal
-        String appraisalStatus = Dicts.getString("customer_appraisal", "false");
+        String appraisalStatus = Dicts.getString("customer_appraisal", "true");
         if ("true".equals(appraisalStatus)){
             List<CarBizCustomerAppraisal> list  = customerAppraisalMapper.queryForListObject(params);
             PageInfo<CarBizCustomerAppraisal> pageInfo = new PageInfo<>(list);
