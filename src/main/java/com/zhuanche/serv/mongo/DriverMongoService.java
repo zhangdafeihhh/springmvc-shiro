@@ -3,15 +3,9 @@ package com.zhuanche.serv.mongo;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.le.config.dict.Dicts;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
-
-import java.util.*;
-
-import javax.annotation.Resource;
-
 import com.zhuanche.mongo.driverwidemongo.DriverWideMongo;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.Md5Util;
@@ -21,11 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 
 /**
@@ -69,9 +61,6 @@ public class DriverMongoService {
 
 	//	http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=43156150
 	private static final String UPDATE_COOPERATION="/v1/driver/update/cooperationType/supplierId";
-
-//	@Resource(name = "driverMongoTemplate")
-//	private MongoTemplate driverMongoTemplate;
 
 	/**
 	 * 查询司机mongo

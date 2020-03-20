@@ -29,11 +29,11 @@
 	</mongo:mongo>
 	
 	<!-- Spring提供的mongodb操作模板 driverDB库 -->
-	<bean id="driverMongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-		<constructor-arg name="mongoDbFactory">
-			<mongo:db-factory dbname="${mongo.database}"  mongo-ref="mongoClient"/>
-		</constructor-arg>
-	</bean>
+	<!--<bean id="driverMongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">-->
+		<!--<constructor-arg name="mongoDbFactory">-->
+			<!--<mongo:db-factory dbname="${mongo.database}"  mongo-ref="mongoClient"/>-->
+		<!--</constructor-arg>-->
+	<!--</bean>-->
 	<!-- Spring提供的mongodb操作模板 carDB库 -->
 	<bean id="carMongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
 		<constructor-arg name="mongoDbFactory">
