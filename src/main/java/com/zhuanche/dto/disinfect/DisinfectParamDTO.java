@@ -3,7 +3,7 @@ package com.zhuanche.dto.disinfect;
 import com.zhuanche.entity.common.BaseEntity;
 import lombok.Data;
 
-import java.util.Date;
+import javax.validation.constraints.NotNull;
 
 /**
  * 消毒入参dto
@@ -18,9 +18,9 @@ public class DisinfectParamDTO extends BaseEntity {
     private String phone;
 
     private String name;
-
+    @NotNull(message = "城市必选")
     private Integer cityId;
-
+    @NotNull(message = "供应商必选")
     private Integer supplierId;
 
     private String licensePlates;
@@ -31,8 +31,9 @@ public class DisinfectParamDTO extends BaseEntity {
     /**
      * 消毒时间
      */
+    @NotNull(message = "消毒时间必选")
     private String disinfectTimeStart;
-
+    @NotNull(message = "消毒时间必选")
     private String disinfectTimeEnd;
 
 }
