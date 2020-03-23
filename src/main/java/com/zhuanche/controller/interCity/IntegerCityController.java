@@ -2718,12 +2718,7 @@ public class IntegerCityController {
                 endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone));
         Long currentTime = System.currentTimeMillis();
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-        Set<Integer> citiesSet = new HashSet<>();
-        if (cityId != null) {
-            citiesSet.add(cityId);
-        } else {
-            citiesSet = loginUser.getCityIds();
-        }
+
         Map<String, Object> map = Maps.newHashMap();
         map.put("pageNo", 1);
         map.put("pageSize", 1000);
@@ -2746,9 +2741,11 @@ public class IntegerCityController {
         map.put("riderPhone", riderPhone);
         map.put("serviceTypeIdBatch", "68");
 
+
         String supplierIdBatch = "";
         if (!WebSessionUtil.isSupperAdmin()) {
             Set<Integer> suppliersSet = loginUser.getSupplierIds();
+            //如果是供应商级别
             if (suppliersSet != null && suppliersSet.size() > 0) {
                 StringBuilder supplierBuilder = new StringBuilder();
                 for (Integer supplierId : suppliersSet) {
@@ -2758,12 +2755,22 @@ public class IntegerCityController {
                     supplierIdBatch = supplierBuilder.toString().substring(0, supplierBuilder.toString().length() - 1);
                 }
                 String lineIds = this.getLineIdBySupplierIds(supplierIdBatch);
+                if(StringUtils.isEmpty(lineIds)){
+                    logger.info("=========该供应商未配置线路============");
+                    return AjaxResponse.success(null);
+                }
+
                 if (StringUtils.isNotBlank(lineIds)) {
                     map.put("ruleIdBatch", lineIds);
                 } else {
                     map.put("ruleIdBatch", "-1");
                 }
             }
+            //如果是城市级别
+           if(CollectionUtils.isNotEmpty(loginUser.getCityIds())){
+               map.put("cityIdBatch",loginUser.getCityIds());
+           }
+
         }
 
         map.put("supplierIdBatch", "");

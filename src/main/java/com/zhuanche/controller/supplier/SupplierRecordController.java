@@ -216,13 +216,13 @@ public class SupplierRecordController {
                                    @Verify(param = "contactsPhone",rule = "required") String contactsPhone,
                                    @Verify(param = "email",rule = "required") String email,
                                    @Verify(param = "address",rule = "required") String address,
-                                   @Verify(param = "customerPhone",rule = "required")String customerPhone,
+                                   String customerPhone,
                                    String customerLineNumber){
         SupplierExtDto dto = new SupplierExtDto();
         try {
             dto.setSupplierId(supplierId);
             dto.setEmail(email);
-            dto.setCustomerPhone(customerPhone);
+            dto.setCustomerPhone(customerPhone==null?"":customerPhone);
             dto.setCustomerLineNumber(customerLineNumber);
             int code = recordService.editExtDto(dto);
             CarBizSupplierVo supplier = new CarBizSupplierVo();
