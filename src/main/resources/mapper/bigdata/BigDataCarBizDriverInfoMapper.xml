@@ -128,18 +128,121 @@
     cooperation_type, group_id, contract_type, contract_no, contract_file, is_two_shifts, 
     is_image
   </sql>
+    <sql id="wheres">
+        WHERE 1 = 1
+        <if test="cityId != null">
+            AND driver.service_city = #{cityId}
+        </if>
+        <if test="supplierId != null">
+            AND driver.supplier_id = #{supplierId}
+        </if>
+        <if test="driverId != null">
+            AND driver.driver_id = #{driverId}
+        </if>
+        <if test="name != null and name != ''">
+            AND driver.name LIKE CONCAT(#{name},'%')
+        </if>
+        <if test="licensePlates != null and licensePlates != ''">
+            AND driver.license_plates = #{license_plates}
+        </if>
+        <if test="disinfectStatus ==1 or disinfectStatus == 2">
+            AND record.audit_status = #{disinfectStatus}
+        </if>
+        <if test="disinfectStatus ==3">
+            AND record.audit_status is null
+        </if>
+        <if test="disinfectTimeStart != null and disinfectTimeStart != ''">
+            AND record.create_time <![CDATA[>= ]]> #{disinfectTimeStart}
+        </if>
+        <if test="disinfectTimeEnd != null and disinfectTimeEnd != ''">
+            AND record.create_time <![CDATA[<= ]]> #{disinfectTimeEnd}
+        </if>
+    </sql>
+    <sql id="wheresnone">
+        WHERE 1 = 1
+        <if test="cityId != null">
+            AND driver.service_city = #{cityId}
+        </if>
+        <if test="supplierId != null">
+            AND driver.supplier_id = #{supplierId}
+        </if>
+        <if test="driverId != null">
+            AND driver.driver_id = #{driverId}
+        </if>
+        <if test="name != null and name != ''">
+            AND driver.name LIKE CONCAT(#{name},'%')
+        </if>
+        <if test="licensePlates != null and licensePlates != ''">
+            AND driver.license_plates = #{license_plates}
+        </if>
+        <if test="disinfectStatus ==1 or disinfectStatus == 2">
+            AND record.audit_status = #{disinfectStatus}
+        </if>
+        <if test="disinfectStatus ==3">
+            AND record.audit_status is null
+        </if>
+          AND record.create_time is null
+    </sql>
   <sql id="Blob_Column_List" >
     memo
   </sql>
   <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
-    select 
+    select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
     from car_biz_driver_info
     where driver_id = #{driverId,jdbcType=INTEGER}
   </select>
-  <insert id="insert" parameterType="com.zhuanche.entity.bigdata.BigDataCarBizDriverInfo" >
+    <select id="list" resultType="com.zhuanche.dto.disinfect.DisinfectResultDTO" parameterType="com.zhuanche.dto.disinfect.DisinfectParamDTO">
+      select
+        driver.driver_id as driverId,
+        driver.phone as phone,
+        driver.name as name,
+        driver.service_city as cityId,
+        driver.supplier_id as supplierId,
+        driver.license_plates as licensePlates,
+        record.create_time as disinfectTime,
+        record.img_url as disinfectImgUrl,
+        record.city_name as cityName,
+        CASE
+        record.audit_status
+        WHEN 1 THEN
+        1
+        WHEN 2 THEN
+        2 ELSE 3
+        END disinfectStatus
+        FROM car_biz_driver_info driver force index(idx_s_c_u)
+        LEFT JOIN disinfect_record record
+        ON driver.driver_id = record.driver_id
+        <include refid="wheres"/>
+
+        UNION ALL
+
+        SELECT
+        driver.driver_id AS driverId,
+        driver.phone AS phone,
+        driver.NAME AS NAME,
+        driver.service_city AS cityId,
+        driver.supplier_id AS supplierId,
+        driver.license_plates AS licensePlates,
+        record.create_time AS disinfectTime,
+        record.img_url AS disinfectImgUrl,
+        record.city_name as cityName,
+        CASE
+        record.audit_status
+        WHEN 1 THEN
+        1
+        WHEN 2 THEN
+        2 ELSE 3
+        END audits
+        FROM
+        car_biz_driver_info driver force index(idx_s_c_u)
+        LEFT JOIN disinfect_record record
+        on driver.driver_id = record.driver_id
+        <include refid="wheresnone"/>
+    </select>
+    <insert id="insert" parameterType="com.zhuanche.entity.bigdata.BigDataCarBizDriverInfo" >
     insert into car_biz_driver_info (driver_id, password, phone, 
       gender, name, supplier_id, 
       age, current_address, emergency_contact_person, 

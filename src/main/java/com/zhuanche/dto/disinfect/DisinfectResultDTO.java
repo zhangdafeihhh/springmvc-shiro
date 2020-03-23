@@ -10,7 +10,7 @@ import java.util.Date;
  * @author admin
  */
 @Data
-public class DisinfectResultDTO {
+public class DisinfectResultDTO implements java.io.Serializable{
 
     private Integer driverId;
 
