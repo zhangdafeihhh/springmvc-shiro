@@ -1,13 +1,8 @@
-package mapper.driver;
+package mapper.bigdata;
 
-import com.zhuanche.entity.driver.DisinfectRecord;
+import com.zhuanche.entity.bigdata.DisinfectRecord;
 
-/**
- * @author admin
- */
 public interface DisinfectRecordMapper {
-    int deleteByPrimaryKey(Integer id);
-
     int insert(DisinfectRecord record);
 
     int insertSelective(DisinfectRecord record);

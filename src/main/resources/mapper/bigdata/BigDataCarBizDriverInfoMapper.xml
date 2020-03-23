@@ -1,0 +1,1355 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.bigdata.BigDataCarBizDriverInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.bigdata.BigDataCarBizDriverInfo" >
+    <id column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="gender" property="gender" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="age" property="age" jdbcType="INTEGER" />
+    <result column="current_address" property="currentAddress" jdbcType="VARCHAR" />
+    <result column="emergency_contact_person" property="emergencyContactPerson" jdbcType="VARCHAR" />
+    <result column="emergency_contact_number" property="emergencyContactNumber" jdbcType="VARCHAR" />
+    <result column="id_card_no" property="idCardNo" jdbcType="VARCHAR" />
+    <result column="superintend_no" property="superintendNo" jdbcType="VARCHAR" />
+    <result column="superintend_url" property="superintendUrl" jdbcType="VARCHAR" />
+    <result column="driving_license_type" property="drivingLicenseType" jdbcType="VARCHAR" />
+    <result column="driving_years" property="drivingYears" jdbcType="INTEGER" />
+    <result column="archives_no" property="archivesNo" jdbcType="VARCHAR" />
+    <result column="issue_date" property="issueDate" jdbcType="TIMESTAMP" />
+    <result column="expire_date" property="expireDate" jdbcType="TIMESTAMP" />
+    <result column="service_city" property="serviceCity" jdbcType="INTEGER" />
+    <result column="attachment_name" property="attachmentName" jdbcType="VARCHAR" />
+    <result column="attachment_addr" property="attachmentAddr" jdbcType="VARCHAR" />
+    <result column="account_bank" property="accountBank" jdbcType="VARCHAR" />
+    <result column="bank_account_no" property="bankAccountNo" jdbcType="VARCHAR" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="mac" property="mac" jdbcType="VARCHAR" />
+    <result column="photoSrct" property="photosrct" jdbcType="VARCHAR" />
+    <result column="push_id" property="pushId" jdbcType="VARCHAR" />
+    <result column="is_binding_credit_card" property="isBindingCreditCard" jdbcType="INTEGER" />
+    <result column="app_version" property="appVersion" jdbcType="VARCHAR" />
+    <result column="credit_card_no" property="creditCardNo" jdbcType="VARCHAR" />
+    <result column="storable_card_no" property="storableCardNo" jdbcType="VARCHAR" />
+    <result column="credit_open_account_bank" property="creditOpenAccountBank" jdbcType="VARCHAR" />
+    <result column="credit_card_period_of_validity" property="creditCardPeriodOfValidity" jdbcType="VARCHAR" />
+    <result column="grab_notice" property="grabNotice" jdbcType="INTEGER" />
+    <result column="credit_CVN2" property="creditCvn2" jdbcType="VARCHAR" />
+    <result column="credit_bind_date" property="creditBindDate" jdbcType="TIMESTAMP" />
+    <result column="quickpay_customerid" property="quickpayCustomerid" jdbcType="VARCHAR" />
+    <result column="is_read" property="isRead" jdbcType="INTEGER" />
+    <result column="bankid" property="bankid" jdbcType="VARCHAR" />
+    <result column="go_home_address" property="goHomeAddress" jdbcType="VARCHAR" />
+    <result column="go_home_point_loBD" property="goHomePointLobd" jdbcType="VARCHAR" />
+    <result column="go_home_point_laBD" property="goHomePointLabd" jdbcType="VARCHAR" />
+    <result column="go_home_point_la" property="goHomePointLa" jdbcType="VARCHAR" />
+    <result column="go_home_point_lo" property="goHomePointLo" jdbcType="VARCHAR" />
+    <result column="go_home_status" property="goHomeStatus" jdbcType="INTEGER" />
+    <result column="update_go_home_date" property="updateGoHomeDate" jdbcType="VARCHAR" />
+    <result column="imei" property="imei" jdbcType="VARCHAR" />
+    <result column="driverLicenseNumber" property="driverlicensenumber" jdbcType="VARCHAR" />
+    <result column="drivingLicenseImg" property="drivinglicenseimg" jdbcType="VARCHAR" />
+    <result column="firstDrivingLicenseDate" property="firstdrivinglicensedate" jdbcType="VARCHAR" />
+    <result column="firstMeshworkDrivingLicenseDate" property="firstmeshworkdrivinglicensedate" jdbcType="VARCHAR" />
+    <result column="nationality" property="nationality" jdbcType="VARCHAR" />
+    <result column="householdRegister" property="householdregister" jdbcType="VARCHAR" />
+    <result column="nation" property="nation" jdbcType="VARCHAR" />
+    <result column="marriage" property="marriage" jdbcType="VARCHAR" />
+    <result column="foreignLanguage" property="foreignlanguage" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="education" property="education" jdbcType="VARCHAR" />
+    <result column="courseName" property="coursename" jdbcType="VARCHAR" />
+    <result column="courseDate" property="coursedate" jdbcType="VARCHAR" />
+    <result column="courseDateStart" property="coursedatestart" jdbcType="VARCHAR" />
+    <result column="courseDateEnd" property="coursedateend" jdbcType="VARCHAR" />
+    <result column="courseTime" property="coursetime" jdbcType="VARCHAR" />
+    <result column="corpType" property="corptype" jdbcType="VARCHAR" />
+    <result column="trafficViolations" property="trafficviolations" jdbcType="VARCHAR" />
+    <result column="signDate" property="signdate" jdbcType="VARCHAR" />
+    <result column="signDateEnd" property="signdateend" jdbcType="VARCHAR" />
+    <result column="contractDate" property="contractdate" jdbcType="VARCHAR" />
+    <result column="isXyDriver" property="isxydriver" jdbcType="INTEGER" />
+    <result column="partTimeJobDri" property="parttimejobdri" jdbcType="VARCHAR" />
+    <result column="phoneType" property="phonetype" jdbcType="VARCHAR" />
+    <result column="phoneCorp" property="phonecorp" jdbcType="VARCHAR" />
+    <result column="appVersion" property="appversion" jdbcType="VARCHAR" />
+    <result column="mapType" property="maptype" jdbcType="VARCHAR" />
+    <result column="emergencyContactAddr" property="emergencycontactaddr" jdbcType="VARCHAR" />
+    <result column="assessment" property="assessment" jdbcType="VARCHAR" />
+    <result column="driverLicenseIssuingDateStart" property="driverlicenseissuingdatestart" jdbcType="VARCHAR" />
+    <result column="driverLicenseIssuingDateEnd" property="driverlicenseissuingdateend" jdbcType="VARCHAR" />
+    <result column="driverLicenseIssuingCorp" property="driverlicenseissuingcorp" jdbcType="VARCHAR" />
+    <result column="driverLicenseIssuingNumber" property="driverlicenseissuingnumber" jdbcType="VARCHAR" />
+    <result column="xy_driver_number" property="xyDriverNumber" jdbcType="VARCHAR" />
+    <result column="driver_license_issuing_register_date" property="driverLicenseIssuingRegisterDate" jdbcType="VARCHAR" />
+    <result column="driver_license_issuing_first_date" property="driverLicenseIssuingFirstDate" jdbcType="VARCHAR" />
+    <result column="driver_license_issuing_grant_date" property="driverLicenseIssuingGrantDate" jdbcType="VARCHAR" />
+    <result column="birth_day" property="birthDay" jdbcType="VARCHAR" />
+    <result column="house_hold_register_permanent" property="houseHoldRegisterPermanent" jdbcType="VARCHAR" />
+    <result column="is_upload_card" property="isUploadCard" jdbcType="INTEGER" />
+    <result column="is_must_confirmation" property="isMustConfirmation" jdbcType="INTEGER" />
+    <result column="account_type" property="accountType" jdbcType="INTEGER" />
+    <result column="cooperation_type" property="cooperationType" jdbcType="INTEGER" />
+    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+    <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
+    <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
+    <result column="contract_file" property="contractFile" jdbcType="VARCHAR" />
+    <result column="is_two_shifts" property="isTwoShifts" jdbcType="INTEGER" />
+    <result column="is_image" property="isImage" jdbcType="TINYINT" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.bigdata.BigDataCarBizDriverInfo" extends="BaseResultMap" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    driver_id, password, phone, gender, name, supplier_id, age, current_address, emergency_contact_person, 
+    emergency_contact_number, id_card_no, superintend_no, superintend_url, driving_license_type, 
+    driving_years, archives_no, issue_date, expire_date, service_city, attachment_name, 
+    attachment_addr, account_bank, bank_account_no, license_plates, update_date, create_date, 
+    update_by, create_by, status, mac, photoSrct, push_id, is_binding_credit_card, app_version, 
+    credit_card_no, storable_card_no, credit_open_account_bank, credit_card_period_of_validity, 
+    grab_notice, credit_CVN2, credit_bind_date, quickpay_customerid, is_read, bankid, 
+    go_home_address, go_home_point_loBD, go_home_point_laBD, go_home_point_la, go_home_point_lo, 
+    go_home_status, update_go_home_date, imei, driverLicenseNumber, drivingLicenseImg, 
+    firstDrivingLicenseDate, firstMeshworkDrivingLicenseDate, nationality, householdRegister, 
+    nation, marriage, foreignLanguage, address, education, courseName, courseDate, courseDateStart, 
+    courseDateEnd, courseTime, corpType, trafficViolations, signDate, signDateEnd, contractDate, 
+    isXyDriver, partTimeJobDri, phoneType, phoneCorp, appVersion, mapType, emergencyContactAddr, 
+    assessment, driverLicenseIssuingDateStart, driverLicenseIssuingDateEnd, driverLicenseIssuingCorp, 
+    driverLicenseIssuingNumber, xy_driver_number, driver_license_issuing_register_date, 
+    driver_license_issuing_first_date, driver_license_issuing_grant_date, birth_day, 
+    house_hold_register_permanent, is_upload_card, is_must_confirmation, account_type, 
+    cooperation_type, group_id, contract_type, contract_no, contract_file, is_two_shifts, 
+    is_image
+  </sql>
+  <sql id="Blob_Column_List" >
+    memo
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_biz_driver_info
+    where driver_id = #{driverId,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.zhuanche.entity.bigdata.BigDataCarBizDriverInfo" >
+    insert into car_biz_driver_info (driver_id, password, phone, 
+      gender, name, supplier_id, 
+      age, current_address, emergency_contact_person, 
+      emergency_contact_number, id_card_no, superintend_no, 
+      superintend_url, driving_license_type, driving_years, 
+      archives_no, issue_date, expire_date, 
+      service_city, attachment_name, attachment_addr, 
+      account_bank, bank_account_no, license_plates, 
+      update_date, create_date, update_by, 
+      create_by, status, mac, 
+      photoSrct, push_id, is_binding_credit_card, 
+      app_version, credit_card_no, storable_card_no, 
+      credit_open_account_bank, credit_card_period_of_validity, 
+      grab_notice, credit_CVN2, credit_bind_date, 
+      quickpay_customerid, is_read, bankid, 
+      go_home_address, go_home_point_loBD, go_home_point_laBD, 
+      go_home_point_la, go_home_point_lo, go_home_status, 
+      update_go_home_date, imei, driverLicenseNumber, 
+      drivingLicenseImg, firstDrivingLicenseDate, 
+      firstMeshworkDrivingLicenseDate, nationality, 
+      householdRegister, nation, marriage, 
+      foreignLanguage, address, education, 
+      courseName, courseDate, courseDateStart, 
+      courseDateEnd, courseTime, corpType, 
+      trafficViolations, signDate, signDateEnd, 
+      contractDate, isXyDriver, partTimeJobDri, 
+      phoneType, phoneCorp, appVersion, 
+      mapType, emergencyContactAddr, assessment, 
+      driverLicenseIssuingDateStart, driverLicenseIssuingDateEnd, 
+      driverLicenseIssuingCorp, driverLicenseIssuingNumber, 
+      xy_driver_number, driver_license_issuing_register_date, 
+      driver_license_issuing_first_date, driver_license_issuing_grant_date, 
+      birth_day, house_hold_register_permanent, is_upload_card, 
+      is_must_confirmation, account_type, cooperation_type, 
+      group_id, contract_type, contract_no, 
+      contract_file, is_two_shifts, is_image, 
+      memo)
+    values (#{driverId,jdbcType=INTEGER}, #{password,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{gender,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER}, 
+      #{age,jdbcType=INTEGER}, #{currentAddress,jdbcType=VARCHAR}, #{emergencyContactPerson,jdbcType=VARCHAR}, 
+      #{emergencyContactNumber,jdbcType=VARCHAR}, #{idCardNo,jdbcType=VARCHAR}, #{superintendNo,jdbcType=VARCHAR}, 
+      #{superintendUrl,jdbcType=VARCHAR}, #{drivingLicenseType,jdbcType=VARCHAR}, #{drivingYears,jdbcType=INTEGER}, 
+      #{archivesNo,jdbcType=VARCHAR}, #{issueDate,jdbcType=TIMESTAMP}, #{expireDate,jdbcType=TIMESTAMP}, 
+      #{serviceCity,jdbcType=INTEGER}, #{attachmentName,jdbcType=VARCHAR}, #{attachmentAddr,jdbcType=VARCHAR}, 
+      #{accountBank,jdbcType=VARCHAR}, #{bankAccountNo,jdbcType=VARCHAR}, #{licensePlates,jdbcType=VARCHAR}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=INTEGER}, 
+      #{createBy,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{mac,jdbcType=VARCHAR}, 
+      #{photosrct,jdbcType=VARCHAR}, #{pushId,jdbcType=VARCHAR}, #{isBindingCreditCard,jdbcType=INTEGER}, 
+      #{appVersion,jdbcType=VARCHAR}, #{creditCardNo,jdbcType=VARCHAR}, #{storableCardNo,jdbcType=VARCHAR}, 
+      #{creditOpenAccountBank,jdbcType=VARCHAR}, #{creditCardPeriodOfValidity,jdbcType=VARCHAR}, 
+      #{grabNotice,jdbcType=INTEGER}, #{creditCvn2,jdbcType=VARCHAR}, #{creditBindDate,jdbcType=TIMESTAMP}, 
+      #{quickpayCustomerid,jdbcType=VARCHAR}, #{isRead,jdbcType=INTEGER}, #{bankid,jdbcType=VARCHAR}, 
+      #{goHomeAddress,jdbcType=VARCHAR}, #{goHomePointLobd,jdbcType=VARCHAR}, #{goHomePointLabd,jdbcType=VARCHAR}, 
+      #{goHomePointLa,jdbcType=VARCHAR}, #{goHomePointLo,jdbcType=VARCHAR}, #{goHomeStatus,jdbcType=INTEGER}, 
+      #{updateGoHomeDate,jdbcType=VARCHAR}, #{imei,jdbcType=VARCHAR}, #{driverlicensenumber,jdbcType=VARCHAR}, 
+      #{drivinglicenseimg,jdbcType=VARCHAR}, #{firstdrivinglicensedate,jdbcType=VARCHAR}, 
+      #{firstmeshworkdrivinglicensedate,jdbcType=VARCHAR}, #{nationality,jdbcType=VARCHAR}, 
+      #{householdregister,jdbcType=VARCHAR}, #{nation,jdbcType=VARCHAR}, #{marriage,jdbcType=VARCHAR}, 
+      #{foreignlanguage,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{education,jdbcType=VARCHAR}, 
+      #{coursename,jdbcType=VARCHAR}, #{coursedate,jdbcType=VARCHAR}, #{coursedatestart,jdbcType=VARCHAR}, 
+      #{coursedateend,jdbcType=VARCHAR}, #{coursetime,jdbcType=VARCHAR}, #{corptype,jdbcType=VARCHAR}, 
+      #{trafficviolations,jdbcType=VARCHAR}, #{signdate,jdbcType=VARCHAR}, #{signdateend,jdbcType=VARCHAR}, 
+      #{contractdate,jdbcType=VARCHAR}, #{isxydriver,jdbcType=INTEGER}, #{parttimejobdri,jdbcType=VARCHAR}, 
+      #{phonetype,jdbcType=VARCHAR}, #{phonecorp,jdbcType=VARCHAR}, #{appversion,jdbcType=VARCHAR}, 
+      #{maptype,jdbcType=VARCHAR}, #{emergencycontactaddr,jdbcType=VARCHAR}, #{assessment,jdbcType=VARCHAR}, 
+      #{driverlicenseissuingdatestart,jdbcType=VARCHAR}, #{driverlicenseissuingdateend,jdbcType=VARCHAR}, 
+      #{driverlicenseissuingcorp,jdbcType=VARCHAR}, #{driverlicenseissuingnumber,jdbcType=VARCHAR}, 
+      #{xyDriverNumber,jdbcType=VARCHAR}, #{driverLicenseIssuingRegisterDate,jdbcType=VARCHAR}, 
+      #{driverLicenseIssuingFirstDate,jdbcType=VARCHAR}, #{driverLicenseIssuingGrantDate,jdbcType=VARCHAR}, 
+      #{birthDay,jdbcType=VARCHAR}, #{houseHoldRegisterPermanent,jdbcType=VARCHAR}, #{isUploadCard,jdbcType=INTEGER}, 
+      #{isMustConfirmation,jdbcType=INTEGER}, #{accountType,jdbcType=INTEGER}, #{cooperationType,jdbcType=INTEGER}, 
+      #{groupId,jdbcType=INTEGER}, #{contractType,jdbcType=VARCHAR}, #{contractNo,jdbcType=VARCHAR}, 
+      #{contractFile,jdbcType=VARCHAR}, #{isTwoShifts,jdbcType=INTEGER}, #{isImage,jdbcType=TINYINT}, 
+      #{memo,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.bigdata.BigDataCarBizDriverInfo" >
+    insert into car_biz_driver_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="gender != null" >
+        gender,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="age != null" >
+        age,
+      </if>
+      <if test="currentAddress != null" >
+        current_address,
+      </if>
+      <if test="emergencyContactPerson != null" >
+        emergency_contact_person,
+      </if>
+      <if test="emergencyContactNumber != null" >
+        emergency_contact_number,
+      </if>
+      <if test="idCardNo != null" >
+        id_card_no,
+      </if>
+      <if test="superintendNo != null" >
+        superintend_no,
+      </if>
+      <if test="superintendUrl != null" >
+        superintend_url,
+      </if>
+      <if test="drivingLicenseType != null" >
+        driving_license_type,
+      </if>
+      <if test="drivingYears != null" >
+        driving_years,
+      </if>
+      <if test="archivesNo != null" >
+        archives_no,
+      </if>
+      <if test="issueDate != null" >
+        issue_date,
+      </if>
+      <if test="expireDate != null" >
+        expire_date,
+      </if>
+      <if test="serviceCity != null" >
+        service_city,
+      </if>
+      <if test="attachmentName != null" >
+        attachment_name,
+      </if>
+      <if test="attachmentAddr != null" >
+        attachment_addr,
+      </if>
+      <if test="accountBank != null" >
+        account_bank,
+      </if>
+      <if test="bankAccountNo != null" >
+        bank_account_no,
+      </if>
+      <if test="licensePlates != null" >
+        license_plates,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="mac != null" >
+        mac,
+      </if>
+      <if test="photosrct != null" >
+        photoSrct,
+      </if>
+      <if test="pushId != null" >
+        push_id,
+      </if>
+      <if test="isBindingCreditCard != null" >
+        is_binding_credit_card,
+      </if>
+      <if test="appVersion != null" >
+        app_version,
+      </if>
+      <if test="creditCardNo != null" >
+        credit_card_no,
+      </if>
+      <if test="storableCardNo != null" >
+        storable_card_no,
+      </if>
+      <if test="creditOpenAccountBank != null" >
+        credit_open_account_bank,
+      </if>
+      <if test="creditCardPeriodOfValidity != null" >
+        credit_card_period_of_validity,
+      </if>
+      <if test="grabNotice != null" >
+        grab_notice,
+      </if>
+      <if test="creditCvn2 != null" >
+        credit_CVN2,
+      </if>
+      <if test="creditBindDate != null" >
+        credit_bind_date,
+      </if>
+      <if test="quickpayCustomerid != null" >
+        quickpay_customerid,
+      </if>
+      <if test="isRead != null" >
+        is_read,
+      </if>
+      <if test="bankid != null" >
+        bankid,
+      </if>
+      <if test="goHomeAddress != null" >
+        go_home_address,
+      </if>
+      <if test="goHomePointLobd != null" >
+        go_home_point_loBD,
+      </if>
+      <if test="goHomePointLabd != null" >
+        go_home_point_laBD,
+      </if>
+      <if test="goHomePointLa != null" >
+        go_home_point_la,
+      </if>
+      <if test="goHomePointLo != null" >
+        go_home_point_lo,
+      </if>
+      <if test="goHomeStatus != null" >
+        go_home_status,
+      </if>
+      <if test="updateGoHomeDate != null" >
+        update_go_home_date,
+      </if>
+      <if test="imei != null" >
+        imei,
+      </if>
+      <if test="driverlicensenumber != null" >
+        driverLicenseNumber,
+      </if>
+      <if test="drivinglicenseimg != null" >
+        drivingLicenseImg,
+      </if>
+      <if test="firstdrivinglicensedate != null" >
+        firstDrivingLicenseDate,
+      </if>
+      <if test="firstmeshworkdrivinglicensedate != null" >
+        firstMeshworkDrivingLicenseDate,
+      </if>
+      <if test="nationality != null" >
+        nationality,
+      </if>
+      <if test="householdregister != null" >
+        householdRegister,
+      </if>
+      <if test="nation != null" >
+        nation,
+      </if>
+      <if test="marriage != null" >
+        marriage,
+      </if>
+      <if test="foreignlanguage != null" >
+        foreignLanguage,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="education != null" >
+        education,
+      </if>
+      <if test="coursename != null" >
+        courseName,
+      </if>
+      <if test="coursedate != null" >
+        courseDate,
+      </if>
+      <if test="coursedatestart != null" >
+        courseDateStart,
+      </if>
+      <if test="coursedateend != null" >
+        courseDateEnd,
+      </if>
+      <if test="coursetime != null" >
+        courseTime,
+      </if>
+      <if test="corptype != null" >
+        corpType,
+      </if>
+      <if test="trafficviolations != null" >
+        trafficViolations,
+      </if>
+      <if test="signdate != null" >
+        signDate,
+      </if>
+      <if test="signdateend != null" >
+        signDateEnd,
+      </if>
+      <if test="contractdate != null" >
+        contractDate,
+      </if>
+      <if test="isxydriver != null" >
+        isXyDriver,
+      </if>
+      <if test="parttimejobdri != null" >
+        partTimeJobDri,
+      </if>
+      <if test="phonetype != null" >
+        phoneType,
+      </if>
+      <if test="phonecorp != null" >
+        phoneCorp,
+      </if>
+      <if test="appversion != null" >
+        appVersion,
+      </if>
+      <if test="maptype != null" >
+        mapType,
+      </if>
+      <if test="emergencycontactaddr != null" >
+        emergencyContactAddr,
+      </if>
+      <if test="assessment != null" >
+        assessment,
+      </if>
+      <if test="driverlicenseissuingdatestart != null" >
+        driverLicenseIssuingDateStart,
+      </if>
+      <if test="driverlicenseissuingdateend != null" >
+        driverLicenseIssuingDateEnd,
+      </if>
+      <if test="driverlicenseissuingcorp != null" >
+        driverLicenseIssuingCorp,
+      </if>
+      <if test="driverlicenseissuingnumber != null" >
+        driverLicenseIssuingNumber,
+      </if>
+      <if test="xyDriverNumber != null" >
+        xy_driver_number,
+      </if>
+      <if test="driverLicenseIssuingRegisterDate != null" >
+        driver_license_issuing_register_date,
+      </if>
+      <if test="driverLicenseIssuingFirstDate != null" >
+        driver_license_issuing_first_date,
+      </if>
+      <if test="driverLicenseIssuingGrantDate != null" >
+        driver_license_issuing_grant_date,
+      </if>
+      <if test="birthDay != null" >
+        birth_day,
+      </if>
+      <if test="houseHoldRegisterPermanent != null" >
+        house_hold_register_permanent,
+      </if>
+      <if test="isUploadCard != null" >
+        is_upload_card,
+      </if>
+      <if test="isMustConfirmation != null" >
+        is_must_confirmation,
+      </if>
+      <if test="accountType != null" >
+        account_type,
+      </if>
+      <if test="cooperationType != null" >
+        cooperation_type,
+      </if>
+      <if test="groupId != null" >
+        group_id,
+      </if>
+      <if test="contractType != null" >
+        contract_type,
+      </if>
+      <if test="contractNo != null" >
+        contract_no,
+      </if>
+      <if test="contractFile != null" >
+        contract_file,
+      </if>
+      <if test="isTwoShifts != null" >
+        is_two_shifts,
+      </if>
+      <if test="isImage != null" >
+        is_image,
+      </if>
+      <if test="memo != null" >
+        memo,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null" >
+        #{gender,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="age != null" >
+        #{age,jdbcType=INTEGER},
+      </if>
+      <if test="currentAddress != null" >
+        #{currentAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="emergencyContactPerson != null" >
+        #{emergencyContactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="emergencyContactNumber != null" >
+        #{emergencyContactNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardNo != null" >
+        #{idCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="superintendNo != null" >
+        #{superintendNo,jdbcType=VARCHAR},
+      </if>
+      <if test="superintendUrl != null" >
+        #{superintendUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="drivingLicenseType != null" >
+        #{drivingLicenseType,jdbcType=VARCHAR},
+      </if>
+      <if test="drivingYears != null" >
+        #{drivingYears,jdbcType=INTEGER},
+      </if>
+      <if test="archivesNo != null" >
+        #{archivesNo,jdbcType=VARCHAR},
+      </if>
+      <if test="issueDate != null" >
+        #{issueDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expireDate != null" >
+        #{expireDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="serviceCity != null" >
+        #{serviceCity,jdbcType=INTEGER},
+      </if>
+      <if test="attachmentName != null" >
+        #{attachmentName,jdbcType=VARCHAR},
+      </if>
+      <if test="attachmentAddr != null" >
+        #{attachmentAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="accountBank != null" >
+        #{accountBank,jdbcType=VARCHAR},
+      </if>
+      <if test="bankAccountNo != null" >
+        #{bankAccountNo,jdbcType=VARCHAR},
+      </if>
+      <if test="licensePlates != null" >
+        #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="mac != null" >
+        #{mac,jdbcType=VARCHAR},
+      </if>
+      <if test="photosrct != null" >
+        #{photosrct,jdbcType=VARCHAR},
+      </if>
+      <if test="pushId != null" >
+        #{pushId,jdbcType=VARCHAR},
+      </if>
+      <if test="isBindingCreditCard != null" >
+        #{isBindingCreditCard,jdbcType=INTEGER},
+      </if>
+      <if test="appVersion != null" >
+        #{appVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCardNo != null" >
+        #{creditCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="storableCardNo != null" >
+        #{storableCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="creditOpenAccountBank != null" >
+        #{creditOpenAccountBank,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCardPeriodOfValidity != null" >
+        #{creditCardPeriodOfValidity,jdbcType=VARCHAR},
+      </if>
+      <if test="grabNotice != null" >
+        #{grabNotice,jdbcType=INTEGER},
+      </if>
+      <if test="creditCvn2 != null" >
+        #{creditCvn2,jdbcType=VARCHAR},
+      </if>
+      <if test="creditBindDate != null" >
+        #{creditBindDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="quickpayCustomerid != null" >
+        #{quickpayCustomerid,jdbcType=VARCHAR},
+      </if>
+      <if test="isRead != null" >
+        #{isRead,jdbcType=INTEGER},
+      </if>
+      <if test="bankid != null" >
+        #{bankid,jdbcType=VARCHAR},
+      </if>
+      <if test="goHomeAddress != null" >
+        #{goHomeAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="goHomePointLobd != null" >
+        #{goHomePointLobd,jdbcType=VARCHAR},
+      </if>
+      <if test="goHomePointLabd != null" >
+        #{goHomePointLabd,jdbcType=VARCHAR},
+      </if>
+      <if test="goHomePointLa != null" >
+        #{goHomePointLa,jdbcType=VARCHAR},
+      </if>
+      <if test="goHomePointLo != null" >
+        #{goHomePointLo,jdbcType=VARCHAR},
+      </if>
+      <if test="goHomeStatus != null" >
+        #{goHomeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="updateGoHomeDate != null" >
+        #{updateGoHomeDate,jdbcType=VARCHAR},
+      </if>
+      <if test="imei != null" >
+        #{imei,jdbcType=VARCHAR},
+      </if>
+      <if test="driverlicensenumber != null" >
+        #{driverlicensenumber,jdbcType=VARCHAR},
+      </if>
+      <if test="drivinglicenseimg != null" >
+        #{drivinglicenseimg,jdbcType=VARCHAR},
+      </if>
+      <if test="firstdrivinglicensedate != null" >
+        #{firstdrivinglicensedate,jdbcType=VARCHAR},
+      </if>
+      <if test="firstmeshworkdrivinglicensedate != null" >
+        #{firstmeshworkdrivinglicensedate,jdbcType=VARCHAR},
+      </if>
+      <if test="nationality != null" >
+        #{nationality,jdbcType=VARCHAR},
+      </if>
+      <if test="householdregister != null" >
+        #{householdregister,jdbcType=VARCHAR},
+      </if>
+      <if test="nation != null" >
+        #{nation,jdbcType=VARCHAR},
+      </if>
+      <if test="marriage != null" >
+        #{marriage,jdbcType=VARCHAR},
+      </if>
+      <if test="foreignlanguage != null" >
+        #{foreignlanguage,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="education != null" >
+        #{education,jdbcType=VARCHAR},
+      </if>
+      <if test="coursename != null" >
+        #{coursename,jdbcType=VARCHAR},
+      </if>
+      <if test="coursedate != null" >
+        #{coursedate,jdbcType=VARCHAR},
+      </if>
+      <if test="coursedatestart != null" >
+        #{coursedatestart,jdbcType=VARCHAR},
+      </if>
+      <if test="coursedateend != null" >
+        #{coursedateend,jdbcType=VARCHAR},
+      </if>
+      <if test="coursetime != null" >
+        #{coursetime,jdbcType=VARCHAR},
+      </if>
+      <if test="corptype != null" >
+        #{corptype,jdbcType=VARCHAR},
+      </if>
+      <if test="trafficviolations != null" >
+        #{trafficviolations,jdbcType=VARCHAR},
+      </if>
+      <if test="signdate != null" >
+        #{signdate,jdbcType=VARCHAR},
+      </if>
+      <if test="signdateend != null" >
+        #{signdateend,jdbcType=VARCHAR},
+      </if>
+      <if test="contractdate != null" >
+        #{contractdate,jdbcType=VARCHAR},
+      </if>
+      <if test="isxydriver != null" >
+        #{isxydriver,jdbcType=INTEGER},
+      </if>
+      <if test="parttimejobdri != null" >
+        #{parttimejobdri,jdbcType=VARCHAR},
+      </if>
+      <if test="phonetype != null" >
+        #{phonetype,jdbcType=VARCHAR},
+      </if>
+      <if test="phonecorp != null" >
+        #{phonecorp,jdbcType=VARCHAR},
+      </if>
+      <if test="appversion != null" >
+        #{appversion,jdbcType=VARCHAR},
+      </if>
+      <if test="maptype != null" >
+        #{maptype,jdbcType=VARCHAR},
+      </if>
+      <if test="emergencycontactaddr != null" >
+        #{emergencycontactaddr,jdbcType=VARCHAR},
+      </if>
+      <if test="assessment != null" >
+        #{assessment,jdbcType=VARCHAR},
+      </if>
+      <if test="driverlicenseissuingdatestart != null" >
+        #{driverlicenseissuingdatestart,jdbcType=VARCHAR},
+      </if>
+      <if test="driverlicenseissuingdateend != null" >
+        #{driverlicenseissuingdateend,jdbcType=VARCHAR},
+      </if>
+      <if test="driverlicenseissuingcorp != null" >
+        #{driverlicenseissuingcorp,jdbcType=VARCHAR},
+      </if>
+      <if test="driverlicenseissuingnumber != null" >
+        #{driverlicenseissuingnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="xyDriverNumber != null" >
+        #{xyDriverNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseIssuingRegisterDate != null" >
+        #{driverLicenseIssuingRegisterDate,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseIssuingFirstDate != null" >
+        #{driverLicenseIssuingFirstDate,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseIssuingGrantDate != null" >
+        #{driverLicenseIssuingGrantDate,jdbcType=VARCHAR},
+      </if>
+      <if test="birthDay != null" >
+        #{birthDay,jdbcType=VARCHAR},
+      </if>
+      <if test="houseHoldRegisterPermanent != null" >
+        #{houseHoldRegisterPermanent,jdbcType=VARCHAR},
+      </if>
+      <if test="isUploadCard != null" >
+        #{isUploadCard,jdbcType=INTEGER},
+      </if>
+      <if test="isMustConfirmation != null" >
+        #{isMustConfirmation,jdbcType=INTEGER},
+      </if>
+      <if test="accountType != null" >
+        #{accountType,jdbcType=INTEGER},
+      </if>
+      <if test="cooperationType != null" >
+        #{cooperationType,jdbcType=INTEGER},
+      </if>
+      <if test="groupId != null" >
+        #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="contractType != null" >
+        #{contractType,jdbcType=VARCHAR},
+      </if>
+      <if test="contractNo != null" >
+        #{contractNo,jdbcType=VARCHAR},
+      </if>
+      <if test="contractFile != null" >
+        #{contractFile,jdbcType=VARCHAR},
+      </if>
+      <if test="isTwoShifts != null" >
+        #{isTwoShifts,jdbcType=INTEGER},
+      </if>
+      <if test="isImage != null" >
+        #{isImage,jdbcType=TINYINT},
+      </if>
+      <if test="memo != null" >
+        #{memo,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.bigdata.BigDataCarBizDriverInfo" >
+    update car_biz_driver_info
+    <set >
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null" >
+        gender = #{gender,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="age != null" >
+        age = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="currentAddress != null" >
+        current_address = #{currentAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="emergencyContactPerson != null" >
+        emergency_contact_person = #{emergencyContactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="emergencyContactNumber != null" >
+        emergency_contact_number = #{emergencyContactNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardNo != null" >
+        id_card_no = #{idCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="superintendNo != null" >
+        superintend_no = #{superintendNo,jdbcType=VARCHAR},
+      </if>
+      <if test="superintendUrl != null" >
+        superintend_url = #{superintendUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="drivingLicenseType != null" >
+        driving_license_type = #{drivingLicenseType,jdbcType=VARCHAR},
+      </if>
+      <if test="drivingYears != null" >
+        driving_years = #{drivingYears,jdbcType=INTEGER},
+      </if>
+      <if test="archivesNo != null" >
+        archives_no = #{archivesNo,jdbcType=VARCHAR},
+      </if>
+      <if test="issueDate != null" >
+        issue_date = #{issueDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expireDate != null" >
+        expire_date = #{expireDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="serviceCity != null" >
+        service_city = #{serviceCity,jdbcType=INTEGER},
+      </if>
+      <if test="attachmentName != null" >
+        attachment_name = #{attachmentName,jdbcType=VARCHAR},
+      </if>
+      <if test="attachmentAddr != null" >
+        attachment_addr = #{attachmentAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="accountBank != null" >
+        account_bank = #{accountBank,jdbcType=VARCHAR},
+      </if>
+      <if test="bankAccountNo != null" >
+        bank_account_no = #{bankAccountNo,jdbcType=VARCHAR},
+      </if>
+      <if test="licensePlates != null" >
+        license_plates = #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="mac != null" >
+        mac = #{mac,jdbcType=VARCHAR},
+      </if>
+      <if test="photosrct != null" >
+        photoSrct = #{photosrct,jdbcType=VARCHAR},
+      </if>
+      <if test="pushId != null" >
+        push_id = #{pushId,jdbcType=VARCHAR},
+      </if>
+      <if test="isBindingCreditCard != null" >
+        is_binding_credit_card = #{isBindingCreditCard,jdbcType=INTEGER},
+      </if>
+      <if test="appVersion != null" >
+        app_version = #{appVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCardNo != null" >
+        credit_card_no = #{creditCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="storableCardNo != null" >
+        storable_card_no = #{storableCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="creditOpenAccountBank != null" >
+        credit_open_account_bank = #{creditOpenAccountBank,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCardPeriodOfValidity != null" >
+        credit_card_period_of_validity = #{creditCardPeriodOfValidity,jdbcType=VARCHAR},
+      </if>
+      <if test="grabNotice != null" >
+        grab_notice = #{grabNotice,jdbcType=INTEGER},
+      </if>
+      <if test="creditCvn2 != null" >
+        credit_CVN2 = #{creditCvn2,jdbcType=VARCHAR},
+      </if>
+      <if test="creditBindDate != null" >
+        credit_bind_date = #{creditBindDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="quickpayCustomerid != null" >
+        quickpay_customerid = #{quickpayCustomerid,jdbcType=VARCHAR},
+      </if>
+      <if test="isRead != null" >
+        is_read = #{isRead,jdbcType=INTEGER},
+      </if>
+      <if test="bankid != null" >
+        bankid = #{bankid,jdbcType=VARCHAR},
+      </if>
+      <if test="goHomeAddress != null" >
+        go_home_address = #{goHomeAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="goHomePointLobd != null" >
+        go_home_point_loBD = #{goHomePointLobd,jdbcType=VARCHAR},
+      </if>
+      <if test="goHomePointLabd != null" >
+        go_home_point_laBD = #{goHomePointLabd,jdbcType=VARCHAR},
+      </if>
+      <if test="goHomePointLa != null" >
+        go_home_point_la = #{goHomePointLa,jdbcType=VARCHAR},
+      </if>
+      <if test="goHomePointLo != null" >
+        go_home_point_lo = #{goHomePointLo,jdbcType=VARCHAR},
+      </if>
+      <if test="goHomeStatus != null" >
+        go_home_status = #{goHomeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="updateGoHomeDate != null" >
+        update_go_home_date = #{updateGoHomeDate,jdbcType=VARCHAR},
+      </if>
+      <if test="imei != null" >
+        imei = #{imei,jdbcType=VARCHAR},
+      </if>
+      <if test="driverlicensenumber != null" >
+        driverLicenseNumber = #{driverlicensenumber,jdbcType=VARCHAR},
+      </if>
+      <if test="drivinglicenseimg != null" >
+        drivingLicenseImg = #{drivinglicenseimg,jdbcType=VARCHAR},
+      </if>
+      <if test="firstdrivinglicensedate != null" >
+        firstDrivingLicenseDate = #{firstdrivinglicensedate,jdbcType=VARCHAR},
+      </if>
+      <if test="firstmeshworkdrivinglicensedate != null" >
+        firstMeshworkDrivingLicenseDate = #{firstmeshworkdrivinglicensedate,jdbcType=VARCHAR},
+      </if>
+      <if test="nationality != null" >
+        nationality = #{nationality,jdbcType=VARCHAR},
+      </if>
+      <if test="householdregister != null" >
+        householdRegister = #{householdregister,jdbcType=VARCHAR},
+      </if>
+      <if test="nation != null" >
+        nation = #{nation,jdbcType=VARCHAR},
+      </if>
+      <if test="marriage != null" >
+        marriage = #{marriage,jdbcType=VARCHAR},
+      </if>
+      <if test="foreignlanguage != null" >
+        foreignLanguage = #{foreignlanguage,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="education != null" >
+        education = #{education,jdbcType=VARCHAR},
+      </if>
+      <if test="coursename != null" >
+        courseName = #{coursename,jdbcType=VARCHAR},
+      </if>
+      <if test="coursedate != null" >
+        courseDate = #{coursedate,jdbcType=VARCHAR},
+      </if>
+      <if test="coursedatestart != null" >
+        courseDateStart = #{coursedatestart,jdbcType=VARCHAR},
+      </if>
+      <if test="coursedateend != null" >
+        courseDateEnd = #{coursedateend,jdbcType=VARCHAR},
+      </if>
+      <if test="coursetime != null" >
+        courseTime = #{coursetime,jdbcType=VARCHAR},
+      </if>
+      <if test="corptype != null" >
+        corpType = #{corptype,jdbcType=VARCHAR},
+      </if>
+      <if test="trafficviolations != null" >
+        trafficViolations = #{trafficviolations,jdbcType=VARCHAR},
+      </if>
+      <if test="signdate != null" >
+        signDate = #{signdate,jdbcType=VARCHAR},
+      </if>
+      <if test="signdateend != null" >
+        signDateEnd = #{signdateend,jdbcType=VARCHAR},
+      </if>
+      <if test="contractdate != null" >
+        contractDate = #{contractdate,jdbcType=VARCHAR},
+      </if>
+      <if test="isxydriver != null" >
+        isXyDriver = #{isxydriver,jdbcType=INTEGER},
+      </if>
+      <if test="parttimejobdri != null" >
+        partTimeJobDri = #{parttimejobdri,jdbcType=VARCHAR},
+      </if>
+      <if test="phonetype != null" >
+        phoneType = #{phonetype,jdbcType=VARCHAR},
+      </if>
+      <if test="phonecorp != null" >
+        phoneCorp = #{phonecorp,jdbcType=VARCHAR},
+      </if>
+      <if test="appversion != null" >
+        appVersion = #{appversion,jdbcType=VARCHAR},
+      </if>
+      <if test="maptype != null" >
+        mapType = #{maptype,jdbcType=VARCHAR},
+      </if>
+      <if test="emergencycontactaddr != null" >
+        emergencyContactAddr = #{emergencycontactaddr,jdbcType=VARCHAR},
+      </if>
+      <if test="assessment != null" >
+        assessment = #{assessment,jdbcType=VARCHAR},
+      </if>
+      <if test="driverlicenseissuingdatestart != null" >
+        driverLicenseIssuingDateStart = #{driverlicenseissuingdatestart,jdbcType=VARCHAR},
+      </if>
+      <if test="driverlicenseissuingdateend != null" >
+        driverLicenseIssuingDateEnd = #{driverlicenseissuingdateend,jdbcType=VARCHAR},
+      </if>
+      <if test="driverlicenseissuingcorp != null" >
+        driverLicenseIssuingCorp = #{driverlicenseissuingcorp,jdbcType=VARCHAR},
+      </if>
+      <if test="driverlicenseissuingnumber != null" >
+        driverLicenseIssuingNumber = #{driverlicenseissuingnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="xyDriverNumber != null" >
+        xy_driver_number = #{xyDriverNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseIssuingRegisterDate != null" >
+        driver_license_issuing_register_date = #{driverLicenseIssuingRegisterDate,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseIssuingFirstDate != null" >
+        driver_license_issuing_first_date = #{driverLicenseIssuingFirstDate,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseIssuingGrantDate != null" >
+        driver_license_issuing_grant_date = #{driverLicenseIssuingGrantDate,jdbcType=VARCHAR},
+      </if>
+      <if test="birthDay != null" >
+        birth_day = #{birthDay,jdbcType=VARCHAR},
+      </if>
+      <if test="houseHoldRegisterPermanent != null" >
+        house_hold_register_permanent = #{houseHoldRegisterPermanent,jdbcType=VARCHAR},
+      </if>
+      <if test="isUploadCard != null" >
+        is_upload_card = #{isUploadCard,jdbcType=INTEGER},
+      </if>
+      <if test="isMustConfirmation != null" >
+        is_must_confirmation = #{isMustConfirmation,jdbcType=INTEGER},
+      </if>
+      <if test="accountType != null" >
+        account_type = #{accountType,jdbcType=INTEGER},
+      </if>
+      <if test="cooperationType != null" >
+        cooperation_type = #{cooperationType,jdbcType=INTEGER},
+      </if>
+      <if test="groupId != null" >
+        group_id = #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="contractType != null" >
+        contract_type = #{contractType,jdbcType=VARCHAR},
+      </if>
+      <if test="contractNo != null" >
+        contract_no = #{contractNo,jdbcType=VARCHAR},
+      </if>
+      <if test="contractFile != null" >
+        contract_file = #{contractFile,jdbcType=VARCHAR},
+      </if>
+      <if test="isTwoShifts != null" >
+        is_two_shifts = #{isTwoShifts,jdbcType=INTEGER},
+      </if>
+      <if test="isImage != null" >
+        is_image = #{isImage,jdbcType=TINYINT},
+      </if>
+      <if test="memo != null" >
+        memo = #{memo,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where driver_id = #{driverId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhuanche.entity.bigdata.BigDataCarBizDriverInfo" >
+    update car_biz_driver_info
+    set password = #{password,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      gender = #{gender,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      age = #{age,jdbcType=INTEGER},
+      current_address = #{currentAddress,jdbcType=VARCHAR},
+      emergency_contact_person = #{emergencyContactPerson,jdbcType=VARCHAR},
+      emergency_contact_number = #{emergencyContactNumber,jdbcType=VARCHAR},
+      id_card_no = #{idCardNo,jdbcType=VARCHAR},
+      superintend_no = #{superintendNo,jdbcType=VARCHAR},
+      superintend_url = #{superintendUrl,jdbcType=VARCHAR},
+      driving_license_type = #{drivingLicenseType,jdbcType=VARCHAR},
+      driving_years = #{drivingYears,jdbcType=INTEGER},
+      archives_no = #{archivesNo,jdbcType=VARCHAR},
+      issue_date = #{issueDate,jdbcType=TIMESTAMP},
+      expire_date = #{expireDate,jdbcType=TIMESTAMP},
+      service_city = #{serviceCity,jdbcType=INTEGER},
+      attachment_name = #{attachmentName,jdbcType=VARCHAR},
+      attachment_addr = #{attachmentAddr,jdbcType=VARCHAR},
+      account_bank = #{accountBank,jdbcType=VARCHAR},
+      bank_account_no = #{bankAccountNo,jdbcType=VARCHAR},
+      license_plates = #{licensePlates,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      mac = #{mac,jdbcType=VARCHAR},
+      photoSrct = #{photosrct,jdbcType=VARCHAR},
+      push_id = #{pushId,jdbcType=VARCHAR},
+      is_binding_credit_card = #{isBindingCreditCard,jdbcType=INTEGER},
+      app_version = #{appVersion,jdbcType=VARCHAR},
+      credit_card_no = #{creditCardNo,jdbcType=VARCHAR},
+      storable_card_no = #{storableCardNo,jdbcType=VARCHAR},
+      credit_open_account_bank = #{creditOpenAccountBank,jdbcType=VARCHAR},
+      credit_card_period_of_validity = #{creditCardPeriodOfValidity,jdbcType=VARCHAR},
+      grab_notice = #{grabNotice,jdbcType=INTEGER},
+      credit_CVN2 = #{creditCvn2,jdbcType=VARCHAR},
+      credit_bind_date = #{creditBindDate,jdbcType=TIMESTAMP},
+      quickpay_customerid = #{quickpayCustomerid,jdbcType=VARCHAR},
+      is_read = #{isRead,jdbcType=INTEGER},
+      bankid = #{bankid,jdbcType=VARCHAR},
+      go_home_address = #{goHomeAddress,jdbcType=VARCHAR},
+      go_home_point_loBD = #{goHomePointLobd,jdbcType=VARCHAR},
+      go_home_point_laBD = #{goHomePointLabd,jdbcType=VARCHAR},
+      go_home_point_la = #{goHomePointLa,jdbcType=VARCHAR},
+      go_home_point_lo = #{goHomePointLo,jdbcType=VARCHAR},
+      go_home_status = #{goHomeStatus,jdbcType=INTEGER},
+      update_go_home_date = #{updateGoHomeDate,jdbcType=VARCHAR},
+      imei = #{imei,jdbcType=VARCHAR},
+      driverLicenseNumber = #{driverlicensenumber,jdbcType=VARCHAR},
+      drivingLicenseImg = #{drivinglicenseimg,jdbcType=VARCHAR},
+      firstDrivingLicenseDate = #{firstdrivinglicensedate,jdbcType=VARCHAR},
+      firstMeshworkDrivingLicenseDate = #{firstmeshworkdrivinglicensedate,jdbcType=VARCHAR},
+      nationality = #{nationality,jdbcType=VARCHAR},
+      householdRegister = #{householdregister,jdbcType=VARCHAR},
+      nation = #{nation,jdbcType=VARCHAR},
+      marriage = #{marriage,jdbcType=VARCHAR},
+      foreignLanguage = #{foreignlanguage,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      education = #{education,jdbcType=VARCHAR},
+      courseName = #{coursename,jdbcType=VARCHAR},
+      courseDate = #{coursedate,jdbcType=VARCHAR},
+      courseDateStart = #{coursedatestart,jdbcType=VARCHAR},
+      courseDateEnd = #{coursedateend,jdbcType=VARCHAR},
+      courseTime = #{coursetime,jdbcType=VARCHAR},
+      corpType = #{corptype,jdbcType=VARCHAR},
+      trafficViolations = #{trafficviolations,jdbcType=VARCHAR},
+      signDate = #{signdate,jdbcType=VARCHAR},
+      signDateEnd = #{signdateend,jdbcType=VARCHAR},
+      contractDate = #{contractdate,jdbcType=VARCHAR},
+      isXyDriver = #{isxydriver,jdbcType=INTEGER},
+      partTimeJobDri = #{parttimejobdri,jdbcType=VARCHAR},
+      phoneType = #{phonetype,jdbcType=VARCHAR},
+      phoneCorp = #{phonecorp,jdbcType=VARCHAR},
+      appVersion = #{appversion,jdbcType=VARCHAR},
+      mapType = #{maptype,jdbcType=VARCHAR},
+      emergencyContactAddr = #{emergencycontactaddr,jdbcType=VARCHAR},
+      assessment = #{assessment,jdbcType=VARCHAR},
+      driverLicenseIssuingDateStart = #{driverlicenseissuingdatestart,jdbcType=VARCHAR},
+      driverLicenseIssuingDateEnd = #{driverlicenseissuingdateend,jdbcType=VARCHAR},
+      driverLicenseIssuingCorp = #{driverlicenseissuingcorp,jdbcType=VARCHAR},
+      driverLicenseIssuingNumber = #{driverlicenseissuingnumber,jdbcType=VARCHAR},
+      xy_driver_number = #{xyDriverNumber,jdbcType=VARCHAR},
+      driver_license_issuing_register_date = #{driverLicenseIssuingRegisterDate,jdbcType=VARCHAR},
+      driver_license_issuing_first_date = #{driverLicenseIssuingFirstDate,jdbcType=VARCHAR},
+      driver_license_issuing_grant_date = #{driverLicenseIssuingGrantDate,jdbcType=VARCHAR},
+      birth_day = #{birthDay,jdbcType=VARCHAR},
+      house_hold_register_permanent = #{houseHoldRegisterPermanent,jdbcType=VARCHAR},
+      is_upload_card = #{isUploadCard,jdbcType=INTEGER},
+      is_must_confirmation = #{isMustConfirmation,jdbcType=INTEGER},
+      account_type = #{accountType,jdbcType=INTEGER},
+      cooperation_type = #{cooperationType,jdbcType=INTEGER},
+      group_id = #{groupId,jdbcType=INTEGER},
+      contract_type = #{contractType,jdbcType=VARCHAR},
+      contract_no = #{contractNo,jdbcType=VARCHAR},
+      contract_file = #{contractFile,jdbcType=VARCHAR},
+      is_two_shifts = #{isTwoShifts,jdbcType=INTEGER},
+      is_image = #{isImage,jdbcType=TINYINT},
+      memo = #{memo,jdbcType=LONGVARCHAR}
+    where driver_id = #{driverId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.bigdata.BigDataCarBizDriverInfo" >
+    update car_biz_driver_info
+    set password = #{password,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      gender = #{gender,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      age = #{age,jdbcType=INTEGER},
+      current_address = #{currentAddress,jdbcType=VARCHAR},
+      emergency_contact_person = #{emergencyContactPerson,jdbcType=VARCHAR},
+      emergency_contact_number = #{emergencyContactNumber,jdbcType=VARCHAR},
+      id_card_no = #{idCardNo,jdbcType=VARCHAR},
+      superintend_no = #{superintendNo,jdbcType=VARCHAR},
+      superintend_url = #{superintendUrl,jdbcType=VARCHAR},
+      driving_license_type = #{drivingLicenseType,jdbcType=VARCHAR},
+      driving_years = #{drivingYears,jdbcType=INTEGER},
+      archives_no = #{archivesNo,jdbcType=VARCHAR},
+      issue_date = #{issueDate,jdbcType=TIMESTAMP},
+      expire_date = #{expireDate,jdbcType=TIMESTAMP},
+      service_city = #{serviceCity,jdbcType=INTEGER},
+      attachment_name = #{attachmentName,jdbcType=VARCHAR},
+      attachment_addr = #{attachmentAddr,jdbcType=VARCHAR},
+      account_bank = #{accountBank,jdbcType=VARCHAR},
+      bank_account_no = #{bankAccountNo,jdbcType=VARCHAR},
+      license_plates = #{licensePlates,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      mac = #{mac,jdbcType=VARCHAR},
+      photoSrct = #{photosrct,jdbcType=VARCHAR},
+      push_id = #{pushId,jdbcType=VARCHAR},
+      is_binding_credit_card = #{isBindingCreditCard,jdbcType=INTEGER},
+      app_version = #{appVersion,jdbcType=VARCHAR},
+      credit_card_no = #{creditCardNo,jdbcType=VARCHAR},
+      storable_card_no = #{storableCardNo,jdbcType=VARCHAR},
+      credit_open_account_bank = #{creditOpenAccountBank,jdbcType=VARCHAR},
+      credit_card_period_of_validity = #{creditCardPeriodOfValidity,jdbcType=VARCHAR},
+      grab_notice = #{grabNotice,jdbcType=INTEGER},
+      credit_CVN2 = #{creditCvn2,jdbcType=VARCHAR},
+      credit_bind_date = #{creditBindDate,jdbcType=TIMESTAMP},
+      quickpay_customerid = #{quickpayCustomerid,jdbcType=VARCHAR},
+      is_read = #{isRead,jdbcType=INTEGER},
+      bankid = #{bankid,jdbcType=VARCHAR},
+      go_home_address = #{goHomeAddress,jdbcType=VARCHAR},
+      go_home_point_loBD = #{goHomePointLobd,jdbcType=VARCHAR},
+      go_home_point_laBD = #{goHomePointLabd,jdbcType=VARCHAR},
+      go_home_point_la = #{goHomePointLa,jdbcType=VARCHAR},
+      go_home_point_lo = #{goHomePointLo,jdbcType=VARCHAR},
+      go_home_status = #{goHomeStatus,jdbcType=INTEGER},
+      update_go_home_date = #{updateGoHomeDate,jdbcType=VARCHAR},
+      imei = #{imei,jdbcType=VARCHAR},
+      driverLicenseNumber = #{driverlicensenumber,jdbcType=VARCHAR},
+      drivingLicenseImg = #{drivinglicenseimg,jdbcType=VARCHAR},
+      firstDrivingLicenseDate = #{firstdrivinglicensedate,jdbcType=VARCHAR},
+      firstMeshworkDrivingLicenseDate = #{firstmeshworkdrivinglicensedate,jdbcType=VARCHAR},
+      nationality = #{nationality,jdbcType=VARCHAR},
+      householdRegister = #{householdregister,jdbcType=VARCHAR},
+      nation = #{nation,jdbcType=VARCHAR},
+      marriage = #{marriage,jdbcType=VARCHAR},
+      foreignLanguage = #{foreignlanguage,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      education = #{education,jdbcType=VARCHAR},
+      courseName = #{coursename,jdbcType=VARCHAR},
+      courseDate = #{coursedate,jdbcType=VARCHAR},
+      courseDateStart = #{coursedatestart,jdbcType=VARCHAR},
+      courseDateEnd = #{coursedateend,jdbcType=VARCHAR},
+      courseTime = #{coursetime,jdbcType=VARCHAR},
+      corpType = #{corptype,jdbcType=VARCHAR},
+      trafficViolations = #{trafficviolations,jdbcType=VARCHAR},
+      signDate = #{signdate,jdbcType=VARCHAR},
+      signDateEnd = #{signdateend,jdbcType=VARCHAR},
+      contractDate = #{contractdate,jdbcType=VARCHAR},
+      isXyDriver = #{isxydriver,jdbcType=INTEGER},
+      partTimeJobDri = #{parttimejobdri,jdbcType=VARCHAR},
+      phoneType = #{phonetype,jdbcType=VARCHAR},
+      phoneCorp = #{phonecorp,jdbcType=VARCHAR},
+      appVersion = #{appversion,jdbcType=VARCHAR},
+      mapType = #{maptype,jdbcType=VARCHAR},
+      emergencyContactAddr = #{emergencycontactaddr,jdbcType=VARCHAR},
+      assessment = #{assessment,jdbcType=VARCHAR},
+      driverLicenseIssuingDateStart = #{driverlicenseissuingdatestart,jdbcType=VARCHAR},
+      driverLicenseIssuingDateEnd = #{driverlicenseissuingdateend,jdbcType=VARCHAR},
+      driverLicenseIssuingCorp = #{driverlicenseissuingcorp,jdbcType=VARCHAR},
+      driverLicenseIssuingNumber = #{driverlicenseissuingnumber,jdbcType=VARCHAR},
+      xy_driver_number = #{xyDriverNumber,jdbcType=VARCHAR},
+      driver_license_issuing_register_date = #{driverLicenseIssuingRegisterDate,jdbcType=VARCHAR},
+      driver_license_issuing_first_date = #{driverLicenseIssuingFirstDate,jdbcType=VARCHAR},
+      driver_license_issuing_grant_date = #{driverLicenseIssuingGrantDate,jdbcType=VARCHAR},
+      birth_day = #{birthDay,jdbcType=VARCHAR},
+      house_hold_register_permanent = #{houseHoldRegisterPermanent,jdbcType=VARCHAR},
+      is_upload_card = #{isUploadCard,jdbcType=INTEGER},
+      is_must_confirmation = #{isMustConfirmation,jdbcType=INTEGER},
+      account_type = #{accountType,jdbcType=INTEGER},
+      cooperation_type = #{cooperationType,jdbcType=INTEGER},
+      group_id = #{groupId,jdbcType=INTEGER},
+      contract_type = #{contractType,jdbcType=VARCHAR},
+      contract_no = #{contractNo,jdbcType=VARCHAR},
+      contract_file = #{contractFile,jdbcType=VARCHAR},
+      is_two_shifts = #{isTwoShifts,jdbcType=INTEGER},
+      is_image = #{isImage,jdbcType=TINYINT}
+    where driver_id = #{driverId,jdbcType=INTEGER}
+  </update>
+</mapper>

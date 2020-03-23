@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="mapper.driver.DisinfectRecordMapper" >
-  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DisinfectRecord" >
+<mapper namespace="mapper.bigdata.DisinfectRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.bigdata.DisinfectRecord" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="driver_id" property="driverId" jdbcType="INTEGER" />
     <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
@@ -12,7 +12,7 @@
     <result column="site_staff_name" property="siteStaffName" jdbcType="VARCHAR" />
     <result column="site_staff_phone" property="siteStaffPhone" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
-    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="BIT" />
     <result column="city_id" property="cityId" jdbcType="INTEGER" />
     <result column="city_name" property="cityName" jdbcType="VARCHAR" />
     <result column="station_type" property="stationType" jdbcType="INTEGER" />
@@ -39,11 +39,7 @@
     from disinfect_record
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from disinfect_record
-    where id = #{id,jdbcType=INTEGER}
-  </delete>
-  <insert id="insert" parameterType="com.zhuanche.entity.driver.DisinfectRecord" >
+  <insert id="insert" parameterType="com.zhuanche.entity.bigdata.DisinfectRecord" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
@@ -58,13 +54,13 @@
     values (#{driverId,jdbcType=INTEGER}, #{driverName,jdbcType=VARCHAR}, #{driverPhone,jdbcType=VARCHAR}, 
       #{stationId,jdbcType=INTEGER}, #{stationName,jdbcType=VARCHAR}, #{siteStaffId,jdbcType=INTEGER}, 
       #{siteStaffName,jdbcType=VARCHAR}, #{siteStaffPhone,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
-      #{type,jdbcType=INTEGER}, #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, 
+      #{type,jdbcType=BIT}, #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, 
       #{stationType,jdbcType=INTEGER}, #{imgUrl,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{disinfectMethod,jdbcType=INTEGER}, #{auditStatus,jdbcType=INTEGER}, 
       #{stationAddr,jdbcType=VARCHAR}, #{licensePlates,jdbcType=VARCHAR}, #{grantMask,jdbcType=INTEGER}, 
       #{grantMaskNumber,jdbcType=INTEGER}, #{operateDay,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DisinfectRecord" >
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.bigdata.DisinfectRecord" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
@@ -169,7 +165,7 @@
         #{status,jdbcType=INTEGER},
       </if>
       <if test="type != null" >
-        #{type,jdbcType=INTEGER},
+        #{type,jdbcType=BIT},
       </if>
       <if test="cityId != null" >
         #{cityId,jdbcType=INTEGER},
@@ -212,7 +208,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.DisinfectRecord" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.bigdata.DisinfectRecord" >
     update disinfect_record
     <set >
       <if test="driverId != null" >
@@ -243,7 +239,7 @@
         status = #{status,jdbcType=INTEGER},
       </if>
       <if test="type != null" >
-        type = #{type,jdbcType=INTEGER},
+        type = #{type,jdbcType=BIT},
       </if>
       <if test="cityId != null" >
         city_id = #{cityId,jdbcType=INTEGER},
@@ -287,7 +283,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.DisinfectRecord" >
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.bigdata.DisinfectRecord" >
     update disinfect_record
     set driver_id = #{driverId,jdbcType=INTEGER},
       driver_name = #{driverName,jdbcType=VARCHAR},
@@ -298,7 +294,7 @@
       site_staff_name = #{siteStaffName,jdbcType=VARCHAR},
       site_staff_phone = #{siteStaffPhone,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
-      type = #{type,jdbcType=INTEGER},
+      type = #{type,jdbcType=BIT},
       city_id = #{cityId,jdbcType=INTEGER},
       city_name = #{cityName,jdbcType=VARCHAR},
       station_type = #{stationType,jdbcType=INTEGER},
