@@ -36,13 +36,11 @@ import static com.zhuanche.common.enums.MenuEnum.DRIVER_ANALYSIS_GRAPH;
 @Controller
 @RequestMapping("/driverOperAnlay")
 public class DriverOperAnlayController{
+
 	private static final Logger logger = LoggerFactory.getLogger(DriverOperAnlayController.class);
-	 
-//	 @Value("${bigdata.saas.data.url}")
-//	 String  saasBigdataApiUrl;
-	 
-	 @Autowired
-	 private StatisticalAnalysisService statisticalAnalysisService;
+
+	@Autowired
+	private StatisticalAnalysisService statisticalAnalysisService;
 
 	@Autowired
 	private BiDriverMeasureDayService biDriverMeasureDayService;
@@ -76,10 +74,12 @@ public class DriverOperAnlayController{
 		  queryTermDriverAnaly.setAllianceId(allianceId);
 		  queryTermDriverAnaly.setCityId(cityId);
 		  if(paramMap.containsKey("visibleAllianceIds")){
-			  queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get("visibleAllianceIds"));// 可见加盟商ID
+			  // 可见加盟商ID
+			  queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get("visibleAllianceIds"));
 		  }
 		  if(paramMap.containsKey("visibleCityIds")){
-			  queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get("visibleCityIds"));// 可见城市ID
+			  // 可见城市ID
+			  queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get("visibleCityIds"));
 		  }
 		  queryTermDriverAnaly.setType(type);
 		  String table = "bi_driver_disinfect_measure_day";
@@ -96,16 +96,9 @@ public class DriverOperAnlayController{
 		  queryTermDriverAnaly.setTable(table);
 
 		  // 从大数据仓库获取统计数据
-		  List<DriverOperAnalyIndex> driverOperAnalyIndexList = null;
-		  try {
-			  driverOperAnalyIndexList = biDriverMeasureDayService.query(queryTermDriverAnaly);
-		  } catch (Exception e) {
-			  e.printStackTrace();
-		  }
+		  List<DriverOperAnalyIndex> driverOperAnalyIndexList = biDriverMeasureDayService.query(queryTermDriverAnaly);
 		  return AjaxResponse.success(driverOperAnalyIndexList);
 	  }
-	  
-
 
  	/**
 	    * 司机运营分析指标趋势查询
@@ -136,10 +129,12 @@ public class DriverOperAnlayController{
 		queryTermDriverAnaly.setAllianceId(allianceId);
 		queryTermDriverAnaly.setCityId(cityId);
 		if(paramMap.containsKey("visibleAllianceIds")){
-			queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get("visibleAllianceIds"));// 可见加盟商ID
+			// 可见加盟商ID
+			queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get("visibleAllianceIds"));
 		}
 		if(paramMap.containsKey("visibleCityIds")){
-			queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get("visibleCityIds"));// 可见城市ID
+			// 可见城市ID
+			queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get("visibleCityIds"));
 		}
 		queryTermDriverAnaly.setType(type);
 		if(type==null || type==1){
@@ -150,12 +145,7 @@ public class DriverOperAnlayController{
 			queryTermDriverAnaly.setType(4);
 		}
 		// 从大数据仓库获取统计数据
-		DriverOperAnalyIndexList trend = null;
-		try {
-			trend = biDriverMeasureDayService.trend(queryTermDriverAnaly);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		DriverOperAnalyIndexList trend = biDriverMeasureDayService.trend(queryTermDriverAnaly);
 		return AjaxResponse.success(trend);
     }
 }
