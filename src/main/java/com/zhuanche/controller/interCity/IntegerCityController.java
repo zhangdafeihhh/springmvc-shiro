@@ -2773,7 +2773,7 @@ public class IntegerCityController {
 
         }
 
-        map.put("supplierIdBatch", "");
+        map.put("supplierIdBatch", supplierIdBatch);
 
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
@@ -2789,6 +2789,7 @@ public class IntegerCityController {
         String url = esOrderDataSaasUrl + "/order/v2/search";
 
         String result = MpOkHttpUtil.okHttpGet(url, map, 0, null);
+        logger.info("查询订单结果:" + JSONObject.toJSONString(result));
         if (StringUtils.isNotEmpty(result)) {
             JSONObject jsonObject = JSONObject.parseObject(result);
             int code = jsonObject.getIntValue("code");
@@ -2804,6 +2805,7 @@ public class IntegerCityController {
                             String createDate = resultObject.get("createDate").toString();
                             Long createLong = DateUtils.getDate(createDate, "yyyy-MM-dd HH:mm:ss").getTime();
                             System.out.println(currentTime - createLong);
+                            logger.info("时间戳结果差：" + (currentTime - createLong));
                             if (currentTime - createLong <= 10000) {
                                 String lineName = resultObject.get("lineName") == null ? "" : resultObject.get("lineName").toString();
                                 String resultOrderNo = resultObject.get("orderNo") == null ? "" : resultObject.get("orderNo").toString();
