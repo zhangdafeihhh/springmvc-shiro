@@ -1,6 +1,5 @@
 package com.zhuanche.controller.statisticalAnalysis;
 
-import com.google.common.collect.Maps;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
@@ -9,7 +8,6 @@ import com.zhuanche.entity.bigdata.DriverOperAnalyIndex;
 import com.zhuanche.entity.bigdata.DriverOperAnalyIndexList;
 import com.zhuanche.entity.bigdata.QueryTermDriverAnaly;
 import com.zhuanche.serv.bigdata.BiDriverMeasureDayService;
-import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,12 +33,12 @@ import static com.zhuanche.common.enums.MenuEnum.DRIVER_ANALYSIS_GRAPH;
  */
 @Controller
 @RequestMapping("/driverOperAnlay")
-public class DriverOperAnlayController{
+public class DriverOperAnlayController {
 
 	private static final Logger logger = LoggerFactory.getLogger(DriverOperAnlayController.class);
 
-	@Autowired
-	private StatisticalAnalysisService statisticalAnalysisService;
+	private static final String SUPPLIER = "visibleAllianceIds";
+	private static final String CITY = "visibleCityIds";
 
 	@Autowired
 	private BiDriverMeasureDayService biDriverMeasureDayService;
@@ -62,42 +60,14 @@ public class DriverOperAnlayController{
 			  String allianceId, Long cityId,
 			  @Verify(param = "type",rule = "required") Integer type){
 		  logger.info("【运营管理-统计分析】司机运营分析指标 数据:queryDriverOperAnlayData");
-		  Map<String, Object> paramMap = Maps.newHashMap();
-		  paramMap.put("startDate", startDate);
-		  paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap, cityId, allianceId, null);
-		  if(paramMap==null){
+		  QueryTermDriverAnaly queryTermDriverAnaly = getQueryTermDriverAnaly(startDate, endDate,
+				  allianceId, cityId, type, 1);
+		  if(queryTermDriverAnaly==null){
 			  return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 		  }
-		  QueryTermDriverAnaly queryTermDriverAnaly = new QueryTermDriverAnaly();
-		  queryTermDriverAnaly.setStartDate(startDate);
-		  queryTermDriverAnaly.setEndDate(endDate);
-		  queryTermDriverAnaly.setAllianceId(allianceId);
-		  queryTermDriverAnaly.setCityId(cityId);
-		  if(paramMap.containsKey("visibleAllianceIds")){
-			  // 可见加盟商ID
-			  queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get("visibleAllianceIds"));
-		  }
-		  if(paramMap.containsKey("visibleCityIds")){
-			  // 可见城市ID
-			  queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get("visibleCityIds"));
-		  }
-		  queryTermDriverAnaly.setType(type);
-		  String table = "bi_driver_disinfect_measure_day";
-		  if(type==null || type==1){
-			  queryTermDriverAnaly.setDateDate(startDate);
-			  queryTermDriverAnaly.setStartDate(null);
-			  queryTermDriverAnaly.setEndDate(null);
-			  table = "bi_driver_disinfect_measure_day";
-		  } else if(type==2){
-			  table = "bi_driver_disinfect_measure_week";
-		  } else if(type==3){
-			  table = "bi_driver_disinfect_measure_month";
-		  }
-		  queryTermDriverAnaly.setTable(table);
-
 		  // 从大数据仓库获取统计数据
-		  List<DriverOperAnalyIndex> driverOperAnalyIndexList = biDriverMeasureDayService.query(queryTermDriverAnaly);
-		  return AjaxResponse.success(driverOperAnalyIndexList);
+		  List<DriverOperAnalyIndex> query = biDriverMeasureDayService.query(queryTermDriverAnaly);
+		  return AjaxResponse.success(query);
 	  }
 
  	/**
@@ -117,35 +87,56 @@ public class DriverOperAnlayController{
 			  String allianceId, Long cityId,
 			  @Verify(param = "type",rule = "required") Integer type){
 		logger.info("【运营管理-统计分析】司机运营分析指标趋势查询 数据:queryDriverOperAnlayTrendData");
-		Map<String, Object> paramMap = Maps.newHashMap();
-		paramMap.put("startDate", startDate);
-		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap, cityId, allianceId, null);
-		if(paramMap==null){
+		QueryTermDriverAnaly queryTermDriverAnaly = getQueryTermDriverAnaly(startDate, endDate,
+				allianceId, cityId, type, 2);
+		if(queryTermDriverAnaly==null){
 			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+		}
+		// 从大数据仓库获取统计数据
+		DriverOperAnalyIndexList trend = biDriverMeasureDayService.trend(queryTermDriverAnaly);
+		return AjaxResponse.success(trend);
+    }
+
+
+    public QueryTermDriverAnaly getQueryTermDriverAnaly(String startDate,  String endDate, String allianceId,
+														Long cityId,  Integer type, Integer value){
+		Map<String, Object> paramMap = biDriverMeasureDayService.getCurrentLoginUserParamMap(cityId, allianceId, null);
+		if(paramMap==null){
+			return null;
 		}
 		QueryTermDriverAnaly queryTermDriverAnaly = new QueryTermDriverAnaly();
 		queryTermDriverAnaly.setStartDate(startDate);
 		queryTermDriverAnaly.setEndDate(endDate);
 		queryTermDriverAnaly.setAllianceId(allianceId);
 		queryTermDriverAnaly.setCityId(cityId);
-		if(paramMap.containsKey("visibleAllianceIds")){
+		if(paramMap.containsKey(SUPPLIER)){
 			// 可见加盟商ID
-			queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get("visibleAllianceIds"));
+			queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get(SUPPLIER));
 		}
-		if(paramMap.containsKey("visibleCityIds")){
+		if(paramMap.containsKey(CITY)){
 			// 可见城市ID
-			queryTermDriverAnaly.setVisibleAllianceIds((Set<String>) paramMap.get("visibleCityIds"));
+			queryTermDriverAnaly.setVisibleCityIds((Set<String>) paramMap.get(CITY));
 		}
 		queryTermDriverAnaly.setType(type);
+
 		if(type==null || type==1){
 			queryTermDriverAnaly.setDateDate(startDate);
 			queryTermDriverAnaly.setStartDate(null);
 			queryTermDriverAnaly.setEndDate(null);
-		} else if(type==2 || type==3){
+		}
+
+		if(value==1){
+			String table = "bi_driver_disinfect_measure_day";
+			if(type==2){
+				table = "bi_driver_disinfect_measure_week";
+			} else if(type==3){
+				table = "bi_driver_disinfect_measure_month";
+			}
+			queryTermDriverAnaly.setTable(table);
+		}
+		if(value==2 && (type==2 || type==3)){
 			queryTermDriverAnaly.setType(4);
 		}
-		// 从大数据仓库获取统计数据
-		DriverOperAnalyIndexList trend = biDriverMeasureDayService.trend(queryTermDriverAnaly);
-		return AjaxResponse.success(trend);
-    }
+		return queryTermDriverAnaly;
+	}
 }
