@@ -2768,9 +2768,16 @@ public class IntegerCityController {
             }
             //如果是城市级别
            if(CollectionUtils.isNotEmpty(loginUser.getCityIds())){
-               map.put("cityIdBatch",loginUser.getCityIds());
+                String cityIdBatch = "";
+                StringBuilder cityBuilder = new StringBuilder();
+                for(Integer hasCity : loginUser.getCityIds()){
+                    cityBuilder.append(hasCity).append(SPLIT);
+                }
+                if(StringUtils.isNotEmpty(cityBuilder.toString())){
+                    cityIdBatch = cityBuilder.toString().substring(0,cityBuilder.toString().length()-1);
+                }
+               map.put("cityIdBatch",cityIdBatch);
            }
-
         }
 
         map.put("supplierIdBatch", supplierIdBatch);
