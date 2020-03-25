@@ -66,7 +66,7 @@ public class DriverOperAnlayController {
 			  return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 		  }
 		  // 从大数据仓库获取统计数据
-		  List<DriverOperAnalyIndex> query = biDriverMeasureDayService.query(queryTermDriverAnaly);
+		  DriverOperAnalyIndex query = biDriverMeasureDayService.query(queryTermDriverAnaly);
 		  return AjaxResponse.success(query);
 	  }
 

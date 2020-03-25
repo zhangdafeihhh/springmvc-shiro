@@ -73,6 +73,7 @@
         from ${table}
         ]]>
     <include refid="allBaseColumnWhereList"/>
+        LIMIT 1
   </select>
 
   <select id="trend" resultMap="BaseResultMap">

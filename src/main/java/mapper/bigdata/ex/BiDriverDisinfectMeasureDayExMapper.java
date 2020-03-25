@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface BiDriverDisinfectMeasureDayExMapper {
 
-    List<DriverOperAnalyIndex> query(QueryTermDriverAnaly queryTerm);
+    DriverOperAnalyIndex query(QueryTermDriverAnaly queryTerm);
 
     List<DriverOperAnalyIndex> trend(QueryTermDriverAnaly queryTerm);
 

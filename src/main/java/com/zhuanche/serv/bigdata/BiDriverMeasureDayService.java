@@ -29,7 +29,7 @@ public class BiDriverMeasureDayService {
     @Autowired
     private BiDriverDisinfectMeasureDayExMapper biDriverDisinfectMeasureDayExMapper;
 
-    public List<DriverOperAnalyIndex> query(QueryTermDriverAnaly queryTerm) {
+    public DriverOperAnalyIndex query(QueryTermDriverAnaly queryTerm) {
         return biDriverDisinfectMeasureDayExMapper.query(queryTerm);
     }
 
