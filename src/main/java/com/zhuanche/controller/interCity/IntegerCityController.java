@@ -36,6 +36,7 @@ import mapper.driver.ex.YueAoTongPhoneConfigExMapper;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
+import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -145,6 +146,9 @@ public class IntegerCityController {
 
     @Autowired
     private YueAoTongPhoneConfigExMapper yueAoTongPhoneConfigExMapper;
+
+    @Autowired
+    private CarBizSupplierExMapper carBizSupplierExMapper;
 
     private static final String SYSMOL = "&";
 
@@ -2709,7 +2713,7 @@ public class IntegerCityController {
                                        String beginCostStartDate,
                                        String beginCostEndDate,
                                        String riderPhone) {
-        logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},orderState:" +
+        logger.info(MessageFormat.format("语音播报订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
                         "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21},riderPhone:{22}", pageNum,
@@ -2765,22 +2769,32 @@ public class IntegerCityController {
                 } else {
                     map.put("ruleIdBatch", "-1");
                 }
+            } else if(CollectionUtils.isNotEmpty(loginUser.getCityIds())){
+
+               List<CarBizSupplier> querySupplierAllList =  carBizSupplierExMapper.querySupplierAllList(loginUser.getCityIds(), null);
+
+               StringBuilder supplierBuilder = new StringBuilder();
+               querySupplierAllList.forEach(list ->{
+                   supplierBuilder.append(list.getSupplierId()).append(SPLIT);
+               });
+               String lineIds = this.getLineIdBySupplierIds(supplierIdBatch);
+               if(StringUtils.isEmpty(lineIds)){
+                   logger.info("=========该城市未配置线路============");
+                   return AjaxResponse.success(null);
+               }
+
+               if (StringUtils.isNotBlank(lineIds)) {
+                   map.put("ruleIdBatch", lineIds);
+               } else {
+                   map.put("ruleIdBatch", "-1");
+               }
+
+
             }
-            //如果是城市级别
-           if(CollectionUtils.isNotEmpty(loginUser.getCityIds())){
-                String cityIdBatch = "";
-                StringBuilder cityBuilder = new StringBuilder();
-                for(Integer hasCity : loginUser.getCityIds()){
-                    cityBuilder.append(hasCity).append(SPLIT);
-                }
-                if(StringUtils.isNotEmpty(cityBuilder.toString())){
-                    cityIdBatch = cityBuilder.toString().substring(0,cityBuilder.toString().length()-1);
-                }
-               map.put("cityIdBatch",cityIdBatch);
-           }
         }
 
-        map.put("supplierIdBatch", supplierIdBatch);
+        //抢单和供应商无关
+        map.put("supplierIdBatch", "");
 
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
