@@ -2816,17 +2816,24 @@ public class IntegerCityController {
                querySupplierAllList.forEach(list ->{
                    supplierBuilder.append(list.getSupplierId()).append(SPLIT);
                });
-               String lineIds = this.getLineIdBySupplierIds(supplierIdBatch);
-               if(StringUtils.isEmpty(lineIds)){
+
+               if(supplierBuilder.toString().length() > 0){
+                   String lineIds = this.getLineIdBySupplierIds(supplierIdBatch.toString().substring(0,supplierBuilder.toString().length()-1));
+                   if(StringUtils.isEmpty(lineIds)){
+                       logger.info("=========该城市未配置线路============");
+                       return AjaxResponse.success(null);
+                   }
+
+                   if (StringUtils.isNotBlank(lineIds)) {
+                       map.put("ruleIdBatch", lineIds);
+                   } else {
+                       map.put("ruleIdBatch", "-1");
+                   }
+               }else {
                    logger.info("=========该城市未配置线路============");
                    return AjaxResponse.success(null);
                }
 
-               if (StringUtils.isNotBlank(lineIds)) {
-                   map.put("ruleIdBatch", lineIds);
-               } else {
-                   map.put("ruleIdBatch", "-1");
-               }
 
 
             }
