@@ -2810,7 +2810,6 @@ public class IntegerCityController {
         String url = esOrderDataSaasUrl + "/order/v2/search";
 
         String result = MpOkHttpUtil.okHttpGet(url, map, 0, null);
-        logger.info("查询订单结果:" + JSONObject.toJSONString(result));
         if (StringUtils.isNotEmpty(result)) {
             JSONObject jsonObject = JSONObject.parseObject(result);
             int code = jsonObject.getIntValue("code");
