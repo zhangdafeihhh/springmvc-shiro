@@ -68,9 +68,6 @@ public class BusDriverMongoService {
 	//	http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=43156150
 	private static final String UPDATE_COOPERATION="/v1/driver/update/cooperationType/supplierId";
 
-	@Resource(name="driverMongoTemplate")
-	private MongoTemplate driverMongoTemplate;
-
 	/**
 	 * 查询司机mongo
 	 * 
@@ -78,26 +75,23 @@ public class BusDriverMongoService {
 	 * @return
 	 */
 	public DriverMongo findByDriverId(Integer driverId) {
-		if(Dicts.getBoolean("DRIVERMONGO_QUERY_FLAG",false)){
-			DriverMongo driverMongo = new DriverMongo();
-			Map<String,Object> params = new HashMap<String,Object>();
-			params.put("businessId", Common.DRIVER_MONGO_HTTP_BUSINESSID);
-			params.put("transId", Md5Util.md5(UUID.randomUUID().toString()));
-			params.put("driverId",driverId);
-			logger.info("{},params:{}",QUERY_DRIVERID,params);
-			JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(driverMongoUrl + QUERY_DRIVERID, params, 3000,"vehicleManage");
-			logger.info("{},result:{}",QUERY_DRIVERID,jsonObject);
-			int code = jsonObject.getIntValue("code");
-			if(code == 0){
-				jsonObject.getJSONObject("data");
-				driverMongo = JSONObject.toJavaObject(jsonObject, DriverMongo.class);
-			}
-			return driverMongo;
+		DriverMongo driverMongo = new DriverMongo();
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("businessId", Common.DRIVER_MONGO_HTTP_BUSINESSID);
+		params.put("transId", Md5Util.md5(UUID.randomUUID().toString()));
+		params.put("driverId",driverId);
+		logger.info("{},params:{}",QUERY_DRIVERID,params);
+		JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(driverMongoUrl + QUERY_DRIVERID, params, 3000,"vehicleManage");
+		logger.info("{},result:{}",QUERY_DRIVERID,jsonObject);
+		int code = jsonObject.getIntValue("code");
+		if(code == 0){
+			jsonObject.getJSONObject("data");
+			driverMongo = JSONObject.toJavaObject(jsonObject, DriverMongo.class);
 		}else{
-			Query query = new Query(Criteria.where("driverId").is(driverId));
-			DriverMongo  driverMongo = driverMongoTemplate.findOne(query, DriverMongo.class);
-			return driverMongo;
+			logger.error("{} fail,code:{}",QUERY_DRIVERID,code);
+			return null;
 		}
+		return driverMongo;
 	}
 
 	/**
@@ -147,38 +141,33 @@ public class BusDriverMongoService {
 		driverMongo.setSuperintendUrl(saveDTO.getSuperintendUrl());
 		driverMongo.setCooperationType(saveDTO.getCooperationType());
 		driverMongo.setOutageStatus(2);
-		if(Dicts.getBoolean("DRIVERMONGO_UPDATE_FLAG",false)) {
-			Map<String,Object> params = new HashMap<String,Object>();
-			params.put("businessId", Common.DRIVER_MONGO_HTTP_BUSINESSID);
-			params.put("transId", Md5Util.md5(UUID.randomUUID().toString()));
-			params.put("phone",driverMongo.getPhone());
-			params.put("supplierId",driverMongo.getSupplierId());
-			params.put("status",driverMongo.getStatus());
-			params.put("serviceCityName",driverMongo.getServiceCityName());
-			params.put("serviceCityId",driverMongo.getServiceCityId());
-			params.put("name",driverMongo.getName());
-			params.put("modelName",driverMongo.getModelName());
-			params.put("modelId",driverMongo.getModelId());
-			params.put("licensePlates",driverMongo.getLicensePlates());
-			params.put("isTwoShifts",driverMongo.getIsTwoShifts());
-			params.put("groupName",driverMongo.getGroupName());
-			params.put("groupId",driverMongo.getGroupId());
-			params.put("driverId",driverMongo.getDriverId());
-			params.put("cooperationType",driverMongo.getCooperationType());
-			params.put("photoSrc",driverMongo.getPhotoSrc());
-			params.put("serviceStatus",driverMongo.getServiceStatus());
-			params.put("dutyStatus",driverMongo.getDutyStatus());
-			params.put("outageStatus",driverMongo.getOutageStatus());
-			logger.info("{},params:{}",INSERT_MONGODRIVER,params);
-			JSONObject jsonObject = MpOkHttpUtil.okHttpPostBackJson(driverMongoUrl + INSERT_MONGODRIVER, params, 3000,"vehicleManage");
-			logger.info("{},result:{}",INSERT_MONGODRIVER,jsonObject);
-			int code = jsonObject.getIntValue("code");
-			if(code != 0 ){
-				logger.error("{} fail,code:{}",INSERT_MONGODRIVER,code);
-			}
-		}else{
-			// 插入司机信息到mongon
-			driverMongoTemplate.insert(driverMongo);
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("businessId", Common.DRIVER_MONGO_HTTP_BUSINESSID);
+		params.put("transId", Md5Util.md5(UUID.randomUUID().toString()));
+		params.put("phone",driverMongo.getPhone());
+		params.put("supplierId",driverMongo.getSupplierId());
+		params.put("status",driverMongo.getStatus());
+		params.put("serviceCityName",driverMongo.getServiceCityName());
+		params.put("serviceCityId",driverMongo.getServiceCityId());
+		params.put("name",driverMongo.getName());
+		params.put("modelName",driverMongo.getModelName());
+		params.put("modelId",driverMongo.getModelId());
+		params.put("licensePlates",driverMongo.getLicensePlates());
+		params.put("isTwoShifts",driverMongo.getIsTwoShifts());
+		params.put("groupName",driverMongo.getGroupName());
+		params.put("groupId",driverMongo.getGroupId());
+		params.put("driverId",driverMongo.getDriverId());
+		params.put("cooperationType",driverMongo.getCooperationType());
+		params.put("photoSrc",driverMongo.getPhotoSrc());
+		params.put("serviceStatus",driverMongo.getServiceStatus());
+		params.put("dutyStatus",driverMongo.getDutyStatus());
+		params.put("outageStatus",driverMongo.getOutageStatus());
+		logger.info("{},params:{}",INSERT_MONGODRIVER,params);
+		JSONObject jsonObject = MpOkHttpUtil.okHttpPostBackJson(driverMongoUrl + INSERT_MONGODRIVER, params, 3000,"vehicleManage");
+		logger.info("{},result:{}",INSERT_MONGODRIVER,jsonObject);
+		int code = jsonObject.getIntValue("code");
+		if(code != 0 ){
+			logger.error("{} fail,code:{}",INSERT_MONGODRIVER,code);
 		}
 	}
 
@@ -188,111 +177,30 @@ public class BusDriverMongoService {
 	 * @param saveDTO
 	 */
 	public void updateDriverMongo(BusDriverSaveDTO saveDTO) {
-		if(Dicts.getBoolean("DRIVERMONGO_UPDATE_FLAG",false)) {
-			Map<String,Object> params = new HashMap<String,Object>();
-			params.put("businessId", Common.DRIVER_MONGO_HTTP_BUSINESSID);
-			params.put("transId", Md5Util.md5(UUID.randomUUID().toString()));
-			params.put("driverId",saveDTO.getDriverId());
-			params.put("groupId",saveDTO.getGroupId());
-			params.put("groupName",saveDTO.getGroupName());
-			params.put("modelId",saveDTO.getModelId());
-			params.put("modelName",saveDTO.getModelName());
-			params.put("serviceCityId",saveDTO.getServiceCity());
-			params.put("serviceCityName",saveDTO.getCityName());
-			params.put("phone",saveDTO.getPhone());
-			params.put("name",saveDTO.getName());
-			params.put("licensePlates",saveDTO.getLicensePlates());
-			params.put("status",saveDTO.getStatus());
-			params.put("supplierId",saveDTO.getSupplierId());
-			params.put("cooperationType",saveDTO.getCooperationType());
-			params.put("isTwoShifts",saveDTO.getIsTwoShifts());
-			params.put("photoSrc",saveDTO.getPhotosrct());
-			logger.info("{},params:{}",UPDATE_MONGODRIVER,params);
-			JSONObject jsonObject = MpOkHttpUtil.okHttpPostBackJson(driverMongoUrl + UPDATE_MONGODRIVER, params, 3000,"vehicleManage");
-			logger.info("{},result:{}",UPDATE_MONGODRIVER,jsonObject);
-			int code = jsonObject.getIntValue("code");
-			if(code == 0){
-				jsonObject.getJSONObject("data");
-//				driverMongo = JSONObject.toJavaObject(jsonObject,DriverMongo.class);
-			}
-		}else{
-			// 更新mongoDB
-			Query query = new Query(Criteria.where("driverId").is(saveDTO.getDriverId()));
-			Update update = new Update();
-			if (saveDTO.getModelName() != null) {
-				update.set("modelName", saveDTO.getModelName());
-			}
-			if (saveDTO.getAge() != null) {
-				update.set("age", saveDTO.getAge());
-			}
-			if (saveDTO.getArchivesNo() != null) {
-				update.set("archivesNo", saveDTO.getArchivesNo());
-			}
-			update.set("superintendNo", saveDTO.getSuperintendNo());
-			update.set("superintendUrl", saveDTO.getSuperintendUrl());
-			if (saveDTO.getAttachmentAddr() != null) {
-				update.set("attachmentAddr", saveDTO.getAttachmentAddr());
-			}
-			if (saveDTO.getAttachmentName() != null) {
-				update.set("attachmentName", saveDTO.getAttachmentName());
-			}
-			if (saveDTO.getUpdateBy() != null) {
-				update.set("updateBy", saveDTO.getUpdateBy());
-			}
-			if (saveDTO.getUpdateDate() != null) {
-				update.set("updateDate", saveDTO.getUpdateDate());
-			}
-			if (saveDTO.getDrivingLicenseType() != null) {
-				update.set("drivingLicenseType", saveDTO.getDrivingLicenseType());
-			}
-			if (saveDTO.getDrivingYears() != null) {
-				update.set("drivingYears", saveDTO.getDrivingYears());
-			}
-			if (saveDTO.getExpireDate() != null) {
-				String expireDate = formatter.format(LocalDateTime.ofInstant(saveDTO.getExpireDate().toInstant(), ZoneId.systemDefault()));
-				update.set("expireDate", expireDate);
-			}
-			if (saveDTO.getGender() != null) {
-				update.set("gender", saveDTO.getGender());
-			}
-			if (saveDTO.getIdCardNo() != null) {
-				update.set("idCardNo", saveDTO.getIdCardNo());
-			}
-			if (saveDTO.getIssueDate() != null) {
-				String issueDate = formatter.format(LocalDateTime.ofInstant(saveDTO.getIssueDate().toInstant(), ZoneId.systemDefault()));
-				update.set("issueDate", issueDate);
-			}
-			if (saveDTO.getGroupId() != null && saveDTO.getGroupId() != 0) {
-				update.set("groupId", saveDTO.getGroupId());
-				update.set("groupName", saveDTO.getGroupName());
-			}
-			if (saveDTO.getLicensePlates() != null) {
-				update.set("licensePlates", saveDTO.getLicensePlates());
-				update.set("modelId", saveDTO.getModelId());
-			}
-			if (saveDTO.getName() != null) {
-				update.set("name", saveDTO.getName());
-			}
-			if (saveDTO.getPhone() != null) {
-				if (saveDTO.getStatus() != 0) {
-					update.set("phone", saveDTO.getPhone());
-				} else {
-					update.set("phone", "");
-				}
-			}
-			if (saveDTO.getStatus() != null) {
-				update.set("status", saveDTO.getStatus());
-			}
-			if (saveDTO.getPhotosrct() != null) {
-				update.set("photoSrc", saveDTO.getPhotosrct());
-			}
-			update.set("serviceCityId", saveDTO.getServiceCity());
-			update.set("serviceCityName", saveDTO.getCityName());
-			update.set("superintendNo", saveDTO.getSuperintendNo());
-			update.set("supplierId", saveDTO.getSupplierId());
-			update.set("superintendUrl", saveDTO.getSuperintendUrl());
-			update.set("cooperationType", saveDTO.getCooperationType());
-			driverMongoTemplate.updateFirst(query, update, DriverMongo.class);
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("businessId", Common.DRIVER_MONGO_HTTP_BUSINESSID);
+		params.put("transId", Md5Util.md5(UUID.randomUUID().toString()));
+		params.put("driverId",saveDTO.getDriverId());
+		params.put("groupId",saveDTO.getGroupId());
+		params.put("groupName",saveDTO.getGroupName());
+		params.put("modelId",saveDTO.getModelId());
+		params.put("modelName",saveDTO.getModelName());
+		params.put("serviceCityId",saveDTO.getServiceCity());
+		params.put("serviceCityName",saveDTO.getCityName());
+		params.put("phone",saveDTO.getPhone());
+		params.put("name",saveDTO.getName());
+		params.put("licensePlates",saveDTO.getLicensePlates());
+		params.put("status",saveDTO.getStatus());
+		params.put("supplierId",saveDTO.getSupplierId());
+		params.put("cooperationType",saveDTO.getCooperationType());
+		params.put("isTwoShifts",saveDTO.getIsTwoShifts());
+		params.put("photoSrc",saveDTO.getPhotosrct());
+		logger.info("{},params:{}",UPDATE_MONGODRIVER,params);
+		JSONObject jsonObject = MpOkHttpUtil.okHttpPostBackJson(driverMongoUrl + UPDATE_MONGODRIVER, params, 3000,"vehicleManage");
+		logger.info("{},result:{}",UPDATE_MONGODRIVER,jsonObject);
+		int code = jsonObject.getIntValue("code");
+		if(code != 0 ){
+			logger.error("{} fail,code:{}",UPDATE_MONGODRIVER,code);
 		}
 	}
 
