@@ -75,7 +75,6 @@ public class BusDriverMongoService {
 	 * @return
 	 */
 	public DriverMongo findByDriverId(Integer driverId) {
-		DriverMongo driverMongo = new DriverMongo();
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("businessId", Common.DRIVER_MONGO_HTTP_BUSINESSID);
 		params.put("transId", Md5Util.md5(UUID.randomUUID().toString()));
@@ -86,12 +85,11 @@ public class BusDriverMongoService {
 		int code = jsonObject.getIntValue("code");
 		if(code == 0){
 			jsonObject.getJSONObject("data");
-			driverMongo = JSONObject.toJavaObject(jsonObject, DriverMongo.class);
+			return JSONObject.toJavaObject(jsonObject, DriverMongo.class);
 		}else{
 			logger.error("{} fail,code:{}",QUERY_DRIVERID,code);
 			return null;
 		}
-		return driverMongo;
 	}
 
 	/**
