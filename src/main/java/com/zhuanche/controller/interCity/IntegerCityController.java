@@ -2779,7 +2779,9 @@ public class IntegerCityController {
                });
 
                if(supplierBuilder.toString().length() > 0){
-                   String lineIds = this.getLineIdBySupplierIds(supplierIdBatch.toString().substring(0,supplierBuilder.toString().length()-1));
+                   String allSupplier = supplierBuilder.toString();
+                   logger.info("获取所有的合作商id:" + allSupplier);
+                   String lineIds = this.getLineIdBySupplierIds(allSupplier.substring(0,allSupplier.length()-1));
                    if(StringUtils.isEmpty(lineIds)){
                        logger.info("=========该城市未配置线路============");
                        return AjaxResponse.success(null);
