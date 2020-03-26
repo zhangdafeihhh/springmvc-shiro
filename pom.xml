@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.zhuanche</groupId>
 		<artifactId>mp-parent</artifactId>
-		<version>1.8-SNAPSHOT</version>
+		<version>1.9-SNAPSHOT</version>
 	</parent>
 	<artifactId>mp-manage</artifactId>
 	<packaging>war</packaging>

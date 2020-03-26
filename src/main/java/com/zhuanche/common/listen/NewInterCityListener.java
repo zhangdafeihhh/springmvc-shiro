@@ -118,7 +118,8 @@ public class NewInterCityListener implements MessageListenerOrderly {
                                                 if (jsonSupplier.get("supplierId") != null) {
                                                     String suppliers = jsonSupplier.getString("supplierId");
                                                     List<String> supplierPhone = this.querySupplierPhone(suppliers);
-                                                    if(CollectionUtils.isNotEmpty(supplierPhone)){
+                                                    logger.info("======获取手机号码==========" + JSONObject.toJSONString(supplierPhone));
+                                                    if(CollectionUtils.isNotEmpty(supplierPhone) && StringUtils.isNotEmpty(supplierPhone.get(0))){
                                                         supplierPhone.forEach(str ->{
                                                             logger.info("=====获取到的供应商手机号======" + str + ",发送短信开始=====");
                                                             SmsSendUtil.send(str, "您好，有一个城际订单，请登录后台及时抢单");
