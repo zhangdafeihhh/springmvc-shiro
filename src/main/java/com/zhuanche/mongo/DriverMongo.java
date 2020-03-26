@@ -54,8 +54,6 @@ public class DriverMongo implements Serializable {
     private long servicecount;
     // 生成的订单号
     private String orderNo;
-    // 生成的订单 id
-    private int orderid;
     // 服务监督吗
     private String superintendNo = "";
     // 服务监督吗 链接
@@ -71,7 +69,7 @@ public class DriverMongo implements Serializable {
     private String bookingDateStr;
 
     // add by lwl 司机是否接受抢单 2015-08-24
-    private int grabNotice;
+    private Integer grabNotice;
 
     // 当前登陆版本号
     private String appVersion;
@@ -99,7 +97,7 @@ public class DriverMongo implements Serializable {
     private Float driverDutyTotalHour;
 
     //update 2017-04-21 zll 加入加盟类型
-    private int cooperationType;//加盟类型
+    private Integer cooperationType;//加盟类型
 
     //update 2017-05-03 zll 停运状态
     private Integer outageStatus;//停运状态  1停运 2正常
@@ -195,11 +193,11 @@ public class DriverMongo implements Serializable {
         this.outStopLongTimeSurplus = outStopLongTimeSurplus;
     }
 
-    public int getCooperationType() {
+    public Integer getCooperationType() {
         return cooperationType;
     }
 
-    public void setCooperationType(int cooperationType) {
+    public void setCooperationType(Integer cooperationType) {
         this.cooperationType = cooperationType;
     }
 
@@ -267,11 +265,11 @@ public class DriverMongo implements Serializable {
         this.goHomeStatus = goHomeStatus;
     }
 
-    public int getGrabNotice() {
+    public Integer getGrabNotice() {
         return grabNotice;
     }
 
-    public void setGrabNotice(int grabNotice) {
+    public void setGrabNotice(Integer grabNotice) {
         this.grabNotice = grabNotice;
     }
 
@@ -321,7 +319,7 @@ public class DriverMongo implements Serializable {
     //
     private String expireDate;
     //
-    private int serviceCityId;
+    private Integer serviceCityId;
     //@Length(max=255)
     private String attachmentName;
     //@Length(max=255)
@@ -491,14 +489,6 @@ public class DriverMongo implements Serializable {
         this.orderNo = orderNo;
     }
 
-    public int getOrderid() {
-        return orderid;
-    }
-
-    public void setOrderid(int orderid) {
-        this.orderid = orderid;
-    }
-
     public String getSuperintendNo() {
         return superintendNo;
     }
@@ -627,11 +617,11 @@ public class DriverMongo implements Serializable {
         this.expireDate = expireDate;
     }
 
-    public int getServiceCityId() {
+    public Integer getServiceCityId() {
         return serviceCityId;
     }
 
-    public void setServiceCityId(int serviceCityId) {
+    public void setServiceCityId(Integer serviceCityId) {
         this.serviceCityId = serviceCityId;
     }
 

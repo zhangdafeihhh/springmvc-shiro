@@ -87,6 +87,9 @@ public class BusDriverMongoService {
 		if(code == 0){
 			jsonObject.getJSONObject("data");
 			driverMongo = JSONObject.toJavaObject(jsonObject, DriverMongo.class);
+		}else{
+			logger.error("{} fail,code:{}",QUERY_DRIVERID,code);
+			return null;
 		}
 		return driverMongo;
 	}

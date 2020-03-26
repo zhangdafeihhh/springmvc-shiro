@@ -80,6 +80,7 @@ public class DriverMongoService {
 		if(code == 0){
 			jsonObject.getJSONObject("data");
 			driverMongo = JSONObject.toJavaObject(jsonObject, DriverMongo.class);
+			return driverMongo;
 		}else{
 			logger.error(QUERY_DRIVERID+" faild,code={}",code);
 		}
