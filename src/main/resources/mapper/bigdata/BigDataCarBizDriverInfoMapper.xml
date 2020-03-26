@@ -157,6 +157,7 @@
         <if test="disinfectTimeEnd != null and disinfectTimeEnd != ''">
             AND record.create_time <![CDATA[<= ]]> #{disinfectTimeEnd}
         </if>
+            AND driver.status = 1
     </sql>
     <sql id="wheresnone">
         WHERE 1 = 1
@@ -182,6 +183,7 @@
             AND record.audit_status is null
         </if>
           AND record.create_time is null
+          AND driver.status = 1
     </sql>
   <sql id="Blob_Column_List" >
     memo
