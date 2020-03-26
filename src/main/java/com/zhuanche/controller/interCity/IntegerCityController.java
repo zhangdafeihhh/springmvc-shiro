@@ -439,7 +439,7 @@ public class IntegerCityController {
 
                 String lineIds = this.getLineIdBySupplierIds(supplierIdBatch);
 
-                if(StringUtils.isEmpty(lineIds)){
+                if (StringUtils.isEmpty(lineIds)) {
                     logger.info("=========抢单查询供应商未配置线路============");
                     return AjaxResponse.success(null);
                 }
@@ -450,20 +450,20 @@ public class IntegerCityController {
                 } else {
                     map.put("ruleIdBatch", "-1");
                 }
-            }else if(CollectionUtils.isNotEmpty(loginUser.getCityIds())){
+            } else if (CollectionUtils.isNotEmpty(loginUser.getCityIds())) {
 
-                List<CarBizSupplier> querySupplierAllList =  carBizSupplierExMapper.querySupplierAllList(loginUser.getCityIds(), null);
+                List<CarBizSupplier> querySupplierAllList = carBizSupplierExMapper.querySupplierAllList(loginUser.getCityIds(), null);
 
                 StringBuilder supplierBuilder = new StringBuilder();
-                querySupplierAllList.forEach(list ->{
+                querySupplierAllList.forEach(list -> {
                     supplierBuilder.append(list.getSupplierId()).append(SPLIT);
                 });
 
-                if(supplierBuilder.toString().length() > 0){
+                if (supplierBuilder.toString().length() > 0) {
                     String allSupplier = supplierBuilder.toString();
                     logger.info("获取所有的合作商id:" + allSupplier);
-                    String lineIds = this.getLineIdBySupplierIds(allSupplier.substring(0,allSupplier.length()-1));
-                    if(StringUtils.isEmpty(lineIds)){
+                    String lineIds = this.getLineIdBySupplierIds(allSupplier.substring(0, allSupplier.length() - 1));
+                    if (StringUtils.isEmpty(lineIds)) {
                         logger.info("=========该城市未配置线路============");
                         return AjaxResponse.success(null);
                     }
@@ -473,13 +473,14 @@ public class IntegerCityController {
                     } else {
                         map.put("ruleIdBatch", "-1");
                     }
-                }else {
+                } else {
                     logger.info("=========该城市未配置线路============");
                     return AjaxResponse.success(null);
                 }
 
 
             }
+        }
 
         map.put("supplierIdBatch", "");
         //添加排序字段
