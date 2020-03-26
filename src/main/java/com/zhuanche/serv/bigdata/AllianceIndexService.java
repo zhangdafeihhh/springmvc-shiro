@@ -277,7 +277,7 @@ public class AllianceIndexService{
            List<SAASCoreIndexPercentDto> list = biSaasCiDeviceDayExMapper.getCiCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff);
            if("0".equals(list.get(0).getDriverNum())){
                List<SAASCoreIndexPercentDto> zeroList = new ArrayList<>();
-               logger.error("加盟商下面没有司机============");
+               logger.info("加盟商下面没有司机============");
                SAASCoreIndexPercentDto s = new SAASCoreIndexPercentDto();
                s.setCompleteOrderAmountPerecnt("0%");
                s.setIncomeAmountPercent("0%");
