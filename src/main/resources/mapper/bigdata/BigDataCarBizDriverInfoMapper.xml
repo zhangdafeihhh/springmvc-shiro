@@ -158,7 +158,7 @@
             AND record.create_time <![CDATA[<= ]]> #{disinfectTimeEnd}
         </if>
         <if test="phone != null and phone != ''">
-            AND dirver.phone = #{phone}
+            AND driver.phone = #{phone}
         </if>
             AND driver.status = 1
     </sql>
@@ -186,7 +186,7 @@
             AND record.audit_status is null
         </if>
         <if test="phone != null and phone != ''">
-          AND dirver.phone = #{phone}
+          AND driver.phone = #{phone}
         </if>
           AND record.create_time is null
           AND driver.status = 1
