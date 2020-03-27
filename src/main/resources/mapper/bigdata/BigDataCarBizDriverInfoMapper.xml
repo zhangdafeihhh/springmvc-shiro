@@ -143,7 +143,7 @@
             AND driver.name LIKE CONCAT(#{name},'%')
         </if>
         <if test="licensePlates != null and licensePlates != ''">
-            AND driver.license_plates = #{license_plates}
+            AND driver.license_plates = #{licensePlates}
         </if>
         <if test="disinfectStatus ==1 or disinfectStatus == 2">
             AND record.audit_status = #{disinfectStatus}
@@ -177,7 +177,7 @@
             AND driver.name LIKE CONCAT(#{name},'%')
         </if>
         <if test="licensePlates != null and licensePlates != ''">
-            AND driver.license_plates = #{license_plates}
+            AND driver.license_plates = #{licensePlates}
         </if>
         <if test="disinfectStatus ==1 or disinfectStatus == 2">
             AND record.audit_status = #{disinfectStatus}
