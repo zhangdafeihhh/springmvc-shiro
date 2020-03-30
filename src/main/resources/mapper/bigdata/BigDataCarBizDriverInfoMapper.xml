@@ -151,12 +151,6 @@
         <if test="disinfectStatus == 3">
           AND record.audit_status is null
         </if>
-        <if test="disinfectTimeStart != null and disinfectTimeStart != ''">
-            AND record.create_time <![CDATA[>= ]]> #{disinfectTimeStart}
-        </if>
-        <if test="disinfectTimeEnd != null and disinfectTimeEnd != ''">
-            AND record.create_time <![CDATA[<= ]]> #{disinfectTimeEnd}
-        </if>
         <if test="phone != null and phone != ''">
             AND driver.phone = #{phone}
         </if>
