@@ -215,7 +215,6 @@
         LEFT JOIN disinfect_record record
         ON driver.driver_id = record.driver_id
         <include refid="wheres"/>
-        order by record.create_time desc
 
         UNION ALL
 
