@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.bigdata.ex.BiDriverDisinfectMeasureDayExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.bigdata.DriverOperAnalyIndex" >
+    <result column="onlineDriverAmount" property="onlineDriverAmount"/>
+    <result column="onlineRate" property="onlineRate"/>
+    <result column="serviceDriverAmount" property="serviceDriverAmount"/>
+    <result column="serviceRate" property="serviceRate"/>
+    <result column="distributeOrderAmount" property="distributeOrderAmount"/>
+    <result column="completeOrderAmount" property="completeOrderAmount"/>
+    <result column="bindOrderAmountPerVehicle" property="bindOrderAmountPerVehicle"/>
+    <result column="completeOrderPerVehicle" property="completeOrderPerVehicle"/>
+    <result column="incomePerVehicle" property="incomePerVehicle"/>
+    <result column="pricePerOIrder" property="pricePerOIrder"/>
+    <result column="totalDriverNum" property="totalDriverNum"/>
+    <result column="disinfectDriverCnt" property="disinfectDriverCnt"/>
+    <result column="noDisinfectDriverCnt" property="noDisinfectDriverCnt"/>
+  </resultMap>
+
+  <!-- mapper基础标准: 当前表所有字段查询条件集 -->
+  <sql id="allBaseColumnWhereList" >
+    <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
+      <if test="startDate != null and startDate != '' and type!=4 ">
+        <![CDATA[  and start_date >=  #{startDate}  ]]>
+      </if>
+      <if test="endDate != null and endDate != ''  and type!=4 " >
+        <![CDATA[ and end_date <= #{endDate}   ]]>
+      </if>
+      <if test="dateDate != null and dateDate != ''" >
+        <![CDATA[ and data_date = #{dateDate}  ]]>
+      </if>
+      <if test="startDate != null and startDate != '' and endDate != null and endDate != '' and type==4 ">
+        <![CDATA[  and data_date >=  #{startDate}  and data_date <= #{endDate} ]]>
+      </if>
+      <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
+        and supplier_id in
+        <foreach item="item" index="index" collection="visibleAllianceIds" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="allianceId != null and allianceId != ''">
+        and supplier_id = #{allianceId}
+      </if>
+      <if test="visibleCityIds != null and visibleCityIds.size >0">
+        and city_id in
+        <foreach item="item" index="index" collection="visibleCityIds" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="cityId != null and cityId != ''">
+        and city_id = #{cityId}
+      </if>
+    </trim>
+  </sql>
+
+  <select id="query" resultMap="BaseResultMap">
+    <![CDATA[
+        select
+		    IFNULL(sum(online_driver_num),0) as onlineDriverAmount,
+		    CONCAT(IFNULL(FORMAT(sum(online_driver_num)*100/sum(total_driver_num),1),0),'%') as onlineRate,
+		    IFNULL(sum(in_use_driver_num),0) as serviceDriverAmount,
+		    CONCAT(IFNULL(FORMAT(sum(in_use_driver_num)*100/sum(total_driver_num),1),0),'%') as serviceRate,
+		    IFNULL(sum(push_order_num),0) as distributeOrderAmount,
+		    CONCAT(IFNULL(FORMAT(sum(com_order_num)*100/sum(push_order_num),1),0),'%') as completeOrderAmount,
+		    IFNULL(FORMAT(sum(bind_order_num)/sum(bind_order_driver_cnt),1),0) as bindOrderAmountPerVehicle,
+		    IFNULL(FORMAT(sum(fact_over_order_num)/sum(in_use_driver_num),1),0) as completeOrderPerVehicle,
+		    IFNULL(FORMAT(sum(fact_over_amount)/sum(in_use_driver_num),1),0) as incomePerVehicle,
+		    IFNULL(FORMAT(sum(fact_over_amount)/sum(fact_over_order_num),1),0) as pricePerOIrder,
+		    IFNULL(sum(total_driver_num),0) as totalDriverNum,
+		    IFNULL(sum(disinfect_driver_cnt),0) as disinfectDriverCnt,
+		    IFNULL(sum(no_disinfect_driver_cnt),0) as noDisinfectDriverCnt,
+		    CONCAT(IFNULL(FORMAT(sum(disinfect_driver_cnt)*100/sum(in_use_driver_num),1),0),'%') as disinfectDriverCntRate
+        from ${table}
+        ]]>
+    <include refid="allBaseColumnWhereList"/>
+        LIMIT 1
+  </select>
+
+  <select id="trend" resultMap="BaseResultMap">
+    <![CDATA[
+        select
+            DATE_FORMAT(data_date,'%Y/%m/%d')   as demenItemName,
+            IFNULL(sum(online_driver_num),0) as onlineDriverAmount,
+		    CONCAT(IFNULL(FORMAT(sum(online_driver_num)*100/sum(total_driver_num),1),0),'%') as onlineRate,
+		    IFNULL(sum(in_use_driver_num),0) as serviceDriverAmount,
+		    CONCAT(IFNULL(FORMAT(sum(in_use_driver_num)*100/sum(total_driver_num),1),0),'%') as serviceRate,
+		    IFNULL(sum(push_order_num),0) as distributeOrderAmount,
+		    CONCAT(IFNULL(FORMAT(sum(com_order_num)*100/sum(push_order_num),1),0),'%') as completeOrderAmount,
+		    IFNULL(FORMAT(sum(bind_order_num)/sum(bind_order_driver_cnt),1),0) as bindOrderAmountPerVehicle,
+		    IFNULL(FORMAT(sum(fact_over_order_num)/sum(in_use_driver_num),1),0) as completeOrderPerVehicle,
+		    IFNULL(FORMAT(sum(fact_over_amount)/sum(in_use_driver_num),0),0) as incomePerVehicle,
+		    IFNULL(FORMAT(sum(fact_over_amount)/sum(fact_over_order_num),1),0) as pricePerOIrder,
+		    IFNULL(sum(total_driver_num),0) as totalDriverNum,
+		    IFNULL(sum(disinfect_driver_cnt),0) as disinfectDriverCnt,
+		    IFNULL(sum(no_disinfect_driver_cnt),0) as noDisinfectDriverCnt,
+		    CONCAT(IFNULL(FORMAT(sum(disinfect_driver_cnt)*100/sum(in_use_driver_num),1),0),'%') as disinfectDriverCntRate
+        from  bi_driver_disinfect_measure_day
+        ]]>
+    <include refid="allBaseColumnWhereList"/>
+    group by data_date
+  </select>
+</mapper>

@@ -19,16 +19,16 @@
 		</javaTypeResolver>
 
 		<!-- po实体类代码位置 -->
-		<javaModelGenerator targetPackage="com.zhuanche.entity.bigdata"	targetProject="/Users/fan/Documents/driver-business/mp-manage/src/main/java">
+		<javaModelGenerator targetPackage="com.zhuanche.entity.bigdata"	targetProject="C:\IdeaProjects\mp-manage\src\main\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- sql代码的xml映射文件位置 -->
-		<sqlMapGenerator targetPackage="mapper.bigdata" targetProject="/Users/fan/Documents/driver-business/mp-manage/src/main/resources">
+		<sqlMapGenerator targetPackage="mapper.bigdata" targetProject="C:\\IdeaProjects\mp-manage\\src\\main\\resources">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		<!-- mapper接口位置 -->
-		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.bigdata" targetProject="/Users/fan/Documents/driver-business/mp-manage/src/main/java">
+		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.bigdata" targetProject="C:\\IdeaProjects\\mp-manage\\src\\main\\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 
@@ -40,7 +40,7 @@
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="id" sqlStatement="MySql" identity="true" />
 		</table>-->
-		<table tableName="bi_driver_business_info_month_report_2019_04" domainObjectName="BiDriverBusinessInfoMonthReport"
+		<table tableName="car_biz_driver_info" domainObjectName="BigDataCarBizDriverInfo"
 			   enableSelectByExample="false" enableDeleteByExample="false"
 			   enableCountByExample="false" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false">
