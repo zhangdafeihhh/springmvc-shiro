@@ -145,8 +145,11 @@
         <if test="licensePlates != null and licensePlates != ''">
             AND driver.license_plates = #{licensePlates}
         </if>
-        <if test="disinfectStatus != null">
-            AND record.audit_status = #{disinfectStatus}
+        <if test="disinfectStatus == 1 or disinfectStatus == 2">
+          AND record.audit_status = #{disinfectStatus}
+        </if>
+        <if test="disinfectStatus == 3">
+          AND record.audit_status is null
         </if>
         <if test="disinfectTimeStart != null and disinfectTimeStart != ''">
             AND record.create_time <![CDATA[>= ]]> #{disinfectTimeStart}
@@ -213,28 +216,9 @@
         END disinfectStatus
         FROM car_biz_driver_info driver force index(idx_s_c_u)
         LEFT JOIN disinfect_record record
-        ON driver.driver_id = record.driver_id
+        ON driver.driver_id = case when record.create_time <![CDATA[>= ]]> #{disinfectTimeStart}  AND record.create_time <![CDATA[<= ]]> #{disinfectTimeEnd}  then record.driver_id  else null end
         <include refid="wheres"/>
 
-        UNION ALL
-
-        SELECT
-        DISTINCT
-        driver.driver_id AS driverId,
-        driver.phone AS phone,
-        driver.NAME AS NAME,
-        driver.service_city AS cityId,
-        driver.supplier_id AS supplierId,
-        driver.license_plates AS licensePlates,
-        null AS disinfectTime,
-        null AS disinfectImgUrl,
-        null as cityName,
-        3 as disinfectStatus
-        FROM
-        car_biz_driver_info driver force index(idx_s_c_u)
-        LEFT JOIN disinfect_record record
-        on driver.driver_id = record.driver_id
-        <include refid="wheresnone"/>
     </select>
     <insert id="insert" parameterType="com.zhuanche.entity.bigdata.BigDataCarBizDriverInfo" >
     insert into car_biz_driver_info (driver_id, password, phone, 
