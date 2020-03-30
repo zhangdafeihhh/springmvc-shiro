@@ -179,16 +179,10 @@
         <if test="licensePlates != null and licensePlates != ''">
             AND driver.license_plates = #{licensePlates}
         </if>
-        <if test="disinfectStatus ==1 or disinfectStatus == 2">
-            AND record.audit_status = #{disinfectStatus}
-        </if>
-        <if test="disinfectStatus ==3">
-            AND record.audit_status is null
-        </if>
         <if test="phone != null and phone != ''">
           AND driver.phone = #{phone}
         </if>
-          AND record.create_time is null
+          AND (record.create_time is null or record.create_time <![CDATA[< ]]> #{disinfectTimeStart} or record.create_time <![CDATA[> ]]> #{disinfectTimeEnd} )
           AND driver.status = 1
     </sql>
   <sql id="Blob_Column_List" >
@@ -228,15 +222,16 @@
         UNION ALL
 
         SELECT
+        DISTINCT
         driver.driver_id AS driverId,
         driver.phone AS phone,
         driver.NAME AS NAME,
         driver.service_city AS cityId,
         driver.supplier_id AS supplierId,
         driver.license_plates AS licensePlates,
-        record.create_time AS disinfectTime,
-        record.img_url AS disinfectImgUrl,
-        record.city_name as cityName,
+        null AS disinfectTime,
+        null AS disinfectImgUrl,
+        null as cityName,
         CASE
         record.audit_status
         WHEN 1 THEN
