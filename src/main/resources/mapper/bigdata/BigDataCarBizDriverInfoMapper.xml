@@ -145,7 +145,7 @@
         <if test="licensePlates != null and licensePlates != ''">
             AND driver.license_plates = #{licensePlates}
         </if>
-        <if test="disinfectStatus ==1 or disinfectStatus == 2">
+        <if test="disinfectStatus != null">
             AND record.audit_status = #{disinfectStatus}
         </if>
         <if test="disinfectTimeStart != null and disinfectTimeStart != ''">
