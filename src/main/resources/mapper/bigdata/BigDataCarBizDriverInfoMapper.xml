@@ -148,9 +148,6 @@
         <if test="disinfectStatus ==1 or disinfectStatus == 2">
             AND record.audit_status = #{disinfectStatus}
         </if>
-        <if test="disinfectStatus ==3">
-            AND record.audit_status is null
-        </if>
         <if test="disinfectTimeStart != null and disinfectTimeStart != ''">
             AND record.create_time <![CDATA[>= ]]> #{disinfectTimeStart}
         </if>
