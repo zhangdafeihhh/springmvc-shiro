@@ -20,4 +20,8 @@ public interface BigDataCarBizDriverInfoMapper {
     int updateByPrimaryKey(BigDataCarBizDriverInfo record);
 
     List<DisinfectResultDTO> list(DisinfectParamDTO disinfectParamDTO);
+
+    List<DisinfectResultDTO> disinfectList(DisinfectParamDTO disinfectParamDTO);
+
+    List<DisinfectResultDTO> getNoDisinfectList(DisinfectParamDTO disinfectParamDTO);
 }

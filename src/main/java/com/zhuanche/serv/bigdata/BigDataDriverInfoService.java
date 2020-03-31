@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +27,19 @@ public class BigDataDriverInfoService {
     private CarBizSupplierExMapper carBizSupplierExMapper;
 
     public List<DisinfectResultDTO> list(DisinfectParamDTO disinfectParamDTO) {
-        List<DisinfectResultDTO> list = bigDataCarBizDriverInfoMapper.list(disinfectParamDTO);
+        List<DisinfectResultDTO> list = new ArrayList<>();
+        //已消毒
+        if (null != disinfectParamDTO.getDisinfectStatus() && disinfectParamDTO.getDisinfectStatus() != 3) {
+            list = bigDataCarBizDriverInfoMapper.disinfectList(disinfectParamDTO);
+        }
+        //未消毒
+        if (null != disinfectParamDTO.getDisinfectStatus() && disinfectParamDTO.getDisinfectStatus() == 3) {
+            list = bigDataCarBizDriverInfoMapper.getNoDisinfectList(disinfectParamDTO);
+        }
+        //已消毒+未消毒
+        if (disinfectParamDTO.getDisinfectStatus() == null) {
+            list = bigDataCarBizDriverInfoMapper.list(disinfectParamDTO);
+        }
         list.forEach(dto -> {
             if (StringUtils.isBlank(dto.getCityName())) {
                 dto.setCityName(carBizCityExMapper.queryNameById(dto.getCityId()));
