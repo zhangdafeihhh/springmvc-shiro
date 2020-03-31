@@ -28,6 +28,10 @@ public class BigDataDriverInfoService {
 
     public List<DisinfectResultDTO> list(DisinfectParamDTO disinfectParamDTO) {
         List<DisinfectResultDTO> list = new ArrayList<>();
+        //已消毒+未消毒
+        if (disinfectParamDTO.getDisinfectStatus() == null) {
+            list = bigDataCarBizDriverInfoMapper.list(disinfectParamDTO);
+        }
         //已消毒
         if (null != disinfectParamDTO.getDisinfectStatus() && disinfectParamDTO.getDisinfectStatus() != 3) {
             list = bigDataCarBizDriverInfoMapper.disinfectList(disinfectParamDTO);
@@ -36,10 +40,7 @@ public class BigDataDriverInfoService {
         if (null != disinfectParamDTO.getDisinfectStatus() && disinfectParamDTO.getDisinfectStatus() == 3) {
             list = bigDataCarBizDriverInfoMapper.getNoDisinfectList(disinfectParamDTO);
         }
-        //已消毒+未消毒
-        if (disinfectParamDTO.getDisinfectStatus() == null) {
-            list = bigDataCarBizDriverInfoMapper.list(disinfectParamDTO);
-        }
+
         list.forEach(dto -> {
             if (StringUtils.isBlank(dto.getCityName())) {
                 dto.setCityName(carBizCityExMapper.queryNameById(dto.getCityId()));
