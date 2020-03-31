@@ -159,6 +159,35 @@
         </if>
             AND driver.status = 1
     </sql>
+    <sql id="wheresExclude">
+        WHERE 1 = 1
+        <if test="cityId != null">
+            AND driver.service_city = #{cityId}
+        </if>
+        <if test="supplierId != null">
+            AND driver.supplier_id = #{supplierId}
+        </if>
+        <if test="driverId != null">
+            AND driver.driver_id = #{driverId}
+        </if>
+        <if test="name != null and name != ''">
+            AND driver.name LIKE CONCAT(#{name},'%')
+        </if>
+        <if test="licensePlates != null and licensePlates != ''">
+            AND driver.license_plates = #{licensePlates}
+        </if>
+            and (record.audit_status = 1 or record.audit_status = 2)
+        <if test="disinfectTimeStart != null and disinfectTimeStart != ''">
+          AND record.create_time <![CDATA[>= ]]> #{disinfectTimeStart}
+        </if>
+        <if test="disinfectTimeEnd != null and disinfectTimeEnd != ''">
+          AND record.create_time <![CDATA[<= ]]> #{disinfectTimeEnd}
+        </if>
+        <if test="phone != null and phone != ''">
+            AND driver.phone = #{phone}
+        </if>
+            AND driver.status = 1
+    </sql>
     <sql id="wheresnone">
         WHERE 1 = 1
         <if test="cityId != null">
@@ -261,8 +290,56 @@
             FROM
             car_biz_driver_info driver FORCE INDEX ( idx_s_c_u )
             LEFT JOIN disinfect_record record ON driver.driver_id = record.driver_id
-            <include refid="wheres"/>
+            <include refid="wheresExclude"/>
         )
+    </select>
+    <select id="getNoDisinfectList" resultType="com.zhuanche.dto.disinfect.DisinfectResultDTO">
+        SELECT DISTINCT
+        driver.driver_id AS driverId,
+        driver.phone AS phone,
+        driver.NAME AS NAME,
+        driver.service_city AS cityId,
+        driver.supplier_id AS supplierId,
+        driver.license_plates AS licensePlates,
+        NULL AS disinfectTime,
+        NULL AS disinfectImgUrl,
+        NULL AS cityName,
+        3 as disinfectStatus
+        FROM
+        car_biz_driver_info driver FORCE INDEX ( idx_s_c_u )
+        LEFT JOIN disinfect_record record ON driver.driver_id = record.driver_id
+        <include refid="wheresnone"/>
+        and driver.driver_id not in(
+            SELECT
+            driver.driver_id AS driverId
+            FROM
+            car_biz_driver_info driver FORCE INDEX ( idx_s_c_u )
+            LEFT JOIN disinfect_record record ON driver.driver_id = record.driver_id
+            <include refid="wheresExclude"/>
+        )
+    </select>
+    <select id="disinfectList" resultType="com.zhuanche.dto.disinfect.DisinfectResultDTO">
+        SELECT
+        driver.driver_id AS driverId,
+        driver.phone AS phone,
+        driver.NAME AS NAME,
+        driver.service_city AS cityId,
+        driver.supplier_id AS supplierId,
+        driver.license_plates AS licensePlates,
+        record.create_time AS disinfectTime,
+        record.img_url AS disinfectImgUrl,
+        record.city_name AS cityName,
+        CASE
+        record.audit_status
+        WHEN 1 THEN
+        1
+        WHEN 2 THEN
+        2 ELSE 3
+        END disinfectStatus
+        FROM
+        car_biz_driver_info driver FORCE INDEX ( idx_s_c_u )
+        LEFT JOIN disinfect_record record ON driver.driver_id = record.driver_id
+        <include refid="wheres"/>
     </select>
     <insert id="insert" parameterType="com.zhuanche.entity.bigdata.BigDataCarBizDriverInfo" >
     insert into car_biz_driver_info (driver_id, password, phone, 
@@ -1477,4 +1554,5 @@
       is_image = #{isImage,jdbcType=TINYINT}
     where driver_id = #{driverId,jdbcType=INTEGER}
   </update>
+
 </mapper>
