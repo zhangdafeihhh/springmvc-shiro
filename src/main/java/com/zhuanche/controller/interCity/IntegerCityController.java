@@ -884,16 +884,6 @@ public class IntegerCityController {
                 //解析data里面的数据
                 Integer returnCode = jsonData.get("returnCode") == null ? null : jsonData.getInteger("returnCode");
                 if (returnCode != null && returnCode == 0) {
-                    //调用派单接口 告诉他们后台创建订单成功 来区分是派单还是后台手动指派
-                    String orderNo = jsonData.get("orderNo") == null ? null : jsonData.getString("orderNo");
-                    if(StringUtils.isNotEmpty(orderNo)){
-                        logger.info("=========创建成功调用派单通知接口========" + orderNo);
-                        try {
-                            this.noticeAssign(orderNo);
-                        } catch (Exception e) {
-                            logger.error("调用派单接口异常" + e);
-                        }
-                    }
                     return AjaxResponse.success(jsonData);
                 } else if (returnCode != null && returnCode == 249) {
                     logger.info("有一笔进行中的订单");
@@ -1874,6 +1864,7 @@ public class IntegerCityController {
             JSONObject jsonResult = JSONObject.parseObject(result);
             if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
                 logger.info("子单绑定主单成功");
+                this.noticeAssign(orderNo);
                 //String mobile = WebSessionUtil.getCurrentLoginUser().getMobile();
                 ExecutorService executor = Executors.newCachedThreadPool();
                 Future<String> future = executor.submit(new Callable<String>() {
