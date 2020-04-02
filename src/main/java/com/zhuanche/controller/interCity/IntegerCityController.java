@@ -916,7 +916,7 @@ public class IntegerCityController {
     private void noticeAssign(String orderNo){
         Map<String,Object> orderMap = Maps.newHashMap();
         orderMap.put("orderNo",orderNo);
-        orderMap.put("businessId",driverBusinessId);
+        orderMap.put("businessId","BusinessPlatform");
         orderMap.put("sign",SignatureUtils.sign(orderMap,driverBusinessId));
         MpOkHttpUtil.okHttpPostAsync(assignUrl + "/v2/carpooling/acrossCityNotify", orderMap, 0, null, new Callback() {
             @Override
