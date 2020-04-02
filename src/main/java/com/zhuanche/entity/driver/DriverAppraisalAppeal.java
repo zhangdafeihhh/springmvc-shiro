@@ -11,7 +11,7 @@ public class DriverAppraisalAppeal {
 
     private String orderNo;
 
-    private Integer orderId;
+    private long orderId;
 
     private String bookingCustomerName;
 
@@ -117,11 +117,11 @@ public class DriverAppraisalAppeal {
         this.orderNo = orderNo == null ? null : orderNo.trim();
     }
 
-    public Integer getOrderId() {
+    public long getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Integer orderId) {
+    public void setOrderId(long orderId) {
         this.orderId = orderId;
     }
 
