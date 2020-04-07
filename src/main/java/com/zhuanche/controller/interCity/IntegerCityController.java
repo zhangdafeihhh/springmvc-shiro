@@ -15,7 +15,6 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.driver.YueAoTongPhoneConfig;
 import com.zhuanche.dto.mdbcarmanage.InterCityOrderDTO;
 import com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO;
-import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
 import com.zhuanche.entity.driver.SupplierExtDto;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
@@ -402,17 +401,6 @@ public class IntegerCityController {
         } else {
             citiesSet = loginUser.getCityIds();
         }
-/*        StringBuilder cityBuilder = new StringBuilder();
-        if (citiesSet != null) {
-            List<Integer> listCity = new ArrayList<>(citiesSet);
-            for (int i = 0; i < listCity.size(); i++) {
-                cityBuilder.append(listCity.get(i)).append(SPLIT);
-            }
-        }
-
-        if (StringUtils.isNotEmpty(cityBuilder.toString())) {
-            serviceCityBatch = cityBuilder.toString().substring(0, cityBuilder.toString().length() - 1);
-        }*/
 
         Map<String, Object> map = Maps.newHashMap();
         map.put("pageNo", pageNum);
@@ -439,11 +427,6 @@ public class IntegerCityController {
 
 
         //根据不同权限添加过滤条件
-/*        if (StringUtils.isNotEmpty(serviceCityBatch)) {
-            map.put("cityIdBatch", serviceCityBatch);
-        }*/
-
-
         map.put("serviceTypeIdBatch", "68");
 
         String supplierIdBatch = "";
@@ -459,11 +442,47 @@ public class IntegerCityController {
                 }
 
                 String lineIds = this.getLineIdBySupplierIds(supplierIdBatch);
+
+                if (StringUtils.isEmpty(lineIds)) {
+                    logger.info("=========抢单查询供应商未配置线路============");
+                    return AjaxResponse.success(null);
+                }
+
+
                 if (StringUtils.isNotBlank(lineIds)) {
                     map.put("ruleIdBatch", lineIds);
                 } else {
                     map.put("ruleIdBatch", "-1");
                 }
+            } else if (CollectionUtils.isNotEmpty(loginUser.getCityIds())) {
+
+                List<CarBizSupplier> querySupplierAllList = carBizSupplierExMapper.querySupplierAllList(loginUser.getCityIds(), null);
+
+                StringBuilder supplierBuilder = new StringBuilder();
+                querySupplierAllList.forEach(list -> {
+                    supplierBuilder.append(list.getSupplierId()).append(SPLIT);
+                });
+
+                if (supplierBuilder.toString().length() > 0) {
+                    String allSupplier = supplierBuilder.toString();
+                    logger.info("获取所有的合作商id:" + allSupplier);
+                    String lineIds = this.getLineIdBySupplierIds(allSupplier.substring(0, allSupplier.length() - 1));
+                    if (StringUtils.isEmpty(lineIds)) {
+                        logger.info("=========该城市未配置线路============");
+                        return AjaxResponse.success(null);
+                    }
+
+                    if (StringUtils.isNotBlank(lineIds)) {
+                        map.put("ruleIdBatch", lineIds);
+                    } else {
+                        map.put("ruleIdBatch", "-1");
+                    }
+                } else {
+                    logger.info("=========该城市未配置线路============");
+                    return AjaxResponse.success(null);
+                }
+
+
             }
         }
 
@@ -2811,7 +2830,9 @@ public class IntegerCityController {
                });
 
                if(supplierBuilder.toString().length() > 0){
-                   String lineIds = this.getLineIdBySupplierIds(supplierIdBatch.toString().substring(0,supplierBuilder.toString().length()-1));
+                   String allSupplier = supplierBuilder.toString();
+                   logger.info("获取所有的合作商id:" + allSupplier);
+                   String lineIds = this.getLineIdBySupplierIds(allSupplier.substring(0,allSupplier.length()-1));
                    if(StringUtils.isEmpty(lineIds)){
                        logger.info("=========该城市未配置线路============");
                        return AjaxResponse.success(null);
