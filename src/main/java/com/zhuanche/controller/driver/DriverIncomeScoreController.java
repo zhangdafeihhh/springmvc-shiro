@@ -17,6 +17,7 @@ import com.zhuanche.dto.driver.DriverVoEntity;
 import com.zhuanche.dto.mdbcarmanage.ScoreDetailDTO;
 import com.zhuanche.dto.rentcar.*;
 import com.zhuanche.serv.CarBizDriverInfoService;
+import com.zhuanche.serv.DriverDispatchScoreService;
 import com.zhuanche.serv.DriverIncomeScoreService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -60,6 +62,43 @@ public class DriverIncomeScoreController {
 
     @Autowired
     private CarAdmUserExMapper carAdmUserExMapper;
+
+    @Resource
+    private DriverDispatchScoreService driverDispatchScoreService;
+
+    /**
+     * 分页查询司机派单分概括<br>
+     *     派单分2.0
+     *
+     * @param driverId      司机id
+     * @param phone         司机手机号
+     * @param licensePlates 车牌号
+     * @param cityId        城市ID
+     * @param supplierId    供应商ID
+     * @param teamId        车队ID
+     * @param page          起始页，默认0
+     * @param pageSize      取N条，默认20
+     * @return AjaxResponse
+     */
+    @ResponseBody
+    @RequestMapping(value = "/queryPageDriverDispatchScore")
+    @RequestFunction(menu = DRIVER_INFO_LIST)
+    public AjaxResponse queryPageDriverDispatchScore(Integer driverId, String phone,
+                                                     String licensePlates, Integer cityId,
+                                                     Integer supplierId, Integer teamId,
+                                                     @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                                     @Verify(param = "pageSize",rule = "max(50)") @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize){
+
+        CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
+        carBizDriverInfoDTO.setDriverId(driverId);
+        carBizDriverInfoDTO.setPhone(phone);
+        carBizDriverInfoDTO.setLicensePlates(licensePlates);
+        carBizDriverInfoDTO.setServiceCity(cityId);
+        carBizDriverInfoDTO.setSupplierId(supplierId);
+        carBizDriverInfoDTO.setTeamId(teamId);
+        PageDTO pageDTO = driverDispatchScoreService.queryPageDriverDispatchScore(page,pageSize,carBizDriverInfoDTO);
+        return AjaxResponse.success(pageDTO);
+    }
 
 
     /**
