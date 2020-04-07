@@ -31,7 +31,6 @@ import java.util.Map;
  */
 public class NewInterCityListener implements MessageListenerOrderly {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final String STATUS = "13";
 
 
     @Autowired
@@ -97,55 +96,73 @@ public class NewInterCityListener implements MessageListenerOrderly {
                             }
                             String[] boardPoint = boardFirstAdd.split(",");
 
+
                             if(boardPoint.length > 1){
                                 String x = boardPoint[0];
                                 String y = boardPoint[1];
-                                String boardOn = utils.hasBoardRoutRights(startCityId, x, y);
+                                List<String> onList = utils.hasBoardRoutRights(startCityId, x, y);
 
-                                if (StringUtils.isNotEmpty(boardOn)) {
+                                List<String> sendMobile = new ArrayList<>();
+
+                                if (CollectionUtils.isNotEmpty(onList)) {
                                     String[] off = bookingEndPoint.split(";");
+                                    Integer finalEndCityId = endCityId;
+                                    onList.forEach(boardOn ->{
+                                        if(off.length > 0){
+                                            String[] offPoint = off[0].split(",");
+                                            if(offPoint.length > 0){
+                                                String offX = offPoint[0];
+                                                String offY = offPoint[1];
+                                                List<String> offList= utils.hasBoardOffRoutRights(finalEndCityId, offX, offY);
+                                                if(CollectionUtils.isNotEmpty(offList)){
+                                                    offList.forEach(boardOff ->{
+                                                        String route = utils.hasRoute(boardOn, boardOff);
+                                                        if (StringUtils.isNotEmpty(route)) {
+                                                            JSONObject jsonSupplier = JSONObject.parseObject(route);
+                                                            logger.info("==========路线在范围内============");
+                                                            if (jsonSupplier.get("supplierId") != null) {
+                                                                String suppliers = jsonSupplier.getString("supplierId");
+                                                                List<String> supplierPhone = this.querySupplierPhone(suppliers);
+                                                                logger.info("======获取手机号码==========" + JSONObject.toJSONString(supplierPhone));
+                                                                if(CollectionUtils.isNotEmpty(supplierPhone) && StringUtils.isNotEmpty(supplierPhone.get(0))){
+                                                                    supplierPhone.forEach(str ->{
+                                                                        logger.info("=====获取到的供应商手机号======" + str + ",发送短信开始=====");
+                                                                        if(!sendMobile.contains(str)){
+                                                                            SmsSendUtil.send(str, "您好，有一个城际订单，请登录后台及时抢单");
+                                                                            sendMobile.add(str);
+                                                                        }
+                                                                    });
+                                                                }else {
+                                                                    List<YueAoTongPhoneConfig> opePhone = this.queryOpePhone(suppliers);
+                                                                    if (CollectionUtils.isNotEmpty(opePhone)) {
+                                                                        //TODO:调用发短信接口
+                                                                        for (YueAoTongPhoneConfig config : opePhone) {
 
-                                    if(off.length > 0){
-                                        String[] offPoint = off[0].split(",");
-                                        if(offPoint.length > 0){
-                                            String offX = offPoint[0];
-                                            String offY = offPoint[1];
-                                            String boardOff = utils.hasBoardOffRoutRights(endCityId, offX, offY);
-                                            String route = utils.hasRoute(boardOn, boardOff);
-                                            if (StringUtils.isNotEmpty(route)) {
-                                                JSONObject jsonSupplier = JSONObject.parseObject(route);
-                                                logger.info("==========路线在范围内============");
-                                                if (jsonSupplier.get("supplierId") != null) {
-                                                    String suppliers = jsonSupplier.getString("supplierId");
-                                                    List<String> supplierPhone = this.querySupplierPhone(suppliers);
-                                                    logger.info("======获取手机号码==========" + JSONObject.toJSONString(supplierPhone));
-                                                    if(CollectionUtils.isNotEmpty(supplierPhone) && StringUtils.isNotEmpty(supplierPhone.get(0))){
-                                                        supplierPhone.forEach(str ->{
-                                                            logger.info("=====获取到的供应商手机号======" + str + ",发送短信开始=====");
-                                                            SmsSendUtil.send(str, "您好，有一个城际订单，请登录后台及时抢单");
-                                                        });
-                                                    }else {
-                                                        List<YueAoTongPhoneConfig> opePhone = this.queryOpePhone(suppliers);
-                                                        if (CollectionUtils.isNotEmpty(opePhone)) {
-                                                            //TODO:调用发短信接口
-                                                            for (YueAoTongPhoneConfig config : opePhone) {
-
-                                                                String phone = config.getPhone();
-                                                                if(phone.contains(",")){
-                                                                    String arr[] = phone.split(",");
-                                                                    phone = arr[0];
+                                                                            String phone = config.getPhone();
+                                                                            if(phone.contains(",")){
+                                                                                String arr[] = phone.split(",");
+                                                                                phone = arr[0];
+                                                                            }
+                                                                            logger.info("=====发送短信开始======" + phone);
+                                                                            if(!sendMobile.contains(phone)){
+                                                                                SmsSendUtil.send(phone, "您好，有一个城际订单，请登录后台及时抢单");
+                                                                                sendMobile.add(phone);
+                                                                            }
+                                                                        }
+                                                                    }
                                                                 }
-                                                                logger.info("=====发送短信开始======" + phone);
-                                                                SmsSendUtil.send(phone, "您好，有一个城际订单，请登录后台及时抢单");
+
                                                             }
                                                         }
-                                                    }
+                                                    });
 
                                                 }
-                                            }
-                                        }
 
-                                    }
+                                            }
+
+                                        }
+                                    });
+
                                 }
                             }
 
