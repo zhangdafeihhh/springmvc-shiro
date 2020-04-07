@@ -514,4 +514,10 @@ public class DateUtil {
         }
         return tl.get();
     }
+
+	public static String getStringDate(Long longTime){
+		SimpleDateFormat sdf= new SimpleDateFormat(DATE_FORMAT);
+		Date date = new Date(longTime);
+		return sdf.format(date);
+	}
 }
