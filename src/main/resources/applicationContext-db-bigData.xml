@@ -23,8 +23,8 @@
     </bean>
 	<!-- 配置datasource数据源(支持动态主从库切换，ID属性即为动态路由数据源标识名)  -->
     <bean id="bigdata-DataSource" class="com.zhuanche.common.database.DynamicRoutingDataSource">
-       <!-- 默认目标数据源为主库 -->
-       <property name="defaultTargetDataSource" ref="bigdata-master-DataSource"/>
+       <!-- 默认目标数据源为从库  我们这都是查询  -->
+       <property name="defaultTargetDataSource" ref="bigdata-slave-DataSource"/>
        <!-- 所有目标数据源 -->
        <property name="targetDataSources">
            <map key-type="java.lang.String">
