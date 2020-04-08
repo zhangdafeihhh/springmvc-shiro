@@ -36,6 +36,9 @@ import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -51,6 +54,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
@@ -919,6 +923,27 @@ public class IntegerCityController {
 
 
     /**
+     * 通知派单后台指派成功
+     * @param orderNo
+     */
+    private void noticeAssign(String orderNo){
+        Map<String,Object> orderMap = Maps.newHashMap();
+        orderMap.put("orderNo",orderNo);
+        orderMap.put("businessId","BusinessPlatform");
+        orderMap.put("sign",SignatureUtils.sign(orderMap,driverBusinessId));
+        MpOkHttpUtil.okHttpPostAsync(assignUrl + "/v2/carpooling/acrossCityNotify", orderMap, 0, null, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                logger.info("========调用派单接口通知失败" + e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                logger.info("========调用派单接口通知成功" );
+            }
+        });
+    }
+    /**
      * 根据子订单号获取订单数据进行编辑
      *
      * @param orderNo
@@ -1624,6 +1649,12 @@ public class IntegerCityController {
                 JSONObject chargeJson = JSONObject.parseObject(chargeResult);
                 if (chargeJson.get("code") != null && chargeJson.getInteger("code") == 0) {
                     logger.info("调用计费取消接口成功");
+                    try {
+                        logger.info("=========取消成功调用派单通知接口========" + orderNo);
+                        this.noticeAssign(orderNo);
+                    } catch (Exception e) {
+                        logger.error("调用派单接口异常" + e);
+                    }
                     return AjaxResponse.success(null);
                 }
             }
@@ -1752,7 +1783,7 @@ public class IntegerCityController {
      * @param driverPhone
      * @param licensePlates
      * @param groupId
-     * @param      如果司机主单为空，主单的行程时间和路线不能为空
+     * @param crossCityStartTime     如果司机主单为空，主单的行程时间和路线不能为空
      * @param routeName
      * @return
      */
@@ -1856,6 +1887,7 @@ public class IntegerCityController {
             JSONObject jsonResult = JSONObject.parseObject(result);
             if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
                 logger.info("子单绑定主单成功");
+                this.noticeAssign(orderNo);
                 //String mobile = WebSessionUtil.getCurrentLoginUser().getMobile();
                 ExecutorService executor = Executors.newCachedThreadPool();
                 Future<String> future = executor.submit(new Callable<String>() {
