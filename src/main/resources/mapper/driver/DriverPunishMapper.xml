@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.DriverPunishMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverPunish" >
+    <id column="punish_id" property="punishId" jdbcType="INTEGER" />
+    <result column="business_id" property="businessId" jdbcType="VARCHAR" />
+    <result column="order_id" property="orderId" jdbcType="BIGINT" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="punish_type" property="punishType" jdbcType="INTEGER" />
+    <result column="punish_type_name" property="punishTypeName" jdbcType="VARCHAR" />
+    <result column="punish_reason" property="punishReason" jdbcType="VARCHAR" />
+    <result column="stop_day" property="stopDay" jdbcType="DECIMAL" />
+    <result column="stop_id" property="stopId" jdbcType="VARCHAR" />
+    <result column="punish_price" property="punishPrice" jdbcType="DECIMAL" />
+    <result column="punish_integral" property="punishIntegral" jdbcType="DECIMAL" />
+    <result column="punish_flow" property="punishFlow" jdbcType="DECIMAL" />
+    <result column="appeal_date" property="appealDate" jdbcType="TIMESTAMP" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="cooperation_type" property="cooperationType" jdbcType="INTEGER" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="team_name" property="teamName" jdbcType="VARCHAR" />
+    <result column="current_audit_node" property="currentAuditNode" jdbcType="INTEGER" />
+    <result column="audit_node" property="auditNode" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="expire_date" property="expireDate" jdbcType="TIMESTAMP" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="dispatch_points" property="dispatchPoints" jdbcType="DECIMAL" />
+    <result column="order_origin" property="orderOrigin" jdbcType="VARCHAR" />
+    <result column="channel_appeal_result" property="channelAppealResult" jdbcType="INTEGER" />
+    <result column="channel_appeal_state" property="channelAppealState" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    punish_id, business_id, order_id, order_no, punish_type, punish_type_name, punish_reason,
+    stop_day, stop_id, punish_price, punish_integral, punish_flow, appeal_date, driver_id,
+    phone, name, license_plates, cooperation_type, city_id, city_name, supplier_id, supplier_name,
+    team_id, team_name, current_audit_node, audit_node, status, expire_date, create_date,
+    update_date, dispatch_points, order_origin, channel_appeal_result, channel_appeal_state
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from driver_punish
+    where punish_id = #{punishId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from driver_punish
+    where punish_id = #{punishId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.DriverPunish" >
+    insert into driver_punish (punish_id, business_id, order_id,
+      order_no, punish_type, punish_type_name,
+      punish_reason, stop_day, stop_id,
+      punish_price, punish_integral, punish_flow,
+      appeal_date, driver_id, phone,
+      name, license_plates, cooperation_type,
+      city_id, city_name, supplier_id,
+      supplier_name, team_id, team_name,
+      current_audit_node, audit_node, status,
+      expire_date, create_date, update_date,
+      dispatch_points, order_origin, channel_appeal_result,
+      channel_appeal_state)
+    values (#{punishId,jdbcType=INTEGER}, #{businessId,jdbcType=VARCHAR}, #{orderId,jdbcType=BIGINT},
+      #{orderNo,jdbcType=VARCHAR}, #{punishType,jdbcType=INTEGER}, #{punishTypeName,jdbcType=VARCHAR},
+      #{punishReason,jdbcType=VARCHAR}, #{stopDay,jdbcType=DECIMAL}, #{stopId,jdbcType=VARCHAR},
+      #{punishPrice,jdbcType=DECIMAL}, #{punishIntegral,jdbcType=DECIMAL}, #{punishFlow,jdbcType=DECIMAL},
+      #{appealDate,jdbcType=TIMESTAMP}, #{driverId,jdbcType=INTEGER}, #{phone,jdbcType=VARCHAR},
+      #{name,jdbcType=VARCHAR}, #{licensePlates,jdbcType=VARCHAR}, #{cooperationType,jdbcType=INTEGER},
+      #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER},
+      #{supplierName,jdbcType=VARCHAR}, #{teamId,jdbcType=INTEGER}, #{teamName,jdbcType=VARCHAR},
+      #{currentAuditNode,jdbcType=INTEGER}, #{auditNode,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
+      #{expireDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
+      #{dispatchPoints,jdbcType=DECIMAL}, #{orderOrigin,jdbcType=VARCHAR}, #{channelAppealResult,jdbcType=INTEGER},
+      #{channelAppealState,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DriverPunish" >
+    insert into driver_punish
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="punishId != null" >
+        punish_id,
+      </if>
+      <if test="businessId != null" >
+        business_id,
+      </if>
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="punishType != null" >
+        punish_type,
+      </if>
+      <if test="punishTypeName != null" >
+        punish_type_name,
+      </if>
+      <if test="punishReason != null" >
+        punish_reason,
+      </if>
+      <if test="stopDay != null" >
+        stop_day,
+      </if>
+      <if test="stopId != null" >
+        stop_id,
+      </if>
+      <if test="punishPrice != null" >
+        punish_price,
+      </if>
+      <if test="punishIntegral != null" >
+        punish_integral,
+      </if>
+      <if test="punishFlow != null" >
+        punish_flow,
+      </if>
+      <if test="appealDate != null" >
+        appeal_date,
+      </if>
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="licensePlates != null" >
+        license_plates,
+      </if>
+      <if test="cooperationType != null" >
+        cooperation_type,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="supplierName != null" >
+        supplier_name,
+      </if>
+      <if test="teamId != null" >
+        team_id,
+      </if>
+      <if test="teamName != null" >
+        team_name,
+      </if>
+      <if test="currentAuditNode != null" >
+        current_audit_node,
+      </if>
+      <if test="auditNode != null" >
+        audit_node,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="expireDate != null" >
+        expire_date,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="dispatchPoints != null" >
+        dispatch_points,
+      </if>
+      <if test="orderOrigin != null" >
+        order_origin,
+      </if>
+      <if test="channelAppealResult != null" >
+        channel_appeal_result,
+      </if>
+      <if test="channelAppealState != null" >
+        channel_appeal_state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="punishId != null" >
+        #{punishId,jdbcType=INTEGER},
+      </if>
+      <if test="businessId != null" >
+        #{businessId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null" >
+        #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="punishType != null" >
+        #{punishType,jdbcType=INTEGER},
+      </if>
+      <if test="punishTypeName != null" >
+        #{punishTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="punishReason != null" >
+        #{punishReason,jdbcType=VARCHAR},
+      </if>
+      <if test="stopDay != null" >
+        #{stopDay,jdbcType=DECIMAL},
+      </if>
+      <if test="stopId != null" >
+        #{stopId,jdbcType=VARCHAR},
+      </if>
+      <if test="punishPrice != null" >
+        #{punishPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="punishIntegral != null" >
+        #{punishIntegral,jdbcType=DECIMAL},
+      </if>
+      <if test="punishFlow != null" >
+        #{punishFlow,jdbcType=DECIMAL},
+      </if>
+      <if test="appealDate != null" >
+        #{appealDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="licensePlates != null" >
+        #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="cooperationType != null" >
+        #{cooperationType,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="teamId != null" >
+        #{teamId,jdbcType=INTEGER},
+      </if>
+      <if test="teamName != null" >
+        #{teamName,jdbcType=VARCHAR},
+      </if>
+      <if test="currentAuditNode != null" >
+        #{currentAuditNode,jdbcType=INTEGER},
+      </if>
+      <if test="auditNode != null" >
+        #{auditNode,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="expireDate != null" >
+        #{expireDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dispatchPoints != null" >
+        #{dispatchPoints,jdbcType=DECIMAL},
+      </if>
+      <if test="orderOrigin != null" >
+        #{orderOrigin,jdbcType=VARCHAR},
+      </if>
+      <if test="channelAppealResult != null" >
+        #{channelAppealResult,jdbcType=INTEGER},
+      </if>
+      <if test="channelAppealState != null" >
+        #{channelAppealState,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.DriverPunish" >
+    update driver_punish
+    <set >
+      <if test="businessId != null" >
+        business_id = #{businessId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null" >
+        order_id = #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="punishType != null" >
+        punish_type = #{punishType,jdbcType=INTEGER},
+      </if>
+      <if test="punishTypeName != null" >
+        punish_type_name = #{punishTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="punishReason != null" >
+        punish_reason = #{punishReason,jdbcType=VARCHAR},
+      </if>
+      <if test="stopDay != null" >
+        stop_day = #{stopDay,jdbcType=DECIMAL},
+      </if>
+      <if test="stopId != null" >
+        stop_id = #{stopId,jdbcType=VARCHAR},
+      </if>
+      <if test="punishPrice != null" >
+        punish_price = #{punishPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="punishIntegral != null" >
+        punish_integral = #{punishIntegral,jdbcType=DECIMAL},
+      </if>
+      <if test="punishFlow != null" >
+        punish_flow = #{punishFlow,jdbcType=DECIMAL},
+      </if>
+      <if test="appealDate != null" >
+        appeal_date = #{appealDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="licensePlates != null" >
+        license_plates = #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="cooperationType != null" >
+        cooperation_type = #{cooperationType,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="teamId != null" >
+        team_id = #{teamId,jdbcType=INTEGER},
+      </if>
+      <if test="teamName != null" >
+        team_name = #{teamName,jdbcType=VARCHAR},
+      </if>
+      <if test="currentAuditNode != null" >
+        current_audit_node = #{currentAuditNode,jdbcType=INTEGER},
+      </if>
+      <if test="auditNode != null" >
+        audit_node = #{auditNode,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="expireDate != null" >
+        expire_date = #{expireDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dispatchPoints != null" >
+        dispatch_points = #{dispatchPoints,jdbcType=DECIMAL},
+      </if>
+      <if test="orderOrigin != null" >
+        order_origin = #{orderOrigin,jdbcType=VARCHAR},
+      </if>
+      <if test="channelAppealResult != null" >
+        channel_appeal_result = #{channelAppealResult,jdbcType=INTEGER},
+      </if>
+      <if test="channelAppealState != null" >
+        channel_appeal_state = #{channelAppealState,jdbcType=INTEGER},
+      </if>
+    </set>
+    where punish_id = #{punishId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.DriverPunish" >
+    update driver_punish
+    set business_id = #{businessId,jdbcType=VARCHAR},
+      order_id = #{orderId,jdbcType=BIGINT},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      punish_type = #{punishType,jdbcType=INTEGER},
+      punish_type_name = #{punishTypeName,jdbcType=VARCHAR},
+      punish_reason = #{punishReason,jdbcType=VARCHAR},
+      stop_day = #{stopDay,jdbcType=DECIMAL},
+      stop_id = #{stopId,jdbcType=VARCHAR},
+      punish_price = #{punishPrice,jdbcType=DECIMAL},
+      punish_integral = #{punishIntegral,jdbcType=DECIMAL},
+      punish_flow = #{punishFlow,jdbcType=DECIMAL},
+      appeal_date = #{appealDate,jdbcType=TIMESTAMP},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      phone = #{phone,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      license_plates = #{licensePlates,jdbcType=VARCHAR},
+      cooperation_type = #{cooperationType,jdbcType=INTEGER},
+      city_id = #{cityId,jdbcType=INTEGER},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      team_id = #{teamId,jdbcType=INTEGER},
+      team_name = #{teamName,jdbcType=VARCHAR},
+      current_audit_node = #{currentAuditNode,jdbcType=INTEGER},
+      audit_node = #{auditNode,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      expire_date = #{expireDate,jdbcType=TIMESTAMP},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      dispatch_points = #{dispatchPoints,jdbcType=DECIMAL},
+      order_origin = #{orderOrigin,jdbcType=VARCHAR},
+      channel_appeal_result = #{channelAppealResult,jdbcType=INTEGER},
+      channel_appeal_state = #{channelAppealState,jdbcType=INTEGER}
+    where punish_id = #{punishId,jdbcType=INTEGER}
+  </update>
+</mapper>
