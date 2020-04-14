@@ -7,6 +7,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.entity.driver.DriverAppealRecord;
 import com.zhuanche.entity.driver.DriverPunishDto;
+import com.zhuanche.util.DateUtils;
 import mapper.driver.DriverAppealRecordMapper;
 import mapper.driver.ex.DriverPunishExMapper;
 import org.apache.poi.ss.usermodel.Cell;
@@ -78,7 +79,11 @@ public class DriverPunishService {
 
     public DriverPunishDto getDetail(Integer punishId) {
         if(punishId != null){
-            return  driverPunishExMapper.getDetail(punishId);
+            DriverPunishDto driverPunishDto= driverPunishExMapper.getDetail(punishId);
+            if(driverPunishDto.getCreateDate() != null){
+                driverPunishDto.setCreateDateStr(DateUtils.formatDateTime(driverPunishDto.getCreateDate()));
+            }
+            return driverPunishDto;
         }
         return null;
     }
