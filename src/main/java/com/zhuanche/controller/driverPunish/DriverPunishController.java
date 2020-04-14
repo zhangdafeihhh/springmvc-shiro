@@ -8,12 +8,17 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.driver.DriverAppealRecord;
 import com.zhuanche.entity.driver.DriverPunishDto;
 import com.zhuanche.serv.driverPunish.DriverPunishService;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +71,38 @@ public class DriverPunishController extends BaseController {
         }catch (Exception e){
             log.error("查询列表出现异常-{}", e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
+
+    @RequestMapping("/exportDriverPunishList")
+    public void daochu(DriverPunishDto params, HttpServletRequest request, HttpServletResponse response){
+
+        try {
+            log.info("导出列表,参数为--{}", params.toString());
+            //数据层权限
+            //CustomUserDetails user = ToolUtils.getSecurityUser();
+            //params.setCities(user.getCities());
+            //params.setSupplierIds(user.getSuppliers());
+            //params.setTeamIds(user.getTeamId());
+            Integer pageIndex =1;
+            params.setPagesize(200);
+            params.setPage(pageIndex);
+            List<DriverPunishDto> rows = new ArrayList<>();
+            PageInfo<DriverPunishDto> page = driverPunishService.selectList(params, false);
+            while (page.getList() != null && page.getList().size() != 0){
+                rows.addAll(page.getList());
+                pageIndex++;
+                params.setPage(pageIndex);
+
+                page = driverPunishService.selectList(params);
+            }
+            Workbook wb = driverPunishService.exportExcel(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driver_punish.xlsx");
+            super.exportExcelFromTemplet(request, response, wb, new String("司机处罚列表".getBytes("utf-8"), "iso8859-1"));
+        } catch (IOException e) {
+            log.error("daochu error", e);
+        } catch (Exception e) {
+            log.error("daochu error", e);
+
         }
     }
 }
