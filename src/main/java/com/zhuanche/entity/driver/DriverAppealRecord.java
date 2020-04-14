@@ -122,6 +122,37 @@ public class DriverAppealRecord {
     private String createDateStr;//创建时间
     private String updateDateStr;//修改时间
 
+    private Integer cgAutoStatus;
+
+    private Date ywExpireDate;
+
+    private Integer ywAutoStatus;
+
+
+    public Integer getYwAutoStatus() {
+        return ywAutoStatus;
+    }
+
+    public void setYwAutoStatus(Integer ywAutoStatus) {
+        this.ywAutoStatus = ywAutoStatus;
+    }
+
+
+    public Date getYwExpireDate() {
+        return ywExpireDate;
+    }
+
+    public void setYwExpireDate(Date ywExpireDate) {
+        this.ywExpireDate = ywExpireDate;
+    }
+
+    public Integer getCgAutoStatus() {
+        return cgAutoStatus;
+    }
+
+    public void setCgAutoStatus(Integer cgAutoStatus) {
+        this.cgAutoStatus = cgAutoStatus;
+    }
 
     public Integer getAppealId() {
         return appealId;
