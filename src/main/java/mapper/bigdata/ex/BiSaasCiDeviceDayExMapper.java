@@ -19,9 +19,7 @@ public interface BiSaasCiDeviceDayExMapper {
 
     CiOrderAllStatisticSection getAllCiOrderNumStatistic(@Param("findDate")String findDate);
 
-    Integer getInstallCiDrierNum(SAASIndexQuery saasIndexQuery,
-                                 @Param("minId")Integer minId,
-                                 @Param("maxId")Integer maxId);
+    Integer getInstallCiDrierNum(SAASIndexQuery saasIndexQuery);
 
     List<SAASCoreIndexPercentDto> getCiCoreIndexStatistic(@Param("startDate") String startDate,
                                                  @Param("endDate")String endDate,

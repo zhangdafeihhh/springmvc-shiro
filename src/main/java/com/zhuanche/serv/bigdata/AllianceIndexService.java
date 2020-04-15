@@ -109,7 +109,9 @@ public class AllianceIndexService{
         try {
             List<Map> result = new ArrayList();
             MaxAndMinId saasMaxAndMinId = biSaasCiDeviceDayExMapper.queryMaxAndMinId(saasIndexQuery.getStartDate(),saasIndexQuery.getEndDate());
-            Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery,saasMaxAndMinId.getMinId(),saasMaxAndMinId.getMaxId());
+            saasIndexQuery.setMinId(saasMaxAndMinId.getMinId());
+            saasIndexQuery.setMaxId(saasMaxAndMinId.getMaxId());
+            Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery);
             if(supplierDriverCount>0){//查询加盟商下是否有安装ci的司机  有
                 List<CiOrderStatisticSection> statisticSections = biSaasCiDeviceDayExMapper.getCiOrderNumStatistic(saasIndexQuery,saasMaxAndMinId.getMinId(),saasMaxAndMinId.getMaxId());
                 MaxAndMinId meaMaxAndMinId = carMeasureDayExMapper.queryMaxAndMinId(saasIndexQuery.getStartDate(),saasIndexQuery.getEndDate());
@@ -184,7 +186,9 @@ public class AllianceIndexService{
         try {
             List<Map> result = new ArrayList();
             MaxAndMinId maxAndMinId = biSaasCiDeviceDayExMapper.queryMaxAndMinId(saasIndexQuery.getStartDate(),saasIndexQuery.getEndDate());
-            Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery,maxAndMinId.getMinId(),maxAndMinId.getMaxId());
+            saasIndexQuery.setMinId(maxAndMinId.getMinId());
+            saasIndexQuery.setMaxId(maxAndMinId.getMaxId());
+            Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery);
             if(supplierDriverCount>0){//查询加盟商下是否有安装ci的司机  有
                 List<CiOrderStatisticSection> rateList = biSaasCiDeviceDayExMapper.getCiServiceNegativeRate(saasIndexQuery,maxAndMinId.getMinId(),maxAndMinId.getMaxId());
 
@@ -286,7 +290,9 @@ public class AllianceIndexService{
            MaxAndMinId scoreIds = carMeasureDayExMapper.queryMaxAndMinId(startDate,endDate);
             List<SAASCoreIndexDto> saasCoreIndexDtoList = carMeasureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff,scoreIds.getMinId(),scoreIds.getMaxId());
            MaxAndMinId maxAndMinId = biSaasCiDeviceDayExMapper.queryMaxAndMinId(startDate,endDate);
-           Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery,maxAndMinId.getMinId(),maxAndMinId.getMaxId());
+           saasIndexQuery.setMinId(maxAndMinId.getMinId());
+           saasIndexQuery.setMaxId(maxAndMinId.getMaxId());
+           Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery);
            List<SAASCoreIndexPercentDto> list = biSaasCiDeviceDayExMapper.getCiCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff,maxAndMinId.getMinId(),maxAndMinId.getMaxId());
            if("0".equals(list.get(0).getDriverNum())){
                List<SAASCoreIndexPercentDto> zeroList = new ArrayList<>();
