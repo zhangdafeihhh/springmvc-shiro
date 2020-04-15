@@ -51,25 +51,27 @@ public class MpDriverCustomerAppraisalService {
 
         if (StringUtils.isNotEmpty(createDateBegin)){
             params.setCreateDateBegin(createDateBegin + " 00:00:00");
-            //如果是线上环境
-            //如果是2018以及之后
-            if(env.equals("pre") || env.equals("online")){
-                params = this.getMinId(params);
-            }
+
 
 
         }
         if (StringUtils.isNotEmpty(createDateEnd)){
             params.setCreateDateEnd(createDateEnd + " 23:59:59");
-            if(env.equals("pre") || env.equals("online")){
-               params = this.getMaxId(params);
-            }
+
         }
         if (StringUtils.isNotEmpty(orderFinishTimeBegin)){
             params.setOrderFinishTimeBegin(orderFinishTimeBegin + " 00:00:00");
+            //如果是线上环境
+            //如果是2018以及之后
+            if(env.equals("pre") || env.equals("online")){
+                params = this.getMinId(params);
+            }
         }
         if (StringUtils.isNotEmpty(orderFinishTimeEnd)){
             params.setOrderFinishTimeEnd(orderFinishTimeEnd + " 23:59:59");
+            if(env.equals("pre") || env.equals("online")){
+                params = this.getMaxId(params);
+            }
         }
 
 
@@ -81,33 +83,33 @@ public class MpDriverCustomerAppraisalService {
 
     //根据开始时间获取数据库里面的id最小值minId
     private MpCustomerAppraisalParams getMinId(MpCustomerAppraisalParams params){
-        String createDateBegin = params.getCreateDateBegin();
+        String orderFinishTimeBegin = params.getOrderFinishTimeBegin();
         Integer minId = null;
-        String createDateSub = createDateBegin.substring(0,4);
+        String createDateSub = orderFinishTimeBegin.substring(0,4);
         if(Integer.valueOf(createDateSub)>2018){
-            minId =  OrderConstants.getOrderMap().get(createDateBegin.substring(0,7));
+            minId =  OrderConstants.getOrderMap().get(orderFinishTimeBegin.substring(0,7));
             if(minId == null){
                 minId = OrderConstants.getOrderMap().get("2020-04");
             }
         }else {
             //考虑到可能会选择2018-12,多加一个月的判断
-            minId = OrderConstants.getOrderMap().get(createDateBegin.substring(0,7));
+            minId = OrderConstants.getOrderMap().get(orderFinishTimeBegin.substring(0,7));
         }
-        logger.info("【min】获取的月份：" + createDateBegin.substring(0,7) +",value值" + minId);
+        logger.info("【min】获取的月份：" + orderFinishTimeBegin.substring(0,7) +",value值" + minId);
         params.setMinId(minId);
         return params;
     }
 
     //根据结束时间获取数据库里面的id最大值maxId
     private MpCustomerAppraisalParams getMaxId(MpCustomerAppraisalParams params){
-        String createDateEnd = params.getCreateDateEnd();
+        String orderFinishTimeEnd = params.getOrderFinishTimeEnd();
         Integer maxId = null;
-        String createDeteSub = createDateEnd.substring(0,4);
+        String createDeteSub = orderFinishTimeEnd.substring(0,4);
         //如果是2018以及之前的
         if(Integer.valueOf(createDeteSub)<=2018){
             maxId = OrderConstants.getOrderMap().get("2018-12");
         }
-        logger.info("【max】获取的月份：" + createDateEnd.substring(0,7) +",value值" + maxId);
+        logger.info("【max】获取的月份：" + orderFinishTimeEnd.substring(0,7) +",value值" + maxId);
         params.setMaxId(maxId);
         return params;
     }
