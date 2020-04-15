@@ -85,7 +85,7 @@
       and ca.id  >= #{minId}
     </if>
     <if test="maxId !=null and maxId != 0">
-      and ca.id  <= #{maxId}
+      AND ca.id &lt;= #{maxId}
     </if>
 
     <if test="appraisalStatus!=null">
@@ -170,7 +170,7 @@
         and id  >= #{minId}
       </if>
       <if test="maxId !=null and maxId != 0">
-        and id  <= #{maxId}
+        and id  &lt;= #{maxId}
       </if>
       <if test="appraisalStatus!=null">
       AND appraisal_status = #{appraisalStatus}
