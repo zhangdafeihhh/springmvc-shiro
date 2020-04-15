@@ -31,6 +31,9 @@ public interface CarMeasureDayExMapper {
      * @param motorcadeId
      * @param visibleAllianceIds
      * @param visibleMotocadeIds
+     * @param dateDiff
+     * @param minId
+     * @param maxId
      * @return
      */
     List<SAASCoreIndexDto> getCoreIndexStatistic(@Param("startDate") String startDate,
@@ -39,6 +42,14 @@ public interface CarMeasureDayExMapper {
                                                  @Param("motorcadeId")String motorcadeId,
                                                  @Param("visibleAllianceIds")List<String> visibleAllianceIds,
                                                  @Param("visibleMotocadeIds")List<String> visibleMotocadeIds,
-                                                 @Param("dateDiff")long dateDiff);
+                                                 @Param("dateDiff")long dateDiff,
+                                                 @Param("minId")Integer minId,
+                                                 @Param("maxId")Integer maxId);
+
+    /**查询指定日期最小值**/
+    Integer queryMinId(@Param("startDate") String startDate);
+
+    /**查询指定日期最大值**/
+    Integer queryMaxId( @Param("endDate")String endDate);
 
 }

@@ -238,6 +238,16 @@
         ]]>
     <where>
       data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+
+      <if test="minId != null and minId != ''">
+        and id >= #{minId}
+      </if>
+
+      <if test="maxId != null and maxId != ''">
+        and id &lt;= #{maxId}
+      </if>
+
+
       <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
         <if test="allianceId != null and allianceId != ''">
           and supplier_id = #{allianceId}
@@ -273,5 +283,26 @@
       </if>
     </where>
   </select>
+
+
+  <select id="getMinId" resultType="java.lang.Integer">
+  <![CDATA[
+        select
+            min(id)
+        from bi_car_measure_day
+        ]]>
+    WHERE data_date >= #{startDate}
+  </select>
+
+
+  <select id="getMaxId" resultType="java.lang.Integer">
+    <![CDATA[
+        select
+            max(id)
+        from bi_car_measure_day
+        ]]>
+    WHERE data_date &lt;= #{endDate}
+  </select>
+
 
 </mapper>
