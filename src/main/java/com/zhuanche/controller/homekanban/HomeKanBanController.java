@@ -770,7 +770,8 @@ public class HomeKanBanController {
 			long dateDiff = DateUtil.calDateDiff(startDate, endDate);
 
 			MaxAndMinId scoreMaxAndMinId = measureDayExMapper.queryMaxAndMinId(startDate,endDate);
- 			List<SAASCoreIndexDto> saasCoreIndexDtoList = measureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleList,visibleMotoIdsList,dateDiff,scoreMaxAndMinId.getMinId(),scoreMaxAndMinId.getMaxId());
+ 			List<SAASCoreIndexDto> saasCoreIndexDtoList = measureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleList,visibleMotoIdsList,dateDiff,
+					scoreMaxAndMinId== null?null:scoreMaxAndMinId.getMinId(),scoreMaxAndMinId== null?null:scoreMaxAndMinId.getMaxId());
 
 			if(CollectionUtils.isNotEmpty(saasCoreIndexDtoList)){
 				RedisCacheUtil.set(key,saasCoreIndexDtoList.get(0),3600*24);

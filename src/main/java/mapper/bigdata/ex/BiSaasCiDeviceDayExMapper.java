@@ -13,15 +13,11 @@ import java.util.List;
  */
 public interface BiSaasCiDeviceDayExMapper {
 
-    List<CiOrderStatisticSection> getCiOrderNumStatistic(SAASIndexQuery saasIndexQuery,
-                                                         @Param("minId")Integer minId,
-                                                         @Param("maxId")Integer maxId);
+    List<CiOrderStatisticSection> getCiOrderNumStatistic(SAASIndexQuery saasIndexQuery);
 
     CiOrderAllStatisticSection getAllCiOrderNumStatistic(@Param("findDate")String findDate);
 
-    Integer getInstallCiDrierNum(SAASIndexQuery saasIndexQuery,
-                                 @Param("minId")Integer minId,
-                                 @Param("maxId")Integer maxId);
+    Integer getInstallCiDrierNum(SAASIndexQuery saasIndexQuery);
 
     List<SAASCoreIndexPercentDto> getCiCoreIndexStatistic(@Param("startDate") String startDate,
                                                  @Param("endDate")String endDate,
@@ -38,9 +34,7 @@ public interface BiSaasCiDeviceDayExMapper {
                                                                 @Param("minId")Integer minId,
                                                                 @Param("maxId")Integer maxId);
 
-    List<CiOrderStatisticSection> getCiServiceNegativeRate(SAASIndexQuery saasIndexQuery,
-                                                           @Param("minId")Integer minId,
-                                                           @Param("maxId")Integer maxId);
+    List<CiOrderStatisticSection> getCiServiceNegativeRate(SAASIndexQuery saasIndexQuery);
     CiServiceBadEvaluateAllStatisticSection getAllCiServiceNegativeRate(@Param("findDate")String findDate);
 
     /**查询指定日期最大和最小id值**/
