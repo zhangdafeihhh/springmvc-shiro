@@ -1,5 +1,6 @@
 package mapper.bigdata.ex;
 
+import com.zhuanche.entity.bigdata.MaxAndMinId;
 import com.zhuanche.entity.bigdata.SAASCoreIndexDto;
 import com.zhuanche.entity.bigdata.SAASIndexQuery;
 import com.zhuanche.entity.bigdata.StatisticSection;
@@ -15,13 +16,21 @@ import java.util.List;
  */
 public interface CarMeasureDayExMapper {
 
-    List<StatisticSection> getCarOnlineDuration(SAASIndexQuery saasIndexQuery);
+    List<StatisticSection> getCarOnlineDuration(SAASIndexQuery saasIndexQuery,
+                                                @Param("minId")Integer minId,
+                                                @Param("maxId")Integer maxId);
 
-    List<StatisticSection> getCarOperateStatistics(SAASIndexQuery saasIndexQuery);
+    List<StatisticSection> getCarOperateStatistics(SAASIndexQuery saasIndexQuery,
+                                                   @Param("minId")Integer minId,
+                                                   @Param("maxId")Integer maxId);
 
-    List<StatisticSection> getOrderNumStatistic(SAASIndexQuery saasIndexQuery);
+    List<StatisticSection> getOrderNumStatistic(SAASIndexQuery saasIndexQuery,
+                                                @Param("minId")Integer minId,
+                                                @Param("maxId")Integer maxId);
 
-    List<StatisticSection> getServiceNegativeRate(SAASIndexQuery saasIndexQuery);
+    List<StatisticSection> getServiceNegativeRate(SAASIndexQuery saasIndexQuery,
+                                                  @Param("minId")Integer minId,
+                                                  @Param("maxId")Integer maxId);
 
     /**
      * 获取首页指标
@@ -47,9 +56,7 @@ public interface CarMeasureDayExMapper {
                                                  @Param("maxId")Integer maxId);
 
     /**查询指定日期最小值**/
-    Integer queryMinId(@Param("startDate") String startDate);
+    MaxAndMinId queryMaxAndMinId(@Param("startDate") String startDate, @Param("endDate")String endDate);
 
-    /**查询指定日期最大值**/
-    Integer queryMaxId( @Param("endDate")String endDate);
 
 }

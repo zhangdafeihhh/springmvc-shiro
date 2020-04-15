@@ -10,10 +10,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
-import com.zhuanche.entity.bigdata.SAASCoreIndexDto;
-import com.zhuanche.entity.bigdata.SAASCoreIndexPercentDto;
-import com.zhuanche.entity.bigdata.SAASDriverRankingDto;
-import com.zhuanche.entity.bigdata.SAASIndexQuery;
+import com.zhuanche.entity.bigdata.*;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.bigdata.AllianceIndexService;
@@ -36,6 +33,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.constraints.Max;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -771,9 +769,8 @@ public class HomeKanBanController {
 
 			long dateDiff = DateUtil.calDateDiff(startDate, endDate);
 
-			Integer scoreMinId = measureDayExMapper.queryMinId(startDate);
-			Integer scoreMaxId = measureDayExMapper.queryMaxId(endDate);
-			List<SAASCoreIndexDto> saasCoreIndexDtoList = measureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleList,visibleMotoIdsList,dateDiff,scoreMinId,scoreMaxId);
+			MaxAndMinId scoreMaxAndMinId = measureDayExMapper.queryMaxAndMinId(startDate,endDate);
+ 			List<SAASCoreIndexDto> saasCoreIndexDtoList = measureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleList,visibleMotoIdsList,dateDiff,scoreMaxAndMinId.getMinId(),scoreMaxAndMinId.getMaxId());
 
 			if(CollectionUtils.isNotEmpty(saasCoreIndexDtoList)){
 				RedisCacheUtil.set(key,saasCoreIndexDtoList.get(0),3600*24);
