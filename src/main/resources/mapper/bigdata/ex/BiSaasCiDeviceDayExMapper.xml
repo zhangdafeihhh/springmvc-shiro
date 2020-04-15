@@ -249,7 +249,7 @@
   </select>
 
 
-  <select id="queryMinId" resultType="java.lang">
+  <select id="queryMinId" resultType="java.lang.Integer">
     <![CDATA[
       select min(id)
       from bi_saas_ci_device_day
@@ -257,7 +257,7 @@
     where data_date >= #{startDate,jdbcType=VARCHAR}
   </select>
 
-  <select id="queryMaxId">
+  <select id="queryMaxId" resultType="java.lang.Integer">
     <![CDATA[
       select max(id)
       from bi_saas_ci_device_day
