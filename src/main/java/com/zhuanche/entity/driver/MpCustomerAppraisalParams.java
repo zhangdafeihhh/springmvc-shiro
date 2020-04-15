@@ -53,6 +53,10 @@ public class MpCustomerAppraisalParams implements Serializable{
 
     private List<Integer> appraisalIds;
 
+    private Integer minId;
+
+    private Integer maxId;
+
 
     public MpCustomerAppraisalParams(String cityId, String supplierId, String teamId, String groupIds, String driverName, String driverPhone, String orderNo,
                                      String createDateBegin, String createDateEnd, String evaluateScore, String sortName, String sortorder, Integer page, Integer pageSize) {
@@ -310,6 +314,22 @@ public class MpCustomerAppraisalParams implements Serializable{
 
     public void setAppraisalIds(List<Integer> appraisalIds) {
         this.appraisalIds = appraisalIds;
+    }
+
+    public Integer getMinId() {
+        return minId;
+    }
+
+    public void setMinId(Integer minId) {
+        this.minId = minId;
+    }
+
+    public Integer getMaxId() {
+        return maxId;
+    }
+
+    public void setMaxId(Integer maxId) {
+        this.maxId = maxId;
     }
 
     @Override
