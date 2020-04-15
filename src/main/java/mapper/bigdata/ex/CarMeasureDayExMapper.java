@@ -16,21 +16,13 @@ import java.util.List;
  */
 public interface CarMeasureDayExMapper {
 
-    List<StatisticSection> getCarOnlineDuration(SAASIndexQuery saasIndexQuery,
-                                                @Param("minId")Integer minId,
-                                                @Param("maxId")Integer maxId);
+    List<StatisticSection> getCarOnlineDuration(SAASIndexQuery saasIndexQuery);
 
-    List<StatisticSection> getCarOperateStatistics(SAASIndexQuery saasIndexQuery,
-                                                   @Param("minId")Integer minId,
-                                                   @Param("maxId")Integer maxId);
+    List<StatisticSection> getCarOperateStatistics(SAASIndexQuery saasIndexQuery);
 
-    List<StatisticSection> getOrderNumStatistic(SAASIndexQuery saasIndexQuery,
-                                                @Param("minId")Integer minId,
-                                                @Param("maxId")Integer maxId);
+    List<StatisticSection> getOrderNumStatistic(SAASIndexQuery saasIndexQuery);
 
-    List<StatisticSection> getServiceNegativeRate(SAASIndexQuery saasIndexQuery,
-                                                  @Param("minId")Integer minId,
-                                                  @Param("maxId")Integer maxId);
+    List<StatisticSection> getServiceNegativeRate(SAASIndexQuery saasIndexQuery);
 
     /**
      * 获取首页指标
