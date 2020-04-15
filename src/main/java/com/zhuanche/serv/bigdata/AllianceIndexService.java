@@ -272,9 +272,14 @@ public class AllianceIndexService{
      */
     public List<SAASCoreIndexPercentDto> getCiCoreIndexStatistic(SAASIndexQuery saasIndexQuery,String startDate, String endDate,String allianceId,String motorcadeId,List<String> visibleAllianceIds,List<String> visibleMotocadeIds,long dateDiff){
        try{
-           List<SAASCoreIndexDto> saasCoreIndexDtoList = carMeasureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff);
+
+           Integer scoreMinId = carMeasureDayExMapper.queryMinId(startDate);
+           Integer scoreMaxId = carMeasureDayExMapper.queryMaxId(endDate);
+           List<SAASCoreIndexDto> saasCoreIndexDtoList = carMeasureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff,scoreMinId,scoreMaxId);
            Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery);
-           List<SAASCoreIndexPercentDto> list = biSaasCiDeviceDayExMapper.getCiCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff);
+           Integer minId = biSaasCiDeviceDayExMapper.queryMinId(startDate);
+           Integer maxId = biSaasCiDeviceDayExMapper.queryMaxId(endDate);
+           List<SAASCoreIndexPercentDto> list = biSaasCiDeviceDayExMapper.getCiCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff,minId,maxId);
            if("0".equals(list.get(0).getDriverNum())){
                List<SAASCoreIndexPercentDto> zeroList = new ArrayList<>();
                logger.info("加盟商下面没有司机============");
