@@ -13,11 +13,15 @@ import java.util.List;
  */
 public interface BiSaasCiDeviceDayExMapper {
 
-    List<CiOrderStatisticSection> getCiOrderNumStatistic(SAASIndexQuery saasIndexQuery);
+    List<CiOrderStatisticSection> getCiOrderNumStatistic(SAASIndexQuery saasIndexQuery,
+                                                         @Param("minId")Integer minId,
+                                                         @Param("maxId")Integer maxId);
 
     CiOrderAllStatisticSection getAllCiOrderNumStatistic(@Param("findDate")String findDate);
 
-    Integer getInstallCiDrierNum(SAASIndexQuery saasIndexQuery);
+    Integer getInstallCiDrierNum(SAASIndexQuery saasIndexQuery,
+                                 @Param("minId")Integer minId,
+                                 @Param("maxId")Integer maxId);
 
     List<SAASCoreIndexPercentDto> getCiCoreIndexStatistic(@Param("startDate") String startDate,
                                                  @Param("endDate")String endDate,
@@ -29,14 +33,18 @@ public interface BiSaasCiDeviceDayExMapper {
                                                  @Param("minId")Integer minId,
                                                  @Param("maxId")Integer maxId);
 
-    List<SAASAllCoreIndexPercentDto> getCiAllCoreIndexStatistic(@Param("startDate") String startDate, @Param("endDate")String endDate);
+    List<SAASAllCoreIndexPercentDto> getCiAllCoreIndexStatistic(@Param("startDate") String startDate,
+                                                                @Param("endDate")String endDate,
+                                                                @Param("minId")Integer minId,
+                                                                @Param("maxId")Integer maxId);
 
-    List<CiOrderStatisticSection> getCiServiceNegativeRate(SAASIndexQuery saasIndexQuery);
+    List<CiOrderStatisticSection> getCiServiceNegativeRate(SAASIndexQuery saasIndexQuery,
+                                                           @Param("minId")Integer minId,
+                                                           @Param("maxId")Integer maxId);
     CiServiceBadEvaluateAllStatisticSection getAllCiServiceNegativeRate(@Param("findDate")String findDate);
 
-    /**查询指定日期最小值**/
-    Integer queryMinId(@Param("startDate") String startDate);
+    /**查询指定日期最大和最小id值**/
+    MaxAndMinId queryMaxAndMinId(@Param("startDate") String startDate,@Param("endDate")String endDate);
 
-    /**查询指定日期最大值**/
-    Integer queryMaxId( @Param("endDate")String endDate);
+
 }
