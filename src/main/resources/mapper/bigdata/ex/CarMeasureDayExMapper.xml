@@ -285,7 +285,7 @@
   </select>
 
 
-  <select id="getMinId" resultType="java.lang.Integer">
+  <select id="queryMinId" resultType="java.lang.Integer">
   <![CDATA[
         select
             min(id)
@@ -295,7 +295,7 @@
   </select>
 
 
-  <select id="getMaxId" resultType="java.lang.Integer">
+  <select id="queryMaxId" resultType="java.lang.Integer">
     <![CDATA[
         select
             max(id)
