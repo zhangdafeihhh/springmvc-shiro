@@ -463,7 +463,7 @@ public class DriverInfoTemporaryController extends BaseController {
                                     @Verify(param = "supplierId",rule="required") Integer supplierId,
                                     @Verify(param = "licensePlates",rule="required") String licensePlates,
                                     @Verify(param = "groupId",rule="required") Integer groupId,
-                                    @RequestParam(value = "bankCardNumber",required = false) String bankCardNumber,
+                                    @Verify(param = "bankCardNumber",rule="maxLength(20)") String bankCardNumber,
                                     @RequestParam(value = "bankCardBank",required = false) String bankCardBank,
                                     @RequestParam(value = "memo",required = false) String memo,
                                     @RequestParam(value = "photoSrct",required = false) String photoSrct,
