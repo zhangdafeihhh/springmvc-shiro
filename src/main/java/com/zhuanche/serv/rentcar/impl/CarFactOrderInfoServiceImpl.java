@@ -13,6 +13,7 @@ import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.driverOrderRecord.OrderTimeEntity;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.order.DriverFeeDetailService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.Common;
@@ -319,10 +320,10 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
     }
 
 	
-	@Override
-	public CarBizOrderSettleEntity selectDriverSettleByOrderId(Long orderId) {
-		return carFactOrderExMapper.selectDriverSettleByOrderId(orderId);
-	}
+//	@Override
+//	public CarBizOrderSettleEntity selectDriverSettleByOrderId(Long orderId) {
+//		return carFactOrderExMapper.selectDriverSettleByOrderId(orderId);
+//	}
 
 	@Override
 	public CarGroupEntity selectCarGroupById(Integer id) {
@@ -394,5 +395,14 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 		return carFactOrderExMapper.selectServiceEntityList(serviceEntity);
 	}
 
-
+	@Override
+	public JSONObject queryByJiFei(String method, Map<String, Object> params, String tag) {
+		String url = orderCostUrl + method;
+		JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, tag);
+		if (jsonObject == null || jsonObject.getIntValue("code")!=0) {
+			logger.error("调用计费接口" + url + "返回结果为null");
+			return null;
+		}
+		return jsonObject.getJSONObject("data");
+	}
 }
