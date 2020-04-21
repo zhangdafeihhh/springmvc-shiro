@@ -31,10 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
@@ -100,6 +97,133 @@ public class DriverIncomeScoreController {
         return AjaxResponse.success(pageDTO);
     }
 
+    /**
+     * 查询司机派单分每日更新记录<br>
+     *     注意，只能查询3个月内的数据
+     *
+     * @param driverId 司机ID
+     * @param driverName 司机姓名
+     * @param driverPhone 司机手机号
+     * @param updateTime 开始日期,格式：YYYY-MM-DD
+     * @param endUpdateTime 结束日期,格式：YYYY-MM-DD
+     * @return AjaxResponse
+     */
+    @ResponseBody
+    @RequestMapping(value = "/queryDispatchScoreDailyUpdateRecord")
+    @RequestFunction(menu = DRIVER_INFO_LIST)
+    public AjaxResponse queryDispatchScoreDailyUpdateRecord(Integer driverId,String driverName,String driverPhone,String updateTime,String endUpdateTime){
+        DriverDispatchScoreDailyUpdateRecordQuery driverDispatchScoreDailyUpdateRecordQuery = new DriverDispatchScoreDailyUpdateRecordQuery();
+        driverDispatchScoreDailyUpdateRecordQuery.setDriverId(driverId);
+        driverDispatchScoreDailyUpdateRecordQuery.setDriverName(driverName);
+        driverDispatchScoreDailyUpdateRecordQuery.setDriverPhone(driverPhone);
+        driverDispatchScoreDailyUpdateRecordQuery.setUpdateTime(updateTime);
+        driverDispatchScoreDailyUpdateRecordQuery.setEndUpdateTime(endUpdateTime);
+        List<DriverDispatchScoreDailyUpdateRecord> list = driverDispatchScoreService.queryDispatchScoreDailyUpdateRecord(driverDispatchScoreDailyUpdateRecordQuery);
+        return AjaxResponse.success(list);
+    }
+
+    /**
+     * 分页查询司机派单分明细记录
+     *
+     * @param driverId 司机ID
+     * @param driverName 司机姓名
+     * @param driverPhone 司机手机号
+     * @param parentDispatchScoreType 父派单分分类
+     * @param type 具体类型
+     * @param orderNo 关联单号
+     * @param startDate 开始日期,格式：YYYY-MM-DD
+     * @param endDate 结束日期,格式：YYYY-MM-DD
+     * @param page 页码
+     * @param pageSize 每页条数
+     * @return AjaxResponse
+     */
+    @ResponseBody
+    @RequestMapping(value = "/queryPageDriverDispatchScoreDetailRecord")
+    @RequestFunction(menu = DRIVER_INFO_LIST)
+    public AjaxResponse queryPageDriverDispatchScoreDetailRecord(Integer driverId,String driverName,String driverPhone,
+                                                                 String parentDispatchScoreType,String type,
+                                                                 String orderNo, String startDate,String endDate,
+                                                                 @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                                                 @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize){
+        DriverDispatchScoreDetailRecordQuery queryCondition = new DriverDispatchScoreDetailRecordQuery();
+        queryCondition.setDriverId(driverId);
+        queryCondition.setDriverName(driverName);
+        queryCondition.setDriverPhone(driverPhone);
+        queryCondition.setParentDispatchScoreType(parentDispatchScoreType);
+        queryCondition.setType(type);
+        queryCondition.setOrderNo(orderNo);
+        queryCondition.setStartDate(startDate);
+        queryCondition.setEndDate(endDate);
+        queryCondition.setPage(page);
+        queryCondition.setPageSize(pageSize);
+        PageDTO pageDTO = driverDispatchScoreService.queryPageDriverDispatchScoreDetailRecord(queryCondition);
+        return AjaxResponse.success(pageDTO);
+    }
+
+    /**
+     * 查询司机服务分计算明细
+     *
+     * @param driverId 司机ID
+     * @param driverName 司机姓名
+     * @param driverPhone 司机手机号
+     * @param ownershipDate 所属日期，示例：2020-02-28
+     * @param serviceScore 当前ownershipDate总服务分
+     * @return AjaxResponse
+     */
+    @ResponseBody
+    @RequestMapping(value = "/queryDriverServiceScoreCalculateDetail")
+    @RequestFunction(menu = DRIVER_INFO_LIST)
+    public AjaxResponse queryDriverServiceScoreCalculateDetail(Integer driverId,String driverName,String driverPhone,
+                                                                                        String ownershipDate,String serviceScore){
+        DriverServiceScoreCalculateGeneralize generalize = driverDispatchScoreService.queryDriverServiceScoreCalculateDetail(driverId,driverName,driverPhone,ownershipDate,serviceScore);
+        return AjaxResponse.success(generalize);
+    }
+
+    /**
+     * 查询司机时长分计算明细
+     *
+     * @param driverId 司机ID
+     * @param driverName 司机姓名
+     * @param driverPhone 司机手机号
+     * @param day 所属日期，示例：2020-02-28
+     * @param timeLengthScore 当前day的时长分
+     * @return AjaxResponse
+     */
+    @ResponseBody
+    @RequestMapping(value = "/queryDriverTimeLengthScoreCalculateDetail")
+    @RequestFunction(menu = DRIVER_INFO_LIST)
+    public AjaxResponse queryDriverTimeLengthScoreCalculateDetail(Integer driverId, String driverName, String driverPhone,
+                                                                                              String day,String timeLengthScore){
+        DriverTimeLengthScoreCalculateGeneralize generalize = driverDispatchScoreService.queryDriverTimeLengthScoreCalculateDetail(driverId,driverName,driverPhone,day,timeLengthScore);
+        return AjaxResponse.success(generalize);
+    }
+
+    /**
+     * 查询父派单分类型
+     *
+     * @return AjaxResponse
+     */
+    @ResponseBody
+    @RequestMapping(value = "/queryParentDispatchScoreType")
+    @RequestFunction(menu = DRIVER_INFO_LIST)
+    public AjaxResponse queryParentDispatchScoreType(){
+        List<DriverIntegralDispatchScoreType> list = driverDispatchScoreService.queryParentDispatchScoreType();
+        return AjaxResponse.success(list);
+    }
+
+    /**
+     * 查询子派单分类型
+     *
+     * @param parentType 父派单分类型编码
+     * @return AjaxResponse
+     */
+    @ResponseBody
+    @RequestMapping(value = "/queryChildDispatchScoreType")
+    @RequestFunction(menu = DRIVER_INFO_LIST)
+    public AjaxResponse queryChildDispatchScoreType(Integer parentType){
+        List<DriverIntegralDispatchScoreType> list = driverDispatchScoreService.queryChildDispatchScoreType(parentType);
+        return AjaxResponse.success(list);
+    }
 
     /**
      * 司机收入分信息列表（有分页）
