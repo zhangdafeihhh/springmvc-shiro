@@ -310,11 +310,11 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
     private void fillDriverAmount(List<CarFactOrderInfoDTO> list) {
         List<String> orderIds = list.stream().map(CarFactOrderInfoDTO::getOrderId).collect(Collectors.toList());
         List<OrderDriverCostDetailVO> driverCostDetails = driverFeeDetailService.getOrderDriverCostDetailVOBatch(orderIds);
-        Map<Integer, OrderDriverCostDetailVO> map = driverCostDetails.stream().collect(Collectors.toMap(OrderDriverCostDetailVO::getOrderId, a -> a, (k1, k2) -> k1));
+        Map<Long, OrderDriverCostDetailVO> map = driverCostDetails.stream().collect(Collectors.toMap(OrderDriverCostDetailVO::getOrderId, a -> a, (k1, k2) -> k1));
         for (CarFactOrderInfoDTO vo : list) {
             try {
-                if (null != map.get(Integer.parseInt(vo.getOrderId())))
-                    vo.setActualPayAmountDriver(map.get(Integer.parseInt(vo.getOrderId())).getTotalAmount().toString());
+                if (null != map.get(Long.parseLong(vo.getOrderId())))
+                    vo.setActualPayAmountDriver(map.get(Long.parseLong(vo.getOrderId())).getTotalAmount().toString());
             } catch (NumberFormatException e) {}
         }
     }

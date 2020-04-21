@@ -1154,7 +1154,7 @@ public class OrderController{
 		getOverMileageNumHtml(orderCostDetailInfo);//计算超套餐里程费
         calcOverMileageTotal(orderCostDetailInfo);
 		result.setDriverCostDetailVO(driverFeeDetailService.getOrderDriverCostDetailVO(result.getOrderNo(), result.getOrderId()));
-		result.setDriverCostDetailVOH5(driverFeeDetailService.getDriverCostDetail(result.getOrderNo(),Integer.parseInt(Long.toString(result.getOrderId())),result.getBuyoutFlag()));
+		result.setDriverCostDetailVOH5(driverFeeDetailService.getDriverCostDetail(result.getOrderNo(),result.getOrderId(),result.getBuyoutFlag()));
         result.setOrderCostDetailInfo(orderCostDetailInfo);
         //添加实际司机车型 fanhongtao 2019-11-07
 		if(result.getDriverCostDetailVOH5() != null && result.getDriverCostDetailVOH5().getGroupId() != null){
