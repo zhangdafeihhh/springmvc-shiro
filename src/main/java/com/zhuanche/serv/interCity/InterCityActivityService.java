@@ -2,6 +2,7 @@ package com.zhuanche.serv.interCity;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.paging.PageDTO;
 
 /**
  * @Author fanht
@@ -18,7 +19,7 @@ public interface InterCityActivityService {
      * @param ruleId
      * @return
      */
-    JSONArray queryList(Integer groupId, Integer discountStatus, Integer ruleId);
+    PageDTO queryList(Integer groupId, Integer discountStatus, Integer ruleId, Integer pageNo, Integer pageSize);
 
     JSONObject getDetail(Integer id);
 

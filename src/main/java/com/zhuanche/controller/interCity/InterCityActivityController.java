@@ -2,8 +2,10 @@ package com.zhuanche.controller.interCity;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.serv.interCity.InterCityActivityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +34,14 @@ public class InterCityActivityController {
     @ResponseBody
     public AjaxResponse queryList(Integer groupId,
                                   Integer disCountStatus,
-                                  Integer ruleId){
+                                  Integer ruleId,
+                                  @Verify(param = "pageNo",rule="required|min(0)")Integer pageNo,
+                                  @Verify(param = "pageSize",rule="required|min(10)")Integer pageSize){
         logger.info("查询城际拼车立减优惠活动入参:{},{},{}",groupId,disCountStatus,ruleId);
 
-        JSONArray jsonArray = activityService.queryList(groupId,disCountStatus,ruleId);
+        PageDTO pageDTO = activityService.queryList(groupId,disCountStatus,ruleId,pageNo,pageSize);
 
-        AjaxResponse ajaxResponse = AjaxResponse.success(jsonArray);
+        AjaxResponse ajaxResponse = AjaxResponse.success(pageDTO);
 
         return ajaxResponse;
     }
@@ -65,7 +69,7 @@ public class InterCityActivityController {
         logger.info("查询城际拼车立减优惠活动saveOrUpdate入参:{},{},{},{},{},{}",discountId,strategyId,
                 discountType,discountAmount,discountStartTime, discountEndTime,discountStatus);
 
-        Integer code = 0;
+        Integer code = 1;
         try {
          code =   activityService.saveOrUpdate(discountId,strategyId,discountType,discountAmount,
                    discountStartTime,discountEndTime,discountStatus);
@@ -73,7 +77,13 @@ public class InterCityActivityController {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
 
-        AjaxResponse ajaxResponse = AjaxResponse.success(code);
+        AjaxResponse ajaxResponse;
+        if(code == 0){
+            ajaxResponse = AjaxResponse.success(code);
+        }else {
+            ajaxResponse = AjaxResponse.fail(code);
+        }
+
 
         return ajaxResponse;
     }

@@ -3,9 +3,12 @@ package com.zhuanche.serv.interCity.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import com.sq.common.okhttp.OkHttpUtil;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.MpOkHttpUtil;
@@ -13,6 +16,7 @@ import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.interCity.InterCityActivityService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
@@ -51,12 +55,17 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
     @Autowired
     private CarBizCarInfoExMapper carBizCarInfoExMapper;
 
+    @Autowired
+    private CarBizCarGroupExMapper  groupExMapper;
+
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public JSONArray queryList(Integer groupId, Integer discountStatus, Integer ruleId) {
+    public PageDTO queryList(Integer groupId, Integer discountStatus, Integer ruleId,Integer pageNo,Integer pageSize) {
 
         Map<String,Object> mapParam = Maps.newHashMap();
+        Integer total= 0;
         String ruleIdListStr = "";
         if(ruleId == null){
             ruleIdListStr = this.getRuleId();
@@ -72,6 +81,10 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
         mapParam.put("serviceTypeId",Constants.INTEGER_SERVICE_TYPE);
         mapParam.put("groupId",groupId);
         mapParam.put("discountStatus",discountStatus);
+        mapParam.put("pageNo",pageNo);
+
+        mapParam.put("pageSize",pageSize);
+
 
         Set<Integer> setCitys = new HashSet<>();
         JSONArray resultArray = null;
@@ -82,13 +95,20 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
                 JSONObject jsonResult = JSONObject.parseObject(result);
                 if(jsonResult.get("code") != null && jsonResult.getInteger("code") ==0 ){
                     String data = jsonResult.getString("data");
-                    resultArray = JSONArray.parseArray(data);
-                    if(resultArray.size() > 0){
-                        resultArray.forEach(array ->{
-                            JSONObject jsonObject = (JSONObject) array;
-                            setCitys.add(jsonObject.get("cityId") == null ? null : jsonObject.getInteger("cityId"));
-                        });
+                    if(data != null  ){
+                        JSONObject strategyJson = JSONObject.parseObject(data);
+                        if(strategyJson.get("strategyList") != null ){
+                            total = strategyJson.get("total") != null?strategyJson.getInteger("total"):0;
+                            resultArray = JSONArray.parseArray(strategyJson.getString("strategyList"));
+                            if(resultArray.size() > 0){
+                                resultArray.forEach(array ->{
+                                    JSONObject jsonObject = (JSONObject) array;
+                                    setCitys.add(jsonObject.get("cityId") == null ? null : jsonObject.getInteger("cityId"));
+                                });
+                            }
+                        }
                     }
+
                 }
             }
         } catch (Exception e) {
@@ -96,6 +116,11 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
         }
         List<CarBizCity> carBizCityList = new ArrayList<>();
         Map<Integer,String> cityMap = Maps.newHashMap();
+        Map<Integer,String> groupMap = Maps.newHashMap();
+        List<CarBizCarGroup> listGroup = groupExMapper.queryAllGroup();
+        listGroup.forEach(group ->{
+            groupMap.put(group.getGroupId(),group.getGroupName());
+        });
         if(CollectionUtils.isNotEmpty(setCitys)){
             carBizCityList = cityExMapper.queryNameByIds(setCitys);
             carBizCityList.forEach(citys ->{
@@ -107,7 +132,8 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
             resultArray.forEach(array ->{
                 JSONObject jsonObject = (JSONObject) array;
                 if(jsonObject.get("cityId") != null && jsonObject.getInteger("cityId") > 0){
-                    jsonObject.put("cityName",cityMap.get(jsonObject.getInteger("cityId")));
+                    jsonObject.put("cityName", jsonObject.get("cityId") == null ? "":cityMap.get(jsonObject.getInteger("cityId")));
+                    jsonObject.put("groupName",jsonObject.get("groupId")== null ? "":groupMap.get(jsonObject.getInteger("groupId")));
                 }else {
                     jsonObject.put("cityName","");
                 }
@@ -115,7 +141,9 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
             });
         }
 
-        return jsonArray;
+        PageDTO pageDTO = new PageDTO(pageNo, pageSize, total, jsonArray);
+
+        return pageDTO;
     }
 
     @Override
@@ -123,7 +151,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
 
         Map<String,Object> mapDetail = Maps.newConcurrentMap();
         mapDetail.put("strategyId",id);
-        String result = MpOkHttpUtil.okHttpPost(orderCostUrl+"/interCity/strategy/discount/getDetail",mapDetail,0,null);
+        String result = MpOkHttpUtil.okHttpGet(orderCostUrl+"/interCity/strategy/discount/getDetail",mapDetail,0,null);
         JSONObject jsonObject = new JSONObject();
         if(StringUtils.isNotEmpty(result)){
             JSONObject jsonResult = JSONObject.parseObject(result);
@@ -169,7 +197,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
 
         if(StringUtils.isNotEmpty(result)){
             JSONObject jsonObject = JSONObject.parseObject(result);
-            if(jsonObject.get("code") != null && jsonObject.getInteger("code") > 0){
+            if(jsonObject.get("code") != null && jsonObject.getInteger("code") == 0){
                 return jsonObject.getInteger("code");
             }
         }
