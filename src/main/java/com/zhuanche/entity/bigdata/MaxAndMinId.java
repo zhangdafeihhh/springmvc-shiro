@@ -27,4 +27,13 @@ public class MaxAndMinId {
     public void setMaxId(Integer maxId) {
         this.maxId = maxId;
     }
+
+
+    public MaxAndMinId() {
+    }
+
+    public MaxAndMinId(Integer minId, Integer maxId) {
+        this.minId = minId;
+        this.maxId = maxId;
+    }
 }

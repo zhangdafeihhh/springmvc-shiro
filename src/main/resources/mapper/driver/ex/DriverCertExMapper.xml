@@ -30,5 +30,6 @@
 		SELECT image
 		FROM driver_cert_opti
 		WHERE driver_id = #{driverId} AND is_valid = 1 AND type = #{type}
+		ORDER BY id DESC LIMIT 1
   </select>
 </mapper>
