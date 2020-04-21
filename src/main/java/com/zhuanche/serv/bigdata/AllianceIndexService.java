@@ -330,11 +330,16 @@ public class AllianceIndexService{
        try{
 
            MaxAndMinId scoreIds = carMeasureDayExMapper.queryMaxAndMinId(startDate,endDate);
+           if(scoreIds == null){
+               scoreIds = new MaxAndMinId(0,1);
+           }
             List<SAASCoreIndexDto> saasCoreIndexDtoList = carMeasureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff,scoreIds.getMinId(),scoreIds.getMaxId());
            MaxAndMinId maxAndMinId = biSaasCiDeviceDayExMapper.queryMaxAndMinId(startDate,endDate);
            if(maxAndMinId != null){
                saasIndexQuery.setMinId(maxAndMinId.getMinId());
                saasIndexQuery.setMaxId(maxAndMinId.getMaxId());
+           }else {
+               maxAndMinId = new MaxAndMinId(0,1);
            }
            Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery);
            List<SAASCoreIndexPercentDto> list = biSaasCiDeviceDayExMapper.getCiCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff,maxAndMinId.getMinId(),maxAndMinId.getMaxId());
