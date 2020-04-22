@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.constant.OrderConstants;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.entity.driver.CustomerAppraisal;
@@ -20,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,6 +37,9 @@ public class MpDriverCustomerAppraisalService {
     @Autowired
     CustomerAppraisalMapper customerAppraisalMapper;
 
+    @Value("${index}")
+    private String env;
+
     public PageInfo<MpCarBizCustomerAppraisal> findPageByparam(MpCustomerAppraisalParams params) {
         logger.info("查询订单评分，参数为："+(params==null?"null": JSON.toJSONString(params)));
         PageHelper.startPage(params.getPage(), params.getPageSize(), true);
@@ -42,23 +47,72 @@ public class MpDriverCustomerAppraisalService {
         String createDateEnd = params.getCreateDateEnd();
         String orderFinishTimeBegin = params.getOrderFinishTimeBegin();
         String orderFinishTimeEnd = params.getOrderFinishTimeEnd();
+
+
         if (StringUtils.isNotEmpty(createDateBegin)){
             params.setCreateDateBegin(createDateBegin + " 00:00:00");
+
+
+
         }
         if (StringUtils.isNotEmpty(createDateEnd)){
             params.setCreateDateEnd(createDateEnd + " 23:59:59");
+
         }
         if (StringUtils.isNotEmpty(orderFinishTimeBegin)){
             params.setOrderFinishTimeBegin(orderFinishTimeBegin + " 00:00:00");
+            //如果是线上环境
+            //如果是2018以及之后
+            if(env.equals("pre") || env.equals("online")){
+                params = this.getMinId(params);
+            }
         }
         if (StringUtils.isNotEmpty(orderFinishTimeEnd)){
             params.setOrderFinishTimeEnd(orderFinishTimeEnd + " 23:59:59");
+            if(env.equals("pre") || env.equals("online")){
+                params = this.getMaxId(params);
+            }
         }
+
+
         List<MpCarBizCustomerAppraisal> list  = customerAppraisalExMapper.queryForListObject(params);
         PageInfo<MpCarBizCustomerAppraisal> pageInfo = new PageInfo<>(list);
         return pageInfo;
     }
 
+
+    //根据开始时间获取数据库里面的id最小值minId
+    private MpCustomerAppraisalParams getMinId(MpCustomerAppraisalParams params){
+        String orderFinishTimeBegin = params.getOrderFinishTimeBegin();
+        Integer minId = null;
+        String createDateSub = orderFinishTimeBegin.substring(0,4);
+        if(Integer.valueOf(createDateSub)>2018){
+            minId =  OrderConstants.getOrderMap().get(orderFinishTimeBegin.substring(0,7));
+            if(minId == null){
+                minId = OrderConstants.getOrderMap().get("2020-04");
+            }
+        }else {
+            //考虑到可能会选择2018-12,多加一个月的判断
+            minId = OrderConstants.getOrderMap().get(orderFinishTimeBegin.substring(0,7));
+        }
+        logger.info("【min】获取的月份：" + orderFinishTimeBegin.substring(0,7) +",value值" + minId);
+        params.setMinId(minId);
+        return params;
+    }
+
+    //根据结束时间获取数据库里面的id最大值maxId
+    private MpCustomerAppraisalParams getMaxId(MpCustomerAppraisalParams params){
+        String orderFinishTimeEnd = params.getOrderFinishTimeEnd();
+        Integer maxId = null;
+        String createDeteSub = orderFinishTimeEnd.substring(0,4);
+        //如果是2018以及之前的
+        if(Integer.valueOf(createDeteSub)<=2018){
+            maxId = OrderConstants.getOrderMap().get("2018-12");
+        }
+        logger.info("【max】获取的月份：" + orderFinishTimeEnd.substring(0,7) +",value值" + maxId);
+        params.setMaxId(maxId);
+        return params;
+    }
 
     public List<Integer> queryIds(MpCustomerAppraisalParams params){
         logger.info("查询订单评分，参数为："+(params==null?"null": JSON.toJSONString(params)));
@@ -68,15 +122,25 @@ public class MpDriverCustomerAppraisalService {
         String orderFinishTimeEnd = params.getOrderFinishTimeEnd();
         if (StringUtils.isNotEmpty(createDateBegin)){
             params.setCreateDateBegin(createDateBegin + " 00:00:00");
-        }
+         }
         if (StringUtils.isNotEmpty(createDateEnd)){
             params.setCreateDateEnd(createDateEnd + " 23:59:59");
         }
         if (StringUtils.isNotEmpty(orderFinishTimeBegin)){
             params.setOrderFinishTimeBegin(orderFinishTimeBegin + " 00:00:00");
+            //如果是线上环境
+            //如果是2018以及之后
+            if(env.equals("pre") || env.equals("online")){
+                params = this.getMinId(params);
+            }
+
         }
         if (StringUtils.isNotEmpty(orderFinishTimeEnd)){
             params.setOrderFinishTimeEnd(orderFinishTimeEnd + " 23:59:59");
+            if(env.equals("pre") || env.equals("online")){
+                params = this.getMaxId(params);
+            }
+
         }
         return customerAppraisalExMapper.queryIds(params);
     }

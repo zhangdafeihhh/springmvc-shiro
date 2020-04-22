@@ -206,7 +206,7 @@ public class CarFactOrderInfo extends BaseEntity {
 	// 分钟数（含）
 	private int includeminute = 0;
 	// 公里数（含）
-	private int includemileage = 0;
+	private String includemileage = "0";
 
 	private String factDriver;
 	// 超里程数
@@ -1748,11 +1748,11 @@ public class CarFactOrderInfo extends BaseEntity {
 		this.includeminute = includeminute;
 	}
 
-	public int getIncludemileage() {
+	public String getIncludemileage() {
 		return includemileage;
 	}
 
-	public void setIncludemileage(int includemileage) {
+	public void setIncludemileage(String includemileage) {
 		this.includemileage = includemileage;
 	}
 

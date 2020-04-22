@@ -14,6 +14,15 @@
         ]]>
     <where>
       data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+
+      <if test="minId != null and minId != ''">
+        and id >= #{minId}
+      </if>
+
+      <if test="maxId != null and maxId != ''">
+        and id &lt;= #{maxId}
+      </if>
+
       <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
         <if test="allianceId != null and allianceId != ''">
           and supplier_id = #{allianceId}
@@ -59,6 +68,8 @@
         from bi_saas_ci_device_day
         ]]>
       where data_date = #{findDate,jdbcType=VARCHAR}
+
+
   </select>
 
   <select id="getInstallCiDrierNum" resultType="java.lang.Integer">
@@ -69,6 +80,7 @@
         ]]>
     <where>
       data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+
       <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
         <if test="allianceId != null and allianceId != ''">
           and supplier_id = #{allianceId}
@@ -102,6 +114,15 @@
           and team_id = #{motorcadeId}
         </if>
       </if>
+
+      <if test="minId != null and minId != ''">
+        and id >= #{minId}
+      </if>
+
+      <if test="maxId != null and maxId != ''">
+        and id &lt;= #{maxId}
+      </if>
+
     </where>
   </select>
 
@@ -123,7 +144,19 @@
         from bi_saas_ci_device_day
         ]]>
     <where>
+
       data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+
+
+      <if test="minId != null and minId != ''">
+        and id >= #{minId}
+      </if>
+
+      <if test="maxId != null and maxId != ''">
+        and id &lt;= #{maxId}
+      </if>
+
+
       <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
         <if test="allianceId != null and allianceId != ''">
           and supplier_id = #{allianceId}
@@ -175,6 +208,15 @@
         ]]>
     <where>
       data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+
+      <if test="minId != null and minId != ''">
+        and id >= #{minId}
+      </if>
+
+      <if test="maxId != null and maxId != ''">
+        and id &lt;= #{maxId}
+      </if>
+
     </where>
   </select>
 
@@ -189,6 +231,17 @@
         ]]>
     <where>
       data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+
+      <if test="minId != null and minId != ''">
+        and id >= #{minId}
+      </if>
+
+      <if test="maxId != null and maxId != ''">
+        and id &lt;= #{maxId}
+      </if>
+
+
+
       <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
         <if test="allianceId != null and allianceId != ''">
           and supplier_id = #{allianceId}
@@ -234,6 +287,18 @@
         from bi_saas_ci_device_day
         ]]>
       where data_date = #{findDate,jdbcType=VARCHAR}
+
+
   </select>
+
+
+  <select id="queryMaxAndMinId" resultType="com.zhuanche.entity.bigdata.MaxAndMinId">
+    <![CDATA[
+      select min(id) as minId,max(id) as maxId
+      from bi_saas_ci_device_day
+      ]]>
+    where data_date >= #{startDate,jdbcType=VARCHAR} and data_date &lt;= #{endDate,jdbcType=VARCHAR}
+  </select>
+
 
 </mapper>

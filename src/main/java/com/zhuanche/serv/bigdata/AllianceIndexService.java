@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.validation.constraints.Max;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,12 @@ public class AllianceIndexService{
     public List<Map> getCarOnlineDuration(SAASIndexQuery saasIndexQuery){
         try {
             List<Map> result = new ArrayList();
+            MaxAndMinId maxAndMinId = carMeasureDayExMapper.queryMaxAndMinId(saasIndexQuery.getStartDate(),saasIndexQuery.getEndDate());
+
+            if(maxAndMinId != null){
+                saasIndexQuery.setMinId(maxAndMinId.getMinId());
+                saasIndexQuery.setMaxId(maxAndMinId.getMaxId());
+            }
             List<StatisticSection> statisticSections = carMeasureDayExMapper.getCarOnlineDuration(saasIndexQuery);
             if (!CollectionUtils.isEmpty(statisticSections)){
                 for(StatisticSection statisticSection : statisticSections){
@@ -57,6 +64,11 @@ public class AllianceIndexService{
     public List<Map> getCarOperateStatistics(SAASIndexQuery saasIndexQuery){
         try {
             List<Map> result = new ArrayList();
+            MaxAndMinId maxAndMinId = carMeasureDayExMapper.queryMaxAndMinId(saasIndexQuery.getStartDate(),saasIndexQuery.getEndDate());
+            if(maxAndMinId != null){
+                saasIndexQuery.setMinId(maxAndMinId.getMinId());
+                saasIndexQuery.setMaxId(maxAndMinId.getMaxId());
+            }
             List<StatisticSection> statisticSections = carMeasureDayExMapper.getCarOperateStatistics(saasIndexQuery);
             if (!CollectionUtils.isEmpty(statisticSections)){
                 for(StatisticSection statisticSection : statisticSections){
@@ -81,6 +93,11 @@ public class AllianceIndexService{
     public List<Map> getOrderNumStatistic(SAASIndexQuery saasIndexQuery){
         try {
             List<Map> result = new ArrayList();
+            MaxAndMinId maxAndMinId = carMeasureDayExMapper.queryMaxAndMinId(saasIndexQuery.getStartDate(),saasIndexQuery.getEndDate());
+            if(maxAndMinId != null){
+                saasIndexQuery.setMinId(maxAndMinId.getMinId());
+                saasIndexQuery.setMaxId(maxAndMinId.getMaxId());
+            }
             List<StatisticSection> statisticSections = carMeasureDayExMapper.getOrderNumStatistic(saasIndexQuery);
             if (!CollectionUtils.isEmpty(statisticSections)){
                 for(StatisticSection statisticSection : statisticSections){
@@ -104,9 +121,23 @@ public class AllianceIndexService{
     public List<Map> getCiOrderNumStatistic(SAASIndexQuery saasIndexQuery){
         try {
             List<Map> result = new ArrayList();
+            MaxAndMinId saasMaxAndMinId = biSaasCiDeviceDayExMapper.queryMaxAndMinId(saasIndexQuery.getStartDate(),saasIndexQuery.getEndDate());
+            if(saasMaxAndMinId != null){
+                saasIndexQuery.setMinId(saasMaxAndMinId.getMinId());
+                saasIndexQuery.setMaxId(saasMaxAndMinId.getMaxId());
+            }
             Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery);
             if(supplierDriverCount>0){//查询加盟商下是否有安装ci的司机  有
+                if(saasMaxAndMinId != null ){
+                    saasIndexQuery.setMinId(saasMaxAndMinId.getMinId());
+                    saasIndexQuery.setMaxId(saasMaxAndMinId.getMaxId());
+                }
                 List<CiOrderStatisticSection> statisticSections = biSaasCiDeviceDayExMapper.getCiOrderNumStatistic(saasIndexQuery);
+                MaxAndMinId meaMaxAndMinId = carMeasureDayExMapper.queryMaxAndMinId(saasIndexQuery.getStartDate(),saasIndexQuery.getEndDate());
+                if(meaMaxAndMinId != null){
+                    saasIndexQuery.setMinId(meaMaxAndMinId.getMinId());
+                    saasIndexQuery.setMaxId(meaMaxAndMinId.getMaxId());
+                }
                 List<StatisticSection> statisticSectionsOld = carMeasureDayExMapper.getOrderNumStatistic(saasIndexQuery);
                 if(statisticSections.size()!=statisticSectionsOld.size()){
                     if (!CollectionUtils.isEmpty(statisticSections)){
@@ -144,6 +175,10 @@ public class AllianceIndexService{
                     }
                 }
             }else{////查询加盟商下是否有安装ci的司机  无安装ci的司机，去全部加盟商
+                if(saasMaxAndMinId != null){
+                    saasIndexQuery.setMinId(saasMaxAndMinId.getMinId());
+                    saasIndexQuery.setMaxId(saasMaxAndMinId.getMaxId());
+                }
                 List<CiOrderStatisticSection> statisticSectionsAll = biSaasCiDeviceDayExMapper.getCiOrderNumStatistic(saasIndexQuery);
                 if (!CollectionUtils.isEmpty(statisticSectionsAll)){
                     for(CiOrderStatisticSection all : statisticSectionsAll){
@@ -177,9 +212,21 @@ public class AllianceIndexService{
     public List<Map> getCiServiceBadEvaNumStatistic(SAASIndexQuery saasIndexQuery){
         try {
             List<Map> result = new ArrayList();
+            MaxAndMinId maxAndMinId = biSaasCiDeviceDayExMapper.queryMaxAndMinId(saasIndexQuery.getStartDate(),saasIndexQuery.getEndDate());
+            if(maxAndMinId != null){
+                saasIndexQuery.setMinId(maxAndMinId.getMinId());
+                saasIndexQuery.setMaxId(maxAndMinId.getMaxId());
+            }
             Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery);
             if(supplierDriverCount>0){//查询加盟商下是否有安装ci的司机  有
+
                 List<CiOrderStatisticSection> rateList = biSaasCiDeviceDayExMapper.getCiServiceNegativeRate(saasIndexQuery);
+
+                MaxAndMinId meaMaxAndMinId = carMeasureDayExMapper.queryMaxAndMinId(saasIndexQuery.getStartDate(),saasIndexQuery.getEndDate());
+                if(meaMaxAndMinId != null){
+                    saasIndexQuery.setMinId(meaMaxAndMinId.getMinId());
+                    saasIndexQuery.setMaxId(meaMaxAndMinId.getMaxId());
+                }
                 List<StatisticSection> rateListOld = carMeasureDayExMapper.getServiceNegativeRate(saasIndexQuery);
                 if(rateList.size()!=rateListOld.size()){
                     if (!CollectionUtils.isEmpty(rateList)){
@@ -226,7 +273,16 @@ public class AllianceIndexService{
                     }
                 }
             }else{////查询加盟商下是否有安装ci的司机  无安装ci的司机，去全部加盟商
+                MaxAndMinId meauMaxAndMinId = carMeasureDayExMapper.queryMaxAndMinId(saasIndexQuery.getStartDate(),saasIndexQuery.getEndDate());
+                if(meauMaxAndMinId != null){
+                    saasIndexQuery.setMinId(meauMaxAndMinId.getMinId());
+                    saasIndexQuery.setMaxId(meauMaxAndMinId.getMaxId());
+                }
                 List<StatisticSection> statisticSections = carMeasureDayExMapper.getServiceNegativeRate(saasIndexQuery);
+                if(maxAndMinId != null){
+                    saasIndexQuery.setMinId(maxAndMinId.getMinId());
+                    saasIndexQuery.setMaxId(maxAndMinId.getMaxId());
+                }
                 List<CiOrderStatisticSection> rateListAll = biSaasCiDeviceDayExMapper.getCiServiceNegativeRate(saasIndexQuery);
                 if (!CollectionUtils.isEmpty(rateListAll)){
                     for(int i =0 ;i<rateListAll.size();i++){
@@ -272,9 +328,21 @@ public class AllianceIndexService{
      */
     public List<SAASCoreIndexPercentDto> getCiCoreIndexStatistic(SAASIndexQuery saasIndexQuery,String startDate, String endDate,String allianceId,String motorcadeId,List<String> visibleAllianceIds,List<String> visibleMotocadeIds,long dateDiff){
        try{
-           List<SAASCoreIndexDto> saasCoreIndexDtoList = carMeasureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff);
+
+           MaxAndMinId scoreIds = carMeasureDayExMapper.queryMaxAndMinId(startDate,endDate);
+           if(scoreIds == null){
+               scoreIds = new MaxAndMinId(0,1);
+           }
+            List<SAASCoreIndexDto> saasCoreIndexDtoList = carMeasureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff,scoreIds.getMinId(),scoreIds.getMaxId());
+           MaxAndMinId maxAndMinId = biSaasCiDeviceDayExMapper.queryMaxAndMinId(startDate,endDate);
+           if(maxAndMinId != null){
+               saasIndexQuery.setMinId(maxAndMinId.getMinId());
+               saasIndexQuery.setMaxId(maxAndMinId.getMaxId());
+           }else {
+               maxAndMinId = new MaxAndMinId(0,1);
+           }
            Integer supplierDriverCount = biSaasCiDeviceDayExMapper.getInstallCiDrierNum(saasIndexQuery);
-           List<SAASCoreIndexPercentDto> list = biSaasCiDeviceDayExMapper.getCiCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff);
+           List<SAASCoreIndexPercentDto> list = biSaasCiDeviceDayExMapper.getCiCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleAllianceIds,visibleMotocadeIds,dateDiff,maxAndMinId.getMinId(),maxAndMinId.getMaxId());
            if("0".equals(list.get(0).getDriverNum())){
                List<SAASCoreIndexPercentDto> zeroList = new ArrayList<>();
                logger.info("加盟商下面没有司机============");
@@ -289,7 +357,7 @@ public class AllianceIndexService{
                zeroList.add(s);
                return zeroList;
            }
-           List<SAASAllCoreIndexPercentDto> allList = biSaasCiDeviceDayExMapper.getCiAllCoreIndexStatistic(startDate,endDate);
+           List<SAASAllCoreIndexPercentDto> allList = biSaasCiDeviceDayExMapper.getCiAllCoreIndexStatistic(startDate,endDate,maxAndMinId.getMinId(),maxAndMinId.getMaxId());
            if(supplierDriverCount>0) {//查询加盟商下是否有安装ci的司机  有
                if (!CollectionUtils.isEmpty(list)) {
                    for (SAASCoreIndexPercentDto p : list) {
@@ -453,7 +521,11 @@ public class AllianceIndexService{
                            BigDecimal eciFactOverAmountb = new BigDecimal(allList.get(0).getCiFactOverAmount());
                            BigDecimal factOverAmountb = new BigDecimal(p.getFactOverAmount());
                            BigDecimal amountTotalSub = eciFactOverAmountb.divide(eciDriverNumb, 5, BigDecimal.ROUND_HALF_UP).multiply(driverNumb).subtract(factOverAmountb);
-                           p.setIncomeAmountPercent(amountTotalSub.multiply(new BigDecimal(100)).divide(factOverAmountb, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           if(factOverAmountb.compareTo(BigDecimal.ZERO)==0){
+                               p.setIncomeAmountPercent("0%");
+                           }else {
+                               p.setIncomeAmountPercent(amountTotalSub.multiply(new BigDecimal(100)).divide(factOverAmountb, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           }
                        }catch (Exception e){
                            logger.info("全部加盟ci计算计算司机端总流水百分比，分母为0",e);
                            p.setIncomeAmountPercent("0%");
@@ -464,7 +536,12 @@ public class AllianceIndexService{
                            BigDecimal eciOrderNumb = new BigDecimal(allList.get(0).getCiOrderNum());
                            BigDecimal vehTotalFlag = eciOrderNumb.divide(eciDriverNumb, 5, BigDecimal.ROUND_HALF_UP);
                            BigDecimal vehTotalSub = vehTotalFlag.subtract(orderPerVehicle);
-                           p.setOrderPerVehiclePercent(vehTotalSub.multiply(new BigDecimal(100)).divide(orderPerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           if(orderPerVehicle.compareTo(BigDecimal.ZERO) == 0){
+                               p.setOrderPerVehiclePercent("0%");
+                           }else {
+                               p.setOrderPerVehiclePercent(vehTotalSub.multiply(new BigDecimal(100)).divide(orderPerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+
+                           }
                        }catch (Exception e){
                            logger.info("全部加盟ci计算计算车均订单百分比，分母为0",e);
                            p.setOrderPerVehiclePercent("0%");
@@ -476,7 +553,11 @@ public class AllianceIndexService{
                            BigDecimal eciIncomeFactOverAmountb = new BigDecimal(allList.get(0).getCiFactOverAmount());
                            BigDecimal incomeFlag = eciIncomeFactOverAmountb.divide(eciDriverNumb, 5, BigDecimal.ROUND_HALF_UP);
                            BigDecimal incomeSub = incomeFlag.subtract(incomePerVehicle);
-                           p.setIncomePerVehiclePercent(incomeSub.multiply(new BigDecimal(100)).divide(incomePerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           if(incomePerVehicle.compareTo(BigDecimal.ZERO) == 0){
+                               p.setIncomePerVehiclePercent("0%");
+                           }else {
+                               p.setIncomePerVehiclePercent(incomeSub.multiply(new BigDecimal(100)).divide(incomePerVehicle, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           }
                        }catch (Exception e){
                            logger.info("全部加盟ci计算计算车均流水百分比，分母为0",e);
                            p.setIncomePerVehiclePercent("0%");
@@ -488,7 +569,11 @@ public class AllianceIndexService{
                            BigDecimal ebadEvaluateAllNum = new BigDecimal(allList.get(0).getCiBadEvaluateAllNum());
                            BigDecimal ciBadEvaluateAllFlag = ebadEvaluateAllNum.divide(eciDriverNumb, 10, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
                            BigDecimal ciBadEvaluateAllSub = ciBadEvaluateAllFlag.subtract(badEvaluateAllNum);
-                           p.setBadEvaluateAllNumPercent(ciBadEvaluateAllSub.multiply(new BigDecimal(100)).divide(badEvaluateAllNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           if(badEvaluateAllNum.compareTo(BigDecimal.ZERO) == 0){
+                               p.setBadEvaluateAllNumPercent("0%");
+                           }else {
+                               p.setBadEvaluateAllNumPercent(ciBadEvaluateAllSub.multiply(new BigDecimal(100)).divide(badEvaluateAllNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           }
                        }catch (Exception e){
                            logger.info("全部加盟ci计算计算差评单量百分比，分母为0",e);
                            p.setBadEvaluateAllNumPercent("0%");
@@ -500,7 +585,11 @@ public class AllianceIndexService{
                            BigDecimal ebadEvaluateNum = new BigDecimal(allList.get(0).getCiBadEvaluateNum());
                            BigDecimal ciBadEvaluateFlag = ebadEvaluateNum.divide(eciDriverNumb, 10, BigDecimal.ROUND_HALF_UP).multiply(driverNumb);
                            BigDecimal ciBadEvaluateSub = ciBadEvaluateFlag.subtract(badEvaluateNum);
-                           p.setBadEvaluateNumPercent(ciBadEvaluateSub.multiply(new BigDecimal(100)).divide(badEvaluateNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           if(badEvaluateNum.compareTo(BigDecimal.ZERO) == 0){
+                               p.setBadEvaluateNumPercent("0%");
+                           }else {
+                               p.setBadEvaluateNumPercent(ciBadEvaluateSub.multiply(new BigDecimal(100)).divide(badEvaluateNum, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           }
                        }catch (Exception e){
                            logger.info("全部加盟ci计算计算有效差评单量百分比，分母为0",e);
                            p.setBadEvaluateNumPercent("0%");
@@ -513,7 +602,11 @@ public class AllianceIndexService{
                            BigDecimal eciBadEvaluateNoChannel = new BigDecimal(allList.get(0).getCiOrderCntNotChannel());
                            BigDecimal badEvaluateNoChannelFlag = ebadEvaluateNum2.divide(eciBadEvaluateNoChannel, 10, BigDecimal.ROUND_HALF_UP);
                            BigDecimal badEvaluateNoChannelSub = badEvaluateNoChannelFlag.subtract(badEvaluateNoChannelRate);
-                           p.setCriticismRatePercent(badEvaluateNoChannelSub.multiply(new BigDecimal(100)).divide(badEvaluateNoChannelRate, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           if(badEvaluateNoChannelRate.compareTo(BigDecimal.ZERO) == 0){
+                               p.setCriticismRatePercent("0%");
+                           }else{
+                               p.setCriticismRatePercent(badEvaluateNoChannelSub.multiply(new BigDecimal(100)).divide(badEvaluateNoChannelRate, 2, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                           }
                        }catch (Exception e){
                            logger.info("全部加盟ci计算计算差评率百分比，分母为0",e);
                            p.setCriticismRatePercent("0%");
@@ -538,6 +631,11 @@ public class AllianceIndexService{
     public List<Map> getServiceNegativeRate(SAASIndexQuery saasIndexQuery){
         try {
             List<Map> result = new ArrayList();
+            MaxAndMinId maxAndMinId = carMeasureDayExMapper.queryMaxAndMinId(saasIndexQuery.getStartDate(),saasIndexQuery.getEndDate());
+            if(maxAndMinId != null){
+                saasIndexQuery.setMinId(maxAndMinId.getMinId());
+                saasIndexQuery.setMaxId(maxAndMinId.getMaxId());
+            }
             List<StatisticSection> statisticSections = carMeasureDayExMapper.getServiceNegativeRate(saasIndexQuery);
             if (!CollectionUtils.isEmpty(statisticSections)){
                 for(StatisticSection statisticSection : statisticSections){

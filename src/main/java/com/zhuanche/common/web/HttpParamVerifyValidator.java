@@ -102,8 +102,19 @@ public class HttpParamVerifyValidator {
 		}
 		return null;
 	}
-	
-	
+
+
+	/**最大值限制**/
+	public String maxLength( String value , String maxLength) {
+		if(StringUtils.isEmpty(value)){
+			return null;
+		}
+		if( value.length() >  Integer.valueOf(maxLength)) {
+			return "传入值"+value+"长度过长,允许的最大长度为"+maxLength ;
+		}
+		return null;
+	}
+
 	
 	public static void main(String[] args) throws Exception {
 		StringBuffer sb = new StringBuffer();

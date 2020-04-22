@@ -80,6 +80,14 @@
     customer_appraisal ca
     WHERE
       ca.create_at &lt;= NOW()
+
+    <if test="minId !=null and minId != 0">
+      and ca.id  >= #{minId}
+    </if>
+    <if test="maxId !=null and maxId != 0">
+      AND ca.id &lt;= #{maxId}
+    </if>
+
     <if test="appraisalStatus!=null">
       AND ca.appraisal_status = #{appraisalStatus}
     </if>
@@ -158,9 +166,15 @@
     id
     from customer_appraisal
     <where>
+      <if test="minId !=null and minId != 0">
+        and id  >= #{minId}
+      </if>
+      <if test="maxId !=null and maxId != 0">
+        and id  &lt;= #{maxId}
+      </if>
       <if test="appraisalStatus!=null">
       AND appraisal_status = #{appraisalStatus}
-    </if>
+      </if>
       <if test="evaluateScore !=null and evaluateScore !=''">
         AND evaluate_score in (${evaluateScore})
       </if>

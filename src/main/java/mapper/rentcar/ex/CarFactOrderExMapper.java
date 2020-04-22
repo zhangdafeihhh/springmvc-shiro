@@ -17,7 +17,7 @@ public interface CarFactOrderExMapper {
      * @param orderId
      * @return
      */
-    public CarBizOrderSettleEntity selectDriverSettleByOrderId(Long orderId);
+//    public CarBizOrderSettleEntity selectDriverSettleByOrderId(Long orderId);
     /**
      * 
      */
@@ -48,9 +48,9 @@ public interface CarFactOrderExMapper {
     public List<ServiceTypeDTO> selectServiceEntityList(ServiceEntity serviceEntity);
 
 	//查询order_cost_detail
-	public CarFactOrderInfo selectOrderCostDetailByOrderId(Long orderId);
-	//查询car_biz_order_cost_detail_extension
-	public CarFactOrderInfo selectOrderCostExtension(Long orderId);
+//	public CarFactOrderInfo selectOrderCostDetailByOrderId(Long orderId);
+	//查询car_biz_order_ cost_detail_extension
+//	public CarFactOrderInfo selectOrderCostExtension(Long orderId);
 	//查询PaymentCustomer
 	public Double selectPaymentCustomer( String orderNo);
 	//查询PaymentDriver
@@ -59,6 +59,6 @@ public interface CarFactOrderExMapper {
 	public Double selectPartnerPayAmount( String orderNo);
 	//查询dissent
 	public CarFactOrderInfo selectDissent(Long orderId);
-	//查询car_biz_order_settle_detail_extension
-	public CarFactOrderInfo selectOrderSettleDetail(Long orderId);
+	//查询car_biz_order_ settle_detail_extension
+//	public CarFactOrderInfo selectOrderSettleDetail(Long orderId);
 }

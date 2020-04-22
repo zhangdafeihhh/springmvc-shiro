@@ -30,4 +30,8 @@ public class SAASIndexQuery {
 
     private int dateDiff;//日期相差几天
 
+    private Integer minId;
+
+    private Integer maxId;
+
 }

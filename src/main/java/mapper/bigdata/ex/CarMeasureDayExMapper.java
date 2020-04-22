@@ -1,5 +1,6 @@
 package mapper.bigdata.ex;
 
+import com.zhuanche.entity.bigdata.MaxAndMinId;
 import com.zhuanche.entity.bigdata.SAASCoreIndexDto;
 import com.zhuanche.entity.bigdata.SAASIndexQuery;
 import com.zhuanche.entity.bigdata.StatisticSection;
@@ -31,6 +32,9 @@ public interface CarMeasureDayExMapper {
      * @param motorcadeId
      * @param visibleAllianceIds
      * @param visibleMotocadeIds
+     * @param dateDiff
+     * @param minId
+     * @param maxId
      * @return
      */
     List<SAASCoreIndexDto> getCoreIndexStatistic(@Param("startDate") String startDate,
@@ -39,6 +43,12 @@ public interface CarMeasureDayExMapper {
                                                  @Param("motorcadeId")String motorcadeId,
                                                  @Param("visibleAllianceIds")List<String> visibleAllianceIds,
                                                  @Param("visibleMotocadeIds")List<String> visibleMotocadeIds,
-                                                 @Param("dateDiff")long dateDiff);
+                                                 @Param("dateDiff")long dateDiff,
+                                                 @Param("minId")Integer minId,
+                                                 @Param("maxId")Integer maxId);
+
+    /**查询指定日期最小值**/
+    MaxAndMinId queryMaxAndMinId(@Param("startDate") String startDate, @Param("endDate")String endDate);
+
 
 }

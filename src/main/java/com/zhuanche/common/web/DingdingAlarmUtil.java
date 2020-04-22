@@ -37,9 +37,6 @@ public class DingdingAlarmUtil {
         JSONObject isAtAll = new JSONObject();
         isAtAll.put("atMobiles",false);
         JSONObject atMobiles = new JSONObject();
-        /*JSONArray jsonArray = new JSONArray();
-        jsonArray.add("13552448009");
-        atMobiles.put("atMobiles",jsonArray);*/
         jsonObject.put("at",isAtAll);
         jsonObject.put("at",atMobiles);
 
@@ -56,17 +53,5 @@ public class DingdingAlarmUtil {
             }
         });
 
-/*        MpOkHttpUtil.okHttpPostJsonAsync(dingding_token_url, jsonObject.toJSONString(), 0, null, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-
-                logger.info("钉钉消息发送失败！失败信息:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                logger.info("钉钉消息发送成功!" + response.toString());
-            }
-        });*/
     }
 }

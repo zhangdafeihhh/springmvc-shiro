@@ -2,26 +2,24 @@ package com.zhuanche.serv;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rpc.RPCResponse;
-import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
-import com.zhuanche.dto.rentcar.DriverDispatchScoreGeneralize;
-import com.zhuanche.dto.rentcar.DriverIntegralDispatchScoreGeneralize;
+import com.zhuanche.dto.rentcar.*;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.DateUtil;
-import com.zhuanche.util.DateUtils;
-import com.zhuanche.util.MobileOverlayUtil;
+import com.zhuanche.util.*;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
@@ -35,6 +33,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,6 +47,16 @@ import java.util.stream.Collectors;
 public class DriverDispatchScoreService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    /**
+     * 父派单分类型缓存key
+     */
+    private static final String PARENT_DISPATCH_SCORE_TYPE = "mp_manage_parent_dispatch_score_type";
+
+    /**
+     * 子派单分类型缓存key
+     */
+    private static final String CHILD_DISPATCH_SCORE_TYPE = "mp_manage_child_dispatch_score_type:";
 
     @Value("${driver.integral.url}")
     private String driverIntegral;
@@ -126,6 +135,289 @@ public class DriverDispatchScoreService {
         buildDispatchScoreGeneralize(dispatchScoreGeneralizeList);
 
         return new PageDTO(page, pageSize, total, dispatchScoreGeneralizeList);
+    }
+
+    /**
+     * 查询司机派单分每日更新记录<br>
+     *     注意，只能查询3个月内的数据
+     *
+     * @param driverDispatchScoreDailyUpdateRecordQuery 司机派单分每日更新记录查询条件
+     * @return List<DriverDispatchScoreDailyUpdateRecord> 司机派单分每日更新记录集合
+     */
+    public List<DriverDispatchScoreDailyUpdateRecord> queryDispatchScoreDailyUpdateRecord(DriverDispatchScoreDailyUpdateRecordQuery driverDispatchScoreDailyUpdateRecordQuery){
+
+        Map<String, Object> paramMap = new HashMap<>(4);
+        paramMap.put("driverId",driverDispatchScoreDailyUpdateRecordQuery.getDriverId());
+        paramMap.put("startDay",driverDispatchScoreDailyUpdateRecordQuery.getUpdateTime().replace("-",""));
+        paramMap.put("endDay",driverDispatchScoreDailyUpdateRecordQuery.getEndUpdateTime().replace("-",""));
+
+        String result = queryDataByIntegralApi("/paidanfen2/getDayByDriverId",paramMap);
+        if(StringUtils.isBlank(result)){
+            return null;
+        }
+
+        List<DriverIntegralDispatchScoreDailyUpdateRecord> list = JSONArray.parseArray(result,DriverIntegralDispatchScoreDailyUpdateRecord.class);
+        if(CollectionUtils.isEmpty(list)){
+            return null;
+        }
+
+        List<DriverDispatchScoreDailyUpdateRecord> recordList = Lists.newArrayListWithCapacity(list.size());
+        list.forEach(x -> {
+            DriverDispatchScoreDailyUpdateRecord record = new DriverDispatchScoreDailyUpdateRecord();
+            record.buildDriverId(x.getDriverId())
+                    .buildDriverName(driverDispatchScoreDailyUpdateRecordQuery.getDriverName())
+                    .buildDriverPhone(driverDispatchScoreDailyUpdateRecordQuery.getDriverPhone())
+                    .buildCurrentDispatchScore(String.valueOf(x.getTotalScore()))
+                    .buildServiceBaseScore(String.valueOf(x.getServiceScore()))
+                    .buildServiceAccelerateScore(String.valueOf(x.getServGrowthScore()))
+                    .buildTimeLengthBaseScore(String.valueOf(x.getDurationScore()))
+                    .buildTimeLengthAccelerateScore(String.valueOf(x.getDuraGrowthScore()))
+                    .buildBadBehaviorDeductionScore(String.valueOf(x.getBadScore()))
+                    .buildChangeScore(String.valueOf(x.getChangeScore()))
+                    .buildUpdateDate(DateUtil.getStringDate(x.getUpdateTime()));
+
+            recordList.add(record);
+        });
+
+        return recordList;
+    }
+
+    /**
+     * 分页查询司机派单分明细记录<br>
+     *     调用策略工具组提供的接口获得，接口wiki：http://inside-yapi.01zhuanche.com/project/187/interface/api/23808
+     *
+     * @param queryCondition 司机派单分明细记录查询条件
+     * @return PageDTO 司机派单分明细记录分页结果
+     */
+    public PageDTO queryPageDriverDispatchScoreDetailRecord(DriverDispatchScoreDetailRecordQuery queryCondition){
+
+        Map<String, Object> paramMap = new HashMap<>(8);
+        paramMap.put("driverId",queryCondition.getDriverId());
+        paramMap.put("pageNo",queryCondition.getPage());
+        paramMap.put("pageSize",queryCondition.getPageSize());
+
+        if(StringUtils.isNotBlank(queryCondition.getOrderNo())){
+            paramMap.put("orderNo",queryCondition.getOrderNo());
+        }
+        if(StringUtils.isNotBlank(queryCondition.getStartDate())){
+            paramMap.put("startDate",queryCondition.getStartDate());
+        }
+        if(StringUtils.isNotBlank(queryCondition.getEndDate())){
+            paramMap.put("endDate",queryCondition.getEndDate());
+        }
+        if(StringUtils.isNotBlank(queryCondition.getType())){
+            paramMap.put("type",queryCondition.getType());
+        }else{
+            if(StringUtils.isNotBlank(queryCondition.getParentDispatchScoreType())){
+                List<DriverIntegralDispatchScoreType> childList = queryChildDispatchScoreType(Integer.valueOf(queryCondition.getParentDispatchScoreType()));
+                if(CollectionUtils.isNotEmpty(childList)){
+                    List<Integer> childCodeList = childList.stream().map(DriverIntegralDispatchScoreType::getCode).collect(Collectors.toList());
+                    paramMap.put("typeList",StringUtils.join(childCodeList,","));
+                }
+            }
+        }
+
+        Map<String,String> resultMap = queryPageByIntegralApi("/paidanfen2/getDetailByType",paramMap);
+        if(MapUtils.isEmpty(resultMap)){
+            return new PageDTO(queryCondition.getPage(), queryCondition.getPageSize(), 0, null);
+        }
+
+        List<DriverDispatchScoreDetailRecord> list = JSONArray.parseArray(resultMap.get("data"),DriverDispatchScoreDetailRecord.class);
+        if(CollectionUtils.isEmpty(list)){
+            return new PageDTO(queryCondition.getPage(), queryCondition.getPageSize(), 0, null);
+        }
+
+        list.forEach(x -> {
+            x.setDriverName(queryCondition.getDriverName());
+            x.setDriverPhone(queryCondition.getDriverPhone());
+        });
+
+        return new PageDTO(queryCondition.getPage(), queryCondition.getPageSize(), Integer.valueOf(resultMap.get("total")), list);
+    }
+
+    /**
+     * 查询司机服务分计算明细
+     *
+     * @param driverId 司机ID
+     * @param driverName 司机姓名
+     * @param driverPhone 司机手机号
+     * @param ownershipDate 所属日期，示例：2020-02-28
+     * @param serviceScore 当前ownershipDate总服务分
+     * @return List<DriverServiceScoreCalculateDetail> 司机服务分计算明细
+     */
+    public DriverServiceScoreCalculateGeneralize queryDriverServiceScoreCalculateDetail(Integer driverId,String driverName,String driverPhone,String ownershipDate,String serviceScore) {
+
+        DriverServiceScoreCalculateGeneralize generalize = new DriverServiceScoreCalculateGeneralize();
+        generalize.setServiceScore(new BigDecimal(serviceScore));
+        //基础服务分固定为50
+        generalize.setTotalBaseServiceScore(new BigDecimal("50"));
+        generalize.setOwnershipDate(ownershipDate);
+
+        DriverServiceScoreCalculateDetail defaultServiceScoreCalculateDetail = new DriverServiceScoreCalculateDetail();
+        defaultServiceScoreCalculateDetail.setDriverId(driverId);
+        defaultServiceScoreCalculateDetail.setDriverName(driverName);
+        defaultServiceScoreCalculateDetail.setDriverPhone(driverPhone);
+        defaultServiceScoreCalculateDetail.setDay(ownershipDate);
+
+        Map<String, Object> paramMap = new HashMap<>(2);
+        paramMap.put("driverId",driverId);
+        paramMap.put("date",ownershipDate);
+
+        String data = queryDataByIntegralApi("/paidanfen2/serviceDetail",paramMap);
+        if(StringUtils.isBlank(data)){
+            generalize.setCalculateDetailList(Lists.newArrayList(defaultServiceScoreCalculateDetail));
+            return generalize;
+        }
+
+        JSONObject obj = JSONObject.parseObject(data);
+        if(null == obj.get("serviceScoreHistoryList")){
+            generalize.setCalculateDetailList(Lists.newArrayList(defaultServiceScoreCalculateDetail));
+            return generalize;
+        }
+
+        String serviceScoreHistoryList = String.valueOf(obj.get("serviceScoreHistoryList"));
+        List<DriverServiceScoreCalculateDetail> list = JSONArray.parseArray(serviceScoreHistoryList,DriverServiceScoreCalculateDetail.class);
+        if(CollectionUtils.isEmpty(list)){
+            generalize.setCalculateDetailList(Lists.newArrayList(defaultServiceScoreCalculateDetail));
+            return generalize;
+        }
+
+        //按照日期倒序
+        list = list.stream().sorted(Comparator.comparing(DriverServiceScoreCalculateDetail::getDay).reversed()).collect(Collectors.toList());
+
+        for(DriverServiceScoreCalculateDetail detail : list){
+            detail.setDriverId(driverId);
+            detail.setDriverName(driverName);
+            detail.setDriverPhone(driverPhone);
+        }
+
+        generalize.setCalculateDetailList(list);
+        return generalize;
+    }
+
+    /**
+     * 查询司机时长分计算明细
+     *
+     * @param driverId 司机ID
+     * @param driverName 司机姓名
+     * @param driverPhone 司机手机号
+     * @param day 所属日期，示例：2020-02-28
+     * @param timeLengthScore 当前day的时长分
+     * @return List<DriverTimeLengthScoreCalculateDetail> 司机时长分计算明细
+     */
+    public DriverTimeLengthScoreCalculateGeneralize queryDriverTimeLengthScoreCalculateDetail(Integer driverId, String driverName, String driverPhone,
+                                                                                              String day,String timeLengthScore) {
+
+        Map<String, Object> paramMap = new HashMap<>(2);
+        paramMap.put("driverId",driverId);
+        paramMap.put("date",day);
+
+        String data = queryDataByIntegralApi("/paidanfen2/durationDetail",paramMap);
+        if(StringUtils.isBlank(data)){
+            return null;
+        }
+
+        JSONObject obj = JSONObject.parseObject(data);
+        if(null == obj.get("durationScoreHistoryList")){
+            return null;
+        }
+
+        String durationScoreHistoryList = String.valueOf(obj.get("durationScoreHistoryList"));
+        List<DriverTimeLengthScoreCalculateDetail> list = JSONArray.parseArray(durationScoreHistoryList,DriverTimeLengthScoreCalculateDetail.class);
+        if(CollectionUtils.isEmpty(list)){
+            return null;
+        }
+
+        //按照日期倒序
+        list = list.stream().sorted(Comparator.comparing(DriverTimeLengthScoreCalculateDetail::getDay).reversed()).collect(Collectors.toList());
+
+        for(DriverTimeLengthScoreCalculateDetail detail : list){
+            detail.setDriverId(driverId);
+            detail.setDriverName(driverName);
+            detail.setDriverPhone(driverPhone);
+        }
+
+        DriverTimeLengthScoreCalculateDetail currentDayCalculateDetail = list.get(0);
+
+        DriverTimeLengthScoreCalculateGeneralize generalize = new DriverTimeLengthScoreCalculateGeneralize();
+        generalize.setDurationScore(new BigDecimal(timeLengthScore));
+        //基础时长分固定为50
+        generalize.setTotalBaseDurationScore(new BigDecimal("50"));
+        generalize.setDay(day);
+        generalize.setCalculateDetailList(list);
+
+        return generalize;
+    }
+
+    /**
+     * 查询父派单分类型
+     *
+     * @return List<DriverIntegralDispatchScoreType> 父派单分类型
+     */
+    public List<DriverIntegralDispatchScoreType> queryParentDispatchScoreType(){
+        List<DriverIntegralDispatchScoreType> list;
+
+        String value = RedisCacheUtil.get(PARENT_DISPATCH_SCORE_TYPE,String.class);
+        if(StringUtils.isNotBlank(value)){
+            list = JSON.parseArray(value,DriverIntegralDispatchScoreType.class);
+            if(CollectionUtils.isNotEmpty(list)){
+                return list;
+            }
+        }
+
+        String data = queryDataByIntegralApi("/paidanfen2/typeList",null);
+        if(StringUtils.isBlank(data)){
+            return Lists.newArrayList();
+        }
+
+
+        list = JSON.parseArray(data,DriverIntegralDispatchScoreType.class);
+        if(CollectionUtils.isEmpty(list)){
+            return Lists.newArrayList();
+        }
+
+        RedisCacheUtil.set(PARENT_DISPATCH_SCORE_TYPE,data,600);
+
+        return list;
+    }
+
+    /**
+     * 查询子派单分类型
+     *
+     * @param parentType 父派单分类型编码
+     * @return List<DriverIntegralDispatchScoreType> 子派单分类型
+     */
+    public List<DriverIntegralDispatchScoreType> queryChildDispatchScoreType(Integer parentType) {
+
+        if(null == parentType){
+            return Lists.newArrayList();
+        }
+
+        List<DriverIntegralDispatchScoreType> list;
+
+        String value = RedisCacheUtil.get(CHILD_DISPATCH_SCORE_TYPE + parentType,String.class);
+        if(StringUtils.isNotBlank(value)){
+            list = JSON.parseArray(value,DriverIntegralDispatchScoreType.class);
+            if(CollectionUtils.isNotEmpty(list)){
+                return list;
+            }
+        }
+
+        Map<String, Object> paramMap = new HashMap<>(2);
+        paramMap.put("type",parentType);
+        String data = queryDataByIntegralApi("/paidanfen2/detailTypeList",paramMap);
+        if(StringUtils.isBlank(data)){
+            return Lists.newArrayList();
+        }
+
+        list = JSON.parseArray(data,DriverIntegralDispatchScoreType.class);
+        if(CollectionUtils.isEmpty(list)){
+            return Lists.newArrayList();
+        }
+
+        RedisCacheUtil.set(CHILD_DISPATCH_SCORE_TYPE + parentType,data,600);
+
+        return list;
     }
 
     /**
@@ -357,6 +649,41 @@ public class DriverDispatchScoreService {
         }
 
         return String.valueOf(apiResponse.getData());
+    }
+
+    private Map<String,String> queryPageByIntegralApi(String path, Map<String, Object> paramMap){
+
+        String url = driverIntegral + path;
+        String param = JSON.toJSONString(paramMap);
+
+        logger.info("DriverDispatchScoreServiceImpl queryPageByIntegralApi: url:{},paramMap:{}",url,param);
+        String result = MpOkHttpUtil.okHttpGet(url, paramMap,2,path);
+        logger.info("DriverDispatchScoreServiceImpl queryPageByIntegralApi: url:{},paramMap:{},result:{}",url,param,result);
+
+        if(StringUtils.isBlank(result)){
+            return null;
+        }
+
+        JSONObject obj = JSONObject.parseObject(result);
+        if(null == obj){
+            return null;
+        }
+
+        if(!obj.getInteger("code").equals(0)){
+            logger.info("DriverDispatchScoreServiceImpl queryPageByIntegralApi: request fail,url:{},paramMap:{},result:{}",url,param,result);
+            return null;
+        }
+
+        Map<String,String> map = new HashMap<>(2);
+        map.put("data",String.valueOf(obj.get("data")));
+        map.put("total","0");
+
+        JSONObject page = obj.getJSONObject("page");
+        if(null != page){
+            map.put("total",String.valueOf(null != page.get("total") ? page.get("total") : 0));
+        }
+
+        return map;
     }
 
 }

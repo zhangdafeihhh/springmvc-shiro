@@ -25,10 +25,20 @@ public interface BiSaasCiDeviceDayExMapper {
                                                  @Param("motorcadeId")String motorcadeId,
                                                  @Param("visibleAllianceIds")List<String> visibleAllianceIds,
                                                  @Param("visibleMotocadeIds")List<String> visibleMotocadeIds,
-                                                 @Param("dateDiff")long dateDiff);
+                                                 @Param("dateDiff")long dateDiff,
+                                                 @Param("minId")Integer minId,
+                                                 @Param("maxId")Integer maxId);
 
-    List<SAASAllCoreIndexPercentDto> getCiAllCoreIndexStatistic(@Param("startDate") String startDate, @Param("endDate")String endDate);
+    List<SAASAllCoreIndexPercentDto> getCiAllCoreIndexStatistic(@Param("startDate") String startDate,
+                                                                @Param("endDate")String endDate,
+                                                                @Param("minId")Integer minId,
+                                                                @Param("maxId")Integer maxId);
 
     List<CiOrderStatisticSection> getCiServiceNegativeRate(SAASIndexQuery saasIndexQuery);
     CiServiceBadEvaluateAllStatisticSection getAllCiServiceNegativeRate(@Param("findDate")String findDate);
+
+    /**查询指定日期最大和最小id值**/
+    MaxAndMinId queryMaxAndMinId(@Param("startDate") String startDate,@Param("endDate")String endDate);
+
+
 }
