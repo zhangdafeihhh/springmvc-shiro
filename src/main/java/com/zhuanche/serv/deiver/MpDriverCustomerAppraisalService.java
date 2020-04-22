@@ -122,17 +122,25 @@ public class MpDriverCustomerAppraisalService {
         String orderFinishTimeEnd = params.getOrderFinishTimeEnd();
         if (StringUtils.isNotEmpty(createDateBegin)){
             params.setCreateDateBegin(createDateBegin + " 00:00:00");
-            params = this.getMinId(params);
-        }
+         }
         if (StringUtils.isNotEmpty(createDateEnd)){
             params.setCreateDateEnd(createDateEnd + " 23:59:59");
-            params = this.getMaxId(params);
         }
         if (StringUtils.isNotEmpty(orderFinishTimeBegin)){
             params.setOrderFinishTimeBegin(orderFinishTimeBegin + " 00:00:00");
+            //如果是线上环境
+            //如果是2018以及之后
+            if(env.equals("pre") || env.equals("online")){
+                params = this.getMinId(params);
+            }
+
         }
         if (StringUtils.isNotEmpty(orderFinishTimeEnd)){
             params.setOrderFinishTimeEnd(orderFinishTimeEnd + " 23:59:59");
+            if(env.equals("pre") || env.equals("online")){
+                params = this.getMaxId(params);
+            }
+
         }
         return customerAppraisalExMapper.queryIds(params);
     }
