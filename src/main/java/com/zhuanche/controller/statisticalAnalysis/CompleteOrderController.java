@@ -73,6 +73,7 @@ public class CompleteOrderController{
 	                                              String motorcardId,
 	                                              String hotelId,
 	                                              String driverId,
+	                                              Integer supplierId,
 	                                              Integer distributorId,
 	                                              @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                              @Verify(param = "pageSize",rule = "required") Integer pageSize){
@@ -117,6 +118,10 @@ public class CompleteOrderController{
             }
             if(distributorId != null){
                 paramMap.put("distributorId",distributorId);
+            }
+
+            if(supplierId != null){
+                paramMap.put("allianceId",supplierId);
             }
             // 数据权限设置
             paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap, cityId, allianceId, motorcardId);
@@ -181,6 +186,7 @@ public class CompleteOrderController{
                                          String motorcardId,
                                          String hotelId,
                                          String driverId,
+                                         Integer supplierId,
                                          Integer distributorId,
                                          HttpServletRequest request,
                                          HttpServletResponse response){
@@ -226,6 +232,10 @@ public class CompleteOrderController{
                 }
                 if(distributorId != null){
                     paramMap.put("distributorId",distributorId);
+                }
+                if(supplierId != null){
+                    //匹配大数据那边的字段
+                    paramMap.put("allianceId",supplierId);
                 }
 
 		  		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
