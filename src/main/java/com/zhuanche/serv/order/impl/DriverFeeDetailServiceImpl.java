@@ -225,7 +225,8 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
             logger.info("查询订单明细，入参订单号：" + orderNos);
             return null;
         }
-        return JSON.parseArray(JSON.toJSONString(orderResponse.getData()), OrderCostDetailInfo.class);
+        List<OrderCostDetailInfo> list = JSON.parseArray(JSON.toJSONString(orderResponse.getData()), OrderCostDetailInfo.class);
+        return list;
     }
 
     /**

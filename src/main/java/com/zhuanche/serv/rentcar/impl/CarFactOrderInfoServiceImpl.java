@@ -13,6 +13,7 @@ import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.driverOrderRecord.OrderTimeEntity;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.order.DriverFeeDetailService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.Common;
@@ -212,7 +213,8 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 		String url = orderCostUrl+Common.COST_ORDER_DETAIL+"?"+paramsStr;
 		//String url01 =  "http://test-inside-charge.01zhuanche.com/orderCostdetail/getCostDetail?orderId=26985&serviceId=1";
 		try {
-			result = HttpClientUtil.buildGetRequest(url).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
+			//result = HttpClientUtil.buildGetRequest(url).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
+			result = MpOkHttpUtil.okHttpGet(url,0,null);
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
 				logger.info("调用计费接口" + url + "返回结果为null");
@@ -227,7 +229,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 					return job.get("data").toString();
 				}
 			}
-		} catch (HttpException e) {
+		} catch (Exception e) {
 			logger.error("调用计费接口" + url + "异常", e);
  		}
 		return result;
