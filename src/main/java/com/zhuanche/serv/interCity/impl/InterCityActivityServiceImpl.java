@@ -167,6 +167,19 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
                      jsonObject.put("cityName","");
 
                  }
+
+
+                 if(jsonObject.get("groupId") != null && jsonObject.getInteger("groupId") > 0){
+                        Integer groupId = jsonObject.getInteger("groupId");
+                        String groupName = groupExMapper.getGroupNameByGroupId(groupId);
+                        jsonObject.put("groupName",groupName);
+                    }else {
+                        jsonObject.put("groupName","");
+
+                    }
+
+
+
                 }
             }
         }
