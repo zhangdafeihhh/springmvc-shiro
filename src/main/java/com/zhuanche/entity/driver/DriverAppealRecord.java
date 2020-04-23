@@ -128,6 +128,18 @@ public class DriverAppealRecord {
 
     private Integer ywAutoStatus;
 
+    private Date cgExpireDate;
+
+    public Date getCgExpireDate() {
+        return cgExpireDate;
+    }
+
+    public void setCgExpireDate(Date cgExpireDate) {
+        this.cgExpireDate = cgExpireDate;
+    }
+
+
+
 
     public Integer getYwAutoStatus() {
         return ywAutoStatus;
