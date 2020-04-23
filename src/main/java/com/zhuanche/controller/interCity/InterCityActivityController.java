@@ -33,13 +33,13 @@ public class InterCityActivityController {
     @RequestMapping(value = "/queryList")
     @ResponseBody
     public AjaxResponse queryList(Integer groupId,
-                                  Integer disCountStatus,
+                                  Integer discountStatus,
                                   Integer ruleId,
                                   @Verify(param = "pageNo",rule="required|min(0)")Integer pageNo,
                                   @Verify(param = "pageSize",rule="required|min(10)")Integer pageSize){
-        logger.info("查询城际拼车立减优惠活动入参:{},{},{}",groupId,disCountStatus,ruleId);
+        logger.info("查询城际拼车立减优惠活动入参:{},{},{}",groupId,discountStatus,ruleId);
 
-        PageDTO pageDTO = activityService.queryList(groupId,disCountStatus,ruleId,pageNo,pageSize);
+        PageDTO pageDTO = activityService.queryList(groupId,discountStatus,ruleId,pageNo,pageSize);
 
         AjaxResponse ajaxResponse = AjaxResponse.success(pageDTO);
 
