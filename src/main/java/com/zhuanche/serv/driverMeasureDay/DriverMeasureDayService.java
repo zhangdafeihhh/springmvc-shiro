@@ -16,10 +16,10 @@ import java.util.List;
  * @Description:
  */
 @Service
-public class BiDriverMeasureDayService {
+public class DriverMeasureDayService {
 
     @Autowired
-    private BiDriverMeasureDayMapper biDriverMeasureDayMapper;
+    private BiDriverMeasureDayMapper driverMeasureDayMapper;
 
     public String getResponsibleComplaintRate(String startDate, String endDate,  String allianceId){
         BiDriverMeasureDay params = new BiDriverMeasureDay();
@@ -36,8 +36,8 @@ public class BiDriverMeasureDayService {
             params.setSupplierIds("");
         }
 
-        Integer numerator = biDriverMeasureDayMapper.countNumerator(params);
-        Integer denominator = biDriverMeasureDayMapper.countDenominator(params);
+        Integer numerator = driverMeasureDayMapper.countNumerator(params);
+        Integer denominator = driverMeasureDayMapper.countDenominator(params);
         if(denominator != 0){
             Double rate = div(numerator, denominator, 4);
             rate = rate*100;

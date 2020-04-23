@@ -15,7 +15,7 @@ import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.bigdata.AllianceIndexService;
 import com.zhuanche.serv.common.CitySupplierTeamService;
-import com.zhuanche.serv.driverMeasureDay.BiDriverMeasureDayService;
+import com.zhuanche.serv.driverMeasureDay.DriverMeasureDayService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
@@ -88,7 +88,7 @@ public class HomeKanBanController {
 	AllianceIndexService allianceIndexService;
 
 	@Autowired
-	private BiDriverMeasureDayService biDriverMeasureDayService;
+	private DriverMeasureDayService driverMeasureDayService;
 
 	/** 日均运营车辆统计查询接口 **/
 	@RequestMapping("/operatingVehicleStatistics")
@@ -820,7 +820,7 @@ public class HomeKanBanController {
 
 		// 从大数据仓库获取统计数据
 		try {
-			String responsibleComplaintRate= biDriverMeasureDayService.getResponsibleComplaintRate(startDate,endDate, allianceId);
+			String responsibleComplaintRate= driverMeasureDayService.getResponsibleComplaintRate(startDate,endDate, allianceId);
 			//获取有责投诉率
 			if(responsibleComplaintRate != null && !("").equals(responsibleComplaintRate)){
 				RedisCacheUtil.set(key,responsibleComplaintRate,3600*24);
