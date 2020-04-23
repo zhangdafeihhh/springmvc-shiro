@@ -1,6 +1,7 @@
 package com.zhuanche.serv.driverMeasureDay;
 
 import com.zhuanche.entity.bigdata.BiDriverMeasureDay;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.bigdata.BiDriverMeasureDayMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,26 +20,25 @@ public class BiDriverMeasureDayService {
     @Autowired
     private BiDriverMeasureDayMapper biDriverMeasureDayMapper;
 
-
-    public List<BiDriverMeasureDay> getRecordList(BiDriverMeasureDay params){
-        return biDriverMeasureDayMapper.getRecordList(params);
+    public String getResponsibleComplaintRate(String startDate, String endDate,  String allianceId){
+        //BiDriverMeasureDay params = new BiDriverMeasureDay();
+        //params.setStartDate(startDate);
+        //params.setEndDate(endDate);
+        //params.setSupplierId(Integer.valueOf(allianceId));
+        //String suppliers = WebSessionUtil.getCurrentLoginUser().getSupplierIds().toString();
+        //params.setSupplierIds(suppliers);
+        //
+        //Integer numerator = biDriverMeasureDayMapper.countNumerator(params);
+        //Integer denominator = biDriverMeasureDayMapper.countDenominator(params);
+        //if(denominator != 0){
+        //    Double rate = div(numerator, denominator, 4);
+        //    rate = rate*100;
+        //    String result = rate.toString()+"%";
+        //    return result;
+        //}
+        return "0";
     }
 
-    public Double count(List<BiDriverMeasureDay> lists){
-        if(lists != null && lists.size() >0){
-            Integer finishClOrderNumCount = 0;
-            Integer responsibleComplaintNumCount = 0;
-            for(BiDriverMeasureDay b: lists){
-                finishClOrderNumCount+=b.getFinishClOrderNum();
-                responsibleComplaintNumCount+=b.getResponsibleComplaintNum();
-            }
-            if(finishClOrderNumCount==0){
-                return 0.00;
-            }
-            return div(responsibleComplaintNumCount, finishClOrderNumCount,4);
-        }
-        return 0.00;
-    }
 
     public static double div(Integer v1,Integer v2,int scale){
         if(scale<0){
