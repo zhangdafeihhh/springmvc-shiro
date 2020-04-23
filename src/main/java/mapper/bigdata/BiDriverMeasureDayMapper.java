@@ -19,7 +19,7 @@ public interface BiDriverMeasureDayMapper {
     int updateByPrimaryKey(BiDriverMeasureDay record);
 
 
-    //Integer countNumerator(BiDriverMeasureDay params);
+    Integer countNumerator(BiDriverMeasureDay params);
     //
-    //Integer countDenominator(BiDriverMeasureDay params);
+    Integer countDenominator(BiDriverMeasureDay params);
 }

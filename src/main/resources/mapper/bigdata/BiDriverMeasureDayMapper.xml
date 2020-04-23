@@ -271,52 +271,32 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
-<!--  <select id="countNumerator" parameterType="com.zhuanche.entity.bigdata.BiDriverMeasureDay" resultType="java.lang.Integer">-->
-<!--    select sum(responsible_complaint_num)-->
-<!--    form bi_driver_measure_day-->
-<!--    <where>-->
-<!--      data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}-->
-<!--      <if test="supplierIds != null and supplierIds.size >0">-->
-<!--        <if test="supplierId != null and supplierId != ''">-->
-<!--          and supplier_id = #{supplierId}-->
-<!--        </if>-->
-<!--        <if test="supplierId == null or supplierId == ''">-->
-<!--          and supplier_id in-->
-<!--          <foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">-->
-<!--            #{item}-->
-<!--          </foreach>-->
-<!--        </if>-->
-<!--      </if>-->
-<!--      <if test="supplierIds == null or supplierIds.size ==0">-->
-<!--        <if test="supplierId != null and supplierId != ''">-->
-<!--          and supplier_id = #{supplierId}-->
-<!--        </if>-->
-<!--      </if>-->
-<!--    </where>-->
-<!--  </select>-->
+  <select id="countNumerator" parameterType="com.zhuanche.entity.bigdata.BiDriverMeasureDay" resultType="java.lang.Integer">
+    select sum(responsible_complaint_num)
+    from bi_driver_measure_day
+    <where>
+      data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+        <if test="supplierIds != null and supplierIds !=''">
+            and supplier_id in (${supplierIds})
+        </if>
+        <if test="supplierId != null">
+            and supplier_id = #{supplierId}
+        </if>
+    </where>
+  </select>
 
-<!--  <select id="countDenominator" parameterType="com.zhuanche.entity.bigdata.BiDriverMeasureDay" resultType="java.lang.Integer">-->
-<!--    select sum(finish_cl_order_num)-->
-<!--    form bi_driver_measure_day-->
-<!--    <where>-->
-<!--      data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}-->
-<!--      <if test="supplierIds != null and supplierIds.size >0">-->
-<!--        <if test="supplierId != null and supplierId != ''">-->
-<!--          and supplier_id = #{supplierId}-->
-<!--        </if>-->
-<!--        <if test="supplierId == null or supplierId == ''">-->
-<!--          and supplier_id in-->
-<!--          <foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">-->
-<!--            #{item}-->
-<!--          </foreach>-->
-<!--        </if>-->
-<!--      </if>-->
-<!--      <if test="supplierIds == null or supplierIds.size ==0">-->
-<!--        <if test="supplierId != null and supplierId != ''">-->
-<!--          and supplier_id = #{supplierId}-->
-<!--        </if>-->
-<!--      </if>-->
-<!--    </where>-->
-<!--  </select>-->
+  <select id="countDenominator" parameterType="com.zhuanche.entity.bigdata.BiDriverMeasureDay" resultType="java.lang.Integer">
+    select sum(finish_cl_order_num)
+    from bi_driver_measure_day
+    <where>
+     data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+      <if test="supplierIds != null and supplierIds !=''">
+          and supplier_id in (${supplierIds})
+      </if>
+      <if test="supplierId != null">
+          and supplier_id = #{supplierId}
+      </if>
+    </where>
+  </select>
 
 </mapper>
