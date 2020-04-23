@@ -4,7 +4,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.serv.driverMeasureDay.BiDriverMeasureDayService;
+import com.zhuanche.serv.driverMeasureDay.DriverMeasureDayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,14 +21,14 @@ public class BiDriverMeasureDayController extends BaseController {
 
 
     @Autowired
-    private BiDriverMeasureDayService biDriverMeasureDayService;
+    private DriverMeasureDayService driverMeasureDayService;
 
 
     @RequestMapping("/count")
     public AjaxResponse count(@Verify(param = "startDate", rule = "required") String startDate,
                               @Verify(param = "endDate", rule = "required") String endDate, String allianceId, String motorcadeId){
         try {
-            String result = biDriverMeasureDayService.getResponsibleComplaintRate(startDate,endDate, allianceId);
+            String result = driverMeasureDayService.getResponsibleComplaintRate(startDate,endDate, allianceId);
             return AjaxResponse.success(result);
         }
         catch (Exception e){
