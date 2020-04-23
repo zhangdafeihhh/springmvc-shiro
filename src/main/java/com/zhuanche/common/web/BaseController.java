@@ -4,8 +4,11 @@ import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.CarBizCityService;
 import com.zhuanche.serv.CarBizSupplierService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -74,4 +77,16 @@ public class BaseController {
 			e.printStackTrace();
 		}
 	}
+
+	public void exportExcelFromTemplet(HttpServletRequest request, HttpServletResponse response, Workbook wb, String fileName) throws IOException {
+		if(StringUtils.isEmpty(fileName)) {
+			fileName = "exportExcel";
+		}
+		response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		ServletOutputStream os =  response.getOutputStream();
+		wb.write(os);
+		os.close();
+	}
+
 }

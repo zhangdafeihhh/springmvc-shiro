@@ -23,9 +23,16 @@ public class SAASCoreIndexDto {
 
     private String badEvaluateAllNum; //差评单量
 
+    private String responsibleComplaintRate; //有责投诉率
 
 
+    public String getResponsibleComplaintRate() {
+        return responsibleComplaintRate;
+    }
 
+    public void setResponsibleComplaintRate(String responsibleComplaintRate) {
+        this.responsibleComplaintRate = responsibleComplaintRate;
+    }
 
     public String getRegistVehicleAmount() {
         return registVehicleAmount;
