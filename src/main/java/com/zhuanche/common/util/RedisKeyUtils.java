@@ -20,6 +20,8 @@ public class RedisKeyUtils {
 
     public static final String CORE_STATISTICS = "core_indicators_statistics"; //核心指标统计
 
+    public static final String RESPONSIBLE_RATE_STATISTICS = "responsible_complaint_rate_statistics"; //有责指标统计
+
     public static final String CORE_STATISTICS_CI = "core_indicators_statistics_ci_"; //核心指标统计
 
     public static final String SAAS_DAILY_REPORT = "saas_daily_report_"; //saas月报查询

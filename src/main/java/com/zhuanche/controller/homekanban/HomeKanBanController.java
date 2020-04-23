@@ -15,6 +15,7 @@ import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.bigdata.AllianceIndexService;
 import com.zhuanche.serv.common.CitySupplierTeamService;
+import com.zhuanche.serv.driverMeasureDay.BiDriverMeasureDayService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
@@ -85,6 +86,9 @@ public class HomeKanBanController {
 
 	@Autowired
 	AllianceIndexService allianceIndexService;
+
+	@Autowired
+	private BiDriverMeasureDayService biDriverMeasureDayService;
 
 	/** 日均运营车辆统计查询接口 **/
 	@RequestMapping("/operatingVehicleStatistics")
@@ -696,17 +700,12 @@ public class HomeKanBanController {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-
 		String key = null;
-
 		try {
 			//如果城市权限为空（说明是全国的权限），且数据权限为全国 则缓存一天数据。如果不是，缓存key值为当前登录用户+时间+allianceId+motorcadeId
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-
 			key = "";
 			StringBuffer stringBuffer = new StringBuffer();
-
-
 			if(CollectionUtils.isEmpty(currentLoginUser.getCityIds()) && currentLoginUser.getLevel().equals(PermissionLevelEnum.ALL.getCode())){
 				//
 				key = RedisKeyUtils.CORE_STATISTICS + stringBuffer.append(startDate).append(endDate).append(allianceId).append(motorcadeId).toString().replaceAll("null","");
@@ -773,6 +772,8 @@ public class HomeKanBanController {
  			List<SAASCoreIndexDto> saasCoreIndexDtoList = measureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleList,visibleMotoIdsList,dateDiff,
 					scoreMaxAndMinId== null?null:scoreMaxAndMinId.getMinId(),scoreMaxAndMinId== null?null:scoreMaxAndMinId.getMaxId());
 
+			//获取有责投诉率
+
 			if(CollectionUtils.isNotEmpty(saasCoreIndexDtoList)){
 				RedisCacheUtil.set(key,saasCoreIndexDtoList.get(0),3600*24);
 				return AjaxResponse.success(saasCoreIndexDtoList.get(0));
@@ -781,6 +782,54 @@ public class HomeKanBanController {
 			}
 		} catch (Exception e) {
 			logger.error("查询首页统计错误异常", e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
+	}
+
+	/** 有责统计 **/
+	@RequestMapping("/countResponsibleComplaintRate")
+	@ResponseBody
+	public AjaxResponse countResponsibleComplaintRate(@Verify(param = "startDate", rule = "required") String startDate,
+												 @Verify(param = "endDate", rule = "required") String endDate, String allianceId) {
+
+		String key = null;
+		try {
+			//如果城市权限为空（说明是全国的权限），且数据权限为全国 则缓存一天数据。如果不是，缓存key值为当前登录用户+时间+allianceId
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+			key = "";
+			StringBuffer stringBuffer = new StringBuffer();
+			if(CollectionUtils.isEmpty(currentLoginUser.getCityIds()) && currentLoginUser.getLevel().equals(PermissionLevelEnum.ALL.getCode())){
+				//
+				key = RedisKeyUtils.RESPONSIBLE_RATE_STATISTICS + stringBuffer.append(startDate).append(endDate).append(allianceId).toString().replaceAll("null","");
+				String  responsibleComplaintRate = RedisCacheUtil.get(key,String.class);
+				if(RedisCacheUtil.exist(key) && responsibleComplaintRate != null && !("").equals(responsibleComplaintRate)){
+					return  AjaxResponse.success(responsibleComplaintRate);
+				}
+			}else {
+				key = RedisKeyUtils.RESPONSIBLE_RATE_STATISTICS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate)
+						.append(allianceId).toString().replaceAll("null","");
+				String  responsibleComplaintRate = RedisCacheUtil.get(key,String.class);
+				if(RedisCacheUtil.exist(key) && responsibleComplaintRate != null && !("").equals(responsibleComplaintRate)){
+					return AjaxResponse.success(responsibleComplaintRate);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("缓存查询错误",e);
+			RedisCacheUtil.delete(key);
+		}
+
+		// 从大数据仓库获取统计数据
+		try {
+			String responsibleComplaintRate= biDriverMeasureDayService.getResponsibleComplaintRate(startDate,endDate, allianceId);
+			//获取有责投诉率
+			if(responsibleComplaintRate != null && !("").equals(responsibleComplaintRate)){
+				RedisCacheUtil.set(key,responsibleComplaintRate,3600*24);
+				return AjaxResponse.success(responsibleComplaintRate);
+			}else {
+				return AjaxResponse.success(null);
+			}
+		} catch (Exception e) {
+			logger.error("查询有责统计异常", e);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
 	}
