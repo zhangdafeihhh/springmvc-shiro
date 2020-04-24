@@ -41,6 +41,8 @@ public class DriverMeasureDayService {
         if(denominator != 0){
             Double rate = div(numerator, denominator, 4);
             rate = rate*100;
+            BigDecimal rate1 = new BigDecimal(rate);
+            rate = rate1.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
             String result = rate.toString()+"%";
             return result;
         }
