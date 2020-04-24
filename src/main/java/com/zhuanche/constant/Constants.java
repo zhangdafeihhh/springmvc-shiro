@@ -118,4 +118,7 @@ public final class Constants {
 
 	/**新城际拼车类型**/
 	public static final Integer INTEGER_SERVICE_TYPE = 68;
+	/**调用预估价标志**/
+	public static final String SAAS_PRECE = "saas_pc";
+
 }
