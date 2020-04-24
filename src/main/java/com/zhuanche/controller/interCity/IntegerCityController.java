@@ -12,6 +12,7 @@ import com.zhuanche.common.util.LbsSignUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.controller.driver.YueAoTongPhoneConfig;
 import com.zhuanche.dto.mdbcarmanage.InterCityOrderDTO;
 import com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO;
@@ -2640,7 +2641,7 @@ public class IntegerCityController {
             map.put("numberOfDays", 0);//多日接送:新增天数
             map.put("numberOfCarpoolSeats", riderCount);//疑问 是总座位不是？
             map.put("isUseAmountSign", true);//是否是一口价  true  false
-            map.put("source", null);//如果是费用预估页 为h5
+            map.put("source", Constants.SAAS_PRECE);//如果是费用预估页 为h5
             map.put("useExpandFee", false);//是否启用价格策略用户感知功能 默认false
             //map.put("areaId",);//重庆万州需求。如果有这个ID城市就用areaId
             JSONObject jsoParam = new JSONObject();
