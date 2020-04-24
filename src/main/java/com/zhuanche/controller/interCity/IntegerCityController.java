@@ -298,7 +298,7 @@ public class IntegerCityController {
         map.put("distributorId", distributorId);
 
         if(StringUtils.isNotEmpty(isCrossDiscountReduction)){
-            map.put("isCrossDiscountReduction", 1);
+            map.put("isCrossDiscountReduction", isCrossDiscountReduction);
         }
         if(StringUtils.isNotEmpty(lineName)){
             String ruleBatch = this.getRuleIdBatch(lineName);
