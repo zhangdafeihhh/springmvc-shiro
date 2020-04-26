@@ -115,4 +115,10 @@ public final class Constants {
 	public static final String RESULT = "result";
 
 	public static final String DRIVER_PHONE = "driverPhone";
+
+	/**新城际拼车类型**/
+	public static final Integer INTEGER_SERVICE_TYPE = 68;
+	/**调用预估价标志**/
+	public static final String SAAS_PRECE = "saas_pc";
+
 }

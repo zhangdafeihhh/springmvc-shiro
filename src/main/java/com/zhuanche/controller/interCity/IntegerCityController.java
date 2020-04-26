@@ -12,6 +12,7 @@ import com.zhuanche.common.util.LbsSignUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.controller.driver.YueAoTongPhoneConfig;
 import com.zhuanche.dto.mdbcarmanage.InterCityOrderDTO;
 import com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO;
@@ -212,7 +213,8 @@ public class IntegerCityController {
                                    String riderPhone,
                                    String distributorId,
                                    String lineName,
-                                   String bookingDateSort) {
+                                   String bookingDateSort,
+                                   String isCrossDiscountReduction) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},supplierId:{3},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
@@ -296,6 +298,9 @@ public class IntegerCityController {
         map.put("riderPhone", riderPhone);
         map.put("distributorId", distributorId);
 
+        if(StringUtils.isNotEmpty(isCrossDiscountReduction)){
+            map.put("isCrossDiscountReduction", isCrossDiscountReduction);
+        }
         if(StringUtils.isNotEmpty(lineName)){
             String ruleBatch = this.getRuleIdBatch(lineName);
             if(StringUtils.isEmpty(ruleBatch)){
@@ -2636,7 +2641,7 @@ public class IntegerCityController {
             map.put("numberOfDays", 0);//多日接送:新增天数
             map.put("numberOfCarpoolSeats", riderCount);//疑问 是总座位不是？
             map.put("isUseAmountSign", true);//是否是一口价  true  false
-            map.put("source", null);//如果是费用预估页 为h5
+            map.put("source", Constants.SAAS_PRECE);//如果是费用预估页 为h5
             map.put("useExpandFee", false);//是否启用价格策略用户感知功能 默认false
             //map.put("areaId",);//重庆万州需求。如果有这个ID城市就用areaId
             JSONObject jsoParam = new JSONObject();
