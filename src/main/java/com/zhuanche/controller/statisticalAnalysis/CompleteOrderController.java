@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.util.MobileOverlayUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,6 +126,15 @@ public class CompleteOrderController{
             }
             // 数据权限设置
             paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap, cityId, allianceId, motorcardId);
+
+
+            //如果选择了城际拼车并且选择了供应商
+            if(StringUtils.isNotEmpty(productId) && Constants.INTEGER_SERVICE_TYPE.toString().equals(productId)){
+                if(supplierId != null && supplierId > 0){
+                    //visibleCityIds
+                    paramMap.remove("visibleCityIds");
+                }
+            }
             if (paramMap == null) {
                 return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
             }
@@ -242,7 +252,14 @@ public class CompleteOrderController{
 				if(paramMap==null){
 					return;
 				}
-    			
+
+                //如果选择了城际拼车并且选择了供应商
+                if(StringUtils.isNotEmpty(productId) && Constants.INTEGER_SERVICE_TYPE.toString().equals(productId)){
+                    if(supplierId != null && supplierId > 0){
+                        //visibleCityIds
+                        paramMap.remove("visibleCityIds");
+                    }
+                }
 	          String jsonString = JSON.toJSONString(paramMap);
 	          
 			  statisticalAnalysisService.exportCsvFromToPage(
