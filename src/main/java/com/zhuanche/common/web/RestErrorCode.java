@@ -343,6 +343,17 @@ public final class RestErrorCode{
 
 	//-------------------金融商品--end---------------------------
 
+
+
+	@ResultMessage("订单完成时间参数不匹配")
+	public static final int ORDER_PARAM_ERROR                 =81001;
+
+
+
+
+
+
+
 	@ResultMessage("请稍后再试,禁止频繁使用！")
 	public static final int SEND_MSG_LOCK=90001;
 	@ResultMessage("圈外司机消息通知频繁,请{0}分钟后再次发送")
