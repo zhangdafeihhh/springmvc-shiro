@@ -2781,7 +2781,7 @@ public class IntegerCityController {
 
         Map<String, Object> map = Maps.newHashMap();
         map.put("pageNo", 1);
-        map.put("pageSize", 1000);
+        map.put("pageSize", 30);
         map.put("status", 13);
         map.put("pushDriverType", pushDriverType);
         map.put("orderType", orderSource);

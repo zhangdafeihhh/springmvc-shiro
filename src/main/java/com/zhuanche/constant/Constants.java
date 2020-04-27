@@ -121,4 +121,6 @@ public final class Constants {
 	/**调用预估价标志**/
 	public static final String SAAS_PRECE = "saas_pc";
 
+	public static final String EROR_DATE = "NaN-NaN-NaN";
+
 }
