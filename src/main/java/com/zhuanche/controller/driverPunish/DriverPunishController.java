@@ -6,11 +6,13 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.entity.bigdata.MaxAndMinId;
 import com.zhuanche.entity.driver.DriverAppealRecord;
 import com.zhuanche.entity.driver.DriverPunishDto;
 import com.zhuanche.serv.driverPunish.DriverPunishService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.DateUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -112,7 +114,17 @@ public class DriverPunishController extends BaseController {
                     return;
                 }
             }
-            
+
+            String endDate = DateUtils.formatDate(new Date(),DateUtils.dateTimeFormat_parttern);
+            Date startDate = DateUtils.afterMonth(new Date(),-3);
+            String start = DateUtils.formatDate(startDate,DateUtils.dateTimeFormat_parttern);
+
+            MaxAndMinId maxAndMinId = driverPunishService.queryMaxAndMin(start,endDate);
+            if(maxAndMinId != null){
+                params.setMaxId(maxAndMinId.getMaxId());
+                params.setMinId(maxAndMinId.getMinId());
+            }
+
             Integer pageIndex =1;
             params.setPagesize(200);
             params.setPage(pageIndex);
