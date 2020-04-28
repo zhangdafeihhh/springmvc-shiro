@@ -347,6 +347,9 @@ public final class RestErrorCode{
 
 
 
+	@ResultMessage("请选择城市")
+	public static final int CHOOSE_CITY                 =85001;
+
 
 
 

@@ -5,9 +5,14 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.driver.DriverAppealRecord;
 import com.zhuanche.entity.driver.DriverPunishDto;
 import com.zhuanche.serv.driverPunish.DriverPunishService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author:qxx
@@ -43,8 +45,23 @@ public class DriverPunishController extends BaseController {
 
     @RequestMapping("/getDriverPunishList")
     public AjaxResponse getDriverPunishList(DriverPunishDto params){
+
+
+        if(params.getCityId() == null){
+            log.info("请选择城市");
+            return AjaxResponse.fail(RestErrorCode.CHOOSE_CITY);
+
+        }
         try {
             log.info("查询列表,参数为--{}", params.toString());
+
+            SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
+            if(ssoLoginUser.getSupplierIds() != null && ssoLoginUser.getSupplierIds().size()>0 ){
+                Set<Integer> set = ssoLoginUser.getSupplierIds();
+                String supplierIds = StringUtils.join(set.toArray(), Constants.SEPERATER);
+                params.setSupplierIds(supplierIds);
+            }
+
             PageInfo<DriverPunishDto> page = driverPunishService.selectList(params);
             PageDTO pageDTO = new PageDTO(params.getPage(), params.getPagesize(), page.getTotal(), page.getList());
             return AjaxResponse.success(pageDTO);
@@ -80,10 +97,22 @@ public class DriverPunishController extends BaseController {
         try {
             log.info("导出列表,参数为--{}", params.toString());
             //数据层权限
-            //CustomUserDetails user = ToolUtils.getSecurityUser();
-            //params.setCities(user.getCities());
-            //params.setSupplierIds(user.getSuppliers());
-            //params.setTeamIds(user.getTeamId());
+            if(params.getCityId() == null){
+                SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
+                if(CollectionUtils.isNotEmpty(ssoLoginUser.getSupplierIds())){
+                    Set<Integer> set = ssoLoginUser.getSupplierIds();
+                    String supplierIds = StringUtils.join(set.toArray(), Constants.SEPERATER);
+                    params.setSupplierIds(supplierIds);
+                }else if(CollectionUtils.isNotEmpty(ssoLoginUser.getCityIds())){
+                    Set<Integer> set = ssoLoginUser.getCityIds();
+                    String cityIds = StringUtils.join(set.toArray(),Constants.SEPERATER);
+                    params.setCities(cityIds);
+                }else  {
+                    log.info("======数据权限过大,无法导出=======");
+                    return;
+                }
+            }
+            
             Integer pageIndex =1;
             params.setPagesize(200);
             params.setPage(pageIndex);
