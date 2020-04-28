@@ -5,11 +5,13 @@ import com.alibaba.druid.support.logging.LogFactory;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.entity.bigdata.MaxAndMinId;
 import com.zhuanche.entity.driver.DriverAppealRecord;
 import com.zhuanche.entity.driver.DriverPunishDto;
 import com.zhuanche.util.DateUtils;
 import mapper.driver.DriverAppealRecordMapper;
 import mapper.driver.ex.DriverPunishExMapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -193,6 +195,10 @@ public class DriverPunishService {
             }
         }
         return wb;
+    }
+
+    public MaxAndMinId queryMaxAndMin(String startDate, String endDate){
+        return driverPunishExMapper.queryMaxAndMin(startDate,endDate);
     }
 
 }
