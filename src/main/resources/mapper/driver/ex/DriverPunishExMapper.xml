@@ -127,7 +127,7 @@
     order by create_date desc
   </select>
 
-  <select id="queryMaxAndMin" resultMap="BaseResultMap" resultType="com.zhuanche.entity.bigdata.MaxAndMinId">
+  <select id="queryMaxAndMin" resultType="com.zhuanche.entity.bigdata.MaxAndMinId">
     select min(punish_id) as minId,max(punish_id) as maxId
     from driver_punish
         where create_date >= #{startDate,jdbcType=VARCHAR} and create_date &lt;= #{endDate,jdbcType=VARCHAR}
