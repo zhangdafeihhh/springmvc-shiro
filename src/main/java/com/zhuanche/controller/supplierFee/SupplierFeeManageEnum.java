@@ -12,7 +12,8 @@ public enum  SupplierFeeManageEnum {
     BECONFIRMED(0,"待确认"),
     WAITINGTICKET(1,"待验票"),
     FAILEDTICKET(2,"验票失败"),
-    SUBSTITUTETICKET(3,"待交财务");
+    SUBSTITUTETICKET(3,"待交财务"),
+    APPLYCATCH(10,"待提现");
 
 
     private int code;
@@ -34,6 +35,8 @@ public enum  SupplierFeeManageEnum {
             case 2:
                 return FAILEDTICKET;
             case 3:
+                return SUBSTITUTETICKET;
+            case 10:
                 return SUBSTITUTETICKET;
             default:
                 return BECONFIRMED;
