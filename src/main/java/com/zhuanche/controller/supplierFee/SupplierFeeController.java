@@ -846,8 +846,8 @@ public class SupplierFeeController {
         }
 
          SupplierFeeManage supplierFeeManage = supplierFeeService.queryByOrderNo(feeOrderNo);
-        if(supplierFeeManage != null && supplierFeeManage.getStatus()!=0){
-            logger.info("状态不是待确认状态，不能进行提现申请");
+        if(supplierFeeManage != null && supplierFeeManage.getStatus()!= SupplierFeeManageEnum.APPLYCATCH.getCode()){
+            logger.info("状态不是待提现状态，不能进行提现申请");
             return AjaxResponse.fail(RestErrorCode.APPLY_NOT);
         }
 
