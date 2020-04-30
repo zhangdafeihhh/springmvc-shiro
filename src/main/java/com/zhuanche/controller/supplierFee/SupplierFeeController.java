@@ -817,6 +817,8 @@ public class SupplierFeeController {
 
 
 
+    @RequestMapping("/applyCashDetail")
+    @ResponseBody
     public AjaxResponse applyCashDetail(@Verify(param = "feeOrderNo",rule = "required") String feeOrderNo){
         SupplierFeeManage supplierFeeManage = supplierFeeService.queryByOrderNo(feeOrderNo);
         if(supplierFeeManage != null){
@@ -831,6 +833,11 @@ public class SupplierFeeController {
      * @param feeOrderNo
      * @return
      */
+    @RequestMapping("/applyCash")
+    @ResponseBody
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.MASTER )
+    } )
     public AjaxResponse applyCash(@Verify(param = "feeOrderNo",rule = "required") String feeOrderNo){
         logger.info("供应商线上化申请提现，入参：" + feeOrderNo);
         SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
