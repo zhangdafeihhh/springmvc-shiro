@@ -351,7 +351,8 @@ public final class RestErrorCode{
 	public static final int CHOOSE_CITY                 =85001;
 
 
-
+	@ResultMessage("状态不是待确认状态，不能进行提现申请")
+	public static final int APPLY_NOT                 =85002;
 
 
 	@ResultMessage("请稍后再试,禁止频繁使用！")

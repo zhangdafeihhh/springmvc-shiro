@@ -168,8 +168,13 @@
   </update>
 
   <update id="updateStatusAndAmount" >
-    update supplier_fee_manage SET status = 1,amount_status = #{amountStatus}
+    update supplier_fee_manage SET status = 10,amount_status = #{amountStatus}
     WHERE fee_order_no =#{feeOrderNo}
   </update>
 
+
+  <update id="updateStatus" >
+    update supplier_fee_manage SET status = 10
+    WHERE fee_order_no =#{feeOrderNo}
+  </update>
 </mapper>

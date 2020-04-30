@@ -21,4 +21,7 @@ public interface SupplierFeeService {
     int updateStatusByFeeOrderNo(String feeOrderNo,int amountStatus);
 
     int updateStatusAndAmount(String feeOrderNo,int amountStatus,int status);
+
+
+    int updateStatus(@Param("feeOrderNo") String feeOrderNo);
 }

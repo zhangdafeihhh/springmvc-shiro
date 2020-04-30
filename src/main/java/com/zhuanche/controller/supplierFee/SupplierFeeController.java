@@ -813,4 +813,69 @@ public class SupplierFeeController {
         }
         return param;
     }
+
+
+
+
+    public AjaxResponse applyCashDetail(@Verify(param = "feeOrderNo",rule = "required") String feeOrderNo){
+        SupplierFeeManage supplierFeeManage = supplierFeeService.queryByOrderNo(feeOrderNo);
+        if(supplierFeeManage != null){
+            return AjaxResponse.success(supplierFeeManage.getTotalManageFees());
+        }
+        return AjaxResponse.success(null);
+    }
+
+
+    /**
+     * 提现申请
+     * @param feeOrderNo
+     * @return
+     */
+    public AjaxResponse applyCash(@Verify(param = "feeOrderNo",rule = "required") String feeOrderNo){
+        logger.info("供应商线上化申请提现，入参：" + feeOrderNo);
+        SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
+        if(null == ssoLoginUser){
+            return AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
+        }
+
+         SupplierFeeManage supplierFeeManage = supplierFeeService.queryByOrderNo(feeOrderNo);
+        if(supplierFeeManage != null && supplierFeeManage.getStatus()!=0){
+            logger.info("状态不是待确认状态，不能进行提现申请");
+            return AjaxResponse.fail(RestErrorCode.APPLY_NOT);
+        }
+
+        Integer loginId = ssoLoginUser.getId();
+         try {
+            SupplierFeeRecord record = new SupplierFeeRecord();
+
+            record.setOperate(SupplierFeeManageEnum.APPLYCATCH.getMsg());
+            record.setCreateTime(new Date());
+            record.setUpdateTime(new Date());
+            record.setOperateId(loginId);
+            record.setStatus(SupplierFeeManageEnum.APPLYCATCH.getCode());
+            record.setRemark(null);
+            record.setOperateUser("系统推送");
+            record.setSupplierAddress("空");
+            record.setFeeOrderNo(feeOrderNo);
+
+            int code =  recordService.insertFeeRecord(record);
+
+            if(code > 0){
+
+                int feeCode = supplierFeeService.updateStatus(feeOrderNo);
+
+                if(feeCode > 0 ){
+                    logger.info("更新状态成功");
+                }
+                logger.info("数据插入success");
+            }else {
+                logger.info("数据插入error");
+            }
+        } catch (Exception e) {
+            logger.info("供应商线上化操作异常",e);
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
+
+        return AjaxResponse.success(null);
+    }
 }
