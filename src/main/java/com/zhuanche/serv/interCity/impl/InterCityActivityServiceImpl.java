@@ -226,7 +226,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
             String linesUrl = configUrl + "/intercityCarUse/getLineIdBySupplierIds";
             Map<String, Object> params = Maps.newHashMap();
             params.put("supplierIds", supplierIdBatch);
-            String lineResult = MpOkHttpUtil.okHttpGet(linesUrl, params, 1, null);
+            String lineResult = MpOkHttpUtil.okHttpPost(linesUrl, params, 1, null);
             logger.info("配置中心供应商--{}查询路线ID集合返回结果集--{}", supplierIdBatch, lineResult);
             if (StringUtils.isNotEmpty(lineResult)) {
                 JSONObject jsonResult = JSONObject.parseObject(lineResult);
