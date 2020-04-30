@@ -174,7 +174,7 @@
 
 
   <update id="updateStatus" >
-    update supplier_fee_manage SET status = 10
+    update supplier_fee_manage SET status = 3
     WHERE fee_order_no =#{feeOrderNo}
   </update>
 </mapper>
