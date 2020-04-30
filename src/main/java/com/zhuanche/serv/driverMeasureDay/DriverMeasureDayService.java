@@ -38,7 +38,7 @@ public class DriverMeasureDayService {
 
         Integer numerator = driverMeasureDayMapper.countNumerator(params);
         Integer denominator = driverMeasureDayMapper.countDenominator(params);
-        if(denominator != 0){
+        if(denominator != null && denominator != 0){
             Double rate = div(numerator, denominator, 4);
             rate = rate*100;
             BigDecimal rate1 = new BigDecimal(rate);
