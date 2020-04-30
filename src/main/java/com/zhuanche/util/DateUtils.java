@@ -47,6 +47,23 @@ public class DateUtils {
 		}
 	}
 
+
+	 /** 得到N(N可以为负数)月后的日期
+	 */
+	public static Date afterMonth(Date theDate, int month) {
+		try {
+			if (theDate == null) {
+				return getCurrentDate();
+			}
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(theDate);
+			cal.add(Calendar.MONTH, month);
+			return cal.getTime();
+		} catch (Exception e) {
+			return getCurrentDate(); // 如果无法转化，则返回默认格式的时间。
+		}
+	}
+
 	/**
 	 * 得到N(N为小数)分钟后的日期
 	 */

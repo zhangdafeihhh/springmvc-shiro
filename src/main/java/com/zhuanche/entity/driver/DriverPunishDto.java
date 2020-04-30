@@ -1,12 +1,12 @@
-package com.zhuanche.entity.bigdata;
+package com.zhuanche.entity.driver;
 
 /**
- * @Author fanht
- * @Description
- * @Date 2020/4/15 下午9:23
- * @Version 1.0
+ * @Author:qxx
+ * @Date:2020/4/9
+ * @Description:
  */
-public class MaxAndMinId {
+public class DriverPunishDto extends  DriverPunish{
+
 
     private Integer minId;
 
@@ -25,15 +25,6 @@ public class MaxAndMinId {
     }
 
     public void setMaxId(Integer maxId) {
-        this.maxId = maxId;
-    }
-
-
-    public MaxAndMinId() {
-    }
-
-    public MaxAndMinId(Integer minId, Integer maxId) {
-        this.minId = minId;
         this.maxId = maxId;
     }
 }

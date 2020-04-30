@@ -12,6 +12,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.entity.driver.DriverAppraisalAppeal;
 import com.zhuanche.entity.driver.MpCarBizCustomerAppraisal;
@@ -91,6 +92,17 @@ public class MpOrderAppraisalController extends DriverQueryController{
                 log.info("【评价时间】范围或【完成日期】范围至少限定一个，支持跨度31天");
                 return AjaxResponse.fail(RestErrorCode.PARAMS_NOT, RestErrorCode.renderMsg(RestErrorCode.PARAMS_NOT));
             }
+
+            if(StringUtils.isNotEmpty(orderFinishTimeBegin) && Constants.EROR_DATE.equals(orderFinishTimeBegin)){
+				log.info("orderFinishTimeBegin入参错误");
+				return AjaxResponse.fail(RestErrorCode.ORDER_PARAM_ERROR, RestErrorCode.renderMsg(RestErrorCode.ORDER_PARAM_ERROR));
+
+			}
+			if(StringUtils.isNotEmpty(orderFinishTimeEnd) && Constants.EROR_DATE.equals(orderFinishTimeEnd)){
+				log.info("orderFinishTimeEnd入参错误");
+				return AjaxResponse.fail(RestErrorCode.ORDER_PARAM_ERROR, RestErrorCode.renderMsg(RestErrorCode.ORDER_PARAM_ERROR));
+
+			}
 			//封装主表查询条件
 			MpCustomerAppraisalParams params = new MpCustomerAppraisalParams(cityId, supplierId, driverName, driverPhone, orderNo,
 					createDateBegin, createDateEnd,orderFinishTimeBegin,orderFinishTimeEnd,

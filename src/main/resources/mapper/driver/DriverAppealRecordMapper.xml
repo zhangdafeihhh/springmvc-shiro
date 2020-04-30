@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.DriverAppealRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverAppealRecord" >
+    <id column="appeal_id" property="appealId" jdbcType="INTEGER" />
+    <result column="punish_id" property="punishId" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="appeal_name" property="appealName" jdbcType="VARCHAR" />
+    <result column="punish_type" property="punishType" jdbcType="INTEGER" />
+    <result column="appeal_reason" property="appealReason" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="cg_operator" property="cgOperator" jdbcType="VARCHAR" />
+    <result column="cg_operate_date" property="cgOperateDate" jdbcType="TIMESTAMP" />
+    <result column="cg_reason" property="cgReason" jdbcType="VARCHAR" />
+    <result column="cg_status" property="cgStatus" jdbcType="TINYINT" />
+    <result column="cg_expire_date" property="cgExpireDate" jdbcType="TIMESTAMP" />
+    <result column="cg_auto_status" property="cgAutoStatus" jdbcType="TINYINT" />
+    <result column="yw_operator" property="ywOperator" jdbcType="VARCHAR" />
+    <result column="yw_operate_date" property="ywOperateDate" jdbcType="TIMESTAMP" />
+    <result column="yw_show_reason" property="ywShowReason" jdbcType="VARCHAR" />
+    <result column="yw_reason" property="ywReason" jdbcType="VARCHAR" />
+    <result column="yw_status" property="ywStatus" jdbcType="TINYINT" />
+    <result column="yw_expire_date" property="ywExpireDate" jdbcType="TIMESTAMP" />
+    <result column="yw_auto_status" property="ywAutoStatus" jdbcType="TINYINT" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.driver.DriverAppealRecord" extends="BaseResultMap" >
+    <result column="appeal_picture_url" property="appealPictureUrl" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    appeal_id, punish_id, driver_id, appeal_name, punish_type, appeal_reason, status, 
+    cg_operator, cg_operate_date, cg_reason, cg_status, cg_expire_date, cg_auto_status, 
+    yw_operator, yw_operate_date, yw_show_reason, yw_reason, yw_status, yw_expire_date, 
+    yw_auto_status, create_date, update_date
+  </sql>
+  <sql id="Blob_Column_List" >
+    appeal_picture_url
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from driver_appeal_rocord
+    where appeal_id = #{appealId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from driver_appeal_rocord
+    where appeal_id = #{appealId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.DriverAppealRecord" >
+    insert into driver_appeal_rocord (appeal_id, punish_id, driver_id, 
+      appeal_name, punish_type, appeal_reason, 
+      status, cg_operator, cg_operate_date, 
+      cg_reason, cg_status, cg_expire_date, 
+      cg_auto_status, yw_operator, yw_operate_date, 
+      yw_show_reason, yw_reason, yw_status, 
+      yw_expire_date, yw_auto_status, create_date, 
+      update_date, appeal_picture_url)
+    values (#{appealId,jdbcType=INTEGER}, #{punishId,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER}, 
+      #{appealName,jdbcType=VARCHAR}, #{punishType,jdbcType=INTEGER}, #{appealReason,jdbcType=VARCHAR}, 
+      #{status,jdbcType=TINYINT}, #{cgOperator,jdbcType=VARCHAR}, #{cgOperateDate,jdbcType=TIMESTAMP}, 
+      #{cgReason,jdbcType=VARCHAR}, #{cgStatus,jdbcType=TINYINT}, #{cgExpireDate,jdbcType=TIMESTAMP}, 
+      #{cgAutoStatus,jdbcType=TINYINT}, #{ywOperator,jdbcType=VARCHAR}, #{ywOperateDate,jdbcType=TIMESTAMP}, 
+      #{ywShowReason,jdbcType=VARCHAR}, #{ywReason,jdbcType=VARCHAR}, #{ywStatus,jdbcType=TINYINT}, 
+      #{ywExpireDate,jdbcType=TIMESTAMP}, #{ywAutoStatus,jdbcType=TINYINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{appealPictureUrl,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DriverAppealRecord" >
+    insert into driver_appeal_rocord
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="appealId != null" >
+        appeal_id,
+      </if>
+      <if test="punishId != null" >
+        punish_id,
+      </if>
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="appealName != null" >
+        appeal_name,
+      </if>
+      <if test="punishType != null" >
+        punish_type,
+      </if>
+      <if test="appealReason != null" >
+        appeal_reason,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="cgOperator != null" >
+        cg_operator,
+      </if>
+      <if test="cgOperateDate != null" >
+        cg_operate_date,
+      </if>
+      <if test="cgReason != null" >
+        cg_reason,
+      </if>
+      <if test="cgStatus != null" >
+        cg_status,
+      </if>
+      <if test="cgExpireDate != null" >
+        cg_expire_date,
+      </if>
+      <if test="cgAutoStatus != null" >
+        cg_auto_status,
+      </if>
+      <if test="ywOperator != null" >
+        yw_operator,
+      </if>
+      <if test="ywOperateDate != null" >
+        yw_operate_date,
+      </if>
+      <if test="ywShowReason != null" >
+        yw_show_reason,
+      </if>
+      <if test="ywReason != null" >
+        yw_reason,
+      </if>
+      <if test="ywStatus != null" >
+        yw_status,
+      </if>
+      <if test="ywExpireDate != null" >
+        yw_expire_date,
+      </if>
+      <if test="ywAutoStatus != null" >
+        yw_auto_status,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="appealPictureUrl != null" >
+        appeal_picture_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="appealId != null" >
+        #{appealId,jdbcType=INTEGER},
+      </if>
+      <if test="punishId != null" >
+        #{punishId,jdbcType=INTEGER},
+      </if>
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="appealName != null" >
+        #{appealName,jdbcType=VARCHAR},
+      </if>
+      <if test="punishType != null" >
+        #{punishType,jdbcType=INTEGER},
+      </if>
+      <if test="appealReason != null" >
+        #{appealReason,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="cgOperator != null" >
+        #{cgOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="cgOperateDate != null" >
+        #{cgOperateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cgReason != null" >
+        #{cgReason,jdbcType=VARCHAR},
+      </if>
+      <if test="cgStatus != null" >
+        #{cgStatus,jdbcType=TINYINT},
+      </if>
+      <if test="cgExpireDate != null" >
+        #{cgExpireDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cgAutoStatus != null" >
+        #{cgAutoStatus,jdbcType=TINYINT},
+      </if>
+      <if test="ywOperator != null" >
+        #{ywOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="ywOperateDate != null" >
+        #{ywOperateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ywShowReason != null" >
+        #{ywShowReason,jdbcType=VARCHAR},
+      </if>
+      <if test="ywReason != null" >
+        #{ywReason,jdbcType=VARCHAR},
+      </if>
+      <if test="ywStatus != null" >
+        #{ywStatus,jdbcType=TINYINT},
+      </if>
+      <if test="ywExpireDate != null" >
+        #{ywExpireDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ywAutoStatus != null" >
+        #{ywAutoStatus,jdbcType=TINYINT},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="appealPictureUrl != null" >
+        #{appealPictureUrl,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.DriverAppealRecord" >
+    update driver_appeal_rocord
+    <set >
+      <if test="punishId != null" >
+        punish_id = #{punishId,jdbcType=INTEGER},
+      </if>
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="appealName != null" >
+        appeal_name = #{appealName,jdbcType=VARCHAR},
+      </if>
+      <if test="punishType != null" >
+        punish_type = #{punishType,jdbcType=INTEGER},
+      </if>
+      <if test="appealReason != null" >
+        appeal_reason = #{appealReason,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="cgOperator != null" >
+        cg_operator = #{cgOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="cgOperateDate != null" >
+        cg_operate_date = #{cgOperateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cgReason != null" >
+        cg_reason = #{cgReason,jdbcType=VARCHAR},
+      </if>
+      <if test="cgStatus != null" >
+        cg_status = #{cgStatus,jdbcType=TINYINT},
+      </if>
+      <if test="cgExpireDate != null" >
+        cg_expire_date = #{cgExpireDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cgAutoStatus != null" >
+        cg_auto_status = #{cgAutoStatus,jdbcType=TINYINT},
+      </if>
+      <if test="ywOperator != null" >
+        yw_operator = #{ywOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="ywOperateDate != null" >
+        yw_operate_date = #{ywOperateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ywShowReason != null" >
+        yw_show_reason = #{ywShowReason,jdbcType=VARCHAR},
+      </if>
+      <if test="ywReason != null" >
+        yw_reason = #{ywReason,jdbcType=VARCHAR},
+      </if>
+      <if test="ywStatus != null" >
+        yw_status = #{ywStatus,jdbcType=TINYINT},
+      </if>
+      <if test="ywExpireDate != null" >
+        yw_expire_date = #{ywExpireDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ywAutoStatus != null" >
+        yw_auto_status = #{ywAutoStatus,jdbcType=TINYINT},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="appealPictureUrl != null" >
+        appeal_picture_url = #{appealPictureUrl,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where appeal_id = #{appealId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhuanche.entity.driver.DriverAppealRecord" >
+    update driver_appeal_rocord
+    set punish_id = #{punishId,jdbcType=INTEGER},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      appeal_name = #{appealName,jdbcType=VARCHAR},
+      punish_type = #{punishType,jdbcType=INTEGER},
+      appeal_reason = #{appealReason,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      cg_operator = #{cgOperator,jdbcType=VARCHAR},
+      cg_operate_date = #{cgOperateDate,jdbcType=TIMESTAMP},
+      cg_reason = #{cgReason,jdbcType=VARCHAR},
+      cg_status = #{cgStatus,jdbcType=TINYINT},
+      cg_expire_date = #{cgExpireDate,jdbcType=TIMESTAMP},
+      cg_auto_status = #{cgAutoStatus,jdbcType=TINYINT},
+      yw_operator = #{ywOperator,jdbcType=VARCHAR},
+      yw_operate_date = #{ywOperateDate,jdbcType=TIMESTAMP},
+      yw_show_reason = #{ywShowReason,jdbcType=VARCHAR},
+      yw_reason = #{ywReason,jdbcType=VARCHAR},
+      yw_status = #{ywStatus,jdbcType=TINYINT},
+      yw_expire_date = #{ywExpireDate,jdbcType=TIMESTAMP},
+      yw_auto_status = #{ywAutoStatus,jdbcType=TINYINT},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      appeal_picture_url = #{appealPictureUrl,jdbcType=LONGVARCHAR}
+    where appeal_id = #{appealId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.DriverAppealRecord" >
+    update driver_appeal_rocord
+    set punish_id = #{punishId,jdbcType=INTEGER},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      appeal_name = #{appealName,jdbcType=VARCHAR},
+      punish_type = #{punishType,jdbcType=INTEGER},
+      appeal_reason = #{appealReason,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      cg_operator = #{cgOperator,jdbcType=VARCHAR},
+      cg_operate_date = #{cgOperateDate,jdbcType=TIMESTAMP},
+      cg_reason = #{cgReason,jdbcType=VARCHAR},
+      cg_status = #{cgStatus,jdbcType=TINYINT},
+      cg_expire_date = #{cgExpireDate,jdbcType=TIMESTAMP},
+      cg_auto_status = #{cgAutoStatus,jdbcType=TINYINT},
+      yw_operator = #{ywOperator,jdbcType=VARCHAR},
+      yw_operate_date = #{ywOperateDate,jdbcType=TIMESTAMP},
+      yw_show_reason = #{ywShowReason,jdbcType=VARCHAR},
+      yw_reason = #{ywReason,jdbcType=VARCHAR},
+      yw_status = #{ywStatus,jdbcType=TINYINT},
+      yw_expire_date = #{ywExpireDate,jdbcType=TIMESTAMP},
+      yw_auto_status = #{ywAutoStatus,jdbcType=TINYINT},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where appeal_id = #{appealId,jdbcType=INTEGER}
+  </update>
+  <select id="selectDriverAppealRocordByPunishId" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    ,DATE_FORMAT(cg_operate_date,'%Y-%m-%d %H:%i:%s') cgOperateDateStr
+    ,DATE_FORMAT(yw_operate_date,'%Y-%m-%d %H:%i:%s') ywOperateDateStr
+    ,DATE_FORMAT(create_date,'%Y-%m-%d %H:%i:%s') createDateStr
+    ,DATE_FORMAT(update_date,'%Y-%m-%d %H:%i:%s') updateDateStr
+    from driver_appeal_rocord
+    where punish_id = #{punishId}
+  </select>
+
+
+</mapper>

@@ -23,10 +23,6 @@ public class SAASCoreIndexDto {
 
     private String badEvaluateAllNum; //差评单量
 
-
-
-
-
     public String getRegistVehicleAmount() {
         return registVehicleAmount;
     }
