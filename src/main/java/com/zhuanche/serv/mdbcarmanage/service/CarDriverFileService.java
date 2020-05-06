@@ -1,8 +1,8 @@
 package com.zhuanche.serv.mdbcarmanage.service;
 
 import com.github.pagehelper.PageInfo;
-import com.zhuanche.entity.mdbcarmanage.CarDriverFile;
+import com.zhuanche.dto.mdbcarmanage.CarDriverFileDto;
 
 public interface CarDriverFileService {
-    PageInfo<CarDriverFile> find4Page(CarDriverFile queryParam, int pageNo, int pageSize);
+    PageInfo<CarDriverFileDto> find4Page(CarDriverFileDto queryParam, int pageNo, int pageSize);
 }

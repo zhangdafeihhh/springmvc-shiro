@@ -2,9 +2,11 @@ package com.zhuanche.controller.carmanage;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.carbizmode.CarBizModelController;
+import com.zhuanche.dto.mdbcarmanage.CarDriverFileDto;
 import com.zhuanche.entity.driver.DriverVehicle;
 import com.zhuanche.entity.mdbcarmanage.CarDriverFile;
 import com.zhuanche.entity.rentcar.CarBizModel;
@@ -39,11 +41,11 @@ public class CarDriverFileController {
             @Verify(param = "pageNo", rule = "required|min(1)")Integer pageNo
             , @Verify(param = "pageSize", rule = "required|min(1)")Integer pageSize
             , @Verify(param = "cityId", rule = "required|min(1)")Integer cityId
-            , CarDriverFile queryParam,HttpServletRequest req
+            , CarDriverFileDto queryParam, HttpServletRequest req
     ) {
         try{
 
-
+            //防止乱码
              String plateNum = req.getParameter("plateNum");
              if(StringUtils.isNotEmpty(plateNum)){
                  String plateNumV1 = new String(plateNum.getBytes("iso-8859-1"), "UTF-8");
@@ -51,9 +53,13 @@ public class CarDriverFileController {
              }
 
 
-            PageInfo<CarDriverFile> pageInfo = carDriverFileService.find4Page(queryParam,pageNo,pageSize);
-
-            return AjaxResponse.success(pageInfo);
+            PageInfo<CarDriverFileDto> pageInfo = carDriverFileService.find4Page(queryParam,pageNo,pageSize);
+            PageDTO pageDTO = new PageDTO(pageNo, pageSize, pageInfo.getTotal(), pageInfo.getList());
+            pageDTO.setPage(pageNo);
+            pageDTO.setPageSize(pageSize);
+            pageDTO.setTotal(pageInfo.getTotal());
+            pageDTO.setResult(pageInfo.getList());
+            return AjaxResponse.success(pageDTO);
         }catch (Exception e){
             logger.error("查询司机头像信息异常，参数为：queryParam="+ JSON.toJSONString(queryParam),e);
             return AjaxResponse.failMsg(500,"服务端错误");
@@ -64,10 +70,11 @@ public class CarDriverFileController {
     @RequestMapping(value = "/exportdriverfile")
     public void exportdriverfile(
             HttpServletRequest request, HttpServletResponse response,
-            @Verify(param = "cityId", rule = "required|min(1)")Integer cityId, CarDriverFile queryParam
+            @Verify(param = "cityId", rule = "required|min(1)")Integer cityId, CarDriverFileDto queryParam
             ,HttpServletRequest req
     ) {
         try{
+            //防止乱码
             String plateNum = req.getParameter("plateNum");
             if(StringUtils.isNotEmpty(plateNum)){
                 String plateNumV1 = new String(plateNum.getBytes("iso-8859-1"), "UTF-8");
@@ -80,7 +87,7 @@ public class CarDriverFileController {
             List<String> headerList = new ArrayList<>();
             headerList.add("序号,城市,司机ID,姓名,手机号,合作商,车牌号,照片提交时间,照片状态");
 
-            PageInfo<CarDriverFile> pageInfo = carDriverFileService.find4Page(queryParam,pageNo,pageSize);
+            PageInfo<CarDriverFileDto> pageInfo = carDriverFileService.find4Page(queryParam,pageNo,pageSize);
             List<String> rowData = new ArrayList<>();
             boolean isFirst = true;
             boolean isLast = false;

@@ -34,7 +34,11 @@
     plate_num, not_reason, audit_time, cooperation_type, create_name, update_name, face_message, 
     face_count, face_code
   </sql>
-  <select id="findByParams" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverFile" resultMap="BaseResultMap">
+
+    <resultMap id="BaseResultMapDto" type="com.zhuanche.dto.mdbcarmanage.CarDriverFileDto" extends="BaseResultMap" >
+
+    </resultMap>
+  <select id="findByParams" parameterType="com.zhuanche.dto.mdbcarmanage.CarDriverFileDto" resultMap="BaseResultMapDto">
     select 
     <include refid="Base_Column_List" />
     from car_driver_file
@@ -63,6 +67,20 @@
     <if test="cooperationType != null">
       and  cooperation_type = #{cooperationType}
     </if>
+
+      <if test="cityIds != null and cityIds.size()>0">
+          and city_id in
+          <foreach collection="cityIds" item="item" open="(" separator="," close=")">
+              #{item}
+          </foreach>
+      </if>
+
+      <if test="supplierIds != null and supplierIds.size()>0">
+          and supplier_id in
+          <foreach collection="supplierIds" item="item" open="(" separator="," close=")">
+              #{item}
+          </foreach>
+      </if>
   </where>
     order by create_time desc
   </select>
