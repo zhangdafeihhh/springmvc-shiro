@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.mdbcarmanage.ex.CarDriverFileExtMapper">
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarDriverFile">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="file_url" jdbcType="VARCHAR" property="fileUrl" />
+    <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+    <result column="driver_name" jdbcType="VARCHAR" property="driverName" />
+    <result column="driver_phone" jdbcType="VARCHAR" property="driverPhone" />
+    <result column="file_type" jdbcType="SMALLINT" property="fileType" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="create_user" jdbcType="INTEGER" property="createUser" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="update_user" jdbcType="INTEGER" property="updateUser" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="driver_id" jdbcType="INTEGER" property="driverId" />
+    <result column="city_id" jdbcType="INTEGER" property="cityId" />
+    <result column="city_name" jdbcType="VARCHAR" property="cityName" />
+    <result column="supplier_id" jdbcType="INTEGER" property="supplierId" />
+    <result column="supplier_name" jdbcType="VARCHAR" property="supplierName" />
+    <result column="plate_num" jdbcType="VARCHAR" property="plateNum" />
+    <result column="not_reason" jdbcType="VARCHAR" property="notReason" />
+    <result column="audit_time" jdbcType="TIMESTAMP" property="auditTime" />
+    <result column="cooperation_type" jdbcType="INTEGER" property="cooperationType" />
+    <result column="create_name" jdbcType="VARCHAR" property="createName" />
+    <result column="update_name" jdbcType="VARCHAR" property="updateName" />
+    <result column="face_message" jdbcType="VARCHAR" property="faceMessage" />
+    <result column="face_count" jdbcType="INTEGER" property="faceCount" />
+    <result column="face_code" jdbcType="BIT" property="faceCode" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, file_url, file_name, driver_name, driver_phone, file_type, create_time, create_user, 
+    update_time, update_user, `status`, driver_id, city_id, city_name, supplier_id, supplier_name, 
+    plate_num, not_reason, audit_time, cooperation_type, create_name, update_name, face_message, 
+    face_count, face_code
+  </sql>
+  <select id="findByParams" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverFile" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from car_driver_file
+  <where>
+    <if test="cityId != null">
+      and  city_id = #{cityId}
+    </if>
+
+    <if test="supplierId != null">
+     and  supplier_id = #{supplierId}
+    </if>
+
+    <if test="driverId != null">
+     and driver_id = #{driverId}
+    </if>
+    <if test="driverPhone != null">
+      and driver_phone = #{driverPhone}
+    </if>
+    <if test="plateNum != null">
+      and  plate_num = #{plateNum}
+    </if>
+    <if test="status != null">
+      and `status` = #{status}
+    </if>
+
+    <if test="cooperationType != null">
+      and  cooperation_type = #{cooperationType}
+    </if>
+  </where>
+    order by create_time desc
+  </select>
+
+</mapper>
