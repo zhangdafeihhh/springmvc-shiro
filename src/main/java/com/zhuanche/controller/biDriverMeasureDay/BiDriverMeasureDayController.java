@@ -5,9 +5,11 @@ import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.IndexBiDriverMeasureDto;
+import com.zhuanche.dto.bigdata.BiDriverMeasureDayDto;
 import com.zhuanche.serv.driverMeasureDay.DriverMeasureDayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -39,9 +41,16 @@ public class BiDriverMeasureDayController extends BaseController {
 
     @RequestMapping("/index")
     public AjaxResponse index(@Verify(param = "startDate", rule = "required") String startDate,
-                              @Verify(param = "endDate", rule = "required") String endDate, String allianceId){
+                              @Verify(param = "endDate", rule = "required") String endDate
+            , @RequestParam(value = "supplierId",required = false) Integer supplierId
+            ,  @RequestParam(value = "teamId",required = false)Integer teamId){
         try {
-            IndexBiDriverMeasureDto entity = driverMeasureDayService.findForStatistics(startDate,endDate, allianceId);
+            BiDriverMeasureDayDto params = new BiDriverMeasureDayDto();
+            params.setStartDate(startDate);
+            params.setEndDate(endDate);
+            params.setSupplierId(supplierId);
+            params.setTeamId(teamId);
+            IndexBiDriverMeasureDto entity = driverMeasureDayService.findForStatistics(params);
 
             return AjaxResponse.success(entity);
         }

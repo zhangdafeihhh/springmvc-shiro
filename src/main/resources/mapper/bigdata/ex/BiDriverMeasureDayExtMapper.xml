@@ -46,6 +46,9 @@
       <if test="supplierId != null">
           and supplier_id = #{supplierId}
       </if>
+      <if test="teamId != null">
+        and team_id = #{teamId}
+      </if>
 
       <!--<if test="cityIds != null and cityIds.size()>0">-->
         <!--and city_id in-->
@@ -60,12 +63,12 @@
           <!--#{item}-->
         <!--</foreach>-->
       <!--</if>-->
-      <!--<if test="teamIds != null and teamIds.size()>0">-->
-        <!--and team_id in-->
-        <!--<foreach collection="teamIds" item="item" open="(" separator="," close=")">-->
-          <!--#{item}-->
-        <!--</foreach>-->
-      <!--</if>-->
+      <if test="teamIds != null and teamIds.size()>0">
+        and team_id in
+        <foreach collection="teamIds" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <!--<if test="groupIds != null and groupIds.size()>0">-->
         <!--and car_group_id in-->
         <!--<foreach collection="groupIds" item="item" open="(" separator="," close=")">-->

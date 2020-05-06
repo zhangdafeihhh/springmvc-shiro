@@ -66,19 +66,12 @@ public class DriverMeasureDayService {
         return b1.divide(b2,scale,BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
-    public IndexBiDriverMeasureDto findForStatistics(String startDate, String endDate, String allianceId) {
-        BiDriverMeasureDayDto params = new BiDriverMeasureDayDto();
-        params.setStartDate(startDate);
-        params.setEndDate(endDate);
-        if(allianceId != null && !("").equals(allianceId)){
-            params.setSupplierId(Integer.valueOf(allianceId));
-        }
+    public IndexBiDriverMeasureDto findForStatistics(BiDriverMeasureDayDto params) {
+
         if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
             //String suppliers = WebSessionUtil.getCurrentLoginUser().getSupplierIds().toString();
             String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds().toArray(), ",");
             params.setSupplierIds(suppliers);
-        }else{
-            params.setSupplierIds("");
         }
         IndexBiDriverMeasureDto indexBiDriverMeasureDto = biDriverMeasureDayExtMapper.findForStatistics(params);
         return indexBiDriverMeasureDto;
