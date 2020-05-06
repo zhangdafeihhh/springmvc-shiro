@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.bigdata.ex.BiDriverMeasureDayExtMapper">
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.bigdata.BiDriverMeasureDay">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="data_date" jdbcType="VARCHAR" property="dataDate" />
+    <result column="supplier_id" jdbcType="INTEGER" property="supplierId" />
+    <result column="supplier_name" jdbcType="VARCHAR" property="supplierName" />
+    <result column="team_id" jdbcType="INTEGER" property="teamId" />
+    <result column="team_name" jdbcType="VARCHAR" property="teamName" />
+    <result column="car_group_id" jdbcType="INTEGER" property="carGroupId" />
+    <result column="car_group_name" jdbcType="VARCHAR" property="carGroupName" />
+    <result column="com_order_num" jdbcType="INTEGER" property="comOrderNum" />
+    <result column="fact_over_order_num" jdbcType="INTEGER" property="factOverOrderNum" />
+    <result column="fact_over_amount" jdbcType="DECIMAL" property="factOverAmount" />
+    <result column="in_use_driver_num" jdbcType="INTEGER" property="inUseDriverNum" />
+    <result column="order_num" jdbcType="INTEGER" property="orderNum" />
+    <result column="push_order_num" jdbcType="INTEGER" property="pushOrderNum" />
+    <result column="bind_order_num" jdbcType="INTEGER" property="bindOrderNum" />
+    <result column="online_driver_num" jdbcType="INTEGER" property="onlineDriverNum" />
+    <result column="total_driver_num" jdbcType="INTEGER" property="totalDriverNum" />
+    <result column="bind_order_driver_cnt" jdbcType="INTEGER" property="bindOrderDriverCnt" />
+    <result column="finish_cl_order_num" jdbcType="INTEGER" property="finishClOrderNum" />
+    <result column="responsible_complaint_num" jdbcType="INTEGER" property="responsibleComplaintNum" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, data_date, supplier_id, supplier_name, team_id, team_name, car_group_id, car_group_name, 
+    com_order_num, fact_over_order_num, fact_over_amount, in_use_driver_num, order_num, 
+    push_order_num, bind_order_num, online_driver_num, total_driver_num, bind_order_driver_cnt, 
+    finish_cl_order_num, responsible_complaint_num
+  </sql>
+
+
+  <select id="findForStatistics" parameterType="com.zhuanche.dto.bigdata.BiDriverMeasureDayDto"
+          resultType="com.zhuanche.dto.IndexBiDriverMeasureDto">
+    select sum(in_use_driver_num) as inUseDriverNum
+    ,sum(operation_verify_driver_day) as operationVerifyDriverDay
+    ,sum(finish_cl_order_num) as finishClOrderNum
+    ,sum(responsible_complaint_num) as responsibleComplaintNum
+    from bi_driver_measure_day
+    <where>
+     data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+      <if test="supplierIds != null and supplierIds !=''">
+          and supplier_id in (${supplierIds})
+      </if>
+      <if test="supplierId != null">
+          and supplier_id = #{supplierId}
+      </if>
+
+      <!--<if test="cityIds != null and cityIds.size()>0">-->
+        <!--and city_id in-->
+        <!--<foreach collection="cityIds" item="item" open="(" separator="," close=")">-->
+          <!--#{item}-->
+        <!--</foreach>-->
+      <!--</if>-->
+
+      <!--<if test="supplierIds != null and supplierIds.size()>0">-->
+        <!--and supplier_id in-->
+        <!--<foreach collection="supplierIds" item="item" open="(" separator="," close=")">-->
+          <!--#{item}-->
+        <!--</foreach>-->
+      <!--</if>-->
+      <!--<if test="teamIds != null and teamIds.size()>0">-->
+        <!--and team_id in-->
+        <!--<foreach collection="teamIds" item="item" open="(" separator="," close=")">-->
+          <!--#{item}-->
+        <!--</foreach>-->
+      <!--</if>-->
+      <!--<if test="groupIds != null and groupIds.size()>0">-->
+        <!--and car_group_id in-->
+        <!--<foreach collection="groupIds" item="item" open="(" separator="," close=")">-->
+          <!--#{item}-->
+        <!--</foreach>-->
+      <!--</if>-->
+    </where>
+  </select>
+
+</mapper>

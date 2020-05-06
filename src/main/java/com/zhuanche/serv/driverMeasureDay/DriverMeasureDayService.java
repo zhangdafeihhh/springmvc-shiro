@@ -1,8 +1,11 @@
 package com.zhuanche.serv.driverMeasureDay;
 
+import com.zhuanche.dto.IndexBiDriverMeasureDto;
+import com.zhuanche.dto.bigdata.BiDriverMeasureDayDto;
 import com.zhuanche.entity.bigdata.BiDriverMeasureDay;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.bigdata.BiDriverMeasureDayMapper;
+import mapper.bigdata.ex.BiDriverMeasureDayExtMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,9 +23,11 @@ public class DriverMeasureDayService {
 
     @Autowired
     private BiDriverMeasureDayMapper driverMeasureDayMapper;
+    @Autowired
+    private BiDriverMeasureDayExtMapper biDriverMeasureDayExtMapper;
 
     public String getResponsibleComplaintRate(String startDate, String endDate,  String allianceId){
-        BiDriverMeasureDay params = new BiDriverMeasureDay();
+        BiDriverMeasureDayDto params = new BiDriverMeasureDayDto();
         params.setStartDate(startDate);
         params.setEndDate(endDate);
         if(allianceId != null && !("").equals(allianceId)){
@@ -35,9 +40,10 @@ public class DriverMeasureDayService {
         }else{
             params.setSupplierIds("");
         }
+        IndexBiDriverMeasureDto indexBiDriverMeasureDto = biDriverMeasureDayExtMapper.findForStatistics(params);
 
-        Integer numerator = driverMeasureDayMapper.countNumerator(params);
-        Integer denominator = driverMeasureDayMapper.countDenominator(params);
+        Integer numerator =indexBiDriverMeasureDto.getResponsibleComplaintNum();// driverMeasureDayMapper.countNumerator(params);
+        Integer denominator = indexBiDriverMeasureDto.getFinishClOrderNum();// driverMeasureDayMapper.countDenominator(params);
         if(denominator != null && denominator != 0){
             Double rate = div(numerator, denominator, 4);
             rate = rate*100;
@@ -60,4 +66,22 @@ public class DriverMeasureDayService {
         return b1.divide(b2,scale,BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
+    public IndexBiDriverMeasureDto findForStatistics(String startDate, String endDate, String allianceId) {
+        BiDriverMeasureDayDto params = new BiDriverMeasureDayDto();
+        params.setStartDate(startDate);
+        params.setEndDate(endDate);
+        if(allianceId != null && !("").equals(allianceId)){
+            params.setSupplierId(Integer.valueOf(allianceId));
+        }
+        if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
+            //String suppliers = WebSessionUtil.getCurrentLoginUser().getSupplierIds().toString();
+            String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds().toArray(), ",");
+            params.setSupplierIds(suppliers);
+        }else{
+            params.setSupplierIds("");
+        }
+        IndexBiDriverMeasureDto indexBiDriverMeasureDto = biDriverMeasureDayExtMapper.findForStatistics(params);
+        return indexBiDriverMeasureDto;
+
+    }
 }
