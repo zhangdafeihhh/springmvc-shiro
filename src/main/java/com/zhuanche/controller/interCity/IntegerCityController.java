@@ -214,15 +214,16 @@ public class IntegerCityController {
                                    String distributorId,
                                    String lineName,
                                    String bookingDateSort,
-                                   String isCrossDiscountReduction) {
+                                   String isCrossDiscountReduction,
+                                   Integer payFlag) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},supplierId:{3},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
                         "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostEndDate{20},endCostEndDate{21},riderPhone:{22},distributorId:{23}," +
-                        "bookingDateSort:{24}", pageNum,
+                        "bookingDateSort:{24},payFlag:{25}", pageNum,
                 pageSize, cityId, supplierId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,lineName,bookingDateSort));
+                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,lineName,bookingDateSort,payFlag));
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -300,6 +301,10 @@ public class IntegerCityController {
 
         if(StringUtils.isNotEmpty(isCrossDiscountReduction)){
             map.put("isCrossDiscountReduction", isCrossDiscountReduction);
+        }
+        //是否走平台流水
+        if(payFlag != null && payFlag > 0){
+            map.put("pay_flag",13);
         }
         if(StringUtils.isNotEmpty(lineName)){
             String ruleBatch = this.getRuleIdBatch(lineName);
