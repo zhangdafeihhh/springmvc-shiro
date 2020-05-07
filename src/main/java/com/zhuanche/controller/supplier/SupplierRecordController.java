@@ -135,12 +135,26 @@ public class SupplierRecordController {
             }
             Page page = PageHelper.startPage(pageNum,pageSize,true);
             List<SupplierExtDto> list =  recordService.extDtoList(supplierExtDto);
+
+            List<Integer> listSuppliers = new ArrayList<>();
+            list.forEach(dto ->{
+                listSuppliers.add(dto.getSupplierId());
+            });
+
+            List<SupplierCooperationAgreement> agreementList = agreementExMapper.querySupplierIds(listSuppliers);
+
+            Map<Integer,Object> maps = Maps.newHashMap();
+
+            agreementList.forEach(agr ->{
+                maps.put(agr.getSupplierId(),agr);
+            });
+
             for(SupplierExtDto dto : list){
                 dto.setSupplierFullName(dto.getSupplierShortName());
                 if(dto.getMainCityId() > 0){
                     dto.setMainCityName(cityMap.get(dto.getMainCityId()));
                  }
-                 SupplierCooperationAgreement agreement = agreementExMapper.queryBySupplierId(dto.getSupplierId());
+                 SupplierCooperationAgreement agreement = (SupplierCooperationAgreement) maps.get(dto.getSupplierId());
                 if(agreement != null){
                     dto.setAgreementStartTime(agreement.getAgreementStartTime() != null ? DateUtils.formatDate(agreement.getAgreementStartTime()):"");
                     dto.setAgreementEndTime(agreement.getAgreementEndTime()     != null ? DateUtils.formatDate(agreement.getAgreementEndTime()) : "");
