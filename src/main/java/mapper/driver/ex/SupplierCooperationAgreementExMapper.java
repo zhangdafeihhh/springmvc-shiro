@@ -19,6 +19,7 @@ public interface SupplierCooperationAgreementExMapper {
 
     SupplierCooperationAgreement queryBySupplierId(@Param("supplierId") Integer supplierId);
 
+    List<SupplierCooperationAgreement> querySupplierIds(@Param("supplierIds") List<Integer> supplierIds);
 
     int deleteBySupplierId(@Param("supplierId") Integer supplierId);
 
