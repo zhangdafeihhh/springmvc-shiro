@@ -304,9 +304,7 @@ public class IntegerCityController {
         }
         //是否走平台流水
         if(payFlag != null && payFlag > 0){
-            map.put("payFlag",13);
-        }else {
-            map.put("payFlag",1);
+            map.put("payFlag","13");
         }
         if(StringUtils.isNotEmpty(lineName)){
             String ruleBatch = this.getRuleIdBatch(lineName);
