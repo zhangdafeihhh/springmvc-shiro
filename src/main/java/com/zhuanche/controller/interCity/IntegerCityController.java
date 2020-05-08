@@ -305,6 +305,8 @@ public class IntegerCityController {
         //是否走平台流水
         if(payFlag != null && payFlag > 0){
             map.put("payFlag",13);
+        }else {
+            map.put("payFlag",1);
         }
         if(StringUtils.isNotEmpty(lineName)){
             String ruleBatch = this.getRuleIdBatch(lineName);
@@ -783,6 +785,9 @@ public class IntegerCityController {
             if(pingSettleType != null && pingSettleType == 1){
                 map.put("payFlag", 13);//业务线ID
                 sb.append("payFlag=" + 13).append(SYSMOL);
+            }else {
+                map.put("payFlag", 1);//业务线ID
+                sb.append("payFlag=" + 1).append(SYSMOL);
             }
             map.put("businessId", Common.BUSSINESSID);//业务线ID
             sb.append("businessId=" + Common.BUSSINESSID).append(SYSMOL);
