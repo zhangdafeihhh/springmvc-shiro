@@ -7,6 +7,8 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.bigdata.BiDriverMeasureDayMapper;
 import mapper.bigdata.ex.BiDriverMeasureDayExtMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import java.util.List;
  */
 @Service
 public class DriverMeasureDayService {
+    private static final Logger logger = LoggerFactory.getLogger(DriverMeasureDayService.class);
 
     @Autowired
     private BiDriverMeasureDayMapper driverMeasureDayMapper;
@@ -74,6 +77,15 @@ public class DriverMeasureDayService {
             params.setSupplierIds(suppliers);
         }
         IndexBiDriverMeasureDto indexBiDriverMeasureDto = biDriverMeasureDayExtMapper.findForStatistics(params);
+        if(indexBiDriverMeasureDto != null){
+            if(indexBiDriverMeasureDto.getInUseDriverNum() != null && indexBiDriverMeasureDto.getInUseDriverNum() != 0){
+                BigDecimal passRateOfHeadPortrait = new BigDecimal(indexBiDriverMeasureDto.getOperationVerifyDriverDay()).divide(new BigDecimal(indexBiDriverMeasureDto.getInUseDriverNum()),2,BigDecimal.ROUND_HALF_UP);
+                indexBiDriverMeasureDto.setPassRateOfHeadPortrait(passRateOfHeadPortrait.toPlainString());
+            }else {
+                logger.info("查询到运营司机数为空或者为null，所以返回头像通过率为-");
+                indexBiDriverMeasureDto.setPassRateOfHeadPortrait("-");
+            }
+        }
         return indexBiDriverMeasureDto;
 
     }

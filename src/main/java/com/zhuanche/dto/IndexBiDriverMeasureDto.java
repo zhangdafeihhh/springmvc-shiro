@@ -11,4 +11,6 @@ public class IndexBiDriverMeasureDto  implements Serializable {
     private Integer finishClOrderNum;//'派后订单量(投诉率分母)'
     private Integer responsibleComplaintNum;//'有责投诉单量(投诉率分子)'
 
+    private String passRateOfHeadPortrait;//司机头像运营率 = 当日运营司机头像合规数 / 当天运营司机数
+
 }
