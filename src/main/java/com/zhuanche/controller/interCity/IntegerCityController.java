@@ -780,7 +780,7 @@ public class IntegerCityController {
 
             StringBuffer sb = new StringBuffer();
 
-            if(pingSettleType != null && pingSettleType == 0){
+            if(pingSettleType != null && pingSettleType == 1){
                 map.put("payFlag", 13);//业务线ID
                 sb.append("payFlag=" + 13).append(SYSMOL);
             }
