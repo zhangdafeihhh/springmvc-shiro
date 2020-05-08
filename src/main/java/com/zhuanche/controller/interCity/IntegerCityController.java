@@ -783,11 +783,11 @@ public class IntegerCityController {
             StringBuffer sb = new StringBuffer();
 
             if(pingSettleType != null && pingSettleType == 1){
-                map.put("payFlag", 13);//业务线ID
-                sb.append("payFlag=" + 13).append(SYSMOL);
+                map.put("payFlag", "13");//13 不走管理费模式
+                sb.append("payFlag=13").append(SYSMOL);
             }else {
-                map.put("payFlag", 1);//业务线ID
-                sb.append("payFlag=" + 1).append(SYSMOL);
+                map.put("payFlag", "1");//付款人标识 0-预订人付款，1-乘车人付款，2-门童代人叫车乘车人是自己且乘车人付款，-1-机构付款
+                sb.append("payFlag=1").append(SYSMOL);
             }
             map.put("businessId", Common.BUSSINESSID);//业务线ID
             sb.append("businessId=" + Common.BUSSINESSID).append(SYSMOL);
@@ -819,8 +819,7 @@ public class IntegerCityController {
             sb.append("cityId=" + boardingCityId).append(SYSMOL);
             map.put("serviceTypeId", 68);//新城际拼车
             sb.append("serviceTypeId=68").append(SYSMOL);
-            //map.put("payFlag", "1");//付款人标识 0-预订人付款，1-乘车人付款，2-门童代人叫车乘车人是自己且乘车人付款，-1-机构付款
-            //sb.append("payFlag=1").append(SYSMOL);
+
             map.put("receiveSMS", "2");//是否接收短信 “1”-接收，“2”-不接收
             sb.append("receiveSMS=2").append(SYSMOL);
             map.put("bookingDriverId", "0");//
