@@ -768,7 +768,7 @@ public class IntegerCityController {
             //获取预估金额
             String estimatedAmount = jsonEst.getString("estimatedAmount");
             String estimatedKey = jsonEst.getString("estimatedKey");
-            Integer pingSettleType = jsonEst.get("pingSettleType") == null ? null : jsonEst.getInteger("pingSettleType");
+            String pingSettleType = jsonEst.get("pingSettleType") == null ? null : jsonEst.getString("pingSettleType");
             logger.info("获取到预估金额:" + estimatedAmount);
             //判断预估价是否大于0
             BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
@@ -780,7 +780,9 @@ public class IntegerCityController {
 
             StringBuffer sb = new StringBuffer();
 
-            if(pingSettleType != null && pingSettleType == 1){
+            logger.info("=================pingSettleType=========" + pingSettleType);
+
+            if(pingSettleType != null &&  "1".equals(pingSettleType)){
                 map.put("payFlag", "13");//13 不走管理费模式
                 sb.append("payFlag=13").append(SYSMOL);
             }else {
