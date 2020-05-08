@@ -814,8 +814,8 @@ public class IntegerCityController {
             sb.append("cityId=" + boardingCityId).append(SYSMOL);
             map.put("serviceTypeId", 68);//新城际拼车
             sb.append("serviceTypeId=68").append(SYSMOL);
-            map.put("payFlag", "1");//付款人标识 0-预订人付款，1-乘车人付款，2-门童代人叫车乘车人是自己且乘车人付款，-1-机构付款
-            sb.append("payFlag=1").append(SYSMOL);
+            //map.put("payFlag", "1");//付款人标识 0-预订人付款，1-乘车人付款，2-门童代人叫车乘车人是自己且乘车人付款，-1-机构付款
+            //sb.append("payFlag=1").append(SYSMOL);
             map.put("receiveSMS", "2");//是否接收短信 “1”-接收，“2”-不接收
             sb.append("receiveSMS=2").append(SYSMOL);
             map.put("bookingDriverId", "0");//
@@ -914,6 +914,8 @@ public class IntegerCityController {
 
             String orderUrl = "/order/carpool/create";
 
+
+            logger.info("创建订单入参:" + JSONObject.toJSONString(map));
             String result = carRestTemplate.postForObject(orderUrl, JSONObject.class, map);
 
             JSONObject orderResult = JSONObject.parseObject(result);
