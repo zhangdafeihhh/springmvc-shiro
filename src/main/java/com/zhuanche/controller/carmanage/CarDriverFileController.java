@@ -46,11 +46,11 @@ public class CarDriverFileController {
         try{
             logger.info("查询司机头像信息异常，参数为：queryParam="+ JSON.toJSONString(queryParam));
             //防止乱码
-             String plateNum = req.getParameter("plateNum");
-             if(StringUtils.isNotEmpty(plateNum)){
-                 String plateNumV1 = new String(plateNum.getBytes("iso-8859-1"), "UTF-8");
-                 queryParam.setPlateNum(plateNumV1);
-             }
+//             String plateNum = req.getParameter("plateNum");
+//             if(StringUtils.isNotEmpty(plateNum)){
+//                 String plateNumV1 = new String(plateNum.getBytes("iso-8859-1"), "UTF-8");
+//                 queryParam.setPlateNum(plateNumV1);
+//             }
             PageInfo<CarDriverFileDto> pageInfo = carDriverFileService.find4Page(queryParam,pageNo,pageSize);
             PageDTO pageDTO = new PageDTO(pageNo, pageSize, pageInfo.getTotal(), pageInfo.getList());
             pageDTO.setPage(pageNo);
@@ -74,11 +74,11 @@ public class CarDriverFileController {
         try{
             logger.info("导出司机头像信息异常，参数为：queryParam="+ JSON.toJSONString(queryParam));
             //防止乱码
-            String plateNum = req.getParameter("plateNum");
-            if(StringUtils.isNotEmpty(plateNum)){
-                String plateNumV1 = new String(plateNum.getBytes("iso-8859-1"), "UTF-8");
-                queryParam.setPlateNum(plateNumV1);
-            }
+//            String plateNum = req.getParameter("plateNum");
+//            if(StringUtils.isNotEmpty(plateNum)){
+//                String plateNumV1 = new String(plateNum.getBytes("iso-8859-1"), "UTF-8");
+//                queryParam.setPlateNum(plateNumV1);
+//            }
 
             logger.info("导出司机头像信息，参数为：queryParam="+ JSON.toJSONString(queryParam));
             int pageNo = 1;
