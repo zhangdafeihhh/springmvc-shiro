@@ -302,9 +302,9 @@ public class IntegerCityController {
         if(StringUtils.isNotEmpty(isCrossDiscountReduction)){
             map.put("isCrossDiscountReduction", isCrossDiscountReduction);
         }
-        //是否走平台流水
+        //是否走平台流水  payFlag 1 是 走 平台 流水 13  不走平台流水   默认全部
         if(payFlag != null && payFlag > 0){
-            map.put("payFlag","13");
+            map.put("payFlag",payFlag);
         }
         if(StringUtils.isNotEmpty(lineName)){
             String ruleBatch = this.getRuleIdBatch(lineName);
