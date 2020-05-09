@@ -302,9 +302,9 @@ public class IntegerCityController {
         if(StringUtils.isNotEmpty(isCrossDiscountReduction)){
             map.put("isCrossDiscountReduction", isCrossDiscountReduction);
         }
-        //是否走平台流水
+        //是否走平台流水  payFlag 1 是 走 平台 流水 13  不走平台流水   默认全部
         if(payFlag != null && payFlag > 0){
-            map.put("payFlag","13");
+            map.put("payFlag",payFlag);
         }
         if(StringUtils.isNotEmpty(lineName)){
             String ruleBatch = this.getRuleIdBatch(lineName);
@@ -768,7 +768,7 @@ public class IntegerCityController {
             //获取预估金额
             String estimatedAmount = jsonEst.getString("estimatedAmount");
             String estimatedKey = jsonEst.getString("estimatedKey");
-            Integer pingSettleType = jsonEst.get("pingSettleType") == null ? null : jsonEst.getInteger("pingSettleType");
+            String pingSettleType = jsonEst.get("pingSettleType") == null ? null : jsonEst.getString("pingSettleType");
             logger.info("获取到预估金额:" + estimatedAmount);
             //判断预估价是否大于0
             BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
@@ -780,7 +780,9 @@ public class IntegerCityController {
 
             StringBuffer sb = new StringBuffer();
 
-            if(pingSettleType != null && pingSettleType == 1){
+            logger.info("=================pingSettleType=========" + pingSettleType);
+
+            if(pingSettleType != null &&  "1".equals(pingSettleType)){
                 map.put("payFlag", "13");//13 不走管理费模式
                 sb.append("payFlag=13").append(SYSMOL);
             }else {
@@ -2674,10 +2676,15 @@ public class IntegerCityController {
                         String estimatedKey = jsonData.getString("estimatedKey");
                         chargeJSON.put("estimatedKey", estimatedKey);
                         JSONArray arrayEst = jsonData.getJSONArray("estimated");
+
                         if (arrayEst != null && arrayEst.size() > 0) {
                             JSONObject jsonEsti = arrayEst.getJSONObject(0);
                             if (jsonEsti != null && jsonEsti.get("pingSign") != null) {
                                 String carpoolingKey = jsonEsti.getString("pingSign");
+                                String pingSettleType = jsonEsti.get("pingSettleType") == null ? null :jsonEsti.getString("pingSettleType");
+                                if(StringUtils.isNotEmpty(pingSettleType)){
+                                    chargeJSON.put("pingSettleType", pingSettleType);
+                                }
                                 String carpoolingKeyStr = ChargeDecrypt.decrypt(carpoolingKey);
                                 if (StringUtils.isNotEmpty(carpoolingKeyStr)) {
                                     logger.info(carpoolingKeyStr);
@@ -2685,6 +2692,7 @@ public class IntegerCityController {
                                         String poolingArr[] = carpoolingKeyStr.split("-");
                                         if (poolingArr.length > 0) {
                                             chargeJSON.put("estimatedAmount", poolingArr[0]);
+                                            logger.info("=============预估价拼接参数==========" + chargeJSON);
                                             return AjaxResponse.success(chargeJSON);
                                         }
                                     }
