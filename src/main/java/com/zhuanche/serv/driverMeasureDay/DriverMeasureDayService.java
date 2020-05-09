@@ -79,7 +79,7 @@ public class DriverMeasureDayService {
         IndexBiDriverMeasureDto indexBiDriverMeasureDto = biDriverMeasureDayExtMapper.findForStatistics(params);
         if(indexBiDriverMeasureDto != null){
             if(indexBiDriverMeasureDto.getInUseDriverNum() != null && indexBiDriverMeasureDto.getInUseDriverNum() != 0){
-                BigDecimal passRateOfHeadPortrait = new BigDecimal(indexBiDriverMeasureDto.getOperationVerifyDriverDay()).divide(new BigDecimal(indexBiDriverMeasureDto.getInUseDriverNum()),2,BigDecimal.ROUND_HALF_UP);
+                BigDecimal passRateOfHeadPortrait = new BigDecimal(indexBiDriverMeasureDto.getOperationVerifyDriverDay()).divide(new BigDecimal(indexBiDriverMeasureDto.getInUseDriverNum()),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
                 indexBiDriverMeasureDto.setPassRateOfHeadPortrait(passRateOfHeadPortrait.toPlainString());
             }else {
                 logger.info("查询到运营司机数为空或者为null，所以返回头像通过率为-");
