@@ -214,15 +214,16 @@ public class IntegerCityController {
                                    String distributorId,
                                    String lineName,
                                    String bookingDateSort,
-                                   String isCrossDiscountReduction) {
+                                   String isCrossDiscountReduction,
+                                   Integer payFlag) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},supplierId:{3},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
                         "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostEndDate{20},endCostEndDate{21},riderPhone:{22},distributorId:{23}," +
-                        "bookingDateSort:{24}", pageNum,
+                        "bookingDateSort:{24},payFlag:{25}", pageNum,
                 pageSize, cityId, supplierId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,lineName,bookingDateSort));
+                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,lineName,bookingDateSort,payFlag));
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -300,6 +301,10 @@ public class IntegerCityController {
 
         if(StringUtils.isNotEmpty(isCrossDiscountReduction)){
             map.put("isCrossDiscountReduction", isCrossDiscountReduction);
+        }
+        //是否走平台流水  payFlag 1 是 走 平台 流水 13  不走平台流水   默认全部
+        if(payFlag != null && payFlag > 0){
+            map.put("payFlag",payFlag);
         }
         if(StringUtils.isNotEmpty(lineName)){
             String ruleBatch = this.getRuleIdBatch(lineName);
@@ -763,6 +768,7 @@ public class IntegerCityController {
             //获取预估金额
             String estimatedAmount = jsonEst.getString("estimatedAmount");
             String estimatedKey = jsonEst.getString("estimatedKey");
+            String pingSettleType = jsonEst.get("pingSettleType") == null ? null : jsonEst.getString("pingSettleType");
             logger.info("获取到预估金额:" + estimatedAmount);
             //判断预估价是否大于0
             BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
@@ -773,6 +779,16 @@ public class IntegerCityController {
 
 
             StringBuffer sb = new StringBuffer();
+
+            logger.info("=================pingSettleType=========" + pingSettleType);
+
+            if(pingSettleType != null &&  "1".equals(pingSettleType)){
+                map.put("payFlag", "13");//13 不走管理费模式
+                sb.append("payFlag=13").append(SYSMOL);
+            }else {
+                map.put("payFlag", "1");//付款人标识 0-预订人付款，1-乘车人付款，2-门童代人叫车乘车人是自己且乘车人付款，-1-机构付款
+                sb.append("payFlag=1").append(SYSMOL);
+            }
             map.put("businessId", Common.BUSSINESSID);//业务线ID
             sb.append("businessId=" + Common.BUSSINESSID).append(SYSMOL);
 
@@ -803,8 +819,7 @@ public class IntegerCityController {
             sb.append("cityId=" + boardingCityId).append(SYSMOL);
             map.put("serviceTypeId", 68);//新城际拼车
             sb.append("serviceTypeId=68").append(SYSMOL);
-            map.put("payFlag", "1");//付款人标识 0-预订人付款，1-乘车人付款，2-门童代人叫车乘车人是自己且乘车人付款，-1-机构付款
-            sb.append("payFlag=1").append(SYSMOL);
+
             map.put("receiveSMS", "2");//是否接收短信 “1”-接收，“2”-不接收
             sb.append("receiveSMS=2").append(SYSMOL);
             map.put("bookingDriverId", "0");//
@@ -903,6 +918,8 @@ public class IntegerCityController {
 
             String orderUrl = "/order/carpool/create";
 
+
+            logger.info("创建订单入参:" + JSONObject.toJSONString(map));
             String result = carRestTemplate.postForObject(orderUrl, JSONObject.class, map);
 
             JSONObject orderResult = JSONObject.parseObject(result);
@@ -2659,10 +2676,15 @@ public class IntegerCityController {
                         String estimatedKey = jsonData.getString("estimatedKey");
                         chargeJSON.put("estimatedKey", estimatedKey);
                         JSONArray arrayEst = jsonData.getJSONArray("estimated");
+
                         if (arrayEst != null && arrayEst.size() > 0) {
                             JSONObject jsonEsti = arrayEst.getJSONObject(0);
                             if (jsonEsti != null && jsonEsti.get("pingSign") != null) {
                                 String carpoolingKey = jsonEsti.getString("pingSign");
+                                String pingSettleType = jsonEsti.get("pingSettleType") == null ? null :jsonEsti.getString("pingSettleType");
+                                if(StringUtils.isNotEmpty(pingSettleType)){
+                                    chargeJSON.put("pingSettleType", pingSettleType);
+                                }
                                 String carpoolingKeyStr = ChargeDecrypt.decrypt(carpoolingKey);
                                 if (StringUtils.isNotEmpty(carpoolingKeyStr)) {
                                     logger.info(carpoolingKeyStr);
@@ -2670,6 +2692,7 @@ public class IntegerCityController {
                                         String poolingArr[] = carpoolingKeyStr.split("-");
                                         if (poolingArr.length > 0) {
                                             chargeJSON.put("estimatedAmount", poolingArr[0]);
+                                            logger.info("=============预估价拼接参数==========" + chargeJSON);
                                             return AjaxResponse.success(chargeJSON);
                                         }
                                     }
