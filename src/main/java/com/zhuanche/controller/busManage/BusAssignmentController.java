@@ -21,6 +21,7 @@ import com.zhuanche.entity.mdbcarmanage.BusOrderMessageTask;
 import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
 import com.zhuanche.entity.mdbcarmanage.CarBizOrderMessageTask;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.busManage.BusAssignmentService;
 import com.zhuanche.serv.busManage.BusCommonService;
 import com.zhuanche.serv.busManage.BusOrderService;
@@ -43,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -568,6 +570,12 @@ public class BusAssignmentController {
 
                 // 查询订单信息
                 BusOrderDetail order = busOrderService.selectOrderDetail(orderNo);
+
+                Boolean b=whetherSendSmsToCustomer(order.getChannelsNum());
+                if (b!=null && b){
+                    return;
+                }
+
                 CarBizOrderMessageTask entity = new CarBizOrderMessageTask();
                 entity.setOrderNo(order.getOrderNo());
                 entity.setDriverName(order.getDriverName());
@@ -621,8 +629,13 @@ public class BusAssignmentController {
 	            String riderContext = "尊敬的用户您好，您预订的" + bookingDate + "的巴士服务订单已被改派成功，司机" + driverName + "，" + afterDriverPhone + "，车牌号" + licensePlates + "，将竭诚为您服务。";
 	
 	            // 乘客
-	            SmsSendUtil.send(riderPhone, riderContext);
-	            // 取消司机
+                Boolean b=whetherSendSmsToCustomer(beforeBusOrder.getChannelsNum());
+                if (b==null || !b){
+                    // 乘客
+                    SmsSendUtil.send(riderPhone, riderContext);
+                }
+
+                // 取消司机
 	            SmsSendUtil.send(beforeDriverPhone, beforeDriverContext);
 	            // 改派司机
 	            SmsSendUtil.send(afterDriverPhone, afterDriverContext);
@@ -633,6 +646,36 @@ public class BusAssignmentController {
             logger.error("巴士改派发送短信异常.", e);
         }
         return result;
+    }
+
+    @Value("${openapi.bus.url}")
+    private String OPENAPI_BUS_URL;
+    /**
+     * 订单是否需要发送短信
+     * @author admin
+     * @param channel
+     * @return
+     * @exception
+     * @date 2020/5/9 17:23
+     */
+    public Boolean whetherSendSmsToCustomer(String channel){
+        Map<String,Object> map =new HashMap <>(2);
+        map.put("channel", channel);
+        try {
+            JSONObject jsonObject = MpOkHttpUtil.okHttpPostBackJson(OPENAPI_BUS_URL+"/query/channel/config",map,3,"开发平台渠道是否发送短信");
+            if(jsonObject != null && jsonObject.get("code") !=null) {
+                int orderCode = jsonObject.getIntValue("code");
+                if (0 == orderCode) {
+                    JSONObject data = jsonObject.getJSONObject("data");
+                    if (data!=null && jsonObject.getByte("msgSwitch")!=null){
+                        return jsonObject.getByte("msgSwitch")==2?true:false;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("---调用开发平台是否发送短信接口失败---{}",channel);
+        }
+        return null;
     }
 
     @ResponseBody
