@@ -2676,6 +2676,10 @@ public class IntegerCityController {
                         String estimatedKey = jsonData.getString("estimatedKey");
                         chargeJSON.put("estimatedKey", estimatedKey);
                         JSONArray arrayEst = jsonData.getJSONArray("estimated");
+
+                        if(jsonData.get("pingSettleType") != null){
+                            chargeJSON.put("pingSettleType",jsonData.get("pingSettleType"));
+                        }
                         if (arrayEst != null && arrayEst.size() > 0) {
                             JSONObject jsonEsti = arrayEst.getJSONObject(0);
                             if (jsonEsti != null && jsonEsti.get("pingSign") != null) {
