@@ -2677,13 +2677,14 @@ public class IntegerCityController {
                         chargeJSON.put("estimatedKey", estimatedKey);
                         JSONArray arrayEst = jsonData.getJSONArray("estimated");
 
-                        if(jsonData.get("pingSettleType") != null){
-                            chargeJSON.put("pingSettleType",jsonData.get("pingSettleType"));
-                        }
                         if (arrayEst != null && arrayEst.size() > 0) {
                             JSONObject jsonEsti = arrayEst.getJSONObject(0);
                             if (jsonEsti != null && jsonEsti.get("pingSign") != null) {
                                 String carpoolingKey = jsonEsti.getString("pingSign");
+                                String pingSettleType = jsonEsti.get("pingSettleType") == null ? null :jsonEsti.getString("pingSettleType");
+                                if(StringUtils.isNotEmpty(pingSettleType)){
+                                    chargeJSON.put("pingSettleType", pingSettleType);
+                                }
                                 String carpoolingKeyStr = ChargeDecrypt.decrypt(carpoolingKey);
                                 if (StringUtils.isNotEmpty(carpoolingKeyStr)) {
                                     logger.info(carpoolingKeyStr);
@@ -2691,6 +2692,7 @@ public class IntegerCityController {
                                         String poolingArr[] = carpoolingKeyStr.split("-");
                                         if (poolingArr.length > 0) {
                                             chargeJSON.put("estimatedAmount", poolingArr[0]);
+                                            logger.info("=============预估价拼接参数==========" + chargeJSON);
                                             return AjaxResponse.success(chargeJSON);
                                         }
                                     }
