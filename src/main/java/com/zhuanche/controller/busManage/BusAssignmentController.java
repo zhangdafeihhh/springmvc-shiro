@@ -662,7 +662,7 @@ public class BusAssignmentController {
         Map<String,Object> map =new HashMap <>(2);
         map.put("channel", channel);
         try {
-            JSONObject jsonObject = MpOkHttpUtil.okHttpPostBackJson(OPENAPI_BUS_URL+"/query/channel/config",map,3,"开发平台渠道是否发送短信");
+            JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(OPENAPI_BUS_URL+"/query/channel/config",map,3,"开发平台渠道是否发送短信");
             if(jsonObject != null && jsonObject.get("code") !=null) {
                 int orderCode = jsonObject.getIntValue("code");
                 if (0 == orderCode) {
