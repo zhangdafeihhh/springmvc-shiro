@@ -25,7 +25,31 @@ public class CarMessagePost{
     private Date createTime;
     /**更新时间**/
     private Date updateTime;
+    /**发布范围1.通知分组 2 通知范围**/
+    private Integer publicRange;
+    /**通知分组时候选择的组ids**/
+    private String messageGroupIds;
 
+
+    public enum RangEnum{
+        groupRange(1),
+        notGroupRange(2);
+
+        private Integer rangCode;
+
+
+        RangEnum(Integer rangCode) {
+            this.rangCode = rangCode;
+         }
+
+        public Integer getRangCode() {
+            return rangCode;
+        }
+
+        public void setRangCode(Integer rangCode) {
+            this.rangCode = rangCode;
+        }
+    }
 
     public enum Status{
         draft(1),  //草稿状态
@@ -201,6 +225,22 @@ public class CarMessagePost{
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getPublicRange() {
+        return publicRange;
+    }
+
+    public void setPublicRange(Integer publicRange) {
+        this.publicRange = publicRange;
+    }
+
+    public String getMessageGroupIds() {
+        return messageGroupIds;
+    }
+
+    public void setMessageGroupIds(String messageGroupIds) {
+        this.messageGroupIds = messageGroupIds;
     }
 
     @Override

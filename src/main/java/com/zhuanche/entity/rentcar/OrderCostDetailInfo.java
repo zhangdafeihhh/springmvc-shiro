@@ -13,7 +13,7 @@ import java.util.List;
 public class OrderCostDetailInfo {
     private Integer detailId;  //主键
 
-    private Integer orderId;  //订单主键
+    private Long orderId;  //订单主键
 
     private String orderNo; //订单号
 
@@ -129,11 +129,11 @@ public class OrderCostDetailInfo {
 
     private String detail; //优惠文案
 
-    private BigDecimal aliPay = BigDecimal.ZERO;  //支付宝支付 --car_biz_order_settle_detail_extension字段
+    private BigDecimal aliPay = BigDecimal.ZERO;  //支付宝支付 --car_biz_order_ settle_detail_extension字段
 
-    private BigDecimal wxPay = BigDecimal.ZERO;  //微信支付 --car_biz_order_settle_detail_extension字段
+    private BigDecimal wxPay = BigDecimal.ZERO;  //微信支付 --car_biz_order_ settle_detail_extension字段
 
-    private BigDecimal creditPay = BigDecimal.ZERO;  //信用卡支付 --car_biz_order_settle_detail_extension字段
+    private BigDecimal creditPay = BigDecimal.ZERO;  //信用卡支付 --car_biz_order_ settle_detail_extension字段
 
     private BigDecimal accountPay = BigDecimal.ZERO;  //账户支付 --字段
 
@@ -211,7 +211,7 @@ public class OrderCostDetailInfo {
 
     private BigDecimal settleAmout;  //结算金额  与totalAmount一样
 
-    private BigDecimal energyDiscountAmout = BigDecimal.ZERO;  //新能量源折扣金额  --car_biz_order_settle_detail_extension字段 extend10
+    private BigDecimal energyDiscountAmout = BigDecimal.ZERO;  //新能量源折扣金额  --car_biz_order_ settle_detail_extension字段 extend10
 
     private Integer orderStatus; //订单状态
 

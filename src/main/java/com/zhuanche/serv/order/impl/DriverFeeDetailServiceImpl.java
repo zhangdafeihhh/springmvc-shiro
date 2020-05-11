@@ -44,7 +44,7 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
      * @param buyoutFlag 0-非一口价 1-一口价
      */
     @Override
-    public DriverCostDetailVO getDriverCostDetail(String orderNo, int orderId, Integer buyoutFlag) {
+    public DriverCostDetailVO getDriverCostDetail(String orderNo, long orderId, Integer buyoutFlag) {
         if (StringUtils.isBlank(orderNo) && orderId != 0) {
             return null;
         }
@@ -225,7 +225,8 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
             logger.info("查询订单明细，入参订单号：" + orderNos);
             return null;
         }
-        return JSON.parseArray(JSON.toJSONString(orderResponse.getData()), OrderCostDetailInfo.class);
+        List<OrderCostDetailInfo> list = JSON.parseArray(JSON.toJSONString(orderResponse.getData()), OrderCostDetailInfo.class);
+        return list;
     }
 
     /**

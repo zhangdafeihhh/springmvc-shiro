@@ -10,7 +10,7 @@ public class OrderDriverCostDetailVO {
 
     private Integer detailId;
     //订单id
-    private Integer orderId;
+    private Long orderId;
     //订单号
     private String orderNo;
     //行驶时间 毫秒
