@@ -228,10 +228,16 @@
         t1.team_name teamName
         FROM
         car_relate_team t,car_driver_team t1
-        WHERE t.team_id = t1.id  and t.driver_id IN
-        <foreach collection="driverIdSet" open="(" close=")" separator="," item="tid" >
-            #{tid}
-        </foreach>
+        WHERE t.team_id = t1.id
+
+        <if test="driverIdSet!=null and driverIdSet.size > 0">
+            and t.driver_id IN
+            <foreach collection="driverIdSet" open="(" close=")" separator="," item="tid" >
+                #{tid}
+            </foreach>
+        </if>
+
+
     </select>
 
 
@@ -239,10 +245,14 @@
         SELECT
         relation_id,team_id,driver_id
         FROM car_relate_team rt
-        WHERE rt.driver_id in
-        <foreach collection="driverIdSet" index="index" item="item" open="(" separator="," close=")">
-            #{item}
-        </foreach>
+        WHERE 1=1
+        <if test="driverIdSet  != null and driverIdSet.size > 0">
+            rt.driver_id in
+            <foreach collection="driverIdSet" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
     </select>
 
     <select id="getTeamIdByDriverId" parameterType="integer" resultType="integer">
