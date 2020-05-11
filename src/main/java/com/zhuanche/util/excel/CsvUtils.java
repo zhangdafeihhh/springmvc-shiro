@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class CsvUtils {
@@ -110,6 +112,38 @@ public class CsvUtils {
 
         }
         return isSucess;
+    }
+
+    public static String renderDate(Date date){
+        if(date == null){
+            return "";
+        }else{
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            return sdf.format(date);
+        }
+    }
+    public static String renderDateTime(Date date){
+        if(date == null){
+            return "";
+        }else{
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return sdf.format(date);
+        }
+    }
+    public static String renderString(String data){
+        if(data == null){
+            return "";
+        }else{
+
+            return data;
+        }
+    }public static String renderInteger(Integer data){
+        if(data == null){
+            return "";
+        }else{
+
+            return data+"";
+        }
     }
 
 
