@@ -12,11 +12,13 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.entity.mdbcarmanage.CarMessageReceiver;
 import com.zhuanche.entity.mdbcarmanage.CarMessageReply;
 import com.zhuanche.serv.message.MessageReplyService;
 import com.zhuanche.serv.message.MessageService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import mapper.mdbcarmanage.ex.CarMessageReceiverExMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +37,13 @@ public class MessageReplyController {
     private static final Logger logger = LoggerFactory.getLogger(MessageReplyController.class);
 
     @Autowired
-    MessageReplyService messageReplyService;
+    private MessageReplyService messageReplyService;
 
     @Autowired
-    MessageService messageService;
+    private MessageService messageService;
+
+    @Autowired
+    private CarMessageReceiverExMapper carMessageReceiverExMapper;
 
     @RequestMapping(value = "/addReply")
     @ResponseBody
@@ -82,6 +87,10 @@ public class MessageReplyController {
             Integer result = messageReplyService.addReply(reply);
 
             if (result > 0){
+                //更改状态为已回复
+                carMessageReceiverExMapper.replyMessage(messageId.intValue(),
+                        currentLoginUser.getId(),
+                        CarMessageReceiver.ReadStatus.reply.getValue());
                 return AjaxResponse.success(null);
             }
 

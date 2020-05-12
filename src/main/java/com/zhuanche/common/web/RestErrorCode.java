@@ -204,6 +204,9 @@ public final class RestErrorCode{
 	public static final int MESSAGE_CONTENT_ERROR = 8002;
 	@ResultMessage("通知消息样式过于复杂")
 	public static final int MESSAGE_CONTENT_CSS_TOO_MANY = 8003;
+
+	@ResultMessage("分组名称已存在")
+	public static final int MESSAGE_GROUP_EXIST = 8005;
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	@ResultMessage("获取分佣信息失败")
 	public static final int GET_SUPPLIER_COMMISSION_INFO_FAILED = 9001;
@@ -351,7 +354,8 @@ public final class RestErrorCode{
 	public static final int CHOOSE_CITY                 =85001;
 
 
-
+	@ResultMessage("状态不是待确认状态，不能进行提现申请")
+	public static final int APPLY_NOT                 =85002;
 
 
 	@ResultMessage("请稍后再试,禁止频繁使用！")

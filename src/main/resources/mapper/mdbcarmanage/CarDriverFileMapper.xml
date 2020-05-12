@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.mdbcarmanage.CarDriverFileMapper">
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarDriverFile">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="file_url" jdbcType="VARCHAR" property="fileUrl" />
+    <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+    <result column="driver_name" jdbcType="VARCHAR" property="driverName" />
+    <result column="driver_phone" jdbcType="VARCHAR" property="driverPhone" />
+    <result column="file_type" jdbcType="SMALLINT" property="fileType" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="create_user" jdbcType="INTEGER" property="createUser" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="update_user" jdbcType="INTEGER" property="updateUser" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="driver_id" jdbcType="INTEGER" property="driverId" />
+    <result column="city_id" jdbcType="INTEGER" property="cityId" />
+    <result column="city_name" jdbcType="VARCHAR" property="cityName" />
+    <result column="supplier_id" jdbcType="INTEGER" property="supplierId" />
+    <result column="supplier_name" jdbcType="VARCHAR" property="supplierName" />
+    <result column="plate_num" jdbcType="VARCHAR" property="plateNum" />
+    <result column="not_reason" jdbcType="VARCHAR" property="notReason" />
+    <result column="audit_time" jdbcType="TIMESTAMP" property="auditTime" />
+    <result column="cooperation_type" jdbcType="INTEGER" property="cooperationType" />
+    <result column="create_name" jdbcType="VARCHAR" property="createName" />
+    <result column="update_name" jdbcType="VARCHAR" property="updateName" />
+    <result column="face_message" jdbcType="VARCHAR" property="faceMessage" />
+    <result column="face_count" jdbcType="INTEGER" property="faceCount" />
+    <result column="face_code" jdbcType="BIT" property="faceCode" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, file_url, file_name, driver_name, driver_phone, file_type, create_time, create_user, 
+    update_time, update_user, `status`, driver_id, city_id, city_name, supplier_id, supplier_name, 
+    plate_num, not_reason, audit_time, cooperation_type, create_name, update_name, face_message, 
+    face_count, face_code
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from car_driver_file
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from car_driver_file
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverFile">
+    insert into car_driver_file (id, file_url, file_name, 
+      driver_name, driver_phone, file_type, 
+      create_time, create_user, update_time, 
+      update_user, `status`, driver_id, 
+      city_id, city_name, supplier_id, 
+      supplier_name, plate_num, not_reason, 
+      audit_time, cooperation_type, create_name, 
+      update_name, face_message, face_count, 
+      face_code)
+    values (#{id,jdbcType=INTEGER}, #{fileUrl,jdbcType=VARCHAR}, #{fileName,jdbcType=VARCHAR}, 
+      #{driverName,jdbcType=VARCHAR}, #{driverPhone,jdbcType=VARCHAR}, #{fileType,jdbcType=SMALLINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{createUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{updateUser,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, #{driverId,jdbcType=INTEGER}, 
+      #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER}, 
+      #{supplierName,jdbcType=VARCHAR}, #{plateNum,jdbcType=VARCHAR}, #{notReason,jdbcType=VARCHAR}, 
+      #{auditTime,jdbcType=TIMESTAMP}, #{cooperationType,jdbcType=INTEGER}, #{createName,jdbcType=VARCHAR}, 
+      #{updateName,jdbcType=VARCHAR}, #{faceMessage,jdbcType=VARCHAR}, #{faceCount,jdbcType=INTEGER}, 
+      #{faceCode,jdbcType=BIT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverFile">
+    insert into car_driver_file
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fileUrl != null">
+        file_url,
+      </if>
+      <if test="fileName != null">
+        file_name,
+      </if>
+      <if test="driverName != null">
+        driver_name,
+      </if>
+      <if test="driverPhone != null">
+        driver_phone,
+      </if>
+      <if test="fileType != null">
+        file_type,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="createUser != null">
+        create_user,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="updateUser != null">
+        update_user,
+      </if>
+      <if test="status != null">
+        `status`,
+      </if>
+      <if test="driverId != null">
+        driver_id,
+      </if>
+      <if test="cityId != null">
+        city_id,
+      </if>
+      <if test="cityName != null">
+        city_name,
+      </if>
+      <if test="supplierId != null">
+        supplier_id,
+      </if>
+      <if test="supplierName != null">
+        supplier_name,
+      </if>
+      <if test="plateNum != null">
+        plate_num,
+      </if>
+      <if test="notReason != null">
+        not_reason,
+      </if>
+      <if test="auditTime != null">
+        audit_time,
+      </if>
+      <if test="cooperationType != null">
+        cooperation_type,
+      </if>
+      <if test="createName != null">
+        create_name,
+      </if>
+      <if test="updateName != null">
+        update_name,
+      </if>
+      <if test="faceMessage != null">
+        face_message,
+      </if>
+      <if test="faceCount != null">
+        face_count,
+      </if>
+      <if test="faceCode != null">
+        face_code,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fileUrl != null">
+        #{fileUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null">
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverName != null">
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null">
+        #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="fileType != null">
+        #{fileType,jdbcType=SMALLINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="driverId != null">
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null">
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null">
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null">
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null">
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="plateNum != null">
+        #{plateNum,jdbcType=VARCHAR},
+      </if>
+      <if test="notReason != null">
+        #{notReason,jdbcType=VARCHAR},
+      </if>
+      <if test="auditTime != null">
+        #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cooperationType != null">
+        #{cooperationType,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null">
+        #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateName != null">
+        #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="faceMessage != null">
+        #{faceMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="faceCount != null">
+        #{faceCount,jdbcType=INTEGER},
+      </if>
+      <if test="faceCode != null">
+        #{faceCode,jdbcType=BIT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverFile">
+    update car_driver_file
+    <set>
+      <if test="fileUrl != null">
+        file_url = #{fileUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null">
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverName != null">
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null">
+        driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="fileType != null">
+        file_type = #{fileType,jdbcType=SMALLINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        create_user = #{createUser,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        update_user = #{updateUser,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="driverId != null">
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null">
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null">
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null">
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null">
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="plateNum != null">
+        plate_num = #{plateNum,jdbcType=VARCHAR},
+      </if>
+      <if test="notReason != null">
+        not_reason = #{notReason,jdbcType=VARCHAR},
+      </if>
+      <if test="auditTime != null">
+        audit_time = #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cooperationType != null">
+        cooperation_type = #{cooperationType,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null">
+        create_name = #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateName != null">
+        update_name = #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="faceMessage != null">
+        face_message = #{faceMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="faceCount != null">
+        face_count = #{faceCount,jdbcType=INTEGER},
+      </if>
+      <if test="faceCode != null">
+        face_code = #{faceCode,jdbcType=BIT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverFile">
+    update car_driver_file
+    set file_url = #{fileUrl,jdbcType=VARCHAR},
+      file_name = #{fileName,jdbcType=VARCHAR},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      file_type = #{fileType,jdbcType=SMALLINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_user = #{createUser,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      update_user = #{updateUser,jdbcType=INTEGER},
+      `status` = #{status,jdbcType=TINYINT},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      city_id = #{cityId,jdbcType=INTEGER},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      plate_num = #{plateNum,jdbcType=VARCHAR},
+      not_reason = #{notReason,jdbcType=VARCHAR},
+      audit_time = #{auditTime,jdbcType=TIMESTAMP},
+      cooperation_type = #{cooperationType,jdbcType=INTEGER},
+      create_name = #{createName,jdbcType=VARCHAR},
+      update_name = #{updateName,jdbcType=VARCHAR},
+      face_message = #{faceMessage,jdbcType=VARCHAR},
+      face_count = #{faceCount,jdbcType=INTEGER},
+      face_code = #{faceCode,jdbcType=BIT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
