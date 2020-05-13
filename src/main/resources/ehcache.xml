@@ -15,7 +15,7 @@
     />
 
 	<!-- 应用于shiro session机制缓存配置-->
-	<cache  name="shiro-activeSessionCache" maxElementsInMemory="10000" eternal="false" timeToIdleSeconds="180" timeToLiveSeconds="600" overflowToDisk="true" maxElementsOnDisk="100000"
+	<cache  name="mp-manage-shiro-activeSessionCache" maxElementsInMemory="10000" eternal="false" timeToIdleSeconds="180" timeToLiveSeconds="600" overflowToDisk="true" maxElementsOnDisk="100000"
 		diskExpiryThreadIntervalSeconds="180" memoryStoreEvictionPolicy="LRU" diskSpoolBufferSizeMB="50">
 	</cache>
 	

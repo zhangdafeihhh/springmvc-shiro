@@ -30,7 +30,7 @@
 	</bean>
 	<!-- 会话DAO （在这里实现自定义的session信息执久化操作）-->
 	<bean id="sessionDAO" class="com.zhuanche.shiro.session.RedisSessionDAO">
-		<property name="activeSessionsCacheName" value="shiro-activeSessionCache" />
+		<property name="activeSessionsCacheName" value="mp-manage-shiro-activeSessionCache" />
 		<property name="sessionIdGenerator" ref="sessionIdGenerator" />
 		<property name="redisTemplate" ref="redisTemplate" />
 		<property name="authorizingRealm" ref="shiroRealm" />
