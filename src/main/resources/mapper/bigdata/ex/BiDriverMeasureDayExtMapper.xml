@@ -51,5 +51,39 @@
       </if>
     </where>
   </select>
+    <select id="disinfectPenetrance" resultType="com.zhuanche.dto.bigdata.DisinfectPenetranceDTO">
+      select
+      sum(b.disinfect_driver_cnt)/sum(a.in_use_driver_num) penetrance
+      from (select data_date,
+      supplier_id,
+      sum(in_use_driver_num) as in_use_driver_num
+      from bi_driver_measure_day
+      where data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+      <if test="supplierId != null">
+        and supplier_id = #{supplierId}
+      </if>
+      <if test="supplierId == null and suppliers != null">
+        and supplier_id in (${suppliers})
+      </if>
+      )a
+      left join
+      (select data_date,
+      supplier_id,
+      sum(disinfect_driver_cnt) as disinfect_driver_cnt
+      from bi_driver_disinfect_measure_day
+      where data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+      <if test="supplierId != null">
+        and supplier_id = #{supplierId}
+      </if>
+      <if test="supplierId == null and suppliers != null">
+        and supplier_id in (${suppliers})
+      </if>
+      )b
+      on a.data_date = b.data_date
+      and a.supplier_id = b.supplier_id
+      group by
+      a.data_date,
+      a.supplier_id
+    </select>
 
 </mapper>
