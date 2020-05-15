@@ -20,7 +20,7 @@ public final class RestErrorCode{
 	@ResultMessage("获得互斥锁超时")
 	public static final int GET_LOCK_TIMEOUT                = 1;
 	@ResultMessage("参数错误")
-	public static final int PARAMS_ERROR                 =400;
+	public static final int PARAMS_ERROR = 400;
 	@ResultMessage("缺少授权")
 	public static final int HTTP_UNAUTHORIZED             = 401;
 	@ResultMessage("禁止访问")
@@ -246,6 +246,14 @@ public final class RestErrorCode{
 	public static final int SUPPLIER_ACCOUNT_APPLY_UPDATE=3111;
 
 	//----------------------------------------------供应商业务
+
+
+	/**************** 调用外部系统错误 30000+ *******************/
+	@ResultMessage("请求商户内部资源失败")
+	public static final int REST_FAIL_MP_MANAGE_API = 30001;
+
+	/************************** end ***************************/
+
 
 
 	//----------------------------------------------千里眼业务

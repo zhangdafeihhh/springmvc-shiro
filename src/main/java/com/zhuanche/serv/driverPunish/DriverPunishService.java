@@ -8,10 +8,11 @@ import com.github.pagehelper.PageInfo;
 import com.zhuanche.entity.bigdata.MaxAndMinId;
 import com.zhuanche.entity.driver.DriverAppealRecord;
 import com.zhuanche.entity.driver.DriverPunishDto;
+import com.zhuanche.entity.driver.PunishRecordVoiceDTO;
+import com.zhuanche.serv.third.MpManageRestClient;
 import com.zhuanche.util.DateUtils;
 import mapper.driver.DriverAppealRecordMapper;
 import mapper.driver.ex.DriverPunishExMapper;
-import org.apache.ibatis.annotations.Param;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -20,6 +21,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,9 @@ public class DriverPunishService {
 
     @Autowired
     private DriverAppealRecordMapper driverAppealRecordMapper;
+
+    @Resource
+    private MpManageRestClient mpManageRestClient;
 
     public PageInfo<DriverPunishDto> selectList(DriverPunishDto params) {
         return selectList(params, true);
@@ -94,6 +99,13 @@ public class DriverPunishService {
         return driverAppealRecordMapper.selectDriverAppealRocordByPunishId(punishId);
     }
 
+    /**
+     * 导出excel
+     * @param list list
+     * @param path path
+     * @return
+     * @throws Exception
+     */
     public Workbook exportExcel(List<DriverPunishDto> list , String path) throws Exception {
 
         FileInputStream io = new FileInputStream(path);
@@ -151,15 +163,6 @@ public class DriverPunishService {
                 cell = row.createCell(12);
                 cell.setCellValue(s.getLicensePlates()!=null?""+s.getLicensePlates()+"":"");
                 //合作类型
-//                String cooperationName = "";
-//                if(s.getCooperationType()!=null){
-//                    CooperationTypeEntity cooperationType = new CooperationTypeEntity();
-//                    cooperationType.setId(s.getCooperationType());
-//                    CooperationTypeEntity cooperationTypeEntity = cooperationTypeDao.queryForObject(cooperationType);
-//                    if(cooperationTypeEntity!=null){
-//                        cooperationName = cooperationTypeEntity.getCooperationName();
-//                    }
-//                }
                 cell = row.createCell(13);
                 cell.setCellValue(s.getCooperationTypeName()!=null?""+s.getCooperationTypeName()+"":"");
                 //城市
@@ -199,6 +202,16 @@ public class DriverPunishService {
 
     public MaxAndMinId queryMaxAndMin(String startDate, String endDate){
         return driverPunishExMapper.queryMaxAndMin(startDate,endDate);
+    }
+
+
+    /**
+     * 查询司机录音
+     * @param orderNo 订单
+     * @return
+     */
+    public List<PunishRecordVoiceDTO> videoRecordQuery(String orderNo) {
+        return mpManageRestClient.driverPunishVideoQuery(orderNo);
     }
 
 }

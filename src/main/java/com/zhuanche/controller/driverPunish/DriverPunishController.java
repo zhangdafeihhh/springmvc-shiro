@@ -1,6 +1,7 @@
 package com.zhuanche.controller.driverPunish;
 
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.exception.ServiceException;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.BaseController;
@@ -19,6 +20,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -68,8 +70,27 @@ public class DriverPunishController extends BaseController {
             PageDTO pageDTO = new PageDTO(params.getPage(), params.getPagesize(), page.getTotal(), page.getList());
             return AjaxResponse.success(pageDTO);
         }catch (Exception e){
-            log.error("查询列表出现异常-{}", e);
+            log.error("查询列表出现异常", e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
+
+
+    /**
+     * 根据订单查询司机录音
+     * @param params
+     * @return
+     */
+    @GetMapping(value = "/initVideoData")
+    public AjaxResponse initVideoData(DriverPunishDto params) {
+        if (Objects.isNull(params.getOrderNo())) {
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        }
+        try {
+            return AjaxResponse.success(driverPunishService.videoRecordQuery(params.getOrderNo()));
+        } catch (ServiceException e) {
+            log.error("司机处罚根据订单查询司机录音异常", e);
+            return AjaxResponse.fail(e.getErrorCode());
         }
     }
 
