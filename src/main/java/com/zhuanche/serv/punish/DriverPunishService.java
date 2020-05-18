@@ -5,10 +5,10 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.enums.PunishEventEnum;
+import com.zhuanche.common.enums.PunishStatusEnum;
 import com.zhuanche.common.exception.ServiceException;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
 import com.zhuanche.entity.bigdata.MaxAndMinId;
 import com.zhuanche.entity.driver.DriverAppealRecord;
@@ -227,19 +227,7 @@ public class DriverPunishService {
                 cell = row.createCell(16);
                 cell.setCellValue(s.getTeamName()!=null?""+s.getTeamName()+"":"");
                 //状态
-                int status = s.getStatus();
-                String statusName = "";
-                if(status==15){
-                    statusName = "待服务";
-                }else if(status==20){
-                    statusName = "已出发";
-                }else if(status==30){
-                    statusName = "服务中";
-                }else if(status==50){
-                    statusName = "已完成";
-                }else if(status==60){
-                    statusName = "取消";
-                }
+                String statusName = PunishStatusEnum.ofValueEmptyStringIfNull(Integer.valueOf(s.getStatus()));
                 cell = row.createCell(17);
                 cell.setCellValue(statusName);
                 //审核节点
@@ -271,7 +259,7 @@ public class DriverPunishService {
      * 处罚审核操作
      *
      * @param punishId
-     * @param status   3 - 通过 4 - 拒绝, 5 - 驳回
+     * @param status   3:通过, 4:拒绝, 5:驳回
      * @param cgReason
      */
     public void doAudit(Integer punishId, Integer status, String cgReason) {
@@ -291,7 +279,7 @@ public class DriverPunishService {
             logicIfPass(punishId, status, cgReason, punishEntity, params, currentAuditNode, auditNode, status, phone, orderNo);
         } else if (status == PunishEventEnum.AUDIT_REFUSE.getStatus()) {
             //审核拒绝,处罚和申述记录都要更新为审核不通过
-            logicIfRefuse(punishId, status, cgReason, punishEntity, params, currentAuditNode, auditNode, phone, orderNo);
+            doWithPunishTypeWhenRefuse(punishId, status, cgReason, punishEntity, params, currentAuditNode, auditNode, phone, orderNo);
         } else if (status == PunishEventEnum.REJECT.getStatus()) {
             // 审核驳回
             logicIfReject(punishId, status, cgReason, punishEntity, params, currentAuditNode, auditNode, phone, orderNo);
@@ -324,7 +312,7 @@ public class DriverPunishService {
             log.info("车管审批之后处理超时时间,dealDuration=" + dealDuration);
             Date expire = org.apache.commons.lang3.time.DateUtils.addHours(new Date(), Integer.parseInt(dealDuration));
             params.put("expireDate", expire);
-            // 更新
+            // 更新状态
             this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, cgStatus);
             riskOrderAppealClient.cancelPunish(punishEntity, 2);
 
@@ -333,73 +321,72 @@ public class DriverPunishService {
             }
         } else {
             //如果不需要，处罚和申述记录都要更新为审核通过,并且需要调用接口，把处罚内容重新加回去
-            Integer punishType = punishEntity.getPunishType();
-            // 风控
-            if (punishType.equals(PUNISH_TYPE_2)) {
-                riskOrderAppealClient.cancelPunish(punishEntity, 3);
-                // 更新状态
-                this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, cgStatus);
-            }
-            // 如果是差评处罚，审核通过后，需要将差评置为无效，并且通知司机不会再扣分
-            else if (punishEntity.getPunishType().equals(5)) {
-                // 更新状态
-                this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, cgStatus);
-                CarBizCustomerAppraisalDTO customerAppraisalEntity = customerAppraisalService.queryForObject(orderNo);
-                if (customerAppraisalEntity == null) {
-                    throw new ServiceException(RestErrorCode.RECORD_DEAL_FAILURE, "根据订单号未找到对应的差评记录");
-                }
-                UpdateAppraisalVo vo = new UpdateAppraisalVo();
-                vo.setAppraisalId(customerAppraisalEntity.getAppraisalId());
-                vo.setStatus(1);
-                vo.setOrderNo(orderNo);
-                SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
-                vo.setModifyBy(currentLoginUser.getId());
-                vo.setModifyName(currentLoginUser.getName());
-                mpRestApiClient.updateAppraisalStatus(vo);
-                this.sendSingleAndMessageForBadAppeal("申诉结果通知", BAD_APPEAL_PASS_MSG, punishEntity.getDriverId(), phone);
+            // 更新状态
+            this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, cgStatus);
+            doWithPunishTypeWhenPass(punishEntity, phone, orderNo);
+        }
+    }
 
-            } else {
-                // 更新状态
-                this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, cgStatus);
-                if (punishEntity.getPunishType() != null && punishEntity.getPunishType() == 1) {
-                    //解除司机停运（如果有停运）；
-                    csApiClient.kefuCancelPunishNew(punishEntity.getStopId(), 1);
-                    //给司机发送短信和站内信
-                    try {
-                        log.info("车管后台司机申诉通过，对司机发送短信和站内信，司机id=" + punishEntity.getDriverId());
-                        this.sendSingleAndMessage("申诉结果通知", orderNo, punishEntity.getDriverId(), phone, punishEntity.getPunishReason(), APPEAL_PASS_MSG);
-                    } catch (Exception e) {
-                        log.error("车管后台司机申诉通过发送短信、站内信失败   error：" + e);
-                    }
-                }
+    private void doWithPunishTypeWhenPass(DriverPunish punishEntity, String phone, String orderNo) {
+        Integer punishType = punishEntity.getPunishType();
+        if (punishType.equals(PUNISH_TYPE_2)) {
+            // 取消风控处理
+            riskOrderAppealClient.cancelPunish(punishEntity, 3);
+        }
+        // 如果是差评处罚，审核通过后，需要将差评置为无效，并且通知司机不会再扣分
+        else if (PUNISH_TYPE_5.equals(punishEntity.getPunishType())) {
+            CarBizCustomerAppraisalDTO customerAppraisalEntity = customerAppraisalService.queryForObject(orderNo);
+            if (customerAppraisalEntity == null) {
+                throw new ServiceException(RestErrorCode.RECORD_DEAL_FAILURE, "根据订单号未找到对应的差评记录");
+            }
+            UpdateAppraisalVo vo = new UpdateAppraisalVo();
+            vo.setAppraisalId(customerAppraisalEntity.getAppraisalId());
+            vo.setStatus(1);
+            vo.setOrderNo(orderNo);
+            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+            vo.setModifyBy(currentLoginUser.getId());
+            vo.setModifyName(currentLoginUser.getName());
+            mpRestApiClient.updateAppraisalStatus(vo);
+            this.sendSingleAndMessageForBadAppeal("申诉结果通知", BAD_APPEAL_PASS_MSG, punishEntity.getDriverId(), phone);
+
+        } else {
+            if (punishEntity.getPunishType() != null && punishEntity.getPunishType() == 1) {
+                //解除司机停运（如果有停运）；
+                csApiClient.kefuCancelPunishNew(punishEntity.getStopId(), 1);
+                //给司机发送短信和站内信
+                log.info("车管后台司机申诉通过，对司机发送短信和站内信，司机id=" + punishEntity.getDriverId());
+                this.sendSingleAndMessage("申诉结果通知", orderNo, punishEntity.getDriverId(), phone, punishEntity.getPunishReason(), APPEAL_PASS_MSG);
             }
         }
     }
 
 
-
     /**
      * 审核拒绝逻辑处理
      */
-    private void logicIfRefuse(Integer punishId, Integer status, String cgReason, DriverPunish punishEntity, Map<String, Object> params, Integer currentAuditNode, String auditNode, String phone, String orderNo) {
+    private void doWithPunishTypeWhenRefuse(Integer punishId, Integer status, String cgReason, DriverPunish punishEntity, Map<String, Object> params, Integer currentAuditNode, String auditNode, String phone, String orderNo) {
+        // 更新状态
+        this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, status);
+        // case punishType
+        logicRefuseWithPunishType(punishEntity, phone, orderNo);
+        //司机保障计划要求客服和风控订单调用策略工具的接口
+        this.guaranteePlanOrder(punishEntity.getPunishType(), punishEntity.getDriverId(), punishEntity.getOrderNo());
+
+    }
+
+    private void logicRefuseWithPunishType(DriverPunish punishEntity, String phone, String orderNo) {
         Integer punishType = punishEntity.getPunishType();
-        // 风控
-        if (punishType.equals(PUNISH_TYPE_2)) {
+        if (PUNISH_TYPE_2.equals(punishType)) {
+            // 风控处理
             riskOrderAppealClient.cancelPunish(punishEntity, 4);
-            // 更新状态
-            this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, status);
         }
         // 如果是差评处罚，审核拒绝后，按照规则对司机进行扣分处罚
-        else if (punishEntity.getPunishType().equals(PUNISH_TYPE_5)) {
-            // 更新
-            this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, status);
+        else if (PUNISH_TYPE_5.equals(punishEntity.getPunishType())) {
             // 通过mp-rest api发送消息到driverScore topic,进行扣分处理
             this.sendDriverScoreMsg(orderNo);
             this.sendSingleAndMessageForBadAppeal("申诉结果通知", BAD_APPEAL_UN_PASS_MSG, punishEntity.getDriverId(), phone);
         } else {
-            // 更新
-            this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, status);
-            if (punishEntity.getPunishType() != null && punishEntity.getPunishType().equals(PUNISH_TYPE_1)) {
+            if (punishEntity.getPunishType() != null && PUNISH_TYPE_1.equals(punishEntity.getPunishType())) {
                 //按照策略对司机进行相关处罚
                 csApiClient.kefuCancelPunishNew(punishEntity.getStopId(), 2);
                 //给司机发送短信和站内信
@@ -411,8 +398,6 @@ public class DriverPunishService {
                 csApiClient.notifyKefuUpdate(punishEntity, 6);
             }
         }
-        //司机保障计划要求客服和风控订单调用策略工具的接口
-        this.guaranteePlanOrder(punishEntity.getPunishType(), punishEntity.getDriverId(), punishEntity.getOrderNo());
     }
 
     /**
@@ -463,8 +448,8 @@ public class DriverPunishService {
      */
     private void sendSingleAndMessage(String title, String orderNo, Integer driverId, String phone, String punishReason, String msgEnd) {
         String content = SEND_MSG_PREFIX + "[" + orderNo + "]" + SEND_MSG_MIDDLE + "[" + punishReason + "]。" + msgEnd;
+        log.info("司机申诉未通过，对司机发送短信和站内信，司机id=" + driverId);
         try {
-            log.info("司机申诉未通过，对司机发送短信和站内信，司机id=" + driverId);
             //发送站内信
             mpConfigClient.singleDriverPush(title, content, content, driverId, phone);
             //发送短信
