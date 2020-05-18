@@ -303,10 +303,10 @@ public class DriverPunishService {
      */
     private void logicIfPass(Integer punishId, Integer status, String cgReason, DriverPunish punishEntity, Map<String, Object> params, Integer currentAuditNode, String auditNode, Integer cgStatus, String phone, String orderNo) {
         // 调接口看下是否还需要业务后台处理
-        ConfigPunishTypeBaseEntity punishType = convertConfigPunishTypeBaseEntity(punishEntity);
-        log.info("查询参数:" + ToStringBuilder.reflectionToString(punishType));
+        ConfigPunishTypeBaseEntity punishTypeBaseEntity = convertConfigPunishTypeBaseEntity(punishEntity);
         // 查询策略配置
-        Boolean had = configPunishTypeBaseService.queryIsYwHandlePunishType(punishType);
+        Boolean had = configPunishTypeBaseService.queryIsYwHandlePunishType(punishTypeBaseEntity);
+        log.info("审核通过是否还需要业务后台处理 参数:{},结果:{}", ToStringBuilder.reflectionToString(punishTypeBaseEntity), had);
         if (had) {
             //如果需要，处罚和申述记录都要保持状态为待审核,currentAuditNode = 2; auditNode = "业务后台";
             status = 2;
@@ -314,7 +314,7 @@ public class DriverPunishService {
             auditNode = "业务后台";
             params.put("ywStatus", 2);
             // 查询策略配置
-            ConfigPunishTypeBaseEntity configPunish = configPunishTypeBaseService.queryIsHandlePuinshType(punishType);
+            ConfigPunishTypeBaseEntity configPunish = configPunishTypeBaseService.queryIsHandlePuinshType(punishTypeBaseEntity);
             // 后台处理时长
             String dealDuration = configPunish.getDealDuration();
             String[] dealDurations = dealDuration.split(",");
@@ -333,9 +333,9 @@ public class DriverPunishService {
             }
         } else {
             //如果不需要，处罚和申述记录都要更新为审核通过,并且需要调用接口，把处罚内容重新加回去
-            Integer punishType1 = punishEntity.getPunishType();
+            Integer punishType = punishEntity.getPunishType();
             // 风控
-            if (punishType1.equals(2)) {
+            if (punishType.equals(PUNISH_TYPE_2)) {
                 riskOrderAppealClient.cancelPunish(punishEntity, 3);
                 // 更新状态
                 this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, cgStatus);
@@ -399,16 +399,12 @@ public class DriverPunishService {
         } else {
             // 更新
             this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, status);
-            if (punishEntity.getPunishType() != null && punishEntity.getPunishType() == 1) {
+            if (punishEntity.getPunishType() != null && punishEntity.getPunishType().equals(PUNISH_TYPE_1)) {
                 //按照策略对司机进行相关处罚
                 csApiClient.kefuCancelPunishNew(punishEntity.getStopId(), 2);
                 //给司机发送短信和站内信
-                try {
-                    log.info("车管后台司机申诉拒绝，对司机发送短信和站内信，司机id=" + punishEntity.getDriverId());
-                    this.sendSingleAndMessage("申诉结果通知", orderNo, punishEntity.getDriverId(), phone, punishEntity.getPunishReason(), APPEAL_UN_PASS_MSG);
-                } catch (Exception e) {
-                    log.error("车管后台司机申诉拒绝发送短信、站内信失败   error：" + e);
-                }
+                log.info("车管后台司机申诉拒绝，对司机发送短信和站内信，司机id=" + punishEntity.getDriverId());
+                this.sendSingleAndMessage("申诉结果通知", orderNo, punishEntity.getDriverId(), phone, punishEntity.getPunishReason(), APPEAL_UN_PASS_MSG);
                 //司机积分调用策略工具接口
                 driverIntegralClient.driverIntegralStrategyUrl(punishEntity.getDriverId(), punishEntity.getOrderNo(), punishEntity.getCreateDate(), punishEntity.getPunishReason());
             } else if (punishEntity.getPunishTypeName().contains(TRIPARTITE_INSPECTION)) {

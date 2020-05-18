@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -100,6 +101,26 @@ public class DriverPunishController extends BaseController {
         }
     }
 
+
+    /**
+     * 根据订单查询司机录音
+     * @param params
+     * @return
+     */
+    @GetMapping(value = "/initVideoData")
+    public AjaxResponse initVideoData(DriverPunishDto params) {
+        if (Objects.isNull(params.getOrderNo())) {
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        }
+        try {
+            return AjaxResponse.success(driverPunishService.videoRecordQuery(params.getOrderNo()));
+        } catch (ServiceException e) {
+            log.error("司机处罚根据订单查询司机录音异常", e);
+            return AjaxResponse.fail(e.getErrorCode());
+        }
+    }
+
+
     /**
      * 查询处罚详情
      * @param punishId punishId
@@ -114,13 +135,8 @@ public class DriverPunishController extends BaseController {
             Map<String, Object> data = new HashMap<>(4);
             log.info("查询详情,punishId为--{}", punishId);
             DriverPunishDto driverPunish = driverPunishService.getDetail(punishId);
-            List<PunishRecordVoiceDTO> videoList = null;
-            if (Objects.nonNull(driverPunish) && Objects.nonNull(driverPunish.getOrderNo())) {
-                videoList = driverPunishService.videoRecordQuery(driverPunish.getOrderNo());
-            }
             List<DriverAppealRecord> recordList = driverPunishService.selectDriverAppealRocordByPunishId(punishId);
             data.put("driverPunish", driverPunish);
-            data.put("videoList", Optional.ofNullable(videoList).orElse(Collections.emptyList()));
             data.put("rocordList", Optional.ofNullable(recordList).orElse(Collections.emptyList()));
             return AjaxResponse.success(data);
         } catch (Exception e) {
