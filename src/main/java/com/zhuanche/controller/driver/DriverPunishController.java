@@ -1,4 +1,4 @@
-package com.zhuanche.controller.driverPunish;
+package com.zhuanche.controller.driver;
 
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.exception.ServiceException;
@@ -10,7 +10,8 @@ import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.bigdata.MaxAndMinId;
 import com.zhuanche.entity.driver.DriverAppealRecord;
 import com.zhuanche.entity.driver.DriverPunishDto;
-import com.zhuanche.serv.driverPunish.DriverPunishService;
+import com.zhuanche.entity.driver.PunishRecordVoiceDTO;
+import com.zhuanche.serv.punish.DriverPunishService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
@@ -20,7 +21,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -75,41 +77,54 @@ public class DriverPunishController extends BaseController {
         }
     }
 
-
     /**
-     * 根据订单查询司机录音
-     * @param params
+     * 处罚审核操作
+     * @param punishId 处罚记录Id
+     * @param status 3 - 通过 4 - 拒绝, 5 - 驳回
+     * @param reason 原因
      * @return
      */
-    @GetMapping(value = "/initVideoData")
-    public AjaxResponse initVideoData(DriverPunishDto params) {
-        if (Objects.isNull(params.getOrderNo())) {
+    @PostMapping(value = "/examineDriverPunish")
+    public AjaxResponse examineDriverPunish(Integer punishId, Integer status, String reason) {
+        if (Objects.isNull(punishId) || Objects.isNull(status)) {
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
+        log.info("司机处罚审核操作 punishId:{},status:{},reason:{}", punishId, status, reason);
         try {
-            return AjaxResponse.success(driverPunishService.videoRecordQuery(params.getOrderNo()));
+            driverPunishService.doAudit(punishId, status, reason);
+            log.info("司机处罚审核操作成功");
+            return AjaxResponse.success(null);
         } catch (ServiceException e) {
-            log.error("司机处罚根据订单查询司机录音异常", e);
-            return AjaxResponse.fail(e.getErrorCode());
+            log.info("司机处罚审核操作失败", e);
+            return AjaxResponse.failMsg(e.getErrorCode(), e.getMessage());
         }
     }
 
+    /**
+     * 查询处罚详情
+     * @param punishId punishId
+     * @return
+     */
     @RequestMapping("/getDriverPunishDetail")
-    public AjaxResponse getDriverPunishDetail(Integer punishId){
+    public AjaxResponse getDriverPunishDetail(Integer punishId) {
+        if (Objects.isNull(punishId)) {
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        }
         try {
-            Map<String, Object> data = new HashMap<>();
-
+            Map<String, Object> data = new HashMap<>(4);
             log.info("查询详情,punishId为--{}", punishId);
             DriverPunishDto driverPunish = driverPunishService.getDetail(punishId);
-            data.put("driverPunish", driverPunish);
-            List<DriverAppealRecord> rocordList = driverPunishService.selectDriverAppealRocordByPunishId(punishId);
-            if(rocordList==null){
-                rocordList = new ArrayList<DriverAppealRecord>();
+            List<PunishRecordVoiceDTO> videoList = null;
+            if (Objects.nonNull(driverPunish) && Objects.nonNull(driverPunish.getOrderNo())) {
+                videoList = driverPunishService.videoRecordQuery(driverPunish.getOrderNo());
             }
-            data.put("rocordList", rocordList);
+            List<DriverAppealRecord> recordList = driverPunishService.selectDriverAppealRocordByPunishId(punishId);
+            data.put("driverPunish", driverPunish);
+            data.put("videoList", Optional.ofNullable(videoList).orElse(Collections.emptyList()));
+            data.put("rocordList", Optional.ofNullable(recordList).orElse(Collections.emptyList()));
             return AjaxResponse.success(data);
-        }catch (Exception e){
-            log.error("查询列表出现异常-{}", e);
+        } catch (Exception e) {
+            log.error("查询列表出现异常", e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
@@ -158,8 +173,8 @@ public class DriverPunishController extends BaseController {
 
                 page = driverPunishService.selectList(params);
             }
-            Workbook wb = driverPunishService.exportExcel(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driver_punish.xlsx");
-            super.exportExcelFromTemplet(request, response, wb, new String("司机处罚列表".getBytes("utf-8"), "iso8859-1"));
+            Workbook wb = driverPunishService.exportExcel(rows,request.getSession().getServletContext().getRealPath("/")+ File.separator+"template"+File.separator+"driver_punish.xlsx");
+            super.exportExcelFromTemplet(request, response, wb, new String("司机处罚列表".getBytes(StandardCharsets.UTF_8), "iso8859-1"));
         } catch (IOException e) {
             log.error("daochu error", e);
         } catch (Exception e) {

@@ -4,6 +4,9 @@ package com.zhuanche.entity.driver;
 
 import com.zhuanche.common.enums.EnumCooperationType;
 import com.zhuanche.entity.common.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -12,6 +15,9 @@ import java.util.Date;
  * driver_punish
  * @author 
  */
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DriverPunish extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

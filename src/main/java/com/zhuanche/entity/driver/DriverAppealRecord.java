@@ -1,13 +1,18 @@
 package com.zhuanche.entity.driver;
 
 import com.zhuanche.util.DateUtil;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DriverAppealRecord {
     private static final long serialVersionUID = 1L;
 
@@ -117,10 +122,22 @@ public class DriverAppealRecord {
 
     private List<String> appealPictureUrlList;
 
-    private String cgOperateDateStr;//车管_处理时间
-    private String ywOperateDateStr;//业务_处理时间
-    private String createDateStr;//创建时间
-    private String updateDateStr;//修改时间
+    /**
+     * 车管_处理时间
+     */
+    private String cgOperateDateStr;
+    /**
+     * 业务_处理时间
+     */
+    private String ywOperateDateStr;
+    /**
+     * 创建时间
+     */
+    private String createDateStr;
+    /**
+     * 修改时间
+     */
+    private String updateDateStr;
 
     private Integer cgAutoStatus;
 

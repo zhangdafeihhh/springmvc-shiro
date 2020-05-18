@@ -3,6 +3,8 @@ package com.zhuanche.serv;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.le.config.dict.Dicts;
 import com.sq.component.utils.CollectionUtils;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
@@ -13,7 +15,6 @@ import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.entity.driver.CustomerAppraisal;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
-import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.util.MobileOverlayUtil;
 import mapper.driver.CustomerAppraisalMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
@@ -25,10 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.google.common.collect.Lists;
 
 import java.util.*;
 
+/**
+ * @author kjeakiry
+ */
 @Service
 public class CustomerAppraisalService {
 
@@ -40,8 +43,6 @@ public class CustomerAppraisalService {
     @Autowired
     private CarBizCustomerAppraisalStatisticsExMapper carBizCustomerAppraisalStatisticsExMapper;
 
-    @Autowired
-    private CarDriverTeamService carDriverTeamService;
     @Autowired
     private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
     @Autowired
@@ -76,7 +77,24 @@ public class CustomerAppraisalService {
         return carBizCustomerAppraisalExMapper.queryCustomerAppraisalList(carBizCustomerAppraisalDTO);
     }
 
-    //转换实体类
+    /**
+     * 查询订单评分
+     * @param orderNo
+     * @return
+     */
+    public CarBizCustomerAppraisalDTO queryForObject(String orderNo) {
+        CarBizCustomerAppraisalDTO param = new CarBizCustomerAppraisalDTO();
+        param.setOrderNo(orderNo);
+        List<CarBizCustomerAppraisalDTO> list = this.queryCustomerAppraisalList(param);
+        if (CollectionUtils.isNotEmpty(list)) {
+            return list.get(0);
+        }
+        return null;
+    }
+
+    /**
+     * 转换实体类
+     */
     public List<CarBizCustomerAppraisalDTO> turnAppraisalDTO(List<CustomerAppraisal> customerAppraisalList){
 
         if(CollectionUtils.isEmpty(customerAppraisalList)){
@@ -174,7 +192,7 @@ public class CustomerAppraisalService {
             return null;
         }
         Set<Integer> driverIdSet = new HashSet<>();
-        Map<String,CarBizDriverInfoDTO> cacheItem = new HashMap<>();
+        Map<String, CarBizDriverInfoDTO> cacheItem = Maps.newHashMapWithExpectedSize(driverInfoDTOList.size());
 
         for(CarBizDriverInfoDTO item :driverInfoDTOList){
             driverIdSet.add(item.getDriverId());

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 /**
+ * 调用mp-manage-rest接口
  * @author kjeakiry
  */
 @Slf4j
@@ -26,7 +27,7 @@ public class MpManageRestClient {
     public static final String CODE = "code";
 
     @Value("${mp-manage-rest.url}")
-    String mpManageRestUrl;
+    private String mpManageRestUrl;
 
 
     /**
