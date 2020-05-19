@@ -312,6 +312,8 @@ public final class RestErrorCode{
 	@ResultMessage("未查询到匹配的线路")
 	public static final int UN_DEFINDED_LINE = 50801;
 
+	@ResultMessage("请输入乘车人数")
+	public static final int UN_RIDER_COUNT = 50901;
 
 
 

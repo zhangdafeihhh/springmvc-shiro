@@ -84,7 +84,6 @@ public class InterCityActivityController {
             ajaxResponse = AjaxResponse.fail(code);
         }
 
-
         return ajaxResponse;
     }
 
@@ -92,7 +91,6 @@ public class InterCityActivityController {
     @RequestMapping(value = "/queryRule")
     @ResponseBody
     public AjaxResponse queryRule(){
-
 
         JSONArray jsonArray = activityService.queryRule();
         AjaxResponse ajaxResponse = AjaxResponse.success(jsonArray);

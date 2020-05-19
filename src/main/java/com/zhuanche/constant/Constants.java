@@ -123,4 +123,16 @@ public final class Constants {
 
 	public static final String EROR_DATE = "NaN-NaN-NaN";
 
+	/**降序排序**/
+	public static final String BOOKING_DATE_SORT_DESC = "1";
+	/**升序排序**/
+	public static final String BOOKING_DATE_SORT_ASC = "2";
+	/**不走管理费模式*/
+	public static final Integer PAYFLAG = 13;
+	/**短横线*/
+	public static final String SHORT_STOKE = "-";
+	/**城际拼车类型*/
+	public static final Integer INTER_CITY_SERVICE_type = 1;
+    /**车技包车类型*/
+	public static final Integer INTER_CITY_CHARTER_type = 2;
 }
