@@ -43,7 +43,7 @@ public class DriverInvitationController {
 	/**SINA提供短链接生成服务**/
 	private static final String SINA_API = "http://api.t.sina.com.cn/short_url/shorten.json?source=1681459862&url_long=";
 	
-	// 生成短链接
+	/**生成短链接*/
 	@RequestMapping(value = "/makeShortUrl")
 	@ResponseBody
 	@RequestFunction(menu = DRIVER_JOIN_PROMOTE_INVITE)
@@ -57,8 +57,8 @@ public class DriverInvitationController {
                 shortUrl = HttpClientUtil.buildGetRequest(SINA_API + url).setLimitResult(1).execute();
                 logger.info("供应商短链接生成,supplierId={},result={}",supplierId,shortUrl);
             } catch (HttpException e) {
-                logger.error("供应商短链接生成异常",e);
-                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+				logger.info("供应商连接地址生成失败，使用长连接" + e);
+				shortUrl = url;
             }
 			parseArray = JSON.parseArray((shortUrl));
 		} catch (Exception e) {
