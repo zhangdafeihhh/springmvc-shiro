@@ -343,7 +343,7 @@ public class MessageManagerController {
     })
     public AjaxResponse messageUnreadCount(@RequestParam(value = "userId",defaultValue = "")Integer userId){
         logger.info(MessageFormat.format("messageUnreadCount入参:userId:{0}",userId));
-        if (StringUtils.isEmpty(String.valueOf(userId))) {
+        if (userId == null || StringUtils.isEmpty(String.valueOf(userId))) {
             logger.info("messageUnreadCount参数为空");
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
         }
