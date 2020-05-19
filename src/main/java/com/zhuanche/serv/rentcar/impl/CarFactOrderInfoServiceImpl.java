@@ -13,6 +13,7 @@ import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.driverOrderRecord.OrderTimeEntity;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.order.DriverFeeDetailService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.Common;
@@ -309,20 +310,20 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
     private void fillDriverAmount(List<CarFactOrderInfoDTO> list) {
         List<String> orderIds = list.stream().map(CarFactOrderInfoDTO::getOrderId).collect(Collectors.toList());
         List<OrderDriverCostDetailVO> driverCostDetails = driverFeeDetailService.getOrderDriverCostDetailVOBatch(orderIds);
-        Map<Integer, OrderDriverCostDetailVO> map = driverCostDetails.stream().collect(Collectors.toMap(OrderDriverCostDetailVO::getOrderId, a -> a, (k1, k2) -> k1));
+        Map<Long, OrderDriverCostDetailVO> map = driverCostDetails.stream().collect(Collectors.toMap(OrderDriverCostDetailVO::getOrderId, a -> a, (k1, k2) -> k1));
         for (CarFactOrderInfoDTO vo : list) {
             try {
-                if (null != map.get(Integer.parseInt(vo.getOrderId())))
-                    vo.setActualPayAmountDriver(map.get(Integer.parseInt(vo.getOrderId())).getTotalAmount().toString());
+                if (null != map.get(Long.parseLong(vo.getOrderId())))
+                    vo.setActualPayAmountDriver(map.get(Long.parseLong(vo.getOrderId())).getTotalAmount().toString());
             } catch (NumberFormatException e) {}
         }
     }
 
 	
-	@Override
-	public CarBizOrderSettleEntity selectDriverSettleByOrderId(Long orderId) {
-		return carFactOrderExMapper.selectDriverSettleByOrderId(orderId);
-	}
+//	@Override
+//	public CarBizOrderSettleEntity selectDriverSettleByOrderId(Long orderId) {
+//		return carFactOrderExMapper.selectDriverSettleByOrderId(orderId);
+//	}
 
 	@Override
 	public CarGroupEntity selectCarGroupById(Integer id) {
@@ -394,5 +395,14 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 		return carFactOrderExMapper.selectServiceEntityList(serviceEntity);
 	}
 
-
+	@Override
+	public JSONObject queryByJiFei(String method, Map<String, Object> params, String tag) {
+		String url = orderCostUrl + method;
+		JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, tag);
+		if (jsonObject == null || jsonObject.getIntValue("code")!=0) {
+			logger.error("调用计费接口" + url + "返回结果为null");
+			return null;
+		}
+		return jsonObject.getJSONObject("data");
+	}
 }
