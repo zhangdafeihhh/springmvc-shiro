@@ -668,7 +668,7 @@ public class BusAssignmentController {
                 if (0 == orderCode) {
                     JSONObject data = jsonObject.getJSONObject("data");
                     if (data!=null && jsonObject.getByte("msgSwitch")!=null){
-                        return jsonObject.getByte("msgSwitch")==2?true:false;
+                        return jsonObject.getByte("msgSwitch")==1?true:false;
                     }
                 }
             }
