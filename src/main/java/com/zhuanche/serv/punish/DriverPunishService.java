@@ -279,7 +279,7 @@ public class DriverPunishService {
             logicIfPass(punishId, status, cgReason, punishEntity, params, currentAuditNode, auditNode, status, phone, orderNo);
         } else if (status == PunishEventEnum.AUDIT_REFUSE.getStatus()) {
             //审核拒绝,处罚和申述记录都要更新为审核不通过
-            doWithPunishTypeWhenRefuse(punishId, status, cgReason, punishEntity, params, currentAuditNode, auditNode, phone, orderNo);
+            logicIfRefuse(punishId, status, cgReason, punishEntity, params, currentAuditNode, auditNode, phone, orderNo);
         } else if (status == PunishEventEnum.REJECT.getStatus()) {
             // 审核驳回
             logicIfReject(punishId, status, cgReason, punishEntity, params, currentAuditNode, auditNode, phone, orderNo);
@@ -314,7 +314,7 @@ public class DriverPunishService {
             params.put("expireDate", expire);
             // 更新状态
             this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, cgStatus);
-            riskOrderAppealClient.cancelPunish(punishEntity, 2);
+            riskOrderAppealClient.updateStatus(punishEntity, 2);
 
             if (punishEntity.getPunishTypeName().contains(TRIPARTITE_INSPECTION)) {
                 csApiClient.notifyKefuUpdate(punishEntity, 4);
@@ -331,7 +331,7 @@ public class DriverPunishService {
         Integer punishType = punishEntity.getPunishType();
         if (punishType.equals(PUNISH_TYPE_2)) {
             // 取消风控处理
-            riskOrderAppealClient.cancelPunish(punishEntity, 3);
+            riskOrderAppealClient.updateStatus(punishEntity, 3);
         }
         // 如果是差评处罚，审核通过后，需要将差评置为无效，并且通知司机不会再扣分
         else if (PUNISH_TYPE_5.equals(punishEntity.getPunishType())) {
@@ -364,21 +364,21 @@ public class DriverPunishService {
     /**
      * 审核拒绝逻辑处理
      */
-    private void doWithPunishTypeWhenRefuse(Integer punishId, Integer status, String cgReason, DriverPunish punishEntity, Map<String, Object> params, Integer currentAuditNode, String auditNode, String phone, String orderNo) {
+    private void logicIfRefuse(Integer punishId, Integer status, String cgReason, DriverPunish punishEntity, Map<String, Object> params, Integer currentAuditNode, String auditNode, String phone, String orderNo) {
         // 更新状态
         this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, status);
         // case punishType
-        logicRefuseWithPunishType(punishEntity, phone, orderNo);
+        this.doWithPunishTypeWhenRefuse(punishEntity, phone, orderNo);
         //司机保障计划要求客服和风控订单调用策略工具的接口
         this.guaranteePlanOrder(punishEntity.getPunishType(), punishEntity.getDriverId(), punishEntity.getOrderNo());
 
     }
 
-    private void logicRefuseWithPunishType(DriverPunish punishEntity, String phone, String orderNo) {
+    private void doWithPunishTypeWhenRefuse(DriverPunish punishEntity, String phone, String orderNo) {
         Integer punishType = punishEntity.getPunishType();
         if (PUNISH_TYPE_2.equals(punishType)) {
             // 风控处理
-            riskOrderAppealClient.cancelPunish(punishEntity, 4);
+            riskOrderAppealClient.updateStatus(punishEntity, 4);
         }
         // 如果是差评处罚，审核拒绝后，按照规则对司机进行扣分处罚
         else if (PUNISH_TYPE_5.equals(punishEntity.getPunishType())) {

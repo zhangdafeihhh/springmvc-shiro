@@ -23,12 +23,14 @@ public class RiskOrderAppealClient {
     @Value("${risk.order.complain.url}")
     private String riskOrderComplainUrl;
 
+    /**  http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=23141554 **/
     private static final String DRIVER_PUNISH_FK_URL = "/admin/orderincontrol/updateStatus.do";
 
     /**
-     * 请求风控系统.更新状态撤消订单处罚
+     * 请求风控系统.订单状态处理接口
+     * status 1 :未申诉；2: 待处理、3 :申诉成功、 4申诉驳回
      */
-    public void cancelPunish(DriverPunish punishEntity, int status) {
+    public void updateStatus(DriverPunish punishEntity, int status) {
         Map<String, Object> map = Maps.newHashMapWithExpectedSize(6);
         map.put("orderNo", punishEntity.getOrderNo());
         map.put("driverId", punishEntity.getDriverId());
