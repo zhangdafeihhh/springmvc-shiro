@@ -98,6 +98,6 @@ public class DriverMeasureDayService {
                 suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds().toArray(), ",");
             }
         }
-        return biDriverMeasureDayExtMapper.disinfectPenetrance(startDate, endDate, supplierId, suppliers);
+        return biDriverMeasureDayExtMapper.disinfectPenetrance(startDate.split(" ")[0], endDate.split(" ")[0], supplierId, suppliers);
     }
 }
