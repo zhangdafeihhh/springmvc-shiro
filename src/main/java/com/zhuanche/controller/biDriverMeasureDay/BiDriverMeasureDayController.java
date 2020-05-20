@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+
 /**
  * @Author:qxx
  * @Date:2020/4/23
@@ -106,6 +108,7 @@ public class BiDriverMeasureDayController extends BaseController {
         if (null == penetranceDTO){
             penetranceDTO = new DisinfectPenetranceDTO();
         }
+        penetranceDTO.setPenetrance(penetranceDTO.getPenetrance().multiply(new BigDecimal(100)));
         return AjaxResponse.success(penetranceDTO);
     }
 }
