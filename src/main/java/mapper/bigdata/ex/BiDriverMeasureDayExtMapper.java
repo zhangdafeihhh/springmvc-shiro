@@ -8,5 +8,5 @@ import com.zhuanche.dto.bigdata.DisinfectPenetranceDTO;import org.apache.ibatis.
 public interface BiDriverMeasureDayExtMapper {
   public IndexBiDriverMeasureDto findForStatistics(BiDriverMeasureDayDto param);
 
-  DisinfectPenetranceDTO disinfectPenetrance(@Param("startDate")String startDate, @Param("endDate")String endDate, @Param("supplierId")Integer supplierId, @Param("suppliers")String suppliers);
+  DisinfectPenetranceDTO disinfectPenetrance(@Param("startDate")String startDate, @Param("endDate")String endDate, @Param("supplierId")Integer supplierId);
 }

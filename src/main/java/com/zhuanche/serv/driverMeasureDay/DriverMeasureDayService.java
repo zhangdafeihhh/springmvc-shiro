@@ -96,8 +96,11 @@ public class DriverMeasureDayService {
         if (null == supplierId) {
             if (WebSessionUtil.isSupperAdmin() == false) {
                 suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds().toArray(), ",");
+                if (StringUtils.isNotBlank(suppliers)){
+                    supplierId = Integer.parseInt(suppliers.split(",")[0]);
+                }
             }
         }
-        return biDriverMeasureDayExtMapper.disinfectPenetrance(startDate.split(" ")[0], endDate.split(" ")[0], supplierId, suppliers);
+        return biDriverMeasureDayExtMapper.disinfectPenetrance(startDate.split(" ")[0], endDate.split(" ")[0], supplierId);
     }
 }
