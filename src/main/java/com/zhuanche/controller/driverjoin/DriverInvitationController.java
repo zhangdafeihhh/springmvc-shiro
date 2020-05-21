@@ -51,7 +51,7 @@ public class DriverInvitationController {
 		logger.info("供应商短链接生成,supplierId="+supplierId);
 		JSONArray parseArray = null;
 		try {
-			String url = DRIVER_JOIN_URL+supplierId;
+			String url = DRIVER_JOIN_URL+supplierId+"%26tt="+System.currentTimeMillis();
 			String shortUrl  = null;
 			try {
                 shortUrl = HttpClientUtil.buildGetRequest(SINA_API + url).setLimitResult(1).execute();
