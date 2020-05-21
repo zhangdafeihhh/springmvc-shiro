@@ -103,6 +103,9 @@ public class DriverMeasureDayService {
             }
         }
         logger.info("startDate.split(\" \")[0]:{}, endDate.split(\" \")[0]:{}, supplierId:{}", startDate.split(" ")[0], endDate.split(" ")[0], supplierId);
+        if (null == supplierId){
+            return null;
+        }
         return biDriverMeasureDayExtMapper.disinfectPenetrance(startDate.split(" ")[0], endDate.split(" ")[0], supplierId);
     }
 }
