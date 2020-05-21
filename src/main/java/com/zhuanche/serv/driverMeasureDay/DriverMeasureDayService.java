@@ -94,12 +94,10 @@ public class DriverMeasureDayService {
     public DisinfectPenetranceDTO disinfectPenetrance(String startDate, String endDate, Integer supplierId) {
         String suppliers = null;
         if (null == supplierId) {
-            if (WebSessionUtil.isSupperAdmin() == false) {
-                suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds().toArray(), ",");
-                logger.info("suppliers:{}" ,suppliers);
-                if (StringUtils.isNotBlank(suppliers)){
-                    supplierId = Integer.parseInt(suppliers.split(",")[0]);
-                }
+            suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds().toArray(), ",");
+            logger.info("suppliers:{}", suppliers);
+            if (StringUtils.isNotBlank(suppliers)) {
+                supplierId = Integer.parseInt(suppliers.split(",")[0]);
             }
         }
         logger.info("startDate.split(\" \")[0]:{}, endDate.split(\" \")[0]:{}, supplierId:{}", startDate.split(" ")[0], endDate.split(" ")[0], supplierId);
