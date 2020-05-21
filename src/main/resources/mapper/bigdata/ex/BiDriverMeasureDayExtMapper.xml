@@ -61,9 +61,6 @@
                 <if test="supplierId != null">
                   and supplier_id = #{supplierId}
                 </if>
-                <if test="supplierId == null and suppliers != null">
-                  and supplier_id in (${suppliers})
-                </if>
             group by supplier_id
       )a
       left join
@@ -73,9 +70,6 @@
       where <![CDATA[ data_date >= #{startDate,jdbcType=VARCHAR} and data_date < #{endDate,jdbcType=VARCHAR} ]]>
             <if test="supplierId != null">
               and supplier_id = #{supplierId}
-            </if>
-            <if test="supplierId == null and suppliers != null">
-              and supplier_id in (${suppliers})
             </if>
           group by supplier_id
       )b
