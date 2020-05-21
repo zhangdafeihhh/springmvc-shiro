@@ -7,7 +7,7 @@ import com.alibaba.rocketmq.client.consumer.listener.MessageListenerOrderly;
 import com.alibaba.rocketmq.common.message.MessageExt;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.controller.driver.YueAoTongPhoneConfig;
-import com.zhuanche.controller.interCity.InterCityUtils;
+import com.zhuanche.controller.intercity.InterCityUtils;
 import com.zhuanche.serv.supplier.SupplierRecordService;
 import mapper.driver.ex.YueAoTongPhoneConfigExMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;

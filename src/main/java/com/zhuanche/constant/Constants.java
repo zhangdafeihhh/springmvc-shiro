@@ -135,4 +135,14 @@ public final class Constants {
 	public static final Integer INTER_CITY_SERVICE_type = 1;
     /**车技包车类型*/
 	public static final Integer INTER_CITY_CHARTER_type = 2;
+
+	/**========json解析常用变量===========**/
+
+ 	/**分销商id*/
+	public static final String  DISTRIBUTORID = "distributorId";
+
+	public static final String  DISTRIBUTORNAME = "distributorName";
+
+	public static final String  LINEID = "lineId";
+
 }

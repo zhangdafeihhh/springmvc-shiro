@@ -1,4 +1,4 @@
-package com.zhuanche.controller.interCity;
+package com.zhuanche.controller.intercity;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;

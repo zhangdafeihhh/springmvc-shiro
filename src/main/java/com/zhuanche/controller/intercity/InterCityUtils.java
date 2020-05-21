@@ -1,31 +1,18 @@
-package com.zhuanche.controller.interCity;
+package com.zhuanche.controller.intercity;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
-import com.zhuanche.common.rpc.RPCAPI;
 import com.zhuanche.common.util.LbsSignUtil;
 import com.zhuanche.common.util.StaticRpcUrl;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.http.MpOkHttpUtil;
-import com.zhuanche.serv.interCity.MainOrderInterService;
-import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.MyRestTemplate;
-import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
-import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * @Author fanht
@@ -40,17 +27,6 @@ public class InterCityUtils {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
-    /*@Autowired
-    private DriverInfoInterCityExMapper infoInterCityExMapper;
-
-    @Autowired
-    private CarBizCarGroupExMapper carBizCarGroupExMapper;
-
-    @Autowired
-    private MainOrderInterService interService;
-
-    @Autowired
-    private CarFactOrderInfoService carFactOrderInfoService;*/
 
 
 
@@ -84,7 +60,7 @@ public class InterCityUtils {
         String getOnId = "";
         if(StringUtils.isNotEmpty(lbsResult)){
             JSONObject jsonResult = JSONObject.parseObject(lbsResult);
-            if(jsonResult.get("code") == null || jsonResult.getInteger("code") != 0 ||
+            if(jsonResult.get(Constants.CODE) == null || jsonResult.getInteger(Constants.CODE) != 0 ||
                     jsonResult.get("data") == null) {
                 logger.info("获取上车点失败");
                 return null;
@@ -143,13 +119,13 @@ public class InterCityUtils {
 
         if(resultY != null ){
             JSONObject jsonResultY = JSONObject.parseObject(resultY);
-            if(jsonResultY.get("code") == null || jsonResultY.getInteger("code") != 0 ||
+            if(jsonResultY.get(Constants.CODE) == null || jsonResultY.getInteger(Constants.CODE) != 0 ||
                     jsonResultY.get("data") == null){
                 logger.info("获取下车点失败");
                 return null;
             }
 
-            JSONArray jsonArray = jsonResultY.getJSONArray("data");
+            JSONArray jsonArray = jsonResultY.getJSONArray(Constants.DATA);
             if(jsonArray.size() == 0){
                 logger.info("获取下车点失败");
                 return null;
@@ -189,7 +165,7 @@ public class InterCityUtils {
             if (StringUtils.isNotEmpty(areaResult)) {
                 JSONObject jsonResult = JSONObject.parseObject(areaResult);
 
-                if (jsonResult.get("data") != null && jsonResult.get("data") != "") {
+                if (jsonResult.get(Constants.DATA) != null && jsonResult.get(Constants.DATA) != "") {
 
                     JSONObject jsonData = jsonResult.getJSONObject("data");
                     jsonRoute.put("supplierId", jsonData.getString("supplierId"));
@@ -230,15 +206,13 @@ public class InterCityUtils {
 
         if(resultY != null ){
             JSONObject jsonResultY = JSONObject.parseObject(resultY);
-            if(jsonResultY.get("code") == null || jsonResultY.getInteger("code") != 0 ||
+            if(jsonResultY.get(Constants.CODE) == null || jsonResultY.getInteger(Constants.CODE) != 0 ||
                     jsonResultY.get("data") == null){
-               // logger.info("获取下车点失败");
                 return null;
             }
 
             JSONArray jsonArray = jsonResultY.getJSONArray("data");
             if(jsonArray.size() == 0){
-                //logger.info("获取下车点失败");
                 return null;
             }
 
@@ -253,7 +227,6 @@ public class InterCityUtils {
         }
 
         if(StringUtils.isEmpty(getOffId)){
-            //logger.info("上下车点不再围栏区域");
             return null;
         }
         System.out.println("=======getOffId:" + getOffId);
