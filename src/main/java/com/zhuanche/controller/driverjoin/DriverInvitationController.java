@@ -51,7 +51,7 @@ public class DriverInvitationController {
 		logger.info("供应商短链接生成,supplierId="+supplierId);
 		JSONArray parseArray = null;
 		try {
-			String url = DRIVER_JOIN_URL+supplierId;
+			String url = DRIVER_JOIN_URL+supplierId+"%26tt="+System.currentTimeMillis();
 			String shortUrl  = null;
 			try {
                 shortUrl = HttpClientUtil.buildGetRequest(SINA_API + url).setLimitResult(1).execute();
@@ -65,7 +65,7 @@ public class DriverInvitationController {
 			logger.info("地址生成失败");
 			parseArray = new JSONArray();
 			Map<String,Object> map = Maps.newHashMap();
-			map.put("url_long",DRIVER_JOIN_URL_LONG+supplierId);
+			map.put("url_long",DRIVER_JOIN_URL_LONG+supplierId+"&tt="+System.currentTimeMillis());
 			map.put("type",0);
 			parseArray.add(map);
 			logger.info("连接地址生成失败，重新生成：" + parseArray);
