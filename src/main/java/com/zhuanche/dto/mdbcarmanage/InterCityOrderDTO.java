@@ -8,46 +8,61 @@ package com.zhuanche.dto.mdbcarmanage;
  */
 public class InterCityOrderDTO {
 
-    private String bookingUserId; //预订人userId
+    /**预订人userId*/
+    private String bookingUserId;
 
-    private String reserveName; //预订人名称
+    /**预订人名称*/
+    private String reserveName;
 
-    private String reservePhone;//预订人手机
+    /**预订人手机*/
+    private String reservePhone;
 
-    private Integer isSameRider;//乘车人手机是否和预订人相同 1 相同 0 不相同
+    /**乘车人手机是否和预订人相同 1 相同 0 不相同*/
+    private Integer isSameRider;
 
-    private String riderName;//乘车人姓名
+    /**乘车人姓名*/
+    private String riderName;
 
     private String riderPhone;
 
-    private Integer riderCount;//乘车人数
+    /**乘车人数*/
+    private Integer riderCount;
 
-    private String boardingTime;//预约时间
+    /**预约时间*/
+    private String boardingTime;
 
-    private String boardingCityId;//预约城市id
+    /**预约城市id*/
+    private String boardingCityId;
 
     private String boardingCityName;
 
-    private String boardingGetOffCityId;//预约下车城市id
+    /**预约下车城市id*/
+    private String boardingGetOffCityId;
 
     private String boardingGetOffCityName;
 
-    private String bookingStartPoint;//预约开始下车坐标点
+    /**预约开始下车坐标点*/
+    private String bookingStartPoint;
 
     private String bookingEndPoint;
 
-    private Integer status;//订单状态
+    /**订单状态*/
+    private Integer status;
 
-    private Integer type;//类型 不确定
+    /**类型 不确定*/
+    private Integer type;
 
-    private Integer serviceTypeId;//服务类型
+    /**服务类型*/
+    private Integer serviceTypeId;
 
-    private String orderTime;//下单时间
+    /**下单时间*/
+    private String orderTime;
 
+    /**上车地点*/
+    private String boardOnAddr;
 
-    private String boardOnAddr;//上车地点
-
-    private String boardOffAddr;//下车地点
+    /**下车地点*/
+    private String boardOffAddr;
 
     private Integer cityId;
 
@@ -57,9 +72,6 @@ public class InterCityOrderDTO {
 
     private String orderNo;
 
-
-
-
     private Integer driverId;
 
     private String driverName;
@@ -68,29 +80,34 @@ public class InterCityOrderDTO {
 
     private String licensePlates;
 
-
     private String cityName;
 
     private Integer supplierId;
 
     private String supplierName;
 
-
     private String mainTime;
 
-    private String carGroup;//车型
+    /**车型*/
+    private String carGroup;
 
-    private Integer seatNum;//车型对应的座位数
+    /**车型对应的座位数*/
+    private Integer seatNum;
 
-    private String bookingStartShortAddr;//上车短地址
+    /**上车短地址*/
+    private String bookingStartShortAddr;
 
-    private String bookingEndShortAddr;//下车短地址
+    /**下车短地址*/
+    private String bookingEndShortAddr;
 
+    /**车型名称*/
+    private String carGroupName;
 
-    private String carGroupName;//车型名称
+    /**乘车线路id*/
+    private String ruleId;
 
-    private String ruleId;//乘车线路id
-
+    /**1: 城际拼车  2:城际包车*/
+    private Integer offlineIntercityServiceType;
 
     public String getReserveName() {
         return reserveName;
@@ -396,5 +413,13 @@ public class InterCityOrderDTO {
 
     public void setServiceTypeId(Integer serviceTypeId) {
         this.serviceTypeId = serviceTypeId;
+    }
+
+    public Integer getOfflineIntercityServiceType() {
+        return offlineIntercityServiceType;
+    }
+
+    public void setOfflineIntercityServiceType(Integer offlineIntercityServiceType) {
+        this.offlineIntercityServiceType = offlineIntercityServiceType;
     }
 }

@@ -172,4 +172,6 @@ public final class Constants {
 
 	public static final  String PING_SIGN = "pingSign";
 
+	public static final String NEW_CROSS_SERVICE_TYPE = "newCrossServiceType";
+
 }

@@ -213,15 +213,16 @@ public class IntegerCityController {
                                    String lineName,
                                    String bookingDateSort,
                                    String isCrossDiscountReduction,
-                                   Integer payFlag) {
+                                   Integer payFlag,
+                                   Integer offlineIntercityServiceType) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},supplierId:{3},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
                         "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostEndDate{20},endCostEndDate{21},riderPhone:{22},distributorId:{23}," +
-                        "bookingDateSort:{24},payFlag:{25}", pageNum,
+                        "bookingDateSort:{24},payFlag:{25},offlineIntercityServiceType:{26}", pageNum,
                 pageSize, cityId, supplierId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,lineName,bookingDateSort,payFlag));
+                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,lineName,bookingDateSort,payFlag,offlineIntercityServiceType));
         Map<String, Object> map = Maps.newHashMap();
         if(StringUtils.isNotEmpty(lineName)){
             String ruleBatch = this.getRuleIdBatch(lineName);
@@ -232,7 +233,7 @@ public class IntegerCityController {
             map.put("ruleIdBatch",ruleBatch);
         }
         map = this.getQueryParam(pageNum, pageSize, cityId, supplierId, orderState, pushDriverType, serviceType,orderType, airportId, orderSource, driverName,driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo,
-                mainOrderNo, beginCreateDate, endCreateDate, beginCostEndDate, endCostEndDate, riderPhone, distributorId, lineName, bookingDateSort, isCrossDiscountReduction, payFlag,map);
+                mainOrderNo, beginCreateDate, endCreateDate, beginCostEndDate, endCostEndDate, riderPhone, distributorId, lineName, bookingDateSort, isCrossDiscountReduction, payFlag,offlineIntercityServiceType,map);
 
         String supplierIdBatch = this.supplierBatch(cityId,supplierId);
         if (StringUtils.isNotEmpty(supplierIdBatch)) {
@@ -347,6 +348,7 @@ public class IntegerCityController {
                                              String bookingDateSort,
                                              String isCrossDiscountReduction,
                                              Integer payFlag,
+                                             Integer offlineIntercityServiceType,
                                              Map<String, Object> map){
         map.put("pageNo", pageNum);
         map.put("pageSize", pageSize);
@@ -369,6 +371,7 @@ public class IntegerCityController {
         map.put("endCostEndDate", endCostEndDate);
         map.put("riderPhone", riderPhone);
         map.put("distributorId", distributorId);
+        map.put("offlineIntercityServiceType", offlineIntercityServiceType);
 
         if(StringUtils.isNotEmpty(isCrossDiscountReduction)){
             map.put("isCrossDiscountReduction", isCrossDiscountReduction);
@@ -423,16 +426,16 @@ public class IntegerCityController {
                                         String beginCostEndDate,
                                         String riderPhone,
                                         String distributorId,
-                                        String bookingDateSort) {
+                                        String bookingDateSort,
+                                        Integer offlineIntercityServiceType) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
                         "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21}," +
-                        "riderPhone:{22},distributorId:{23},bookingDateSort:{24}", pageNum,
+                        "riderPhone:{22},distributorId:{23},bookingDateSort:{24},offlineIntercityServiceType:{25}", pageNum,
                 pageSize, cityId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone,distributorId,bookingDateSort));
-
+                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone,distributorId,bookingDateSort,offlineIntercityServiceType));
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
@@ -467,6 +470,7 @@ public class IntegerCityController {
         map.put("endCostEndDate", beginCostEndDate);
         map.put("riderPhone", riderPhone);
         map.put("distributorId", distributorId);
+        map.put("offlineIntercityServiceType", offlineIntercityServiceType);
 
 
 
@@ -1144,7 +1148,7 @@ public class IntegerCityController {
                             }
                         }
                     }
-                     //获取预订人
+                     /**获取预订人*/
                     Map<String, Object> bookMap = Maps.newHashMap();
                     bookMap.put("orderNo", orderNo);
                     bookMap.put("name", "bookingUserName");
@@ -1154,9 +1158,11 @@ public class IntegerCityController {
                         JSONObject jsonBook = JSONObject.parseObject(bookingResult);
                         if (jsonBook.get(Constants.CODE) != null && jsonBook.getInteger(Constants.CODE) == 0) {
                             JSONObject jsonBookData = jsonBook.getJSONObject(Constants.DATA);
-                            if (jsonBookData != null && jsonBookData.get(Constants.BOOKING_USER_NAME) != null) {
-                                String bookingUserName = jsonBookData.getString(Constants.BOOKING_USER_NAME);
+                            if (jsonBookData != null) {
+                                String bookingUserName = jsonBookData.get(Constants.BOOKING_USER_NAME) != null?jsonBookData.getString(Constants.BOOKING_USER_NAME):"";
                                 dto.setReserveName(bookingUserName);
+                                Integer  newCrossServiceType = jsonBook.get(Constants.NEW_CROSS_SERVICE_TYPE) != null ? jsonBook.getInteger(Constants.NEW_CROSS_SERVICE_TYPE):0;
+                                dto.setOfflineIntercityServiceType(newCrossServiceType);
                             }
 
                         }
@@ -1166,7 +1172,7 @@ public class IntegerCityController {
                         String mainOrderNo = carFactOrderInfoService.getMainOrderBySubOrderNo(orderNo);
                         if (StringUtils.isNotEmpty(mainOrderNo)) {
                             dto.setMainOrderNo(mainOrderNo);
-                            //如果主单号不为空，根据主单号获取主单信息以及司机信息
+                            /**如果主单号不为空，根据主单号获取主单信息以及司机信息*/
                             MainOrderInterCity mainOrderInterCity = interService.queryMainOrder(mainOrderNo);
                             if (mainOrderInterCity != null && mainOrderInterCity.getDriverId() != null) {
                                 dto.setRouteName(mainOrderInterCity.getMainName());
@@ -1189,9 +1195,7 @@ public class IntegerCityController {
                         e.printStackTrace();
                     }
 
-                    //获取上下车的短地址 wiki http://inside-yapi.01zhuanche.com/project/19/interface/api/9519
-
-
+                    /**获取上下车的短地址 wiki http://inside-yapi.01zhuanche.com/project/19/interface/api/9519*/
                     Map<String, Object> shortMap = Maps.newHashMap();
                     List<String> shortList = new ArrayList<>();
                     shortMap.put("bId", Common.BUSSINESSID);
@@ -1249,7 +1253,8 @@ public class IntegerCityController {
      */
     @ResponseBody
     @RequestMapping(value = "/editOrder", method = RequestMethod.POST)
-    public AjaxResponse editOrder(@Verify(param = "orderNo", rule = "required") String orderNo,
+    public AjaxResponse editOrder(@Verify(param = "offlineIntercityServiceType", rule = "required") Integer offlineIntercityServiceType,
+                                  @Verify(param = "orderNo", rule = "required") String orderNo,
                                   String reserveName,
                                   String reservePhone,
                                   Integer isSameRider,
@@ -1275,11 +1280,23 @@ public class IntegerCityController {
 
         logger.info(MessageFormat.format("编辑订单入参:orderNo{0},reserveName{1},reservePhone{2},isSameRider{3},riderName{4},riderPhone{5}," +
                         "riderCount:{6},boardingTime{7},boardingCityId{8},boardingGetOnX{9},boardingGetOnY{10},boardingGetOffCityId{11}," +
-                        "boardingGetOffX:{12},boardingGetOffY:{13},", orderNo, reserveName, reservePhone, isSameRider, riderName, riderPhone, riderCount,
+                        "boardingGetOffX:{12},boardingGetOffY:{13},offlineIntercityServiceType:{14}", orderNo, reserveName, reservePhone, isSameRider, riderName, riderPhone, riderCount,
                 boardingTime, boardingCityId, boardingGetOnX, boardingGetOnY, boardingGetOffCityId, boardingGetOffX, boardingGetOffY, mainOrderNo,
-                status, startCityName, endCityName, bookingStartAddr, bookingEndAddr, carGroup, bookingStartShortAddr, bookingEndShortAddr));
-        //根据上下车地址判断是否在城际列车配置的范围内
-        //根据横纵坐标获取围栏，根据围栏获取路线
+                status, startCityName, endCityName, bookingStartAddr, bookingEndAddr, carGroup, bookingStartShortAddr, bookingEndShortAddr,offlineIntercityServiceType));
+
+
+
+        if(Constants.INTER_CITY_CHARTER_type.equals(offlineIntercityServiceType)){
+            riderCount = seatCount(Integer.valueOf(carGroup));
+        }else {
+            if(riderCount == null){
+                logger.info("城际拼车请输入乘车人数");
+                return AjaxResponse.fail(RestErrorCode.UN_RIDER_COUNT);
+            }
+        }
+
+        /**根据上下车地址判断是否在城际列车配置的范围内*/
+        /**根据横纵坐标获取围栏，根据围栏获取路线*/
         String getOnId = "";
         if (StringUtils.isNotEmpty(boardingGetOnX) && StringUtils.isNotEmpty(boardingGetOnY)) {
             AjaxResponse boardResponse = hasBoardRoutRights(boardingCityId, boardingGetOnX, boardingGetOnY);
@@ -1386,7 +1403,7 @@ public class IntegerCityController {
                     JSONObject jsonEst = (JSONObject) elsRes.getData();
                     /***获取预估金额*/
                     String estimatedAmount = jsonEst.getString("estimatedAmount");
-                    //判断预估价是否大于0
+                    /**判断预估价是否大于0*/
                     BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
                     if (bigDecimal.compareTo(BigDecimal.ZERO) == 1) {
                         logger.info("=========获取到了合适的预估价==========");
@@ -1410,21 +1427,23 @@ public class IntegerCityController {
 
 
         JSONObject jsonEst = (JSONObject) elsRes.getData();
-        //获取预估金额
+        /**获取预估金额*/
         String estimatedAmount = jsonEst.getString("estimatedAmount");
         String estimatedKey = jsonEst.getString("estimatedKey");
 
         logger.info("获取到预估金额:" + estimatedAmount);
-        //判断预估价是否大于0
+        /**判断预估价是否大于0*/
         BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
         if (bigDecimal.compareTo(BigDecimal.ZERO) != 1) {
             logger.info("获取到的预估金额为0");
             return AjaxResponse.fail(RestErrorCode.UN_SUPPORT_CAR);
         }
 
-
         Map<String, Object> map = Maps.newHashMap();
         List<String> list = new ArrayList<>();
+        /**城际包车、拼车*/
+        map.put("offlineIntercityServiceType", offlineIntercityServiceType);
+        list.add("offlineIntercityServiceType=" + offlineIntercityServiceType);
         /**预估金额*/
         map.put("estimatedAmount", estimatedAmount);
         list.add("estimatedAmount=" + estimatedAmount);
@@ -1433,7 +1452,6 @@ public class IntegerCityController {
         list.add("buyoutPrice=" + estimatedAmount);
         map.put("estimatedKey", estimatedKey);
         list.add("estimatedKey=" + estimatedKey);
-
 
         map.put("businessId", Common.BUSSINESSID);
         list.add("businessId=" + Common.BUSSINESSID);
@@ -2156,8 +2174,8 @@ public class IntegerCityController {
                         logger.error("====调用派单改派接口异常==" + e);
                     }
 
-                    ExecutorService executor = Executors.newCachedThreadPool();
-                    Future<String> future = executor.submit(new Callable<String>() {
+                    ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1,new BasicThreadFactory.Builder().namingPattern("order-update-%d").daemon(true).build());
+                    Future<String> future = executorService.submit(new Callable<String>() {
                         @Override
                         public String call() throws Exception {
                             //如果是新增或者改派，需要将
