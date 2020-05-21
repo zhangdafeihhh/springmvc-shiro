@@ -129,11 +129,16 @@ public final class Constants {
 	public static final String BOOKING_DATE_SORT_ASC = "2";
 	/**不走管理费模式*/
 	public static final Integer PAYFLAG = 13;
+
+	public static final String PING_SETTLE_TYPE = "1";
+
+
+
 	/**短横线*/
 	public static final String SHORT_STOKE = "-";
 	/**城际拼车类型*/
 	public static final Integer INTER_CITY_SERVICE_type = 1;
-    /**车技包车类型*/
+    /**包车类型*/
 	public static final Integer INTER_CITY_CHARTER_type = 2;
 
 	/**========json解析常用变量===========**/
@@ -144,5 +149,27 @@ public final class Constants {
 	public static final String  DISTRIBUTORNAME = "distributorName";
 
 	public static final String  LINEID = "lineId";
+
+	public static final String SPLIT = ";";
+
+	/**订单*/
+	public static final Integer ORDER_RETURN_CODE = 249;
+
+
+	public static final String MEMO = "memo";
+
+	public static final String BOOKING_USER_NAME = "bookingUserName";
+
+	public static final String ORDER_ADDRESS = "orderAddress";
+
+	public static final Integer ORDER_STATUS = 13;
+
+	public static final String MAIN_ORDER_NO = "mainOrderNo";
+
+	public static final String ESTIMATED = "estimated";
+
+	public static final  String ESTIMATED_KEY = "estimatedKey";
+
+	public static final  String PING_SIGN = "pingSign";
 
 }

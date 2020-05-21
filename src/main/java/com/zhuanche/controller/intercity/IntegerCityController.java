@@ -222,12 +222,59 @@ public class IntegerCityController {
                 pageSize, cityId, supplierId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
                 endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,lineName,bookingDateSort,payFlag));
+        Map<String, Object> map = Maps.newHashMap();
+        if(StringUtils.isNotEmpty(lineName)){
+            String ruleBatch = this.getRuleIdBatch(lineName);
+            if(StringUtils.isEmpty(ruleBatch)){
+                logger.info("=====未查询到匹配的线路====");
+                return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
+            }
+            map.put("ruleIdBatch",ruleBatch);
+        }
+        map = this.getQueryParam(pageNum, pageSize, cityId, supplierId, orderState, pushDriverType, serviceType,orderType, airportId, orderSource, driverName,driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo,
+                mainOrderNo, beginCreateDate, endCreateDate, beginCostEndDate, endCostEndDate, riderPhone, distributorId, lineName, bookingDateSort, isCrossDiscountReduction, payFlag,map);
+
+        String supplierIdBatch = this.supplierBatch(cityId,supplierId);
+        if (StringUtils.isNotEmpty(supplierIdBatch)) {
+            map.put("supplierIdBatch", supplierIdBatch);
+        }
+        /**添加排序字段*/
+        JSONArray arraySort = this.arraySort(bookingDateSort);
+        map.put("sort", arraySort.toString());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmssSS");
+        String transId = sdf.format(new Date());
+        map.put("transId", transId);
+        String url = esOrderDataSaasUrl + "/order/v2/search";
+
+        String result = MpOkHttpUtil.okHttpGet(url, map, 0, null);
+        if (StringUtils.isNotEmpty(result)) {
+            JSONObject jsonObject = JSONObject.parseObject(result);
+            int code = jsonObject.getIntValue(Constants.CODE);
+            //0表示有结果返回
+            if (code == 0) {
+                JSONObject jsonData = jsonObject.getJSONObject(Constants.DATA);
+                if (jsonData != null && jsonData.get(Constants.DATA) != null) {
+                    //解析里面的内容获取分销商名称
+                    return this.response(jsonData);
+                }
+            }
+        }
+        //调用订单组接口查询
+        return AjaxResponse.success(null);
+    }
 
 
-        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+    /**
+     * 获取供应商
+     * @param cityId
+     * @param supplierId
+     * @return
+     */
+    private String supplierBatch(Integer cityId, Integer supplierId){
 
-        String supplierIdBatch = "";
-
+            SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+            String supplierIdBatch = "";
         Set<Integer> citiesSet = new HashSet<>();
         Set<Integer> suppliersSet = new HashSet<>();
         if (cityId != null) {
@@ -267,9 +314,40 @@ public class IntegerCityController {
         if (StringUtils.isNotEmpty(supplierBuilder.toString())) {
             supplierIdBatch = supplierBuilder.toString().substring(0, supplierBuilder.toString().length() - 1);
         }
+        return supplierIdBatch;
+    }
 
 
-        Map<String, Object> map = Maps.newHashMap();
+
+    private Map<String,Object> getQueryParam(Integer pageNum,
+                                             Integer pageSize,
+                                             Integer cityId,
+                                             Integer supplierId,
+                                             Integer orderState,
+                                             Integer pushDriverType,
+                                             Integer serviceType,
+                                             Integer orderType,
+                                             Integer airportId,
+                                             Integer orderSource,
+                                             String driverName,
+                                             String driverPhone,
+                                             String licensePlates,
+                                             String reserveName,
+                                             String reservePhone,
+                                             String riderName,
+                                             String orderNo,
+                                             String mainOrderNo,
+                                             String beginCreateDate,
+                                             String endCreateDate,
+                                             String beginCostEndDate,
+                                             String endCostEndDate,
+                                             String riderPhone,
+                                             String distributorId,
+                                             String lineName,
+                                             String bookingDateSort,
+                                             String isCrossDiscountReduction,
+                                             Integer payFlag,
+                                             Map<String, Object> map){
         map.put("pageNo", pageNum);
         map.put("pageSize", pageSize);
         map.put("status", orderState);
@@ -295,25 +373,15 @@ public class IntegerCityController {
         if(StringUtils.isNotEmpty(isCrossDiscountReduction)){
             map.put("isCrossDiscountReduction", isCrossDiscountReduction);
         }
-        //是否走平台流水  payFlag 1 是 走 平台 流水 13  不走平台流水   默认全部
+        /**是否走平台流水  payFlag 1 是 走 平台 流水 13  不走平台流水   默认全部*/
         if(payFlag != null && payFlag > 0){
             map.put("payFlag",payFlag);
         }
-        if(StringUtils.isNotEmpty(lineName)){
-            String ruleBatch = this.getRuleIdBatch(lineName);
-            if(StringUtils.isEmpty(ruleBatch)){
-                logger.info("=====未查询到匹配的线路====");
-                return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
-            }
-            map.put("ruleIdBatch",ruleBatch);
-        }
+        return map;
+    }
 
 
-        if (StringUtils.isNotEmpty(supplierIdBatch)) {
-            map.put("supplierIdBatch", supplierIdBatch);
-        }
-
-        //添加排序字段
+    private JSONArray arraySort(String bookingDateSort){
         JSONObject jsonSort = new JSONObject();
         if(StringUtils.isNotEmpty(bookingDateSort) && Constants.BOOKING_DATE_SORT_DESC.equals(bookingDateSort)){
             jsonSort.put("field", "bookingDate");
@@ -327,28 +395,7 @@ public class IntegerCityController {
         }
         JSONArray arraySort = new JSONArray();
         arraySort.add(jsonSort);
-        map.put("sort", arraySort.toString());
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmssSS");
-        String transId = sdf.format(new Date());
-        map.put("transId", transId);
-        String url = esOrderDataSaasUrl + "/order/v2/search";
-
-        String result = MpOkHttpUtil.okHttpGet(url, map, 0, null);
-        if (StringUtils.isNotEmpty(result)) {
-            JSONObject jsonObject = JSONObject.parseObject(result);
-            int code = jsonObject.getIntValue(Constants.CODE);
-            //0表示有结果返回
-            if (code == 0) {
-                JSONObject jsonData = jsonObject.getJSONObject(Constants.DATA);
-                if (jsonData != null && jsonData.get(Constants.DATA) != null) {
-                    //解析里面的内容获取分销商名称
-                    return this.response(jsonData);
-                }
-            }
-        }
-        //调用订单组接口查询
-        return AjaxResponse.success(null);
+        return arraySort;
     }
 
     @RequestMapping(value = "/orderWrestQuery", method = RequestMethod.GET)
@@ -704,7 +751,7 @@ public class IntegerCityController {
                 String registerResult = MpOkHttpUtil.okHttpPost(centerUrl + url, map, 0, null);
                 if (StringUtils.isNotEmpty(registerResult)) {
                     JSONObject jsonResult = JSONObject.parseObject(registerResult);
-                    if (jsonResult.get("code") == null || jsonResult.getInteger("code") != 0) {
+                    if (jsonResult.get(Constants.CODE) == null || jsonResult.getInteger(Constants.CODE) != 0) {
                         logger.info("根据乘客获取customer失败");
                         return AjaxResponse.fail(RestErrorCode.REGISTER_BY_PHONE);
                     }
@@ -779,7 +826,7 @@ public class IntegerCityController {
 
             logger.info("=================pingSettleType=========" + pingSettleType);
 
-            if(pingSettleType != null &&  "1".equals(pingSettleType)){
+            if(pingSettleType != null &&  Constants.PING_SETTLE_TYPE.equals(pingSettleType)){
                 map.put("payFlag", String.valueOf(Constants.PAYFLAG));
                 sb.append("payFlag=13").append(SYSMOL);
             }else {
@@ -934,14 +981,14 @@ public class IntegerCityController {
             String result = carRestTemplate.postForObject(orderUrl, JSONObject.class, map);
 
             JSONObject orderResult = JSONObject.parseObject(result);
-            if (orderResult.get("code") != null && orderResult.getInteger("code") == 0) {
-                JSONObject jsonData = orderResult.getJSONObject("data");
+            if (orderResult.get(Constants.CODE) != null && orderResult.getInteger(Constants.CODE) == 0) {
+                JSONObject jsonData = orderResult.getJSONObject(Constants.DATA);
                 logger.info("========创建订单返回结果========" + jsonData.toString());
                 //解析data里面的数据
                 Integer returnCode = jsonData.get("returnCode") == null ? null : jsonData.getInteger("returnCode");
                 if (returnCode != null && returnCode == 0) {
                     return AjaxResponse.success(jsonData);
-                } else if (returnCode != null && returnCode == 249) {
+                } else if (returnCode != null && Constants.ORDER_RETURN_CODE.equals(returnCode) ) {
                     logger.info("有一笔进行中的订单");
                     return AjaxResponse.fail(RestErrorCode.HAS_SUB_ORDER);
                 }
@@ -1010,10 +1057,10 @@ public class IntegerCityController {
             //wiki地址 http://inside-yapi.01zhuanche.com/project/19/interface/api/3561
             JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderByOrderNo", map, 0, "查询订单详情");
 
-            if (jsonObject != null && jsonObject.get("code") != null) {
-                Integer code = jsonObject.getIntValue("code");
+            if (jsonObject != null && jsonObject.get(Constants.CODE) != null) {
+                Integer code = jsonObject.getIntValue(Constants.CODE);
                 if (0 == code) {
-                    JSONObject jsonData = jsonObject.getJSONObject("data");
+                    JSONObject jsonData = jsonObject.getJSONObject(Constants.DATA);
                     InterCityOrderDTO dto = new InterCityOrderDTO();
                     String bookingUserPhone = jsonData.get("bookingUserPhone") == null ? "" : jsonData.getString("bookingUserPhone");
                     String riderPhone = jsonData.get("riderPhone") == null ? "" : jsonData.getString("riderPhone");
@@ -1026,8 +1073,8 @@ public class IntegerCityController {
                     dto.setBoardingGetOffCityId(jsonData.get("bookingEndAddr") == null ? "" : jsonData.getString("bookingEndAddr"));
                     String jsonPoint = jsonData.get("bookingStartPoint") == null ? "" : jsonData.getString("bookingStartPoint");
                     if (StringUtils.isNotEmpty(jsonPoint)) {
-                        if (jsonPoint.contains(";")) {
-                            String[] arr = jsonPoint.split(";");
+                        if (jsonPoint.contains(Constants.SPLIT)) {
+                            String[] arr = jsonPoint.split(Constants.SPLIT);
                             if (arr.length > 0) {
                                 dto.setBookingStartPoint(arr[0]);
                             }
@@ -1038,8 +1085,8 @@ public class IntegerCityController {
 
                     String jsonEnd = jsonData.get("bookingEndPoint") == null ? "" : jsonData.getString("bookingEndPoint");
                     if (StringUtils.isNotEmpty(jsonEnd)) {
-                        if (jsonEnd.contains(";")) {
-                            String[] arr = jsonEnd.split(";");
+                        if (jsonEnd.contains(Constants.SPLIT)) {
+                            String[] arr = jsonEnd.split(Constants.SPLIT);
                             if (arr.length > 0) {
                                 dto.setBookingEndPoint(arr[0]);
                             }
@@ -1060,7 +1107,7 @@ public class IntegerCityController {
                         dto.setSeatNum(seatNum);
                     }
 
-                    if (jsonData != null && jsonData.get("memo") != null) {
+                    if (jsonData != null && jsonData.get(Constants.MEMO) != null) {
                         JSONObject jsonMemo = jsonData.getJSONObject("memo");
                         dto.setBoardingCityId(jsonMemo.get("startCityId") == null ? "" : jsonMemo.getString("startCityId"));
                         dto.setBoardingGetOffCityId(jsonMemo.get("endCityId") == null ? "" : jsonMemo.getString("endCityId"));
@@ -1087,8 +1134,8 @@ public class IntegerCityController {
                         logger.info("==============调用配置后台获取线路结果=========" + JSONObject.toJSONString(routeResult));
                         if (StringUtils.isNotEmpty(routeResult)) {
                             JSONObject jsonRoute = JSONObject.parseObject(routeResult);
-                            if (jsonRoute.get("code") != null && jsonRoute.getInteger("code") == 0) {
-                                JSONArray routeArray = jsonRoute.getJSONArray("data");
+                            if (jsonRoute.get(Constants.CODE) != null && jsonRoute.getInteger(Constants.CODE) == 0) {
+                                JSONArray routeArray = jsonRoute.getJSONArray(Constants.DATA);
                                 if (routeArray != null && routeArray.size() > 0) {
                                     JSONObject jsonObjRoute = (JSONObject) routeArray.get(0);
                                     String routeName = jsonObjRoute.get("lineName") == null ? "" : jsonObjRoute.getString("lineName");
@@ -1105,10 +1152,10 @@ public class IntegerCityController {
                     String bookingResult = MpOkHttpUtil.okHttpGet(orderServiceUrl + "/order/byFields/find", bookMap, 0, null);
                     if (StringUtils.isNotEmpty(bookingResult)) {
                         JSONObject jsonBook = JSONObject.parseObject(bookingResult);
-                        if (jsonBook.get("code") != null && jsonBook.getInteger("code") == 0) {
-                            JSONObject jsonBookData = jsonBook.getJSONObject("data");
-                            if (jsonBookData != null && jsonBookData.get("bookingUserName") != null) {
-                                String bookingUserName = jsonBookData.getString("bookingUserName");
+                        if (jsonBook.get(Constants.CODE) != null && jsonBook.getInteger(Constants.CODE) == 0) {
+                            JSONObject jsonBookData = jsonBook.getJSONObject(Constants.DATA);
+                            if (jsonBookData != null && jsonBookData.get(Constants.BOOKING_USER_NAME) != null) {
+                                String bookingUserName = jsonBookData.getString(Constants.BOOKING_USER_NAME);
                                 dto.setReserveName(bookingUserName);
                             }
 
@@ -1168,10 +1215,10 @@ public class IntegerCityController {
                     //wiki地址 http://inside-yapi.01zhuanche.com/project/19/interface/api/9519
                     JSONObject jsonShort = MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderSpecifiedByOrderNo", shortMap, 0, "获取上下车地址");
                     logger.info("=============获取订单短地址结果=============" + jsonShort.toString());
-                    if (jsonShort != null && jsonShort.get("code") != null) {
-                        if (jsonShort.getInteger("code") == 0 && jsonShort.get("data") != null) {
-                            JSONObject jsonAddress = jsonShort.getJSONObject("data");
-                            if (jsonAddress != null && jsonAddress.get("orderAddress") != null) {
+                    if (jsonShort != null && jsonShort.get(Constants.CODE) != null) {
+                        if (jsonShort.getInteger(Constants.CODE) == 0 && jsonShort.get(Constants.DATA) != null) {
+                            JSONObject jsonAddress = jsonShort.getJSONObject(Constants.DATA);
+                            if (jsonAddress != null && jsonAddress.get(Constants.ORDER_ADDRESS) != null) {
                                 JSONObject jsonDetailAdd = jsonAddress.getJSONObject("orderAddress");
                                 dto.setBookingStartShortAddr(jsonDetailAdd.get("bookingStartShortAddr") == null ? "" : jsonDetailAdd.getString("bookingStartShortAddr"));
                                 dto.setBookingEndShortAddr(jsonDetailAdd.get("bookingEndShortAddr") == null ? "" : jsonDetailAdd.getString("bookingEndShortAddr"));
@@ -1281,7 +1328,7 @@ public class IntegerCityController {
         JSONObject jsonRoute = (JSONObject) configRouteRes.getData();
 
 
-        if (jsonRoute != null && jsonRoute.get("lineId") != null) {
+        if (jsonRoute != null && jsonRoute.get(Constants.LINEID) != null) {
             ruleId = jsonRoute.get("lineId").toString();
             supplierId = jsonRoute.get("supplierId").toString();
         }
@@ -1302,11 +1349,11 @@ public class IntegerCityController {
             String registerResult = MpOkHttpUtil.okHttpPost(centerUrl + url, map, 0, null);
             if (StringUtils.isNotEmpty(registerResult)) {
                 JSONObject jsonResult = JSONObject.parseObject(registerResult);
-                if (jsonResult.get("code") == null || jsonResult.getInteger("code") != 0) {
+                if (jsonResult.get(Constants.CODE) == null || jsonResult.getInteger(Constants.CODE) != 0) {
                     logger.info("根据乘客获取customer失败");
                     return AjaxResponse.fail(RestErrorCode.REGISTER_BY_PHONE);
                 }
-                JSONObject data = jsonResult.getJSONObject("data");
+                JSONObject data = jsonResult.getJSONObject(Constants.DATA);
                 customerId = data.getInteger("customerId");
             }
         }
@@ -1326,8 +1373,8 @@ public class IntegerCityController {
         AjaxResponse elsRes = null;
 
         //获取预估价
-        String[] ruleStr = ruleId.split(",");
-        String[] supplierStr = supplierId.split(",");
+        String[] ruleStr = ruleId.split(Constants.SEPERATER);
+        String[] supplierStr = supplierId.split(Constants.SEPERATER);
 
         //获取多条线路的
         for (int i = 0; i < ruleStr.length; i++) {
@@ -1555,7 +1602,7 @@ public class IntegerCityController {
         logger.info("编辑结果：" + editResult);
         if (StringUtils.isNotBlank(editResult)) {
             JSONObject updateResult = JSONObject.parseObject(editResult);
-            if (updateResult.get("code") != null && updateResult.getInteger("code") == 0) {
+            if (updateResult.get(Constants.CODE) != null && updateResult.getInteger(Constants.CODE) == 0) {
                 logger.info("更新成功");
                 JSONObject editJson = new JSONObject();
                 editJson.put("orderNo", orderNo);
@@ -1645,14 +1692,14 @@ public class IntegerCityController {
             map.put("sign", sign);
 
             String url = "/order/carpool/inDispatcherCancelSubOrder";
-            if (status > 13) {
+            if (status > Constants.ORDER_STATUS) {
                 url = "/order/carpool/syncCancelSubOrder";
             }
             String result = carRestTemplate.postForObject(url, JSONObject.class, map);
             logger.info("============取消订单返回结果:" + result);
             if (StringUtils.isNotEmpty(result)) {
                 JSONObject jsonResult = JSONObject.parseObject(result);
-                if (jsonResult != null && jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
+                if (jsonResult != null && jsonResult.get(Constants.CODE) != null && jsonResult.getInteger(Constants.CODE) == 0) {
                     logger.info("取消订单成功");
                 }else {
                     logger.info("已上车，无法取消，请联系客服电话10105678" );
@@ -1683,7 +1730,7 @@ public class IntegerCityController {
             logger.info("========调用计费取消接口返回结果========" + chargeResult);
             if (StringUtils.isNotEmpty(chargeResult)) {
                 JSONObject chargeJson = JSONObject.parseObject(chargeResult);
-                if (chargeJson.get("code") != null && chargeJson.getInteger("code") == 0) {
+                if (chargeJson.get(Constants.CODE) != null && chargeJson.getInteger(Constants.CODE) == 0) {
                     logger.info("调用计费取消接口成功");
                     try {
                         logger.info("=========取消成功调用派单通知接口========" + orderNo);
@@ -1915,7 +1962,7 @@ public class IntegerCityController {
         logger.info("指派返回结果:" + result);
         if (StringUtils.isNotBlank(result)) {
             JSONObject jsonResult = JSONObject.parseObject(result);
-            if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
+            if (jsonResult.get(Constants.CODE) != null && jsonResult.getInteger(Constants.CODE) == 0) {
                 logger.info("子单绑定主单成功");
                 this.noticeAssign(orderNo);
                 ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1,
@@ -1923,10 +1970,10 @@ public class IntegerCityController {
                 Future<String> future = executorService.submit(new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        logger.info("=================异步处理开始============" + jsonResult.getJSONObject("data"));
-                        JSONObject jsonData = jsonResult.getJSONObject("data");
+                        logger.info("=================异步处理开始============" + jsonResult.getJSONObject(Constants.DATA));
+                        JSONObject jsonData = jsonResult.getJSONObject(Constants.DATA);
                         try {
-                            if (jsonData != null && jsonData.get("mainOrderNo") != null) {
+                            if (jsonData != null && jsonData.get(Constants.MAIN_ORDER_NO) != null) {
                                 String newMainOrderNo = jsonData.getString("mainOrderNo");
                                 MainOrderInterCity queryMain = interService.queryMainOrder(newMainOrderNo);
                                 logger.info("========查询结果=======" + JSONObject.toJSONString(queryMain));
@@ -2095,7 +2142,7 @@ public class IntegerCityController {
             logger.info("改派结果result:" + result);
             if (StringUtils.isNotBlank(result)) {
                 JSONObject jsonResult = JSONObject.parseObject(result);
-                if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
+                if (jsonResult.get(Constants.CODE) != null && jsonResult.getInteger(Constants.CODE) == 0) {
                     logger.info("=====改派成功====== 手动改派通知派单接口===入参:orderNo:" + orderNo + ",driverId:" + driverId);
                     try {
                         Map<String,Object> mapParam = Maps.newHashMap();
@@ -2289,10 +2336,10 @@ public class IntegerCityController {
         String result = MpOkHttpUtil.okHttpGet(url, map, 0, null);
         if (StringUtils.isNotEmpty(result)) {
             JSONObject jsonResult = JSONObject.parseObject(result);
-            if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
-                return AjaxResponse.success(jsonResult.get("data"));
+            if (jsonResult.get(Constants.CODE) != null && jsonResult.getInteger(Constants.CODE) == 0) {
+                return AjaxResponse.success(jsonResult.get(Constants.DATA));
             } else {
-                return AjaxResponse.failMsg(jsonResult.getIntValue("code"), jsonResult.getString("msg"));
+                return AjaxResponse.failMsg(jsonResult.getIntValue(Constants.CODE), jsonResult.getString("msg"));
             }
         }
         return AjaxResponse.success(null);
@@ -2321,10 +2368,10 @@ public class IntegerCityController {
         String result = MpOkHttpUtil.okHttpGet(url, map, 0, null);
         if (StringUtils.isNotEmpty(result)) {
             JSONObject jsonResult = JSONObject.parseObject(result);
-            if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
-                return AjaxResponse.success(jsonResult.get("data"));
+            if (jsonResult.get(Constants.CODE) != null && jsonResult.getInteger(Constants.CODE) == 0) {
+                return AjaxResponse.success(jsonResult.get(Constants.DATA));
             } else {
-                return AjaxResponse.failMsg(jsonResult.getIntValue("code"), jsonResult.getString("msg"));
+                return AjaxResponse.failMsg(jsonResult.getIntValue(Constants.CODE), jsonResult.getString("msg"));
             }
         }
         return AjaxResponse.success(null);
@@ -2356,13 +2403,13 @@ public class IntegerCityController {
         String getOnId = "";
         if (StringUtils.isNotEmpty(lbsResult)) {
             JSONObject jsonResult = JSONObject.parseObject(lbsResult);
-            if (jsonResult.get("code") == null || jsonResult.getInteger("code") != 0 ||
-                    jsonResult.get("data") == null) {
+            if (jsonResult.get(Constants.CODE) == null || jsonResult.getInteger(Constants.CODE) != 0 ||
+                    jsonResult.get(Constants.DATA) == null) {
                 logger.info("获取上车点失败");
                 return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
             }
 
-            JSONArray arrayData = jsonResult.getJSONArray("data");
+            JSONArray arrayData = jsonResult.getJSONArray(Constants.DATA);
             if (arrayData == null) {
                 logger.info("获取上车区域失败");
                 return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
@@ -2414,13 +2461,13 @@ public class IntegerCityController {
 
         if (resultY != null) {
             JSONObject jsonResultY = JSONObject.parseObject(resultY);
-            if (jsonResultY.get("code") == null || jsonResultY.getInteger("code") != 0 ||
-                    jsonResultY.get("data") == null) {
+            if (jsonResultY.get(Constants.CODE) == null || jsonResultY.getInteger(Constants.CODE) != 0 ||
+                    jsonResultY.get(Constants.DATA) == null) {
                 logger.info("获取下车点失败");
                 return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
             }
 
-            JSONArray jsonArray = jsonResultY.getJSONArray("data");
+            JSONArray jsonArray = jsonResultY.getJSONArray(Constants.DATA);
             if (jsonArray.size() == 0) {
                 logger.info("获取下车点失败");
                 return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
@@ -2499,13 +2546,13 @@ public class IntegerCityController {
             String areaResult = MpOkHttpUtil.okHttpGet(areaUrl, null, 0, null);
             if (StringUtils.isNotEmpty(areaResult)) {
                 JSONObject jsonResult = JSONObject.parseObject(areaResult);
-                if (jsonResult.get("data") != null && jsonResult.get("data") != "") {
+                if (jsonResult.get(Constants.DATA) != null && jsonResult.get(Constants.DATA) != "") {
                     //添加权限验证 管理员直接过去
                     SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
                     Set<Integer> cities = loginUser.getCityIds();
                     Set<Integer> suppliers = loginUser.getSupplierIds();
-                    JSONObject jsonData = jsonResult.getJSONObject("data");
-                    if (jsonData.getString("supplierId") == null) {
+                    JSONObject jsonData = jsonResult.getJSONObject(Constants.DATA);
+                    if (jsonData.getString(Constants.SUPPLIER_ID) == null) {
                         logger.info("对应坐标没有线路");
                         return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
                     }
@@ -2519,7 +2566,7 @@ public class IntegerCityController {
                     boolean bl = false;
                     if (suppliers.size() > 0) {
                         HashSet<Integer> hashSet = new HashSet<>(suppliers);
-                        if (jsonData.get("supplierId") != null) {
+                        if (jsonData.get(Constants.SUPPLIER_ID) != null) {
                             Iterator<Integer> iterator = linkedList.iterator();
                             while (iterator.hasNext()) {
                                 Integer supplierId = iterator.next();
@@ -2676,9 +2723,9 @@ public class IntegerCityController {
             logger.info("=============调用预估返回结果=============" + result);
             if (StringUtils.isNotEmpty(result)) {
                 JSONObject jsonResult = JSONObject.parseObject(result);
-                if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
-                    JSONObject jsonData = jsonResult.getJSONObject("data");
-                    if (jsonData != null && jsonData.get("estimated") != null && jsonData.get("estimatedKey") != null) {
+                if (jsonResult.get(Constants.CODE) != null && jsonResult.getInteger(Constants.CODE) == 0) {
+                    JSONObject jsonData = jsonResult.getJSONObject(Constants.DATA);
+                    if (jsonData != null && jsonData.get(Constants.ESTIMATED) != null && jsonData.get(Constants.ESTIMATED_KEY) != null) {
                         /***获取estimatedKey 给计费*/
                         JSONObject chargeJson = new JSONObject();
                         String estimatedKey = jsonData.getString("estimatedKey");
@@ -2687,7 +2734,7 @@ public class IntegerCityController {
 
                         if (arrayEst != null && arrayEst.size() > 0) {
                             JSONObject jsonEsti = arrayEst.getJSONObject(0);
-                            if (jsonEsti != null && jsonEsti.get("pingSign") != null) {
+                            if (jsonEsti != null && jsonEsti.get(Constants.PING_SIGN) != null) {
                                 String carpoolingKey = jsonEsti.getString("pingSign");
                                 String pingSettleType = jsonEsti.get("pingSettleType") == null ? null :jsonEsti.getString("pingSettleType");
                                 if(StringUtils.isNotEmpty(pingSettleType)){
@@ -2735,9 +2782,9 @@ public class IntegerCityController {
             logger.info("配置中心供应商--{}查询路线ID集合返回结果集--{}", supplierIdBatch, lineResult);
             if (StringUtils.isNotEmpty(lineResult)) {
                 JSONObject jsonResult = JSONObject.parseObject(lineResult);
-                if (jsonResult != null && jsonResult.getInteger("code") == 0) {
-                    if (jsonResult.get("data") != null) {
-                        return jsonResult.get("data").toString();
+                if (jsonResult != null && jsonResult.getInteger(Constants.CODE) == 0) {
+                    if (jsonResult.get(Constants.DATA) != null) {
+                        return jsonResult.get(Constants.DATA).toString();
                     }
                 }
             }
@@ -2907,13 +2954,13 @@ public class IntegerCityController {
         String result = MpOkHttpUtil.okHttpGet(url, map, 0, null);
         if (StringUtils.isNotEmpty(result)) {
             JSONObject jsonObject = JSONObject.parseObject(result);
-            int code = jsonObject.getIntValue("code");
+            int code = jsonObject.getIntValue(Constants.CODE);
             //0表示有结果返回
             if (code == 0) {
-                JSONObject jsonData = jsonObject.getJSONObject("data");
+                JSONObject jsonData = jsonObject.getJSONObject(Constants.DATA);
                 JSONArray arrayList = new JSONArray();
-                if (jsonData != null && jsonData.get("data") != null) {
-                    JSONArray arrayData = JSONArray.parseArray(jsonData.get("data").toString());
+                if (jsonData != null && jsonData.get(Constants.DATA) != null) {
+                    JSONArray arrayData = JSONArray.parseArray(jsonData.get(Constants.DATA).toString());
                     for (int i = 0; i < arrayData.size(); i++) {
                         JSONObject resultObject = arrayData.getJSONObject(i);
                         if (resultObject.get("createDate") != null) {
@@ -2984,8 +3031,7 @@ public class IntegerCityController {
         return null;
     }
 
-    //获取所有的线路名称和id
-
+    /**获取所有的线路名称和id*/
     public String getRuleIdBatch(String lineName){
         logger.info("====获取所有线路和名称=====start");
         StringBuffer stringBuffer = new StringBuffer();
@@ -3001,12 +3047,12 @@ public class IntegerCityController {
             logger.info("=====获取结果===" + configResult);
             if(!org.springframework.util.StringUtils.isEmpty(configResult)){
                 JSONObject jsonResult = JSONObject.parseObject(configResult);
-                if(jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
-                    String jsonData =  jsonResult.get("data").toString();
+                if(jsonResult.get(Constants.CODE) != null && jsonResult.getInteger(Constants.CODE) == 0){
+                    String jsonData =  jsonResult.get(Constants.DATA).toString();
                     JSONArray jsonArray = JSONArray.parseArray(jsonData);
                     jsonArray.forEach(json ->{
                         JSONObject jsonObject = (JSONObject) json;
-                        if(jsonObject.get("lineId") != null ){
+                        if(jsonObject.get(Constants.LINEID) != null ){
                             stringBuffer.append(jsonObject.get("lineId")).append(",");
                         }
                     });
