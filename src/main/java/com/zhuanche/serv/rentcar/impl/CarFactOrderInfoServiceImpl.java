@@ -399,8 +399,8 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 	public JSONObject queryByJiFei(String method, Map<String, Object> params, String tag) {
 		String url = orderCostUrl + method;
 		JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, tag);
+		logger.info("调用计费接口={}, 返回结果为={}", url, jsonObject);
 		if (jsonObject == null || jsonObject.getIntValue("code")!=0) {
-			logger.error("调用计费接口" + url + "返回结果为null");
 			return null;
 		}
 		return jsonObject.getJSONObject("data");

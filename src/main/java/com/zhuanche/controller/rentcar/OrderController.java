@@ -1451,6 +1451,7 @@ public class OrderController{
 		Map<String, Object> params = new HashMap<>();
 		params.put("orderNo", orderNo);
 		params.put("bId", Common.BUSSINESSID);
+		params.put("columns", "*");
 		String tag = "查询结算扩展表";
 
 		JSONObject jsonObject = carFactOrderInfoService.queryByJiFei(method, params, tag);
