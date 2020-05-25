@@ -2989,11 +2989,14 @@ public class IntegerCityController {
                                 String resultOrderNo = resultObject.get("orderNo") == null ? "" : resultObject.get("orderNo").toString();
                                 String bookingDate = resultObject.get("bookingDate") == null ? "" : resultObject.get("bookingDate").toString();
                                 String customerNumber = resultObject.get("factDriverId") == null ? "" : resultObject.get("factDriverId").toString();
+                                Integer offlineIntercityServiceType = resultObject.get("offlineIntercityServiceType") == null ? 0 : resultObject.getInteger("offlineIntercityServiceType");
+
                                 JSONObject objectNotice = new JSONObject();
                                 objectNotice.put("lineName", lineName);
                                 objectNotice.put("orderNo", resultOrderNo);
                                 objectNotice.put("bookingDate", bookingDate);
                                 objectNotice.put("customerNumber", customerNumber);
+                                objectNotice.put("offlineIntercityServiceType", offlineIntercityServiceType);
                                 arrayList.add(objectNotice);
                             }
                         }
