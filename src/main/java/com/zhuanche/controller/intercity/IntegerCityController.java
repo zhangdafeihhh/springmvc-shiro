@@ -1152,6 +1152,7 @@ public class IntegerCityController {
                     Map<String, Object> bookMap = Maps.newHashMap();
                     bookMap.put("orderNo", orderNo);
                     bookMap.put("name", "bookingUserName");
+                    bookMap.put("name", "offlineIntercityServiceType");
                     logger.info("====================获取预订人名称入参：" + JSONObject.toJSONString(bookMap));
                     String bookingResult = MpOkHttpUtil.okHttpGet(orderServiceUrl + "/order/byFields/find", bookMap, 0, null);
                     if (StringUtils.isNotEmpty(bookingResult)) {
