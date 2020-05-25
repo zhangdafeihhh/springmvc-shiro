@@ -82,7 +82,7 @@ public class CarDriverFileController {
 
             logger.info("导出司机头像信息，参数为：queryParam="+ JSON.toJSONString(queryParam));
             int pageNo = 1;
-            int pageSize = 20;
+            int pageSize = 2000;
             List<String> headerList = new ArrayList<>();
             headerList.add("序号,城市,司机ID,姓名,手机号,合作商,车牌号,照片提交时间,照片状态");
 
