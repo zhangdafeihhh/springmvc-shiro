@@ -1,5 +1,8 @@
 package com.zhuanche.constant;
 
+/**
+ * @Author fanht
+ */
 public final class Constants {
 
 	private Constants() {
@@ -42,7 +45,6 @@ public final class Constants {
 	/*******司机派单信息导出***********/
 	public static final Integer SAAS_DRIVER_DISPATCH = 14;
 
-	public static final String yyyy_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";
 
 
 	public static final int  CONTRY  = 1; //全国
@@ -137,9 +139,9 @@ public final class Constants {
 	/**短横线*/
 	public static final String SHORT_STOKE = "-";
 	/**城际拼车类型*/
-	public static final Integer INTER_CITY_SERVICE_type = 1;
+	public static final Integer INTER_CITY_SERVICE_TYPE = 1;
     /**包车类型*/
-	public static final Integer INTER_CITY_CHARTER_type = 2;
+	public static final Integer INTER_CITY_CHARTER_TYPE = 2;
 
 	/**========json解析常用变量===========**/
 
@@ -172,6 +174,6 @@ public final class Constants {
 
 	public static final  String PING_SIGN = "pingSign";
 
-	public static final String NEW_CROSS_SERVICE_TYPE = "newCrossServiceType";
+	public static final String NEW_CROSS_SERVICE_TYPE = "offlineIntercityServiceType";
 
 }

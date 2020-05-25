@@ -770,7 +770,7 @@ public class IntegerCityController {
             }
 
             /**如果是城际包车,乘车人数和乘车类型人数相同*/
-            if(Constants.INTER_CITY_CHARTER_type.equals(offlineIntercityServiceType)){
+            if(Constants.INTER_CITY_CHARTER_TYPE.equals(offlineIntercityServiceType)){
                 riderCount = seatCount(carGroup);
             }else {
                 if(riderCount == null){
@@ -1286,7 +1286,7 @@ public class IntegerCityController {
 
 
 
-        if(Constants.INTER_CITY_CHARTER_type.equals(offlineIntercityServiceType)){
+        if(Constants.INTER_CITY_CHARTER_TYPE.equals(offlineIntercityServiceType)){
             riderCount = seatCount(Integer.valueOf(carGroup));
         }else {
             if(riderCount == null){
