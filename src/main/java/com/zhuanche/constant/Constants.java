@@ -176,4 +176,11 @@ public final class Constants {
 
 	public static final String NEW_CROSS_SERVICE_TYPE = "offlineIntercityServiceType";
 
+	public static final String STRATEGY_LIST = "strategyList";
+
+	public static final String CITY_ID = "cityId";
+
+	public static final Integer IS_REDUCT_DISCOUNT_FALSE = 0;
+
+	public static final Integer IS_REDUCT_DISCOUNT_TRUE = 1;
 }

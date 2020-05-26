@@ -12,7 +12,7 @@ import com.zhuanche.entity.driver.SupplierExtDto;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.http.MpOkHttpUtil;
-import com.zhuanche.serv.interCity.MainOrderInterService;
+import com.zhuanche.serv.intercity.MainOrderInterService;
 import com.zhuanche.serv.supplier.SupplierRecordService;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.SignatureUtils;

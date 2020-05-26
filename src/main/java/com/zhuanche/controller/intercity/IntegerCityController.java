@@ -24,7 +24,7 @@ import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
-import com.zhuanche.serv.interCity.MainOrderInterService;
+import com.zhuanche.serv.intercity.MainOrderInterService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.serv.supplier.SupplierDistributorService;
 import com.zhuanche.serv.supplier.SupplierRecordService;

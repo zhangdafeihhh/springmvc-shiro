@@ -6,7 +6,7 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.serv.interCity.InterCityActivityService;
+import com.zhuanche.serv.intercity.InterCityActivityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,14 +65,17 @@ public class InterCityActivityController {
                                      String discountAmount,
                                      String discountStartTime,
                                      String discountEndTime,
-                                     Integer discountStatus){
-        logger.info("查询城际拼车立减优惠活动saveOrUpdate入参:{},{},{},{},{},{}",discountId,strategyId,
-                discountType,discountAmount,discountStartTime, discountEndTime,discountStatus);
+                                     Integer discountStatus,
+                                     Integer allDiscountType,
+                                     String allDiscountAmount){
+        logger.info("查询城际拼车立减优惠活动saveOrUpdate入参:{},{},{},{},{},{},{},{}",discountId,strategyId,
+                discountType,discountAmount,discountStartTime, discountEndTime,discountStatus,
+                allDiscountType,allDiscountAmount);
 
         Integer code = 1;
         try {
          code =   activityService.saveOrUpdate(discountId,strategyId,discountType,discountAmount,
-                   discountStartTime,discountEndTime,discountStatus);
+                   discountStartTime,discountEndTime,discountStatus,allDiscountType,allDiscountAmount);
         } catch (Exception e) {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }

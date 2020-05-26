@@ -76,6 +76,7 @@ public class CompleteOrderController{
 	                                              String driverId,
 	                                              Integer supplierId,
 	                                              Integer distributorId,
+	                                              Integer isReductDiscount,
 	                                              @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                              @Verify(param = "pageSize",rule = "required") Integer pageSize){
 	        logger.info("【运营管理-统计分析】完成订单列表数据:queryCompleteOrderData");
@@ -123,6 +124,12 @@ public class CompleteOrderController{
 
             if(supplierId != null){
                 paramMap.put("allianceId",supplierId);
+            }
+
+            if(isReductDiscount != null){
+                if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isReductDiscount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isReductDiscount) ){
+                    paramMap.put("isReductDiscount",isReductDiscount);
+                }
             }
             // 数据权限设置
             paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap, cityId, allianceId, motorcardId);
@@ -198,6 +205,7 @@ public class CompleteOrderController{
                                          String driverId,
                                          Integer supplierId,
                                          Integer distributorId,
+                                         Integer isReductDiscount,
                                          HttpServletRequest request,
                                          HttpServletResponse response){
     	    try{
@@ -248,6 +256,11 @@ public class CompleteOrderController{
                     paramMap.put("allianceId",supplierId);
                 }
 
+                if(isReductDiscount != null){
+                    if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isReductDiscount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isReductDiscount) ){
+                        paramMap.put("isReductDiscount",isReductDiscount);
+                    }
+                }
 		  		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
 				if(paramMap==null){
 					return;

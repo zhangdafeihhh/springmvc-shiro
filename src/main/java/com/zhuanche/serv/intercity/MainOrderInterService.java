@@ -1,4 +1,4 @@
-package com.zhuanche.serv.interCity;
+package com.zhuanche.serv.intercity;
 
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 
@@ -17,5 +17,5 @@ public interface MainOrderInterService {
 
     MainOrderInterCity queryMainOrder(String mainOrderNo);
 
-    int updateMainOrderState(String mainOrderNo,Integer status,String phone);
+    int updateMainOrderState(String mainOrderNo, Integer status, String phone);
 }

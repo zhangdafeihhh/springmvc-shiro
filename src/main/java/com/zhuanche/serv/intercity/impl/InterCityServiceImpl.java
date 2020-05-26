@@ -1,4 +1,4 @@
-package com.zhuanche.serv.interCity.impl;
+package com.zhuanche.serv.intercity.impl;
 
 import org.springframework.stereotype.Service;
 
