@@ -1154,7 +1154,7 @@ public class IntegerCityController {
                     bookMap.put("name", "bookingUserName");
                     bookMap.put("name", "offlineIntercityServiceType");
                     logger.info("====================获取预订人名称入参：" + JSONObject.toJSONString(bookMap));
-                    String bookingResult = MpOkHttpUtil.okHttpGet(orderServiceUrl + "/order/byFields/find", bookMap, 0, null);
+                    String bookingResult = MpOkHttpUtil.okHttpGet(orderServiceUrl + "/order/byFields/find?orderNo="+orderNo+"&name=bookingUserName&name=offlineIntercityServiceType", null, 0, null);
                     if (StringUtils.isNotEmpty(bookingResult)) {
                         JSONObject jsonBook = JSONObject.parseObject(bookingResult);
                         if (jsonBook.get(Constants.CODE) != null && jsonBook.getInteger(Constants.CODE) == 0) {
@@ -1162,7 +1162,7 @@ public class IntegerCityController {
                             if (jsonBookData != null) {
                                 String bookingUserName = jsonBookData.get(Constants.BOOKING_USER_NAME) != null?jsonBookData.getString(Constants.BOOKING_USER_NAME):"";
                                 dto.setReserveName(bookingUserName);
-                                Integer  newCrossServiceType = jsonBook.get(Constants.NEW_CROSS_SERVICE_TYPE) != null ? jsonBook.getInteger(Constants.NEW_CROSS_SERVICE_TYPE):0;
+                                Integer  newCrossServiceType = jsonBookData.get(Constants.NEW_CROSS_SERVICE_TYPE) != null ? jsonBookData.getInteger(Constants.NEW_CROSS_SERVICE_TYPE):0;
                                 dto.setOfflineIntercityServiceType(newCrossServiceType);
                             }
 
