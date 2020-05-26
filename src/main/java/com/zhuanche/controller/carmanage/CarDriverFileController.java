@@ -127,7 +127,7 @@ public class CarDriverFileController {
                         transData2List(list,rowData,start);
                         utilEntity.exportCsvV2(response,rowData,headerList,fileName,isFirst,isLast);
                         //序号自增
-                        start = list.size();
+                        start += list.size();
                     }
                 }
             }
