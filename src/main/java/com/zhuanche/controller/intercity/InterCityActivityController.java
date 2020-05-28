@@ -9,8 +9,6 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.serv.intercity.InterCityActivityService;
 import com.zhuanche.util.collectionutil.TransportUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * @Author fanht
@@ -97,7 +92,7 @@ public class InterCityActivityController {
                 discountType,discountAmount,discountStartTime, discountEndTime,discountStatus,
                 allDiscountType,allDiscountAmount);
         /**拼车设置的立减价格不能大于已有的价格最小值 */
-        if(IntegerEnum.DISCOUNT_TYPE_ZERO.equals(discountType)){
+        if(IntegerEnum.DISCOUNT_TYPE_ZERO.getValue().equals(discountType)){
          String[] strArr =   carShardRulePrice.split(Constants.SEPERATER);
          Double minPrice = TransportUtils.getDoubleMinValue(strArr);
           if(Double.valueOf(discountAmount)>=minPrice){
@@ -106,7 +101,7 @@ public class InterCityActivityController {
           }
         }
 
-        if(IntegerEnum.ALL_DISCOUNT_TYPE_ZERO.equals(discountType)){
+        if(IntegerEnum.ALL_DISCOUNT_TYPE_ZERO.getValue().equals(discountType)){
             String[] strArr =   carPackRulePrice.split(Constants.SEPERATER);
             Double minPrice = TransportUtils.getDoubleMinValue(strArr);
             if(Double.valueOf(allDiscountAmount)>=minPrice){
