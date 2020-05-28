@@ -315,6 +315,12 @@ public final class RestErrorCode{
 	@ResultMessage("请输入乘车人数")
 	public static final int UN_RIDER_COUNT = 50901;
 
+	@ResultMessage("设置的拼车规则价格过大")
+	public static final int DISCOUNT_MAX = 50910;
+
+
+	@ResultMessage("设置的包车规则价格过大")
+	public static final int ALL_DISCOUNT_MAX = 50911;
 
 
 
