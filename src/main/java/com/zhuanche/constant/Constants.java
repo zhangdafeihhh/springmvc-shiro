@@ -183,4 +183,7 @@ public final class Constants {
 	public static final Integer IS_REDUCT_DISCOUNT_FALSE = 0;
 
 	public static final Integer IS_REDUCT_DISCOUNT_TRUE = 1;
+
+	/**包车乘车人数*/
+	public static final Integer BAO_CHE_RIDER_COUNT = 99;
 }
