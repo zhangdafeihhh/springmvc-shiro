@@ -2120,7 +2120,8 @@ public class IntegerCityController {
                     JSONObject jsonData = jsonObject.getJSONObject(Constants.DATA);
                     String bookingDate = jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDate");
                     if (StringUtils.isNotEmpty(bookingDate)) {
-                        Date bookingTime = DateUtils.parseDateStr(bookingDate, DateUtils.dateTimeFormat_parttern);
+                        String longToStr = DateUtils.convertLongToString(Long.valueOf(bookingDate),DateUtils.dateTimeFormat_parttern);
+                        Date bookingTime = DateUtils.parseDateStr(longToStr, DateUtils.dateTimeFormat_parttern);
                         Date bookingStartTime = DateUtils.afterNHoursDate(bookingTime, -2);
                         Date bookingEndTime =   DateUtils.afterNHoursDate(bookingTime, 2);
                         Map<String, Object> orderMap = Maps.newHashMap();
@@ -2142,7 +2143,7 @@ public class IntegerCityController {
                         if (orderObject != null && orderObject.get(Constants.CODE) != null) {
                             if (0 == orderObject.getInteger(Constants.CODE)) {
                                 JSONObject orderData = orderObject.getJSONObject(Constants.DATA);
-                                if (orderData != null && orderData.get(Constants.DATA) != null) {
+                                if (orderData != null && orderData.get("orderNo") != null) {
                                     logger.info("=======该司机已经绑定了司机====" + JSONObject.toJSONString(orderData));
                                     return false;
                                 }
