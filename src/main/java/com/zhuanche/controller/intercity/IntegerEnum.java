@@ -7,10 +7,13 @@ package com.zhuanche.controller.intercity;
  * @Version 1.0
  */
 public enum  IntegerEnum {
-
+    /**拼车固定金额*/
     DISCOUNT_TYPE_ZERO(0,"固定金额"),
+    /**拼车优惠折扣*/
     DISCOUNT_TYPE_ONE(1,"优惠折扣"),
+    /**包车固定金额*/
     ALL_DISCOUNT_TYPE_ZERO(0,"包车固定金额"),
+    /**包车优惠折扣*/
     ALL_DISCOUNT_TYPE_ONE(1,"包车优惠折扣");
 
     private Integer value;

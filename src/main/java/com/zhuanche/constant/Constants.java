@@ -186,4 +186,8 @@ public final class Constants {
 
 	/**包车乘车人数*/
 	public static final Integer BAO_CHE_RIDER_COUNT = 99;
+
+	public static final String AND = "&";
+
+	public static final Integer VERIFY_HOUR = 2;
 }

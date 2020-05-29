@@ -323,6 +323,9 @@ public final class RestErrorCode{
 	public static final int ALL_DISCOUNT_MAX = 50911;
 
 
+	@ResultMessage("当前司机不可用")
+	public static final int HAS_ORDER_DRIVER_ID = 50920;
+
 
 	//------------------------------------------------
 
