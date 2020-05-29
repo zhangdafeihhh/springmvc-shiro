@@ -2121,15 +2121,14 @@ public class IntegerCityController {
                     String bookingDate = jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDate");
                     if (StringUtils.isNotEmpty(bookingDate)) {
                         Date bookingTime = DateUtils.parseDateStr(bookingDate, DateUtils.dateTimeFormat_parttern);
-                        Date bookingStartTime = DateUtils.afterNHoursDate(bookingTime, -Constants.VERIFY_HOUR);
-                        Date bookingEndTime = DateUtils.afterNHoursDate(bookingTime, Constants.VERIFY_HOUR);
+                        Date bookingStartTime = DateUtils.afterNHoursDate(bookingTime, -2);
+                        Date bookingEndTime =   DateUtils.afterNHoursDate(bookingTime, 2);
                         Map<String, Object> orderMap = Maps.newHashMap();
                         orderMap.put("businessId", Common.BUSSINESSID);
                         orderMap.put("driverId", driverId);
                         orderMap.put("bookingStartTime", bookingStartTime.getTime());
                         orderMap.put("bookingEndTime", bookingEndTime.getTime());
                         String orderSign = null;
-
                         try {
                             orderSign = MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(orderMap, Common.MAIN_ORDER_KEY));
                         } catch (NoSuchAlgorithmException e) {
