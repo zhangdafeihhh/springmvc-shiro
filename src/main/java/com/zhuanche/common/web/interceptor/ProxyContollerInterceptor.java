@@ -55,6 +55,8 @@ public class ProxyContollerInterceptor implements HandlerInterceptor {
 
     private static final String JSON_PREFIX = ".json";
 
+    private static final String COMPANY_INFO_PREFIX = "companyInfo";
+
     private Map<String, String> urlDomainMapping = new HashMap<>(16);
 
     public void setUrlDomainMapping(Map<String, String> urlDomainMapping) {
@@ -84,7 +86,11 @@ public class ProxyContollerInterceptor implements HandlerInterceptor {
         url = url.replace(PROXY_PREFIX, "");
         String[] urlParts = url.split("/");
         String thirdHttpUrl = urlDomainMapping.get(urlParts[1]);
-        url = url.replace(urlParts[1],"").replace(JSON_PREFIX,"");
+        if(COMPANY_INFO_PREFIX.equals(urlParts[1])){
+            url = url.replace(urlParts[1],"").replace(JSON_PREFIX,".html");
+        }else{
+            url = url.replace(urlParts[1],"").replace(JSON_PREFIX,"");
+        }
         if (Objects.nonNull(map)) {
             for (String key : map.keySet()) {
                 if (key.equals(EXPORT_FLAG_KEY)) {
