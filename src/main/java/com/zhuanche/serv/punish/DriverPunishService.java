@@ -1,9 +1,12 @@
 package com.zhuanche.serv.punish;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
+import com.zhuanche.common.enums.EnumCallReleaseCause;
 import com.zhuanche.common.enums.PunishEventEnum;
 import com.zhuanche.common.enums.PunishStatusEnum;
 import com.zhuanche.common.exception.ServiceException;
@@ -17,11 +20,14 @@ import com.zhuanche.entity.driver.DriverPunishDto;
 import com.zhuanche.entity.driver.PunishRecordVoiceDTO;
 import com.zhuanche.entity.driver.appraisa.UpdateAppraisalVo;
 import com.zhuanche.entity.driver.punish.ConfigPunishTypeBaseEntity;
+import com.zhuanche.entity.rentcar.OrderVideoVO;
+import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.CustomerAppraisalService;
 import com.zhuanche.serv.third.*;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.SignatureUtils;
 import lombok.extern.slf4j.Slf4j;
 import mapper.driver.DriverAppealRecordMapper;
 import mapper.driver.DriverPunishMapper;
@@ -32,10 +38,13 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.FileInputStream;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -48,6 +57,8 @@ import java.util.*;
 @Service
 public class DriverPunishService {
 
+    @Value("${virtual.url}")
+    private String virtualUrl;
 
     @Resource
     private ConfigPunishTypeBaseService configPunishTypeBaseService;
@@ -153,6 +164,100 @@ public class DriverPunishService {
         return driverAppealRecordMapper.selectDriverAppealRocordByPunishId(punishId);
     }
 
+
+    /**
+     * 查询订单通话记录
+     * @param orderNo
+     * @param businessId
+     * @param sign
+     * @return
+     */
+    public List<OrderVideoVO> getOrderVideoVOList(String orderNo, String businessId, String sign) {
+
+        List<OrderVideoVO> orderVideoVOS = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(virtualUrl).append("/virtualcallrecord/getcallrecordlist?");
+
+        Map<String, String> map = new TreeMap<String, String>();
+        map.put("businessId", businessId);
+        map.put("orderNo", orderNo);
+        map.put("sign",sign);
+        String md5Sign = SignatureUtils.createMD5Sign(map, sign);
+        String encode = null;
+        try {
+            encode = URLEncoder.encode(md5Sign, "UTF-8");
+        } catch (Exception e) {
+            log.error("调用开发平台录音异常,订单号"+ orderNo);
+            log.error("调用开放平台录音 /virtualcallrecord/getcallrecordlist 异常," + e);
+            return Lists.newArrayList();
+        }
+
+        sb.append("businessId=").append(businessId);
+        sb.append("&orderNo=").append(orderNo);
+        sb.append("&sign=").append(encode);
+        String url = sb.toString();
+
+
+        try {
+
+            String result = HttpClientUtil.buildGetRequest(url).execute();
+            JSONObject jsonObject = JSON.parseObject(result);
+            log.info("查询 处罚列表 录音 url = "+ url + "查询处罚列表返回结果 : " + result);
+
+            int code = jsonObject.getIntValue("code");
+            if (0 == code){
+                String data = jsonObject.getString("data");
+                orderVideoVOS = JSONObject.parseArray(data, OrderVideoVO.class);
+            }
+        } catch (Exception e) {
+            log.error("调用开发平台录音异常,订单号"+ orderNo);
+            log.error("查询 处罚列表 录音 失败 url = " + url);
+            return Lists.newArrayList();
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for (OrderVideoVO orderVideoVO : orderVideoVOS) {
+
+            orderVideoVO.setOriginNoStr(getOriginFrom(orderVideoVO.getCallType()));
+            // 挂断方(0平台释放 1主叫释放2被叫释放)
+            orderVideoVO.setReleaseStr(getReleaseFrom(orderVideoVO.getReleaseDir()));
+            //挂断原因
+            Integer releaseCause = orderVideoVO.getReleaseCause();
+            if (null == releaseCause){
+                orderVideoVO.setReleaseCauseStr("未返回");
+            }
+            if (null != releaseCause){
+                if (-1 == releaseCause){
+                    orderVideoVO.setReleaseCauseStr("无匹配状态码");
+                }else {
+                    try {
+                        orderVideoVO.setReleaseCauseStr(EnumCallReleaseCause.valueOf("SY"+orderVideoVO.getReleaseCause()).getMsg());
+                    } catch (Exception e) {
+                        log.info("订单号orderNo={}, 枚举转换异常 erroe={}", orderNo, e);
+                        orderVideoVO.setReleaseCauseStr("无匹配状态码");
+                    }
+                }
+            }
+
+            // 拨打时间
+            orderVideoVO.setCallTimeStr(null == orderVideoVO.getCallTime() ? "未返回" : sdf.format(orderVideoVO.getCallTime()));
+            // 响铃时间
+            orderVideoVO.setRingTimeStr(null == orderVideoVO.getRingTime() ? "未返回" : sdf.format(orderVideoVO.getRingTime()));
+            // 通话时长(秒)
+            orderVideoVO.setAllTimeStr("");
+            if (null != orderVideoVO.getReleaseTime() && null != orderVideoVO.getStartTime()){
+                long seconds = ((orderVideoVO.getReleaseTime().getTime() - orderVideoVO.getStartTime().getTime()) / 1000);
+                orderVideoVO.setAllTimeStr(String.valueOf(seconds));
+            }
+
+            orderVideoVO.setSoundPath(null == orderVideoVO.getSoundPath() ?null: orderVideoVO.getSoundPath().replaceAll("zcads.01zhuanche.com", "inside-zcads.01zhuanche.com"));
+
+
+        }
+
+        return orderVideoVOS;
+    }
     /**
      * 导出excel
      * @param list list
@@ -240,6 +345,62 @@ public class DriverPunishService {
             }
         }
         return wb;
+    }
+
+    /**
+     * 匹配通话主叫方
+     * 0主叫(乘客拨打) 1被叫(司机拨打) 2短信发送  3短信接收
+     */
+    public static String getOriginFrom(Integer type){
+        if(null == type) {
+            return "未返回";
+        }
+        String res = "";
+        switch(type){
+            case 0:
+                res = "乘客";
+                break;
+            case 1:
+                res = "司机";
+                break;
+            case 2:
+                res = "短信发送";
+                break;
+            case 3:
+                res = "短信接收";
+                break;
+            default:
+                res = "未知返回值";
+                break;
+        }
+        return res;
+    }
+
+    /**
+     * 挂断方(0平台释放 1主叫释放2被叫释放)
+     * @param type
+     * @return
+     */
+    public static String getReleaseFrom(Integer type){
+        if(null == type) {
+            return "未返回";
+        }
+        String res = "";
+        switch(type){
+            case 0:
+                res = "平台释放";
+                break;
+            case 1:
+                res = "主叫释放";
+                break;
+            case 2:
+                res = "被叫释放";
+                break;
+            default:
+                res = "未知返回值";
+                break;
+        }
+        return res;
     }
 
     public MaxAndMinId queryMaxAndMin(String startDate, String endDate){

@@ -10,7 +10,7 @@ import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.bigdata.MaxAndMinId;
 import com.zhuanche.entity.driver.DriverAppealRecord;
 import com.zhuanche.entity.driver.DriverPunishDto;
-import com.zhuanche.entity.driver.PunishRecordVoiceDTO;
+import com.zhuanche.entity.rentcar.OrderVideoVO;
 import com.zhuanche.serv.punish.DriverPunishService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -131,13 +131,20 @@ public class DriverPunishController extends BaseController {
         if (Objects.isNull(punishId)) {
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
+        Map<String, Object> data = new HashMap<>(4);
         try {
-            Map<String, Object> data = new HashMap<>(4);
             log.info("查询详情,punishId为--{}", punishId);
             DriverPunishDto driverPunish = driverPunishService.getDetail(punishId);
             List<DriverAppealRecord> recordList = driverPunishService.selectDriverAppealRocordByPunishId(punishId);
+
+            String orderNo = driverPunish.getOrderNo();
+            String sign = com.zhuanche.util.Common.MAIN_ORDER_KEY;
+            String businessId = com.zhuanche.util.Common.BUSSINESSID;
+            List<OrderVideoVO> orderVideoVOList = driverPunishService.getOrderVideoVOList(orderNo, businessId, sign);
+
             data.put("driverPunish", driverPunish);
             data.put("rocordList", Optional.ofNullable(recordList).orElse(Collections.emptyList()));
+            data.put("orderVideoVOList", orderVideoVOList);
             return AjaxResponse.success(data);
         } catch (Exception e) {
             log.error("查询列表出现异常", e);
