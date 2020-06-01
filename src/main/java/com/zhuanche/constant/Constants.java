@@ -190,4 +190,7 @@ public final class Constants {
 	public static final String AND = "&";
 
 	public static final Integer VERIFY_HOUR = 2;
+
+	/**验证司机的状态*/
+	public static final String VERIFY_STATUS = "15,20,25,30";
 }

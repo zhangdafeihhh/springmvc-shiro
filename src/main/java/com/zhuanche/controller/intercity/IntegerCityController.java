@@ -146,6 +146,9 @@ public class IntegerCityController {
     @Value("${ordercost.server.api.base.url}")
     private String orderCostUrl;
 
+    @Value("${query.driver.url}")
+    private String queryDriverUrl;
+
     @Autowired
     private YueAoTongPhoneConfigExMapper yueAoTongPhoneConfigExMapper;
 
@@ -1941,9 +1944,9 @@ public class IntegerCityController {
         logger.info("指派接口入参:mainOrderNo=" + mainOrderNo + ",orderNo:" + orderNo
                 + ",driverId:" + driverId + ",driverName:" + driverName + ",driverPhone:" + driverPhone + ",licensePlates:" + licensePlates
                 + ",groupId:" + groupId + ",crossCityStartTime:" + crossCityStartTime + ",routeName:" + routeName);
-        boolean bl = this.hasOrderByDriverId(orderNo,driverId);
+        boolean bl = this.queryOrderByDriverId(orderNo, driverId);
 
-        if(!bl){
+        if (!bl) {
             logger.info("====当前司机已经有包车或者拼车单=====");
             return AjaxResponse.fail(RestErrorCode.HAS_ORDER_DRIVER_ID);
         }
@@ -2092,13 +2095,13 @@ public class IntegerCityController {
 
 
     /**
-     * 验证司机前后两个小时有没有订单
+     * 验证司机前后两个小时有没有订单-通过派单接口
      *
      * @param orderNo
      * @param driverId
      * @return
      */
-    private boolean hasOrderByDriverId(String orderNo, Integer driverId) {
+    private boolean queryOrderByDriverId(String orderNo, Integer driverId) {
         try {
             Map<String, Object> map = Maps.newHashMap();
             map.put("bId", Common.BUSSINESSID);
@@ -2111,7 +2114,7 @@ public class IntegerCityController {
             }
             map.put("sign", sign);
             logger.info("==================获取订单详情入参：" + JSONObject.toJSONString(map));
-            //wiki地址 http://inside-yapi.01zhuanche.com/project/19/interface/api/3561
+            /**wiki地址 http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=37123085*/
             JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderByOrderNo", map, 0, "查询订单详情");
 
             if (jsonObject != null && jsonObject.get(Constants.CODE) != null) {
@@ -2120,15 +2123,16 @@ public class IntegerCityController {
                     JSONObject jsonData = jsonObject.getJSONObject(Constants.DATA);
                     String bookingDate = jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDate");
                     if (StringUtils.isNotEmpty(bookingDate)) {
-                        String longToStr = DateUtils.convertLongToString(Long.valueOf(bookingDate),DateUtils.dateTimeFormat_parttern);
+                        String longToStr = DateUtils.convertLongToString(Long.valueOf(bookingDate), DateUtils.dateTimeFormat_parttern);
                         Date bookingTime = DateUtils.parseDateStr(longToStr, DateUtils.dateTimeFormat_parttern);
-                        Date bookingStartTime = DateUtils.afterNHoursDate(bookingTime, -2);
-                        Date bookingEndTime =   DateUtils.afterNHoursDate(bookingTime, 2);
+                        Date bookingStartTime = DateUtils.afterNHoursDate(bookingTime, -Constants.VERIFY_HOUR);
+                        Date bookingEndTime = DateUtils.afterNHoursDate(bookingTime, Constants.VERIFY_HOUR);
                         Map<String, Object> orderMap = Maps.newHashMap();
-                        orderMap.put("businessId", Common.BUSSINESSID);
+                        orderMap.put("bId", Common.BUSSINESSID);
                         orderMap.put("driverId", driverId);
-                        orderMap.put("bookingStartTime", bookingStartTime.getTime());
-                        orderMap.put("bookingEndTime", bookingEndTime.getTime());
+                        orderMap.put("bookingDateStart", DateUtils.formatDate(bookingStartTime, DateUtils.dateTimeFormat_parttern));
+                        orderMap.put("bookingDateEnd", DateUtils.formatDate(bookingEndTime, DateUtils.dateTimeFormat_parttern));
+                        orderMap.put("status", Constants.VERIFY_STATUS);
                         String orderSign = null;
                         try {
                             orderSign = MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(orderMap, Common.MAIN_ORDER_KEY));
@@ -2137,14 +2141,14 @@ public class IntegerCityController {
                         }
                         orderMap.put("sign", orderSign);
                         /**wiki地址 http://inside-yapi.01zhuanche.com/project/22/interface/api/69102*/
-                        logger.info("========调用订单获取司机是否有订单入参========" + JSONObject.toJSONString(orderMap));
-                        JSONObject orderObject = MpOkHttpUtil.okHttpGetBackJson(carRestUrl + "/order/carpool/driver/getDriverRecentlyOrder", orderMap, 0, "获取新城际拼车司机指定时间段内一笔订单");
-                        logger.info("========调用订单获取司机是否有订单result========" + JSONObject.toJSONString(orderObject));
+                        logger.info("========调用派单获取司机是否有订单入参========" + JSONObject.toJSONString(orderMap));
+                        JSONObject orderObject = MpOkHttpUtil.okHttpGetBackJson(queryDriverUrl + "/driverWait/selectOrderDriverWaitByDriverId", orderMap, 0, "获取新城际拼车司机指定时间段内一笔订单");
+                        logger.info("========调用派单获取司机是否有订单result========" + JSONObject.toJSONString(orderObject));
                         if (orderObject != null && orderObject.get(Constants.CODE) != null) {
                             if (0 == orderObject.getInteger(Constants.CODE)) {
-                                JSONObject orderData = orderObject.getJSONObject(Constants.DATA);
-                                if (orderData != null && orderData.get("orderNo") != null) {
-                                    logger.info("=======该司机已经绑定了司机====" + JSONObject.toJSONString(orderData));
+                                JSONArray arrayData = orderObject.getJSONArray(Constants.DATA);
+                                if (arrayData != null && arrayData.size() > 0) {
+                                    logger.info("=======该司机已经绑定了司机====" + JSONObject.toJSONString(arrayData));
                                     return false;
                                 }
                             }
@@ -2154,11 +2158,12 @@ public class IntegerCityController {
                 }
             }
         } catch (Exception e) {
-            logger.error("=====接口异常===" +e);
+            logger.error("=====接口异常===" + e);
         }
 
         return true;
     }
+
 
     /**
      * 改派
