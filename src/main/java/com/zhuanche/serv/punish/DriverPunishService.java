@@ -89,8 +89,10 @@ public class DriverPunishService {
 
     public static final String APPEAL_RETURN_MSG = "该申诉被驳回，请您及时补充材料进行二次申诉，逾时未申诉平台将依据规则对您做出处罚。";
 
-    /** 车管后台 */
-    public static final String PUNISH_AUDIT_CAR_MANAGE = "1";
+    /**
+     * 车管后台
+     */
+    public static final byte PUNISH_AUDIT_CAR_MANAGE = 1;
     public static final String PUNISH_CAR_MANAGE_NAME = "车管后台";
     /** 业务平台 */
     public static final String PUNISH_AUDIT_BUSINESS = "2";
@@ -264,7 +266,7 @@ public class DriverPunishService {
      */
     public void doAudit(Integer punishId, Integer status, String cgReason) {
         DriverPunishDto punishEntity = driverPunishExMapper.getDetail(punishId);
-        if (Objects.isNull(punishEntity) || !Objects.equals(PUNISH_AUDIT_CAR_MANAGE, punishEntity.getAuditNode())) {
+        if (Objects.isNull(punishEntity) || !Objects.equals(PUNISH_AUDIT_CAR_MANAGE, punishEntity.getCurrentAuditNode())) {
             throw new ServiceException(RestErrorCode.RECORD_DEAL_FAILURE, "没有需求车管审核的记录");
         }
 
