@@ -33,13 +33,14 @@
     <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
     <result column="dispatch_points" property="dispatchPoints" jdbcType="DECIMAL" />
+    <result column="not_listening" property="notListening" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     punish_id, business_id, order_id, order_no, punish_type, punish_type_name, punish_reason,
     stop_day, stop_id, punish_price, punish_integral, punish_flow, appeal_date, driver_id,
     phone, name, license_plates, cooperation_type, city_id, city_name, supplier_id, supplier_name,
     team_id, team_name, current_audit_node, audit_node, status, expire_date, create_date,
-    update_date, dispatch_points
+    update_date, dispatch_points,not_listening
   </sql>
   <!-- mapper基础标准: 当前表所有字段查询条件集 -->
   <sql id="allBaseColumnWhereList" >

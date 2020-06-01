@@ -52,18 +52,15 @@ public class DriverPunishController extends BaseController {
 
     @RequestMapping("/getDriverPunishList")
     public AjaxResponse getDriverPunishList(DriverPunishDto params){
-
-
         if(params.getCityId() == null){
             log.info("请选择城市");
             return AjaxResponse.fail(RestErrorCode.CHOOSE_CITY);
-
         }
         try {
             log.info("查询列表,参数为--{}", params.toString());
 
             SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
-            if(ssoLoginUser.getSupplierIds() != null && ssoLoginUser.getSupplierIds().size()>0 ){
+            if (ssoLoginUser.getSupplierIds() != null && ssoLoginUser.getSupplierIds().size() > 0) {
                 Set<Integer> set = ssoLoginUser.getSupplierIds();
                 String supplierIds = StringUtils.join(set.toArray(), Constants.SEPERATER);
                 params.setSupplierIds(supplierIds);

@@ -5,7 +5,7 @@ package com.zhuanche.entity.driver;
  * @Date:2020/4/9
  * @Description:
  */
-public class DriverPunishDto extends  DriverPunish{
+public class DriverPunishDto extends DriverPunish {
 
 
     private Integer minId;

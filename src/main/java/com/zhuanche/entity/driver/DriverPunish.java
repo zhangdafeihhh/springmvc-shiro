@@ -176,6 +176,11 @@ public class DriverPunish extends BaseEntity {
 
     private BigDecimal dispatchPoints;
 
+    /**
+     * 限制听单描述
+     */
+    private String notListening;
+
     public String getCreateDateStr() {
         return createDateStr;
     }
@@ -449,6 +454,14 @@ public class DriverPunish extends BaseEntity {
 
     public void setDispatchPoints(BigDecimal dispatchPoints) {
         this.dispatchPoints = dispatchPoints;
+    }
+
+    public String getNotListening() {
+        return notListening;
+    }
+
+    public void setNotListening(String notListening) {
+        this.notListening = notListening;
     }
 
     @Override
