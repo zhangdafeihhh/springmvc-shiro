@@ -1,6 +1,5 @@
-package com.zhuanche.controller.interCity;
+package com.zhuanche.controller.intercity;
 
-import co.elastic.apm.shaded.bytebuddy.asm.Advice;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
@@ -14,7 +13,6 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.common.web.datavalidate.custom.IdCard;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.dto.rentcar.CityDto;
@@ -22,8 +20,6 @@ import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.entity.orderPlatform.CarFactOrderInfoEntity;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
-import com.zhuanche.entity.rentcar.DriverEntity;
-import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.CarBizCityService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.Common;
@@ -34,7 +30,6 @@ import mapper.mdbcarmanage.ex.MainOrderInterCityExMapper;
 import mapper.orderPlatform.ex.PoolMainOrderExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
-import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -43,13 +38,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author fanht
@@ -125,8 +122,6 @@ public class InterCityMainOrderController {
                                        String endCreateDate,
                                        String beginCostStartDate,
                                        String beginCostEndDate){
-
-        //Page page = PageHelper.startPage(pageNum,pageSize);
         StringBuffer sb =new StringBuffer();
         Map<Integer,DriverInfoInterCity> map = Maps.newHashMap();
         boolean hasQuery = false;
@@ -143,29 +138,12 @@ public class InterCityMainOrderController {
                 return AjaxResponse.success(new PageDTO(pageNum,pageSize,0,null));
             }
         }
-
-        CarPoolMainOrderDTO dto = new CarPoolMainOrderDTO();
-
-        if(StringUtils.isNotEmpty(sb.toString())){
-            String driverIds = sb.toString().substring(0,sb.toString().length()-1);
-            dto.setDriverIds(driverIds);
-        }
-        dto.setCityId(cityId);
-        dto.setStatus(orderState);
-        dto.setServiceTypeId(serviceType);
-        dto.setMainOrderNo(mainOrderNo);
-        dto.setCreateDateBegin(beginCreateDate);
-        dto.setCreateDateEnd(endCreateDate);
-        dto.setDriverStartDateStr(beginCostStartDate);
-        dto.setDriverEndDateStr(beginCostEndDate);
+        CarPoolMainOrderDTO dto = this.dto(cityId,supplierId,orderState,serviceType,driverName,driverPhone,licensePlates,mainOrderNo,
+                beginCreateDate,endCreateDate,beginCostStartDate,beginCostEndDate,sb);
         Page pageQuery = null;
-        /*if(StringUtils.isNotEmpty(sb.toString())){
-        }*/
-
         pageQuery = PageHelper.startPage(pageNum,pageSize);
-
         List<CarPoolMainOrderDTO> dtoList = exMapper.queryCarpoolMainList(dto);
-        //如果查询条件是直接查询订单的库，需要回显
+        /**如果查询条件是直接查询订单的库，需要回显*/
         if(!hasQuery && CollectionUtils.isNotEmpty(dtoList)){
             StringBuilder orderSb = new StringBuilder();
             for(CarPoolMainOrderDTO orderDTO : dtoList){
@@ -183,56 +161,70 @@ public class InterCityMainOrderController {
                     map.put(driver.getDriverId(),driver);
                 }
             }
-
             for(CarPoolMainOrderDTO mainOrder : dtoList){
                 DriverInfoInterCity driver =   map.get(mainOrder.getDriverId());
                 if(driver != null){
-                    mainOrder.setSupplierName(driver.getDriverName());
-                    mainOrder.setSupplierId(driver.getSupplierId());
-                    mainOrder.setDriverName(driver.getDriverName());
-                    mainOrder.setDriverPhone(driver.getDriverPhone());
-                    mainOrder.setLicensePlates(driver.getLicensePlates());
-                    mainOrder.setCityName(driver.getCityName());
-                    if(StringUtils.isNotEmpty(mainOrder.getMainOrderNo())){
-                        MainOrderInterCity orderInterCity = mainOrderInterCityExMapper.queryMainOrder(mainOrder.getMainOrderNo());
-                        mainOrder.setRouteName(orderInterCity != null ? orderInterCity.getMainName() : "");
-                    }
+                    mainOrder = this.mainOrder(driver,mainOrder);
                 }
             }
-
-
         }else {
             for(CarPoolMainOrderDTO mainOrder : dtoList){
                 DriverInfoInterCity driver =   map.get(mainOrder.getDriverId());
                 if(driver != null){
-                    mainOrder.setSupplierName(driver.getDriverName());
-                    mainOrder.setSupplierId(driver.getSupplierId());
-                    mainOrder.setDriverName(driver.getDriverName());
-                    mainOrder.setDriverPhone(driver.getDriverPhone());
-                    mainOrder.setLicensePlates(driver.getLicensePlates());
-                    mainOrder.setCityName(driver.getCityName());
-                    if(StringUtils.isNotEmpty(mainOrder.getMainOrderNo())){
-                        MainOrderInterCity orderInterCity = mainOrderInterCityExMapper.queryMainOrder(mainOrder.getMainOrderNo());
-                        mainOrder.setRouteName(orderInterCity != null ? orderInterCity.getMainName() : "");
-                    }
+                    mainOrder = this.mainOrder(driver,mainOrder);
                 }
             }
         }
-
         int total = 0;
         total = (int)pageQuery.getTotal();
-
-        /*if(StringUtils.isNotEmpty(sb.toString())){
-        }else {
-            total = (int)page.getTotal();
-        }
-    */
-
         PageDTO pageDTO =  new PageDTO(pageNum,pageSize,total,dtoList);
         return AjaxResponse.success(pageDTO);
     }
 
 
+            private CarPoolMainOrderDTO dto(Integer cityId,
+                                       Integer supplierId,
+                                       Integer orderState,
+                                       Integer serviceType,
+                                       String driverName,
+                                       String driverPhone,
+                                       String licensePlates,
+                                       String mainOrderNo,
+                                       String beginCreateDate,
+                                       String endCreateDate,
+                                       String beginCostStartDate,
+                                       String beginCostEndDate,
+                                        StringBuffer sb){
+                CarPoolMainOrderDTO dto = new CarPoolMainOrderDTO();
+
+                if(StringUtils.isNotEmpty(sb.toString())){
+                    String driverIds = sb.toString().substring(0,sb.toString().length()-1);
+                    dto.setDriverIds(driverIds);
+                }
+                dto.setCityId(cityId);
+                dto.setStatus(orderState);
+                dto.setServiceTypeId(serviceType);
+                dto.setMainOrderNo(mainOrderNo);
+                dto.setCreateDateBegin(beginCreateDate);
+                dto.setCreateDateEnd(endCreateDate);
+                dto.setDriverStartDateStr(beginCostStartDate);
+                dto.setDriverEndDateStr(beginCostEndDate);
+                return dto;
+            }
+
+            private CarPoolMainOrderDTO mainOrder(DriverInfoInterCity driver,CarPoolMainOrderDTO mainOrder){
+                mainOrder.setSupplierName(driver.getDriverName());
+                mainOrder.setSupplierId(driver.getSupplierId());
+                mainOrder.setDriverName(driver.getDriverName());
+                mainOrder.setDriverPhone(driver.getDriverPhone());
+                mainOrder.setLicensePlates(driver.getLicensePlates());
+                mainOrder.setCityName(driver.getCityName());
+                if(StringUtils.isNotEmpty(mainOrder.getMainOrderNo())){
+                    MainOrderInterCity orderInterCity = mainOrderInterCityExMapper.queryMainOrder(mainOrder.getMainOrderNo());
+                    mainOrder.setRouteName(orderInterCity != null ? orderInterCity.getMainName() : "");
+                }
+                return mainOrder;
+            }
     /**
      * 拼车主订单详情
      * @param mainOrderNo
@@ -302,7 +294,7 @@ public class InterCityMainOrderController {
         //        车型 modelDetail
        data.put("modelDetail", carFactOrderInfoService.selectModelNameByLicensePlates(data.getString("licensePlates")));
         String tableName="car_biz_driver_record_"+data.getString("createDateStr").split(" ")[0];
-        Map<String,String> paraMap=new HashMap<String, String>();
+        Map<String,String> paraMap=new HashMap<String, String>(4);
         paraMap.put("orderNo", data.getString("mainOrderNo"));
         paraMap.put("tableName", tableName.replace("-", "_") );
 

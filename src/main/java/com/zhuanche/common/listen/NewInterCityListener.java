@@ -5,11 +5,9 @@ import com.alibaba.rocketmq.client.consumer.listener.ConsumeOrderlyContext;
 import com.alibaba.rocketmq.client.consumer.listener.ConsumeOrderlyStatus;
 import com.alibaba.rocketmq.client.consumer.listener.MessageListenerOrderly;
 import com.alibaba.rocketmq.common.message.MessageExt;
-import com.google.common.collect.Maps;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.controller.driver.YueAoTongPhoneConfig;
-import com.zhuanche.controller.interCity.InterCityUtils;
-import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
+import com.zhuanche.controller.intercity.InterCityUtils;
 import com.zhuanche.serv.supplier.SupplierRecordService;
 import mapper.driver.ex.YueAoTongPhoneConfigExMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
@@ -20,9 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 监听下单发短信

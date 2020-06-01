@@ -1,4 +1,4 @@
-package com.zhuanche.serv.interCity;
+package com.zhuanche.serv.intercity;
 
 /**
  * @Author fanht

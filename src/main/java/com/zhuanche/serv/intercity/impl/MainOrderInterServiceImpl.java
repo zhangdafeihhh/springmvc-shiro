@@ -1,7 +1,7 @@
-package com.zhuanche.serv.interCity.impl;
+package com.zhuanche.serv.intercity.impl;
 
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
-import com.zhuanche.serv.interCity.MainOrderInterService;
+import com.zhuanche.serv.intercity.MainOrderInterService;
 import mapper.mdbcarmanage.ex.MainOrderInterCityExMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -312,8 +312,19 @@ public final class RestErrorCode{
 	@ResultMessage("未查询到匹配的线路")
 	public static final int UN_DEFINDED_LINE = 50801;
 
+	@ResultMessage("请输入乘车人数")
+	public static final int UN_RIDER_COUNT = 50901;
+
+	@ResultMessage("设置的拼车规则价格过大")
+	public static final int DISCOUNT_MAX = 50910;
 
 
+	@ResultMessage("设置的包车规则价格过大")
+	public static final int ALL_DISCOUNT_MAX = 50911;
+
+
+	@ResultMessage("当前司机不可用")
+	public static final int HAS_ORDER_DRIVER_ID = 50920;
 
 
 	//------------------------------------------------

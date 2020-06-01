@@ -1,19 +1,15 @@
-package com.zhuanche.serv.interCity.impl;
+package com.zhuanche.serv.intercity.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
-import com.sq.common.okhttp.OkHttpUtil;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.MpOkHttpUtil;
-import com.zhuanche.serv.CarBizSupplierService;
-import com.zhuanche.serv.interCity.InterCityActivityService;
+import com.zhuanche.serv.intercity.InterCityActivityService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
@@ -37,7 +33,7 @@ import java.util.*;
  * @Version 1.0
  */
 @Service
-public class InterCityActivityServiceImpl implements InterCityActivityService{
+public class InterCityActivityServiceImpl implements InterCityActivityService {
 
     @Value("${config.url}")
     private String configUrl;
@@ -82,10 +78,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
         mapParam.put("groupId",groupId);
         mapParam.put("discountStatus",discountStatus);
         mapParam.put("pageNo",pageNo);
-
         mapParam.put("pageSize",pageSize);
-
-
         Set<Integer> setCitys = new HashSet<>();
         JSONArray resultArray = null;
         try {
@@ -93,11 +86,11 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
             logger.info("=========获取计费后台数据============" + JSONObject.toJSONString(result));
             if(StringUtils.isNotEmpty(result)){
                 JSONObject jsonResult = JSONObject.parseObject(result);
-                if(jsonResult.get("code") != null && jsonResult.getInteger("code") ==0 ){
+                if(jsonResult.get(Constants.CODE) != null && jsonResult.getInteger(Constants.CODE) ==0 ){
                     String data = jsonResult.getString("data");
                     if(data != null  ){
                         JSONObject strategyJson = JSONObject.parseObject(data);
-                        if(strategyJson.get("strategyList") != null ){
+                        if(strategyJson.get(Constants.STRATEGY_LIST) != null ){
                             total = strategyJson.get("total") != null?strategyJson.getInteger("total"):0;
                             resultArray = JSONArray.parseArray(strategyJson.getString("strategyList"));
                             if(resultArray.size() > 0){
@@ -131,7 +124,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
         if(resultArray != null && resultArray.size() > 0){
             resultArray.forEach(array ->{
                 JSONObject jsonObject = (JSONObject) array;
-                if(jsonObject.get("cityId") != null && jsonObject.getInteger("cityId") > 0){
+                if(jsonObject.get(Constants.CITY_ID) != null && jsonObject.getInteger(Constants.CITY_ID) > 0){
                     jsonObject.put("cityName", jsonObject.get("cityId") == null ? "":cityMap.get(jsonObject.getInteger("cityId")));
                     jsonObject.put("groupName",jsonObject.get("groupId")== null ? "":groupMap.get(jsonObject.getInteger("groupId")));
                 }else {
@@ -140,9 +133,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
                 jsonArray.add(jsonObject);
             });
         }
-
         PageDTO pageDTO = new PageDTO(pageNo, pageSize, total, jsonArray);
-
         return pageDTO;
     }
 
@@ -155,11 +146,11 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
         JSONObject jsonObject = new JSONObject();
         if(StringUtils.isNotEmpty(result)){
             JSONObject jsonResult = JSONObject.parseObject(result);
-            if(jsonResult.get("code") != null && jsonResult.getInteger("code") ==0 ){
+            if(jsonResult.get(Constants.CODE) != null && jsonResult.getInteger(Constants.CODE) ==0 ){
                 String data = jsonResult.getString("data");
                 if(data != null ){
                  jsonObject = jsonResult.getJSONObject("data");
-                 if(jsonObject.get("cityId") != null && jsonObject.getInteger("cityId") > 0){
+                 if(jsonObject.get(Constants.CITY_ID) != null && jsonObject.getInteger(Constants.CITY_ID) > 0){
                      Integer cityId = jsonObject.getInteger("cityId");
                      String cityName = cityExMapper.queryNameById(cityId);
                      jsonObject.put("cityName",cityName);
@@ -169,7 +160,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
                  }
 
 
-                 if(jsonObject.get("groupId") != null && jsonObject.getInteger("groupId") > 0){
+                 if(jsonObject.get(Constants.GROUP_ID) != null && jsonObject.getInteger(Constants.GROUP_ID) > 0){
                         Integer groupId = jsonObject.getInteger("groupId");
                         String groupName = groupExMapper.getGroupNameByGroupId(groupId);
                         jsonObject.put("groupName",groupName);
@@ -193,7 +184,9 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
                                 String discountAmount,
                                 String discountStartTime,
                                 String discountEndTime,
-                                Integer discountStatus) {
+                                Integer discountStatus,
+                                Integer allDiscountType,
+                                String allDiscountAmount) {
         Map<String,Object> map = Maps.newHashMap();
         if(discountId != null){
             map.put("discountId",discountId);
@@ -206,11 +199,14 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
         map.put("discountStatus",discountStatus);
         map.put("updateBy",WebSessionUtil.getCurrentLoginUser().getLoginName());
 
+        map.put("allDiscountType",allDiscountType);
+        map.put("allDiscountAmount",allDiscountAmount);
+
         String result = MpOkHttpUtil.okHttpPost(orderCostUrl+"/interCity/strategy/discount/saveOrUpdate",map,0,null);
 
         if(StringUtils.isNotEmpty(result)){
             JSONObject jsonObject = JSONObject.parseObject(result);
-            if(jsonObject.get("code") != null && jsonObject.getInteger("code") == 0){
+            if(jsonObject.get(Constants.CODE) != null && jsonObject.getInteger(Constants.CODE) == 0){
                 return jsonObject.getInteger("code");
             }
         }
@@ -230,8 +226,8 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
             logger.info("配置中心供应商--{}查询路线ID集合返回结果集--{}", supplierIdBatch, lineResult);
             if (StringUtils.isNotEmpty(lineResult)) {
                 JSONObject jsonResult = JSONObject.parseObject(lineResult);
-                if (jsonResult != null && jsonResult.getInteger("code") == 0) {
-                    if (jsonResult.get("data") != null) {
+                if (jsonResult != null && jsonResult.getInteger(Constants.CODE) == 0) {
+                    if (jsonResult.get(Constants.CODE) != null) {
                         return jsonResult.get("data").toString();
                     }
                 }
@@ -314,7 +310,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
             String result = MpOkHttpUtil.okHttpGet(configUrl + "/intercityCarUse/getIntercityCarSharingList",map,0,null);
             if(StringUtils.isNotEmpty(result)){
                 JSONObject jsonObject = JSONObject.parseObject(result);
-                if(jsonObject.get("code") != null && jsonObject.getInteger("code") == 0){
+                if(jsonObject.get(Constants.CODE) != null && jsonObject.getInteger(Constants.CODE) == 0){
                     JSONArray jsonArray = jsonObject.getJSONArray("data");
                     jsonArray.forEach(array ->{
                         JSONObject json = (JSONObject) array;
@@ -334,7 +330,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService{
                 String result = MpOkHttpUtil.okHttpGet(configUrl + "/intercityCarUse/getLineNameByIds",map,0,null);
                 if(StringUtils.isNotEmpty(result)){
                     JSONObject jsonObject = JSONObject.parseObject(result);
-                    if(jsonObject.get("code") != null && jsonObject.getInteger("code") == 0){
+                    if(jsonObject.get(Constants.CODE) != null && jsonObject.getInteger(Constants.CODE) == 0){
                         JSONArray jsonArray = jsonObject.getJSONArray("data");
                         return jsonArray;
                     }
