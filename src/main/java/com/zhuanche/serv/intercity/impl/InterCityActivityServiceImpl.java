@@ -86,7 +86,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService {
         Set<Integer> setCitys = new HashSet<>();
         JSONArray resultArray = null;
         try {
-            String result = MpOkHttpUtil.okHttpPost(orderCostUrl+"/interCity/strategy/discount/list",mapParam,0,null);
+            String result = MpOkHttpUtil.okHttpPost(busOrderUrl+"/interCity/strategy/discount/list",mapParam,0,null);
             logger.info("=========获取计费后台数据============" + JSONObject.toJSONString(result));
             if(StringUtils.isNotEmpty(result)){
                 JSONObject jsonResult = JSONObject.parseObject(result);
@@ -206,7 +206,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService {
         map.put("allDiscountType",allDiscountType);
         map.put("allDiscountAmount",allDiscountAmount);
 
-        String result = MpOkHttpUtil.okHttpPost(orderCostUrl+"/interCity/strategy/discount/saveOrUpdate",map,0,null);
+        String result = MpOkHttpUtil.okHttpPost(busOrderUrl+"/interCity/strategy/discount/saveOrUpdate",map,0,null);
 
         if(StringUtils.isNotEmpty(result)){
             JSONObject jsonObject = JSONObject.parseObject(result);
