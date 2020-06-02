@@ -133,7 +133,7 @@ public class CompleteOrderController{
                 }
             }
 
-            if(isReductDiscount != null){
+            if(isPlatformAmount != null){
                 if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isPlatformAmount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isPlatformAmount) ){
                     paramMap.put("isPlatformAmount",isPlatformAmount);
                 }
@@ -213,6 +213,7 @@ public class CompleteOrderController{
                                          Integer supplierId,
                                          Integer distributorId,
                                          Integer isReductDiscount,
+                                         Integer isPlatformAmount,
                                          HttpServletRequest request,
                                          HttpServletResponse response){
     	    try{
@@ -268,6 +269,14 @@ public class CompleteOrderController{
                         paramMap.put("isReductDiscount",isReductDiscount);
                     }
                 }
+
+                if(isPlatformAmount != null){
+                    if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isPlatformAmount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isPlatformAmount) ){
+                        paramMap.put("isPlatformAmount",isPlatformAmount);
+                    }
+                }
+
+
 		  		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
 				if(paramMap==null){
 					return;
