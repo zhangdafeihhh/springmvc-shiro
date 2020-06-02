@@ -19,7 +19,7 @@ import com.zhuanche.entity.driver.DriverPunish;
 import com.zhuanche.entity.driver.DriverPunishDto;
 import com.zhuanche.entity.driver.PunishRecordVoiceDTO;
 import com.zhuanche.entity.driver.appraisa.UpdateAppraisalVo;
-import com.zhuanche.entity.driver.punish.ConfigPunishTypeBaseEntity;
+import com.zhuanche.entity.mpconfig.ConfigPunishTypeBaseEntity;
 import com.zhuanche.entity.rentcar.OrderVideoVO;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.CustomerAppraisalService;

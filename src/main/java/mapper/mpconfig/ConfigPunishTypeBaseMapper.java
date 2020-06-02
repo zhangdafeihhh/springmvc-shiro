@@ -1,6 +1,6 @@
-package mapper.driver;
+package mapper.mpconfig;
 
-import com.zhuanche.entity.driver.punish.ConfigPunishTypeBaseEntity;
+import com.zhuanche.entity.mpconfig.ConfigPunishTypeBaseEntity;
 
 /**
  * @author kjeakiry
@@ -13,7 +13,7 @@ public interface ConfigPunishTypeBaseMapper {
      * @param params
      * @return
      */
-    ConfigPunishTypeBaseEntity  queryPunishTypeSpecial(ConfigPunishTypeBaseEntity params);
+    ConfigPunishTypeBaseEntity queryPunishTypeSpecial(ConfigPunishTypeBaseEntity params);
 
     /**
      * queryPunishTypeBase

@@ -4,9 +4,7 @@ package com.zhuanche.entity.driver;
 
 import com.zhuanche.common.enums.EnumCooperationType;
 import com.zhuanche.entity.common.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -174,7 +172,15 @@ public class DriverPunish extends BaseEntity {
     private String createDateStr;
     private String appealDateStr;
 
+    @Setter@Getter
+    private String orderOrigin;
+
     private BigDecimal dispatchPoints;
+
+    @Setter@Getter
+    private Integer channelAppealResult;
+    @Setter@Getter
+    private Integer channelAppealState;
 
     /**
      * 限制听单描述

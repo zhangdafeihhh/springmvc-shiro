@@ -1,4 +1,4 @@
-package com.zhuanche.entity.driver.punish;
+package com.zhuanche.entity.mpconfig;
 
 
 import com.zhuanche.entity.common.BaseEntity;

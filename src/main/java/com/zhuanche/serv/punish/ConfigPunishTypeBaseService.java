@@ -1,7 +1,7 @@
 package com.zhuanche.serv.punish;
 
-import com.zhuanche.entity.driver.punish.ConfigPunishTypeBaseEntity;
-import mapper.driver.ConfigPunishTypeBaseMapper;
+import com.zhuanche.entity.mpconfig.ConfigPunishTypeBaseEntity;
+import mapper.mpconfig.ConfigPunishTypeBaseMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

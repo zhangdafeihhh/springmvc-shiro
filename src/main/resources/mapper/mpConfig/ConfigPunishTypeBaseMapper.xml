@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="mapper.driver.ConfigPunishTypeBaseMapper">
-  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.punish.ConfigPunishTypeBaseEntity">
+<mapper namespace="mapper.mpconfig.ConfigPunishTypeBaseMapper">
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mpconfig.ConfigPunishTypeBaseEntity">
     <id column="configid" jdbcType="INTEGER" property="configid" />
     <result column="punish_name" jdbcType="VARCHAR" property="punishName" />
     <result column="related_operation_sys" jdbcType="VARCHAR" property="relatedOperationSys" />
@@ -27,14 +27,14 @@
     appeal_duration_second, deal_background, deal_duration, deal_overtime, create_time,
     status
   </sql>
-  <select id="queryPunishTypeBase" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.driver.punish.ConfigPunishTypeBaseEntity">
+  <select id="queryPunishTypeBase" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mpconfig.ConfigPunishTypeBaseEntity">
     select
     <include refid="Base_Column_List_Base"/>
     from config_punish_type_base
     where status = 1 and configid = #{configid,jdbcType=INTEGER} and FIND_IN_SET(#{dealBackground,jdbcType=VARCHAR},deal_background)
     Limit 1
   </select>
-  <select id="queryPunishTypeSpecial" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.driver.punish.ConfigPunishTypeBaseEntity">
+  <select id="queryPunishTypeSpecial" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mpconfig.ConfigPunishTypeBaseEntity">
     select
     <include refid="Base_Column_List_Special"/>
     from config_punish_type_special
