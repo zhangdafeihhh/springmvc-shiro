@@ -16,7 +16,7 @@ public interface DriverAppealRecordMapper {
 
     int updateByPrimaryKeySelective(DriverAppealRecord record);
 
-    int updateByPrimaryKeyWithBLOBs(DriverAppealRecord record);
+    int updateNotRejectedByPunishId(DriverAppealRecord record);
 
     int updateByPrimaryKey(DriverAppealRecord record);
 

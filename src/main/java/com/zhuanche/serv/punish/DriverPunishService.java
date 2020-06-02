@@ -652,21 +652,21 @@ public class DriverPunishService {
                 .punishId(punishId)
                 .expireDate(expireDate)
                 .build();
+        log.info("update driverPunish ,param :{}", JSONObject.toJSONString(driverPunish));
         driverPunishMapper.updateByPrimaryKeySelective(driverPunish);
 
-        if (status != PunishEventEnum.REJECT.getStatus()) {
-            DriverAppealRecord appealRecord = DriverAppealRecord.builder()
-                    .status(status.byteValue())
-                    .cgReason(cgReason)
-                    .cgStatus(cgStatus.byteValue())
-                    .cgOperator(currentLoginUser.getName())
-                    .cgOperateDate(new Date())
-                    .ywStatus(ywStatus)
-                    .ywExpireDate(expireDate)
-                    .punishId(punishId)
-                    .build();
-            driverAppealRecordMapper.updateByPrimaryKeySelective(appealRecord);
-        }
+        DriverAppealRecord appealRecord = DriverAppealRecord.builder()
+                .status(status.byteValue())
+                .cgReason(cgReason)
+                .cgStatus(cgStatus.byteValue())
+                .cgOperator(currentLoginUser.getName())
+                .cgOperateDate(new Date())
+                .ywStatus(ywStatus)
+                .ywExpireDate(expireDate)
+                .punishId(punishId)
+                .build();
+        log.info("update appealRecord ,param :{}", JSONObject.toJSONString(appealRecord));
+        driverAppealRecordMapper.updateNotRejectedByPunishId(appealRecord);
     }
 
 
