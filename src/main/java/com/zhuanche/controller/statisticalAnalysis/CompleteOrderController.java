@@ -77,6 +77,7 @@ public class CompleteOrderController{
 	                                              Integer supplierId,
 	                                              Integer distributorId,
 	                                              Integer isReductDiscount,
+                                                  Integer isPlatformAmount,
 	                                              @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                              @Verify(param = "pageSize",rule = "required") Integer pageSize){
 	        logger.info("【运营管理-统计分析】完成订单列表数据:queryCompleteOrderData");
@@ -129,6 +130,12 @@ public class CompleteOrderController{
             if(isReductDiscount != null){
                 if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isReductDiscount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isReductDiscount) ){
                     paramMap.put("isReductDiscount",isReductDiscount);
+                }
+            }
+
+            if(isReductDiscount != null){
+                if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isPlatformAmount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isPlatformAmount) ){
+                    paramMap.put("isPlatformAmount",isPlatformAmount);
                 }
             }
             // 数据权限设置
