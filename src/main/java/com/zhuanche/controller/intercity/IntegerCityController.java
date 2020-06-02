@@ -2122,7 +2122,15 @@ public class IntegerCityController {
                 if (0 == code) {
                     JSONObject jsonData = jsonObject.getJSONObject(Constants.DATA);
                     String bookingDate = jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDate");
-                    if (StringUtils.isNotEmpty(bookingDate)) {
+
+                    Integer newCrossServiceType = 0;
+                    if (jsonData != null && jsonData.get(Constants.MEMO) != null) {
+                        JSONObject jsonMemo = jsonData.getJSONObject("memo");
+                        logger.info("=======获取memo数据=====" + JSONObject.toJSONString(jsonMemo));
+                        newCrossServiceType = jsonMemo.get(Constants.NEW_CROSS_SERVICE_TYPE) != null ? jsonMemo.getInteger(Constants.NEW_CROSS_SERVICE_TYPE) : 0;
+                    }
+                    
+                    if (StringUtils.isNotEmpty(bookingDate) &&  Constants.INTER_CITY_CHARTER_TYPE.equals(newCrossServiceType)) {
                         String longToStr = DateUtils.convertLongToString(Long.valueOf(bookingDate), DateUtils.dateTimeFormat_parttern);
                         Date bookingTime = DateUtils.parseDateStr(longToStr, DateUtils.dateTimeFormat_parttern);
                         Date bookingStartTime = DateUtils.afterNHoursDate(bookingTime, -Constants.VERIFY_HOUR);
