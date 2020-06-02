@@ -1,5 +1,8 @@
 package com.zhuanche.constant;
 
+/**
+ * @Author fanht
+ */
 public final class Constants {
 
 	private Constants() {
@@ -42,7 +45,6 @@ public final class Constants {
 	/*******司机派单信息导出***********/
 	public static final Integer SAAS_DRIVER_DISPATCH = 14;
 
-	public static final String yyyy_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";
 
 
 	public static final int  CONTRY  = 1; //全国
@@ -123,4 +125,72 @@ public final class Constants {
 
 	public static final String EROR_DATE = "NaN-NaN-NaN";
 
+	/**降序排序**/
+	public static final String BOOKING_DATE_SORT_DESC = "1";
+	/**升序排序**/
+	public static final String BOOKING_DATE_SORT_ASC = "2";
+	/**不走管理费模式*/
+	public static final Integer PAYFLAG = 13;
+
+	public static final String PING_SETTLE_TYPE = "1";
+
+
+
+	/**短横线*/
+	public static final String SHORT_STOKE = "-";
+	/**城际拼车类型*/
+	public static final Integer INTER_CITY_SERVICE_TYPE = 1;
+    /**包车类型*/
+	public static final Integer INTER_CITY_CHARTER_TYPE = 2;
+
+	/**========json解析常用变量===========**/
+
+ 	/**分销商id*/
+	public static final String  DISTRIBUTORID = "distributorId";
+
+	public static final String  DISTRIBUTORNAME = "distributorName";
+
+	public static final String  LINEID = "lineId";
+
+	public static final String SPLIT = ";";
+
+	/**订单*/
+	public static final Integer ORDER_RETURN_CODE = 249;
+
+
+	public static final String MEMO = "memo";
+
+	public static final String BOOKING_USER_NAME = "bookingUserName";
+
+	public static final String ORDER_ADDRESS = "orderAddress";
+
+	public static final Integer ORDER_STATUS = 13;
+
+	public static final String MAIN_ORDER_NO = "mainOrderNo";
+
+	public static final String ESTIMATED = "estimated";
+
+	public static final  String ESTIMATED_KEY = "estimatedKey";
+
+	public static final  String PING_SIGN = "pingSign";
+
+	public static final String NEW_CROSS_SERVICE_TYPE = "offlineIntercityServiceType";
+
+	public static final String STRATEGY_LIST = "strategyList";
+
+	public static final String CITY_ID = "cityId";
+
+	public static final Integer IS_REDUCT_DISCOUNT_FALSE = 0;
+
+	public static final Integer IS_REDUCT_DISCOUNT_TRUE = 1;
+
+	/**包车乘车人数*/
+	public static final Integer BAO_CHE_RIDER_COUNT = 99;
+
+	public static final String AND = "&";
+
+	public static final Integer VERIFY_HOUR = 2;
+
+	/**验证司机的状态*/
+	public static final String VERIFY_STATUS = "15,20,25,30";
 }

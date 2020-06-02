@@ -1,4 +1,4 @@
-package com.zhuanche.controller.interCity;
+package com.zhuanche.controller.intercity;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -6,13 +6,16 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.serv.interCity.InterCityActivityService;
+import com.zhuanche.constant.Constants;
+import com.zhuanche.serv.intercity.InterCityActivityService;
+import com.zhuanche.util.collectionutil.TransportUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 
 /**
  * @Author fanht
@@ -57,6 +60,21 @@ public class InterCityActivityController {
         return ajaxResponse;
     }
 
+    /**
+     *
+     * @param discountId
+     * @param strategyId
+     * @param discountType
+     * @param discountAmount
+     * @param discountStartTime
+     * @param discountEndTime
+     * @param discountStatus
+     * @param allDiscountType
+     * @param allDiscountAmount
+     * @param carShardRulePrice 拼车规则价格
+     * @param carPackRulePrice 包车规则价格
+     * @return
+     */
     @RequestMapping(value = "/saveOrUpdate")
     @ResponseBody
     public AjaxResponse saveOrUpdate(Integer discountId,
@@ -65,14 +83,37 @@ public class InterCityActivityController {
                                      String discountAmount,
                                      String discountStartTime,
                                      String discountEndTime,
-                                     Integer discountStatus){
-        logger.info("查询城际拼车立减优惠活动saveOrUpdate入参:{},{},{},{},{},{}",discountId,strategyId,
-                discountType,discountAmount,discountStartTime, discountEndTime,discountStatus);
+                                     Integer discountStatus,
+                                     Integer allDiscountType,
+                                     String allDiscountAmount,
+                                     String carShardRulePrice,
+                                     String carPackRulePrice){
+        logger.info("查询城际拼车立减优惠活动saveOrUpdate入参:{},{},{},{},{},{},{},{}",discountId,strategyId,
+                discountType,discountAmount,discountStartTime, discountEndTime,discountStatus,
+                allDiscountType,allDiscountAmount);
+        /**拼车设置的立减价格不能大于已有的价格最小值 */
+        if(IntegerEnum.DISCOUNT_TYPE_ZERO.getValue().equals(discountType)){
+         String[] strArr =   carShardRulePrice.split(Constants.SEPERATER);
+         Double minPrice = TransportUtils.getDoubleMinValue(strArr);
+          if(Double.valueOf(discountAmount)>=minPrice){
+              logger.info("设置的拼车价格过大");
+              return AjaxResponse.fail(RestErrorCode.DISCOUNT_MAX);
+          }
+        }
+
+        if(IntegerEnum.ALL_DISCOUNT_TYPE_ZERO.getValue().equals(discountType)){
+            String[] strArr =   carPackRulePrice.split(Constants.SEPERATER);
+            Double minPrice = TransportUtils.getDoubleMinValue(strArr);
+            if(Double.valueOf(allDiscountAmount)>=minPrice){
+                logger.info("设置的包车价格过大");
+                return AjaxResponse.fail(RestErrorCode.ALL_DISCOUNT_MAX);
+            }
+        }
 
         Integer code = 1;
         try {
          code =   activityService.saveOrUpdate(discountId,strategyId,discountType,discountAmount,
-                   discountStartTime,discountEndTime,discountStatus);
+                   discountStartTime,discountEndTime,discountStatus,allDiscountType,allDiscountAmount);
         } catch (Exception e) {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
@@ -84,7 +125,6 @@ public class InterCityActivityController {
             ajaxResponse = AjaxResponse.fail(code);
         }
 
-
         return ajaxResponse;
     }
 
@@ -92,7 +132,6 @@ public class InterCityActivityController {
     @RequestMapping(value = "/queryRule")
     @ResponseBody
     public AjaxResponse queryRule(){
-
 
         JSONArray jsonArray = activityService.queryRule();
         AjaxResponse ajaxResponse = AjaxResponse.success(jsonArray);

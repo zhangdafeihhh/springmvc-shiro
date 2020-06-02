@@ -16,6 +16,7 @@ import com.zhuanche.entity.mdbcarmanage.CarDriverDayDuty;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo;
 import com.zhuanche.entity.rentcar.CarBizCity;
+import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.request.CommonRequest;
 import com.zhuanche.request.DriverTeamRequest;
@@ -26,6 +27,7 @@ import mapper.mdbcarmanage.ex.CarDriverDayDutyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.CarDutyDurationExMapper;
 import mapper.mdbcarmanage.ex.DriverDutyTimeInfoExMapper;
+import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
@@ -83,6 +85,9 @@ public class AsyncDutyService {
 
 	@Autowired
 	private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
+
+	@Autowired
+	private CarBizDriverInfoMapper carBizDriverInfoMapper;
 
 	@Autowired
 	private CitySupplierTeamCommonService citySupplierTeamCommonService;
@@ -494,7 +499,12 @@ public class AsyncDutyService {
 			messageMap.put("teamName", driver.getTeamName()==null?"":driver.getTeamName());
 			messageMap.put("teamGroupId", driver.getGroupId()==null?"":driver.getGroupId());
 			messageMap.put("teamGroupName", driver.getCarGroupName()==null?"":driver.getCarGroupName());
-
+			logger.info("根据司机id查询司机信息driverId={}" , driver.getDriverId());
+			CarBizDriverInfo driverInfo = carBizDriverInfoMapper.selectByPrimaryKey(Integer.parseInt(driver.getDriverId()));
+			if (Objects.nonNull(driverInfo)) {
+				logger.info("查询司机信息不为空添加车牌号到messageMap");
+				messageMap.put("licensePlates" , driverInfo.getLicensePlates());
+			}
 			String messageStr = JSONObject.fromObject(messageMap).toString();
 			logger.info("专车司机，同步发送数据：" + messageStr);
 			//TODO 20190619新增一组修改司机信息发送MQ

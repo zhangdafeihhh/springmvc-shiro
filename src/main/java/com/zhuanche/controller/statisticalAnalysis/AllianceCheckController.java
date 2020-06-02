@@ -110,7 +110,7 @@ public class AllianceCheckController{
 	public void exportAllianceCheckData( 
 										 @Verify(param = "queryDate",rule = "required") String queryDate,
 							             String allianceId,
-							             Long cityId,
+							             @Verify(param = "cityId",rule = "required") Long cityId,
 							             @Verify(param = "orderByColumnCode",rule = "required") String orderByColumnCode,
 							             @Verify(param = "orderTypeCode",rule = "required") String orderTypeCode,
 	                                     HttpServletRequest request,

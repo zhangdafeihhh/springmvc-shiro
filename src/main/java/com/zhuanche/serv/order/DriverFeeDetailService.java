@@ -15,5 +15,5 @@ public interface DriverFeeDetailService {
     List<OrderCostDetailInfo> getOrdersCostDetailInfo(String orderNos);
     OrderCostDetailInfo getOrderCostDetailInfo(String orderNo);
 
-    DriverCostDetailVO getDriverCostDetail(String orderNo, int orderId, Integer buyoutFlag);
+    DriverCostDetailVO getDriverCostDetail(String orderNo, long orderId, Integer buyoutFlag);
 }

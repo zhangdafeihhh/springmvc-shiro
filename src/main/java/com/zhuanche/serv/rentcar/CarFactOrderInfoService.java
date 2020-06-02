@@ -1,5 +1,6 @@
 package com.zhuanche.serv.rentcar;
 
+import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
@@ -47,7 +48,7 @@ public interface CarFactOrderInfoService {
      * @param orderId
      * @return
      */
-    public CarBizOrderSettleEntity selectDriverSettleByOrderId(Long orderId);
+//    public CarBizOrderSettleEntity selectDriverSettleByOrderId(Long orderId);
     /**
      * 
      */
@@ -116,4 +117,5 @@ public interface CarFactOrderInfoService {
 
 //    Workbook exportExceleOrderList(List<CarFactOrderInfoDTO> list, String path) throws Exception;
 
+    JSONObject queryByJiFei(String method, Map<String, Object> params, String tag);
 }

@@ -74,11 +74,7 @@
       and t.driverId = #{driverId}
     </if>
     <if test="sortName ==null or sortName ==''">
-      ORDER BY time desc
-    </if>
-    <if test="sortName !=null and sortName !=''">
-      ORDER BY
-      ${sortName} ${sortOrder}
+      ORDER BY id desc
     </if>
   </select>
 
@@ -138,11 +134,7 @@
     </if>
     GROUP BY licensePlates
     <if test="sortName ==null or sortName ==''">
-      ORDER BY time desc
-    </if>
-    <if test="sortName !=null and sortName !=''">
-      ORDER BY
-      ${sortName},id ${sortOrder}
+      ORDER BY id desc
     </if>
   </select>
 </mapper>

@@ -974,7 +974,12 @@ public class BusCarBizDriverInfoService implements BusConst {
 			messageMap.put("teamName", saveDTO.getTeamName() == null ? "" : saveDTO.getTeamName()); // 司机所属车队名称
 			messageMap.put("teamGroupId", saveDTO.getTeamGroupId() == null ? "" : saveDTO.getTeamGroupId()); // 司机所属小组ID
 			messageMap.put("teamGroupName", saveDTO.getTeamGroupName() == null ? "" : saveDTO.getTeamGroupName()); // 司机所属小组名称
-
+            logger.info("根据司机id查询司机信息driverId={}" , saveDTO.getDriverId());
+            CarBizDriverInfo driverInfo = carBizDriverInfoMapper.selectByPrimaryKey(saveDTO.getDriverId());
+            if (Objects.nonNull(driverInfo)) {
+                logger.info("查询司机信息不为空添加车牌号到messageMap");
+                messageMap.put("licensePlates" , driverInfo.getLicensePlates());
+            }
             Integer driverId = saveDTO.getDriverId();
             logger.info("专车司机driverId={}，同步发送数据={}", driverId, JSON.toJSONString(messageMap));
             //TODO 20190619新增一组修改司机信息发送MQ

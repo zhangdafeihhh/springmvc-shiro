@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.zhuanche</groupId>
 		<artifactId>mp-parent</artifactId>
-		<version>1.9-SNAPSHOT</version>
+		<version>1.10-SNAPSHOT</version>
 	</parent>
 	<artifactId>mp-manage</artifactId>
 	<packaging>war</packaging>
@@ -436,6 +436,13 @@
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itext-asian</artifactId>
 			<version>5.2.0</version>
+		</dependency>
+
+		<!--操作日志拦截-->
+		<dependency>
+			<groupId>mp-mvc-logger</groupId>
+			<artifactId>mp-mvc-logger</artifactId>
+			<version>2.0.5-SNAPSHOT</version>
 		</dependency>
     </dependencies>
 

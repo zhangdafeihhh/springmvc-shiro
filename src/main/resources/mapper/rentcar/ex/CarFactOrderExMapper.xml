@@ -183,7 +183,7 @@
 		<result property="airportId" column="airport_id"/>
 	</resultMap>
 	
-	<select id="selectDriverSettleByOrderId" parameterType="java.lang.Long" resultType="com.zhuanche.entity.rentcar.CarBizOrderSettleEntity">
+	<!--<select id="selectDriverSettleByOrderId" parameterType="java.lang.Long" resultType="com.zhuanche.entity.rentcar.CarBizOrderSettleEntity">
 		SELECT
 				detail.coupon_amount AS couponAmount,
 				detail.coupon_settle_amount AS couponSettleAmount,
@@ -199,7 +199,7 @@
 		FROM
 			car_biz_order_settle_detail detail
 		WHERE detail.order_id=#{orderId}
-	</select>
+	</select>-->
 	
 	<select id="selectCarGroupById" parameterType="java.lang.Integer" resultType="com.zhuanche.entity.rentcar.CarGroupEntity">
 		SELECT
@@ -322,7 +322,7 @@
    </select>
    
 	<!-- 此订单的order_cost_detail -->
-	<select id="selectOrderCostDetailByOrderId" resultMap="CarFactOrderInfoMap"	parameterType="java.lang.Long">
+	<!--<select id="selectOrderCostDetailByOrderId" resultMap="CarFactOrderInfoMap"	parameterType="java.lang.Long">
 		SELECT
 			b.travel_time ,
 			b.travel_mileage ,
@@ -363,16 +363,16 @@
        LEFT JOIN car_biz_pricing h on h.price_id=b.price_plan_id and b.price_plan_version=h.version
 	   LEFT JOIN cs_car_sys_user AS a ON a.user_id =b.reduction_person
 	   where b.order_id = #{orderId , jdbcType=BIGINT}
-	</select>
-	<!-- 此订单的car_biz_order_cost_detail_extension -->
-	<select id="selectOrderCostExtension" resultMap="CarFactOrderInfoMap"	parameterType="java.lang.Long">
+	</select>-->
+	<!-- 此订单的car_biz_order_ cost_detail_extension -->
+	<!--<select id="selectOrderCostExtension" resultMap="CarFactOrderInfoMap"	parameterType="java.lang.Long">
 		SELECT
 			IFNULL(deo.language_service_fee, 0) as languageServiceFee,
 			deo.distant_detail distantDetail,
 			deo.channel_discount_driver channelDiscountDriver
 		FROM car_biz_order_cost_detail_extension deo 
     	WHERE deo.order_id = #{orderId , jdbcType=BIGINT} 
-	</select>
+	</select>-->
 	
 	<!-- 此订单的PaymentCustomer -->
 	<select id="selectPaymentCustomer" resultType="java.lang.Double"	parameterType="java.lang.String">
@@ -404,8 +404,8 @@
 			car_biz_order_dissent AS c
 		LEFT JOIN car_sys_user AS a ON a.user_id = c.create_by where c.order_id=#{orderId , jdbcType=BIGINT}
 	</select>	
-	<!-- 此订单的car_biz_order_settle_detail_extension -->
-	<select id="selectOrderSettleDetail" resultMap="CarFactOrderInfoMap"	parameterType="java.lang.Long">
+	<!-- 此订单的car_biz_order_ settle_detail_extension -->
+	<!--<select id="selectOrderSettleDetail" resultMap="CarFactOrderInfoMap"	parameterType="java.lang.Long">
 		SELECT
  			IFNULL(de.wx_settle_amount, 0) AS weixin,
 			IFNULL(de.zfb_settle_amount, 0) AS zfb,
@@ -417,6 +417,6 @@
 		LEFT JOIN car_biz_order_settle_detail_extension de on det.order_no=de.order_no
 		where
 		det.order_id = #{orderId , jdbcType=BIGINT}
-	</select>
+	</select>-->
     
 </mapper>

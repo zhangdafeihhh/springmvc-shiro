@@ -677,7 +677,12 @@ public class CarBizDriverInfoService {
             messageMap.put("teamName", carBizDriverInfoDTO.getTeamName() == null ? "" : carBizDriverInfoDTO.getTeamName()); //司机所属车队名称
             messageMap.put("teamGroupId", carBizDriverInfoDTO.getTeamGroupId() == null ? "" : carBizDriverInfoDTO.getTeamName()); //司机所属小组ID
             messageMap.put("teamGroupName", carBizDriverInfoDTO.getTeamGroupName() == null ? "" : carBizDriverInfoDTO.getTeamGroupName()); //司机所属小组名称
-
+            logger.info("根据司机id查询司机信息driverId={}" , carBizDriverInfoDTO.getDriverId());
+            CarBizDriverInfo driverInfo = carBizDriverInfoMapper.selectByPrimaryKey(carBizDriverInfoDTO.getDriverId());
+            if (Objects.nonNull(driverInfo)) {
+                logger.info("查询司机信息不为空添加车牌号到messageMap");
+                messageMap.put("licensePlates" , driverInfo.getLicensePlates());
+            }
             String messageStr = JSONObject.fromObject(messageMap).toString();
             logger.info("专车司机driverId={}，同步发送数据={}", carBizDriverInfoDTO.getDriverId(), messageStr);
             //TODO 20190619新增一组修改司机信息发送MQ
@@ -688,7 +693,7 @@ public class CarBizDriverInfoService {
                 CommonRocketProducerDouble.publishMessage("driver_info", method, String.valueOf(carBizDriverInfoDTO.getDriverId()), messageMap);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("send Driver mq error" ,e);
         }
     }
 

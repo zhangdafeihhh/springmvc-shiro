@@ -43,7 +43,7 @@ public class DriverInvitationController {
 	/**SINA提供短链接生成服务**/
 	private static final String SINA_API = "http://api.t.sina.com.cn/short_url/shorten.json?source=1681459862&url_long=";
 	
-	// 生成短链接
+	/**生成短链接*/
 	@RequestMapping(value = "/makeShortUrl")
 	@ResponseBody
 	@RequestFunction(menu = DRIVER_JOIN_PROMOTE_INVITE)
@@ -51,21 +51,21 @@ public class DriverInvitationController {
 		logger.info("供应商短链接生成,supplierId="+supplierId);
 		JSONArray parseArray = null;
 		try {
-			String url = DRIVER_JOIN_URL+supplierId;
+			String url = DRIVER_JOIN_URL+supplierId+"%26tt="+System.currentTimeMillis();
 			String shortUrl  = null;
 			try {
                 shortUrl = HttpClientUtil.buildGetRequest(SINA_API + url).setLimitResult(1).execute();
                 logger.info("供应商短链接生成,supplierId={},result={}",supplierId,shortUrl);
             } catch (HttpException e) {
-                logger.error("供应商短链接生成异常",e);
-                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+				logger.info("供应商连接地址生成失败，使用长连接" + e);
+				shortUrl = url;
             }
 			parseArray = JSON.parseArray((shortUrl));
 		} catch (Exception e) {
 			logger.info("地址生成失败");
 			parseArray = new JSONArray();
 			Map<String,Object> map = Maps.newHashMap();
-			map.put("url_long",DRIVER_JOIN_URL_LONG+supplierId);
+			map.put("url_long",DRIVER_JOIN_URL_LONG+supplierId+"&tt="+System.currentTimeMillis());
 			map.put("type",0);
 			parseArray.add(map);
 			logger.info("连接地址生成失败，重新生成：" + parseArray);

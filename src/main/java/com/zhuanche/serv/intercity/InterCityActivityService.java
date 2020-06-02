@@ -1,4 +1,4 @@
-package com.zhuanche.serv.interCity;
+package com.zhuanche.serv.intercity;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -24,11 +24,13 @@ public interface InterCityActivityService {
     JSONObject getDetail(Integer id);
 
     Integer saveOrUpdate(Integer discountId,
-                        Integer strategyId,
-                        Integer discountType,
-                        String discountAmount,
-                        String discountStartTime,
-                        String discountEndTime,
-                        Integer discountStatus);
+                         Integer strategyId,
+                         Integer discountType,
+                         String discountAmount,
+                         String discountStartTime,
+                         String discountEndTime,
+                         Integer discountStatus,
+                         Integer allDiscountType,
+                         String allDiscountAmount);
     JSONArray queryRule();
 }

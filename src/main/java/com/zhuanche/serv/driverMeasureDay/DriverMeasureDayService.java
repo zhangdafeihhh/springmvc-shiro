@@ -2,6 +2,7 @@ package com.zhuanche.serv.driverMeasureDay;
 
 import com.zhuanche.dto.IndexBiDriverMeasureDto;
 import com.zhuanche.dto.bigdata.BiDriverMeasureDayDto;
+import com.zhuanche.dto.bigdata.DisinfectPenetranceDTO;
 import com.zhuanche.entity.bigdata.BiDriverMeasureDay;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.bigdata.BiDriverMeasureDayMapper;
@@ -88,5 +89,21 @@ public class DriverMeasureDayService {
         }
         return indexBiDriverMeasureDto;
 
+    }
+
+    public DisinfectPenetranceDTO disinfectPenetrance(String startDate, String endDate, Integer supplierId) {
+        String suppliers = null;
+        if (null == supplierId) {
+            suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds().toArray(), ",");
+            logger.info("suppliers:{}", suppliers);
+            if (StringUtils.isNotBlank(suppliers)) {
+                supplierId = Integer.parseInt(suppliers.split(",")[0]);
+            }
+        }
+        logger.info("startDate.split(\" \")[0]:{}, endDate.split(\" \")[0]:{}, supplierId:{}", startDate.split(" ")[0], endDate.split(" ")[0], supplierId);
+        if (null == supplierId){
+            return null;
+        }
+        return biDriverMeasureDayExtMapper.disinfectPenetrance(startDate.split(" ")[0], endDate.split(" ")[0], supplierId);
     }
 }

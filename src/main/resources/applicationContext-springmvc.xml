@@ -136,6 +136,7 @@
     <!-- 配置统一异常处理（需要区分页面请求异常、XHR请求异常、文件上传请求异常时的特殊处理） -->
 	<bean class="com.zhuanche.common.web.CustomExceptionResolver"></bean>
 	<context:component-scan base-package="com.zhuanche.**"/>
+	<context:component-scan base-package="mp.mvc.logger.**"/>
 	<!--开启aop注解 -->
 	<aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
 </beans>
