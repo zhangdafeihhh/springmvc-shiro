@@ -41,6 +41,10 @@ public class InterCityActivityServiceImpl implements InterCityActivityService {
     @Value("${ordercost.server.api.base.url}")
     private String orderCostUrl;
 
+    @Value("${bus.order.cost.url}")
+    private String busOrderUrl;
+
+
     @Autowired
     private CarBizSupplierExMapper carBizSupplierExMapper;
 
@@ -142,7 +146,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService {
 
         Map<String,Object> mapDetail = Maps.newConcurrentMap();
         mapDetail.put("strategyId",id);
-        String result = MpOkHttpUtil.okHttpGet(orderCostUrl+"/interCity/strategy/discount/getDetail",mapDetail,0,null);
+        String result = MpOkHttpUtil.okHttpGet(busOrderUrl+"/interCity/strategy/discount/getDetail",mapDetail,0,null);
         JSONObject jsonObject = new JSONObject();
         if(StringUtils.isNotEmpty(result)){
             JSONObject jsonResult = JSONObject.parseObject(result);
