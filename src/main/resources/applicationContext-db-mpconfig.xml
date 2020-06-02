@@ -64,7 +64,7 @@
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="sqlSessionFactoryBeanName" value="driver-config-sqlSessionFactory"></property>
         <!-- 请修改此处： 请修改为实际的mapper接口包路径 -->
-        <property name="basePackage" value="mapper.mpConfig" />
+        <property name="basePackage" value="mapper.mpconfig" />
     </bean>
 
 </beans>
