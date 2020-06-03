@@ -241,9 +241,9 @@ public class SupplierFeeController {
 
 
             document.setMargins(5, 5, 5, 5);
-            //H 代表文字版式是横版，相应的 V 代表竖版
+            /**H 代表文字版式是横版，相应的 V 代表竖版*/
             BaseFont bfChinese = BaseFont.createFont("STSongStd-Light","UniGB-UCS2-H",BaseFont.NOT_EMBEDDED);//STSongStd-Light 是字体，在jar 中以property为后缀
-            //参数一：新建好的字体；参数二：字体大小，参数三：字体样式，多个样式用“|”分隔
+            /**参数一：新建好的字体；参数二：字体大小，参数三：字体样式，多个样式用“|”分隔*/
             Font topfont = new Font(bfChinese,14,Font.BOLD);
 
             Paragraph blankRow1 = new Paragraph(18f, " ");
@@ -254,16 +254,18 @@ public class SupplierFeeController {
             int width1[] = {250,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300};//每栏的宽度
             table1.setKeepTogether(false);
             table1.setHorizontalAlignment(Element.ALIGN_LEFT);
-            table1.setWidthPercentage(100);//设置表格大小为可用空白区域的300%
-            table1.setWidths(width1); //设置宽度
+            /**设置表格大小为可用空白区域的300%*/
+            table1.setWidthPercentage(100);
+            /**设置宽度*/
+            table1.setWidths(width1);
 
-            //首行
+
             for(int i=0;i<titles.length;i++){
                 PdfPCell cell1 = new PdfPCell(new Paragraph(titles[i],topfont));
                 table1.addCell(cell1);
             }
 
-            //每栏的值 注意行数要和上面的对应要不然导出的pdf显示不出来。如果要显示多行
+            /**每栏的值 注意行数要和上面的对应要不然导出的pdf显示不出来。如果要显示多行*/
             PdfPCell cell1 = new PdfPCell(new Paragraph(manage.getSupplierName(),topfont));
             table1.addCell(cell1);
             PdfPCell cell2= new PdfPCell(new Paragraph(DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.dateTimeFormat_parttern),topfont));
@@ -319,14 +321,14 @@ public class SupplierFeeController {
             table1.addCell(cell23);
             PdfPCell cell24= new PdfPCell(new Paragraph(manage.getTotalManageFees(),topfont));
             table1.addCell(cell24);
-
-            document.add(table1);//将表格加入到document中
+            /**将表格加入到document中*/
+            document.add(table1);
             document.add(blankRow1);
             document.close();
             ba.writeTo(outputStream);
             outputStream.flush();
             outputStream.close();
-            ba.close(); // 导出pdf注解
+            ba.close();
 
         } catch (Exception e) {
             logger.error("导出PDF异常" + e);
@@ -361,7 +363,7 @@ public class SupplierFeeController {
             try {
                 if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
                     fileName = URLEncoder.encode(fileName, "UTF-8");
-                } else {  //其他浏览器
+                } else {
                     fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
                 }
             } catch (UnsupportedEncodingException e) {
@@ -375,8 +377,6 @@ public class SupplierFeeController {
             List<String> listStr = new ArrayList<>();
             Map<String,Object> map = getData(manage,listStr,titles);
             listStr = (List<String>) map.get("listStr");
-            //headerList= (List<String>) map.get("headList");
-           /* String newTitle = (String) map.get("title");*/
             int length = (int) map.get("length");
             logger.info("headerList:" + JSONObject.toJSONString(headerList));
 
@@ -735,45 +735,6 @@ public class SupplierFeeController {
             listStr.add("城市经理评级:"+manage.getCityManageRating());
 
         }
-
-
-
-        //实现特定的业务需求 每隔7行换行
-        /*String value  = builder.toString().substring(0,builder.length()-1);
-        String[] valueStr = value.split(",");
-        String str = "";
-        for(int k = 0;k<valueStr.length;k++){
-            int zhengshu = k%7;
-            while (zhengshu==0 && StringUtils.isNotEmpty(str)){
-                listStr.add(str.substring(0,str.length()-1));
-                str = "";
-            }
-            str += valueStr[k]+",";
-            if(k==valueStr.length-1 && StringUtils.isNotEmpty(str)){
-                listStr.add(str.substring(0,str.length()-1));
-            }
-        }
-
-
-
-        //将合计费用修改为合计  替换会出现替换多个情况
-        String addTitle = title.replaceAll("合计费用","合计");
-        //addTitle = addTitle.replaceAll("这列为空","");
-        String[] titleStr = addTitle.split(",");
-
-        String  headStr ="";
-        for(int m = 0;m<titleStr.length;m++){
-            int zhengchu = m%7;
-            while (zhengchu == 0 && StringUtils.isNotEmpty(headStr)){
-                headList.add(headStr.substring(0,headStr.length()-1));
-                headStr = "";
-            }
-            headStr += titleStr[m]+",";
-
-            if(m==valueStr.length-1 && StringUtils.isNotEmpty(headStr)){
-                headList.add(headStr.substring(0,headStr.length()-1));
-            }
-        }*/
 
 
         mapData.put("listStr",listStr);

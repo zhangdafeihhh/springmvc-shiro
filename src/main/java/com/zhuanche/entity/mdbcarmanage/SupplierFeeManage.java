@@ -73,7 +73,8 @@ public class SupplierFeeManage {
 
     private String cityName;
 
-    private Date amountStatusTime; //金额异议处理时间
+    /**金额异议处理时间*/
+    private Date amountStatusTime;
 
     private String settleStartDateStr;
 
@@ -97,21 +98,32 @@ public class SupplierFeeManage {
 
     private String supplierFullName;
 
-    private String serialNumber;//序号
+    /**序号*/
+    private String serialNumber;
 
-    private String operateUser;//验票操作人
+    /**验票操作人*/
+    private String operateUser;
 
-    private String verifyStartDate;//验票开始时间
+    /**验票开始时间*/
+    private String verifyStartDate;
 
-    private String verifyEndDate; //验票结束时间
+    /**验票结束时间*/
+    private String verifyEndDate;
 
-    private String handOverStartDate;//交票开始时间
+    /**交票开始时间*/
+    private String handOverStartDate;
 
-    private String handOverEndDate;//交票结束时间
+    /**交票结束时间*/
+    private String handOverEndDate;
 
-    private String generalizationfficient;//推广系数
+    /**推广系数*/
+    private String generalizationfficient;
 
-    private String cityManageRating; //城市经理评级
+    /**城市经理评级*/
+    private String cityManageRating;
+
+    /**供应商是否审核0未审核1 审核 */
+    private Integer supplierStatus;
 
     public Integer getId() {
         return id;
@@ -551,5 +563,13 @@ public class SupplierFeeManage {
 
     public void setCityManageRating(String cityManageRating) {
         this.cityManageRating = cityManageRating;
+    }
+
+    public Integer getSupplierStatus() {
+        return supplierStatus;
+    }
+
+    public void setSupplierStatus(Integer supplierStatus) {
+        this.supplierStatus = supplierStatus;
     }
 }
