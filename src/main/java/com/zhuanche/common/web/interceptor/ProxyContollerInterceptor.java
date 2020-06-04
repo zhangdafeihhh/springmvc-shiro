@@ -223,7 +223,7 @@ public class ProxyContollerInterceptor implements HandlerInterceptor {
         boolean authFlag = true;
         if (params != null) {
             for (String key : params.keySet()) {
-                if ("cityId".equals(key) && params.get(key) != null && Integer.parseInt(params.get(key).toString()) != 0) {
+                if ("cityId".equals(key) && params.get(key) != null && !"".equals(params.get(key)) && Integer.parseInt(params.get(key).toString()) != 0) {
                     authFlag = false;
                 }
             }
