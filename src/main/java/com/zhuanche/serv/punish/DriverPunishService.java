@@ -20,12 +20,15 @@ import com.zhuanche.entity.driver.DriverPunishDto;
 import com.zhuanche.entity.driver.PunishRecordVoiceDTO;
 import com.zhuanche.entity.driver.appraisa.UpdateAppraisalVo;
 import com.zhuanche.entity.mpconfig.ConfigPunishTypeBaseEntity;
+import com.zhuanche.entity.rentcar.DriverOutage;
 import com.zhuanche.entity.rentcar.OrderVideoVO;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.CustomerAppraisalService;
+import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.serv.third.*;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.SignatureUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -33,16 +36,19 @@ import mapper.driver.DriverAppealRecordMapper;
 import mapper.driver.DriverPunishMapper;
 import mapper.driver.ex.DriverPunishExMapper;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.http.HttpException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.FileInputStream;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -59,6 +65,13 @@ public class DriverPunishService {
 
     @Value("${virtual.url}")
     private String virtualUrl;
+
+    /**
+     * 未坐车生产费用处罚类型
+     * config_punish_type_base 表主键
+     */
+    @Value("${punishType23}")
+    private Integer punishType23;
 
     @Resource
     private ConfigPunishTypeBaseService configPunishTypeBaseService;
@@ -115,6 +128,10 @@ public class DriverPunishService {
     public static final Integer PUNISH_TYPE_3 = 3;
     public static final Integer PUNISH_TYPE_4 = 4;
     public static final Integer PUNISH_TYPE_5 = 5;
+    @Value("${prorate.new.url}")
+    private String prorateNewUrl;
+    @Autowired
+    private DriverOutageService driverOutageService;
 
 
 
@@ -539,6 +556,39 @@ public class DriverPunishService {
 
     private void doWithPunishTypeWhenRefuse(DriverPunish punishEntity, String phone, String orderNo) {
         Integer punishType = punishEntity.getPunishType();
+        //未乘车产生费用
+        if (punishType.equals(punishType23)){
+            log.info("未乘车产生费用punishId:{}", punishEntity.getPunishId());
+            //1.处罚金额
+            if (punishEntity.getPunishPrice().compareTo(new BigDecimal(0)) > 0) {
+                log.info("doPunish处罚金额 punishId:{}", punishEntity.getPunishId());
+                try {
+                    String result1 = HttpClientUtil.buildPostRequest(prorateNewUrl + "/rewardPunishInput/add")
+                            .setConnectTimeOut(3000)
+                            .setReadTimeOut(3000)
+                            .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                            .addParam("driverId", punishEntity.getDriverId())
+                            .addParam("rewardPunishId", punishEntity.getPunishId())
+                            .addParam("orderNo", punishEntity.getOrderNo())
+                            .addParam("amount", "-" + punishEntity.getPunishPrice())
+                            .addParam("summary", punishEntity.getPunishReason())
+                            .execute();
+                    log.info("rewardPunishInput/add return:{}", result1);
+                } catch (HttpException e) {
+                    log.error("rewardPunishInput/add punishId:{} exception: ", punishEntity.getPunishId(), e);
+                }
+            }
+            //2.停运
+            DriverOutage outageEntity = new DriverOutage();
+            outageEntity.setDriverId(punishEntity.getDriverId());
+            outageEntity.setOutStopLongTime(punishEntity.getStopDay().doubleValue());
+            outageEntity.setOutageReason(punishEntity.getPunishReason());
+            outageEntity.setOutStartDateStr(DateUtil.getTimeString(new Date()));
+            driverOutageService.saveDriverOutage(outageEntity);
+            //3.司机积分调用策略工具接口
+            driverIntegralClient.driverIntegralStrategyUrl(punishEntity.getDriverId(), punishEntity.getOrderNo(), punishEntity.getCreateDate(), punishEntity.getPunishReason());
+            this.sendSingleAndMessageForBadAppeal("申诉结果通知", APPEAL_UN_PASS_MSG, punishEntity.getDriverId(), phone);
+        } else
         if (PUNISH_TYPE_2.equals(punishType)) {
             // 风控处理
             riskOrderAppealClient.updateStatus(punishEntity, 4);
