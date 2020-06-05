@@ -135,6 +135,7 @@ public class ProxyContollerInterceptor implements HandlerInterceptor {
             return false;
         } else {
              if (StringUtils.isNotBlank(conentType) && conentType.contains(MULTIPART_FILE)) {
+                 logger.info("转发代理策略工具文件上传POST请求url={}",url);
                 // 调用策略工具，支持文件上传 创建一个通用的多部分解析器
                 CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
                 // 判断 request 是否有文件上传,即多部分请求
@@ -148,16 +149,18 @@ public class ProxyContollerInterceptor implements HandlerInterceptor {
                 }
             } else {
                 if (APPLICATION_JSON.equals(conentType)) {
+                    logger.info("转发代理策略工具APPLICATION/JSON--POST请求url={}",url);
                     ServletInputStream stream = request.getInputStream();
                     String strcont = strcontBuilding(stream);
                     JSONObject paramJson = JSONObject.parseObject(strcont);
                     String resultString = MpOkHttpUtil.okHttpPostToJson(thirdHttpUrl + url, paramJson.toString(), 0, "首约saas代理接口" + url, headerMap);
                     result = JSONObject.parseObject(resultString);
                 } else {
+                    logger.info("转发代理策略工具普通--POST请求url={}",url);
                     result = MpOkHttpUtil.okHttpPostBackJson(thirdHttpUrl + url, params, 0, "首约saas代理接口" + url, headerMap);
                 }
             }
-            logger.info("转发代理策略工具请求url={} params={}, result={}", url, JSON.toJSONString(params), result);
+            logger.info("转发代理策略工具post请求url={} params={}, result={}", url, JSON.toJSONString(params), result);
             response.getWriter().print(result);
             return false;
         }
