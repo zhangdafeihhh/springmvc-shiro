@@ -568,7 +568,7 @@ public class DriverPunishService {
                             .setReadTimeOut(3000)
                             .addHeader("Content-Type", "application/x-www-form-urlencoded")
                             .addParam("driverId", punishEntity.getDriverId())
-                            .addParam("rewardPunishId", punishEntity.getPunishId())
+                            .addParam("rewardPunishId", "P1722971111584461981188096")
                             .addParam("orderNo", punishEntity.getOrderNo())
                             .addParam("amount", "-" + punishEntity.getPunishPrice())
                             .addParam("summary", punishEntity.getPunishReason())
