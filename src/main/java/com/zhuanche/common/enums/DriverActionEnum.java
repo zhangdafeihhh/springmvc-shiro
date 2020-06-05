@@ -77,6 +77,8 @@ public enum DriverActionEnum {
     MANUAL_CHARGING_END(82, "手动结束计费等候"),
     AUTO_CHARGING_END(83, "自动结束计费等候"),
     PASSENGER_ABOARD(84, "服务中结束等待"),
+    DRIVER_SHARE(85, "司机行程分享"),
+    TIME_OUT_REMINDER(86, "预约单超时未出发提醒"),
     ;
 
     private int actionId;
