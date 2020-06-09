@@ -805,13 +805,7 @@ public class SupplierFeeController {
         if(null == ssoLoginUser){
             return AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
         }
-
-         SupplierFeeManage supplierFeeManage = supplierFeeService.queryByOrderNo(feeOrderNo);
-        if(supplierFeeManage != null && supplierFeeManage.getStatus()!= SupplierFeeManageEnum.APPLYCATCH.getCode()){
-            logger.info("状态不是待提现状态，不能进行提现申请");
-            return AjaxResponse.fail(RestErrorCode.APPLY_NOT);
-        }
-
+        
         Integer loginId = ssoLoginUser.getId();
          try {
             SupplierFeeRecord record = new SupplierFeeRecord();
