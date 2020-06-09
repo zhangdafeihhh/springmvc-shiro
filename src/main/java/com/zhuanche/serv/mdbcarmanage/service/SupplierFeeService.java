@@ -23,5 +23,5 @@ public interface SupplierFeeService {
     int updateStatusAndAmount(String feeOrderNo,int amountStatus,int status);
 
 
-    int updateStatus(String feeOrderNo);
+    int updateStatus(String feeOrderNo,Integer status);
 }

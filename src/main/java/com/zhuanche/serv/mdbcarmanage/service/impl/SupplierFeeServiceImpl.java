@@ -74,8 +74,8 @@ public class SupplierFeeServiceImpl implements SupplierFeeService {
     }
 
     @Override
-    public int updateStatus(String feeOrderNo) {
-        return exMapper.updateStatus(feeOrderNo);
+    public int updateStatus(String feeOrderNo,Integer status) {
+        return exMapper.updateStatus(feeOrderNo,status);
     }
 
 

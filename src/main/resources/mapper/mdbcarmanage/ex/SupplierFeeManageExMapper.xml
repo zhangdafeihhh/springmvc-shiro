@@ -175,7 +175,15 @@
 
 
   <update id="updateStatus" >
-    update supplier_fee_manage SET status = 1,supplier_status = 2
+    update supplier_fee_manage
+
+    <trim prefix="SET" suffixOverrides="," >
+
+      <if test="status != null" >
+        status = #{status},
+      </if>
+      supplier_status = 2
+    </trim>
     WHERE fee_order_no =#{feeOrderNo}
   </update>
 </mapper>

@@ -175,7 +175,6 @@ public class SupplierFeeController {
         String userName = ssoLoginUser.getLoginName();
         try {
             SupplierFeeRecord record = new SupplierFeeRecord();
-
             record.setOperate(SupplierFeeManageEnum.getFeeStatus(status).getMsg());
             record.setCreateTime(new Date());
             record.setUpdateTime(new Date());
@@ -823,8 +822,13 @@ public class SupplierFeeController {
             int code =  recordService.insertFeeRecord(record);
 
             if(code > 0){
-
-                int feeCode = supplierFeeService.updateStatus(feeOrderNo);
+                SupplierFeeManage feeManage = supplierFeeService.queryByOrderNo(feeOrderNo);
+                int feeCode = 0;
+                if(feeManage != null && SupplierFeeManageEnum.APPLYCATCH.getCode() == feeManage.getStatus() ){
+                    feeCode = supplierFeeService.updateStatus(feeOrderNo,SupplierFeeManageEnum.WAITINGTICKET.getCode());
+                }else {
+                    feeCode = supplierFeeService.updateStatus(feeOrderNo,null);
+                }
 
                 if(feeCode > 0 ){
                     logger.info("更新状态成功");
