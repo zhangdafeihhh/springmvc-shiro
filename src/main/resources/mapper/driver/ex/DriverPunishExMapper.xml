@@ -108,7 +108,7 @@
         and punish_id &lt;= #{maxId}
       </if>
       <if test="punishType == null" >
-        and punish_type in (1,4)
+        and punish_type not in (2,3,5)
       </if>
     </trim>
   </sql>
