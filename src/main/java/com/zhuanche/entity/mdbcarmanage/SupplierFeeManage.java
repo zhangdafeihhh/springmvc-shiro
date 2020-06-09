@@ -122,7 +122,7 @@ public class SupplierFeeManage {
     /**城市经理评级*/
     private String cityManageRating;
 
-    /**供应商是否审核0未审核1 审核 */
+    /**供应商是否审核1未审核2 审核 */
     private Integer supplierStatus;
 
     public Integer getId() {
