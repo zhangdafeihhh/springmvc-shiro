@@ -151,26 +151,19 @@ public class DriverPunishController extends BaseController {
 
     @RequestMapping("/exportDriverPunishList")
     public void daochu(DriverPunishDto params, HttpServletRequest request, HttpServletResponse response){
-
+        if(params.getCityId() == null){
+            log.error("城市为必传项");
+            return;
+        }
         try {
-            log.info("导出列表,参数为--{}", params.toString());
             //数据层权限
-            if(params.getCityId() == null){
-                SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
-                if(CollectionUtils.isNotEmpty(ssoLoginUser.getSupplierIds())){
-                    Set<Integer> set = ssoLoginUser.getSupplierIds();
-                    String supplierIds = StringUtils.join(set.toArray(), Constants.SEPERATER);
-                    params.setSupplierIds(supplierIds);
-                }else if(CollectionUtils.isNotEmpty(ssoLoginUser.getCityIds())){
-                    Set<Integer> set = ssoLoginUser.getCityIds();
-                    String cityIds = StringUtils.join(set.toArray(),Constants.SEPERATER);
-                    params.setCities(cityIds);
-                }else  {
-                    log.info("======数据权限过大,无法导出=======");
-                    return;
-                }
+            SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
+            if(CollectionUtils.isNotEmpty(ssoLoginUser.getSupplierIds())){
+                Set<Integer> set = ssoLoginUser.getSupplierIds();
+                String supplierIds = StringUtils.join(set.toArray(), Constants.SEPERATER);
+                params.setSupplierIds(supplierIds);
             }
-
+            log.info("处罚列表导出，参数为--{}", params.toString());
             String endDate = DateUtils.formatDate(new Date(),DateUtils.dateTimeFormat_parttern);
             Date startDate = DateUtils.afterMonth(new Date(),-3);
             String start = DateUtils.formatDate(startDate,DateUtils.dateTimeFormat_parttern);
