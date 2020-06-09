@@ -53,7 +53,7 @@
     <result column="serial_number" property="serialNumber" jdbcType="VARCHAR" />
     <result column="generalization_efficient" property="generalizationfficient" jdbcType="VARCHAR" />
     <result column="city_manage_rating" property="cityManageRating" jdbcType="VARCHAR" />
-
+    <result column="supplier_status" property="supplierStatus" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, fee_order_no, city_id, supplier_name, supplier_id, settle_start_date, settle_end_date, 
@@ -64,7 +64,7 @@
     status, amount_status, payment_time, create_time, update_time, create_user,amount_status_time,
     turnover_drivers, total_driver_contribution, total_compliance_awards,
     number_of_active_drivers, rejection_amount, is_reissue, other_increase_amount, garden_award,
-    supplier_full_name,serial_number,generalization_efficient,city_manage_rating
+    supplier_full_name,serial_number,generalization_efficient,city_manage_rating,supplier_status
   </sql>
 
 
@@ -106,7 +106,8 @@
     create_user,
     amount_status_time,
     c.city_name AS cityName,
-    t.supplier_full_name
+    t.supplier_full_name,
+    t.supplier_status
     from supplier_fee_manage t
     LEFT JOIN car_biz_city c  ON t.city_id = c.city_id
     where 1=1
