@@ -822,7 +822,7 @@ public class SupplierFeeController {
             record.setOperateId(loginId);
             record.setStatus(SupplierFeeManageEnum.APPLYCATCH.getCode());
             record.setRemark(null);
-            record.setOperateUser("系统推送");
+            record.setOperateUser(ssoLoginUser.getLoginName());
             record.setSupplierAddress("空");
             record.setFeeOrderNo(feeOrderNo);
 
