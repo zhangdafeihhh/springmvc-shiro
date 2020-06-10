@@ -769,7 +769,9 @@ public class SupplierFeeController {
         }
         if(param.indexOf(".")>0){
             int index =param.indexOf(".");
-            param = param.substring(0,index+3)+"%";
+            if(param.length()>index+3){
+                param = param.substring(0,index+3)+"%";
+            }
         }
         return param;
     }
