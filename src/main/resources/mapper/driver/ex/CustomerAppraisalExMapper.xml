@@ -266,4 +266,25 @@
         #{idItem}
       </foreach>
   </select>
+
+  <select id="queryBatchAppraisal" parameterType="java.util.List" resultMap="BaseResultMap">
+    SELECT
+    order_id,order_no,evaluate_score
+    from customer_appraisal
+    where order_no in
+    <foreach collection="list" item="item" separator="," open="(" close=")">
+      #{item}
+    </foreach>
+  </select>
+
+  <!-- 查询订单评分 -->
+  <select id="queryAppraisal" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    customer_appraisal a
+    WHERE
+    a.order_no = #{orderNo}
+    limit 1
+  </select>
 </mapper>

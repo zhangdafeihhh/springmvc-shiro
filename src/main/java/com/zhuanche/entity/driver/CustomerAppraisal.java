@@ -5,7 +5,7 @@ import java.util.Date;
 public class CustomerAppraisal {
     private Integer id;
 
-    private long orderId;
+    private Long orderId;
 
     private String orderNo;
 
@@ -475,11 +475,11 @@ public class CustomerAppraisal {
         this.isAlreadyAppeal = isAlreadyAppeal;
     }
 
-    public long getOrderId() {
+    public Long getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(long orderId) {
+    public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
 }
