@@ -22,11 +22,17 @@ public class CsApiClient {
     @Value("${cs.api.url}")
     private String csApiUrl;
 
+    /**
+     * http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=26247394
+     */
     public static final String DRIVER_PUNISH_KEFU_URL_NEW = "/api/driver/punishment/repealnew";
+    /**
+     * http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=28761107
+     */
     public static final String DRIVER_PUNISH_KEFU_UPDATE_URL = "/api/threeParty/updateStatus";
 
     /**
-     * 请求客服系统.对司机进行处罚或者解除停运
+     * 司机申诉结果处理接口,对司机进行处罚或者解除停运
      */
     public void kefuCancelPunishNew(String businessId, Integer repealResult) {
         TreeMap<String, Object> map = new TreeMap<>();
@@ -49,6 +55,7 @@ public class CsApiClient {
 
     /**
      * 通知客服系统处罚记录状态变更
+     * @param status 稽查状态(2待申诉,3已过期; 4审核通过；6审核拒绝；7已驳回)
      */
     public void notifyKefuUpdate(DriverPunish punishEntity, Integer status) {
         try {
