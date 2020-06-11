@@ -6,9 +6,11 @@
     <result column="role_code" property="roleCode" jdbcType="VARCHAR" />
     <result column="role_name" property="roleName" jdbcType="VARCHAR" />
     <result column="valid" property="valid" jdbcType="BIT" />
+    <result column="is_visiable" property="isisiable" jdbcType="INTEGER" />
+
   </resultMap>
   <sql id="Base_Column_List" >
-    role_id, role_code, role_name, valid
+    role_id, role_code, role_name, valid,is_visiable
   </sql>
   
   <!-- 查询角色列表 -->
@@ -49,5 +51,18 @@
 		where r.role_id=ur.role_id
 		and r.valid=1 and ur.user_id=#{userId}
   </select>
- 
+
+    <!-- 查询可见角色列表 -->
+    <select id="queryVisiableRoles" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from saas_role
+        where 1=1 and is_visiable = 1
+        order by role_id
+    </select>
+
+    <update id="updateIsVisable">
+        UPDATE  saas_role set is_visiable = #{isVisiable}
+        WHERE  role_id = #{roleId}
+    </update>
 </mapper>

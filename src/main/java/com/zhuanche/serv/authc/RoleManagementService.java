@@ -267,6 +267,24 @@ public class RoleManagementService{
 		return AjaxResponse.success( null );
 	}
 
+	/**十、让某个角色供应商可见**/
+	public AjaxResponse visiableSaasRole ( Integer roleId,Integer isVisiable ) {
+		//角色不存在
+		SaasRole role = saasRoleMapper.selectByPrimaryKey(roleId);
+		if( role==null ) {
+			return AjaxResponse.fail(RestErrorCode.ROLE_NOT_EXIST );
+		}
+		//系统预置角色，不能被禁用
+		if( SaasConst.SYSTEM_ROLE.equalsIgnoreCase(role.getRoleCode()) ) {
+			return AjaxResponse.fail(RestErrorCode.SYSTEM_ROLE_CANOT_CHANGE , role.getRoleCode() );
+		}
+		//执行
+		redisSessionDAO.clearRelativeSession(null, roleId, null); //自动清理用户会话
+		try {Thread.sleep(3000);} catch (InterruptedException e) {	}//目的是等待一会儿，因会话清理也要查表的
+        saasRoleExMapper.updateIsVisable(roleId,isVisiable);
+		return AjaxResponse.success( null );
+	}
+
 	public List<String> getAllRoleName(Integer userId) {
 		return saasRolePermissionRalationExMapper.queryRoleNameList(userId);
 	}

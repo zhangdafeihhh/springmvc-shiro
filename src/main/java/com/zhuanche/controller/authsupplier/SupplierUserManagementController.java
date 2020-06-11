@@ -133,19 +133,19 @@ public class SupplierUserManagementController {
     }
 
     /**六、查询一个用户中的角色ID**/
-    @RequestMapping("/getAllRoleIds")
-    @RequiresPermissions(value = { "GET_ALL_ROLEIDS_OF_USER" } )
+    @RequestMapping("/supplierGetAllRoleIds")
+    @RequiresPermissions(value = { "SUPPLIER_GET_ALL_ROLEIDS_OF_USER" } )
     @RequestFunction(menu = USER_ROLE_LIST)
-    public AjaxResponse getAllRoleIds( @Verify(param="userId",rule="required|min(1)") Integer userId ){
+    public AjaxResponse supplierGetAllRoleIds( @Verify(param="userId",rule="required|min(1)") Integer userId ){
         List<Integer> roleIds = userManagementService.getAllRoleIds(userId);
         return AjaxResponse.success( roleIds  );
     }
 
     /**七、保存一个用户中的角色ID**/
-    @RequestMapping("/saveRoleIds")
+    @RequestMapping("/supplierSaveRoleIds")
     @RequiresPermissions(value = { "SAVE_ROLEIDS_OF_USER" } )
     @RequestFunction(menu = USER_ROLE_SAVE)
-    public AjaxResponse saveRoleIds( @Verify(param="userId",rule="required|min(1)") Integer userId,  @Verify(param="roleIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String roleIds) {
+    public AjaxResponse supplierSaveRoleIds( @Verify(param="userId",rule="required|min(1)") Integer userId,  @Verify(param="roleIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String roleIds) {
         SysSaveOrUpdateLog sysLog = new SysSaveOrUpdateLog();
         sysLog.setStartTime(new Date());
 
@@ -209,10 +209,10 @@ public class SupplierUserManagementController {
     }
 
     /**九、重置用户密码**/
-    @RequestMapping("/resetPassword")
+    @RequestMapping("/supplierResetPassword")
     @RequiresPermissions(value = { "RESET_USER_PASSWORD" } )
     @RequestFunction(menu = USER_RESET_PASSWORD)
-    public AjaxResponse resetPassword( @Verify(param="userId",rule="required|min(1)") Integer userId ) {
+    public AjaxResponse supplierResetPassword( @Verify(param="userId",rule="required|min(1)") Integer userId ) {
         return userManagementService.resetPassword(userId);
     }
 

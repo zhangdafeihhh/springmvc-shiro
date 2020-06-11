@@ -46,6 +46,8 @@ public class CarAdmUser implements Serializable{
 
     private String email;
 
+    private Integer createUserId;
+
     public Integer getUserId() {
         return userId;
     }
@@ -180,5 +182,13 @@ public class CarAdmUser implements Serializable{
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Integer getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(Integer createUserId) {
+        this.createUserId = createUserId;
     }
 }
