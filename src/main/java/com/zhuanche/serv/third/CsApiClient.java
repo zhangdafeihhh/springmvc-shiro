@@ -22,11 +22,17 @@ public class CsApiClient {
     @Value("${cs.api.url}")
     private String csApiUrl;
 
+    /**
+     * http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=26247394
+     */
     public static final String DRIVER_PUNISH_KEFU_URL_NEW = "/api/driver/punishment/repealnew";
+    /**
+     * http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=28761107
+     */
     public static final String DRIVER_PUNISH_KEFU_UPDATE_URL = "/api/threeParty/updateStatus";
 
     /**
-     * 请求客服系统.对司机进行处罚或者解除停运
+     * 司机申诉结果处理接口,对司机进行处罚或者解除停运
      */
     public void kefuCancelPunishNew(String businessId, Integer repealResult) {
         TreeMap<String, Object> map = new TreeMap<>();
@@ -39,16 +45,17 @@ public class CsApiClient {
             String sign = Md5Util.createSignByBase64(map, "vwQ5L3Gc");
             map.put("sign", sign);
             log.info("sign=" + sign);
-            log.info("请求客服系统，对司机进行处罚或者解除停运：businessId:" + businessId + ",repealResult:" + repealResult);
-            JSONObject result = MpOkHttpUtil.okHttpGetBackJson(csApiUrl + DRIVER_PUNISH_KEFU_URL_NEW, map, 1, "司机处罚或解除停运");
-            log.info("请求客服系统，执行结果,result={}", JSONObject.toJSONString(result));
+            log.info("司机申诉请求客服系统，对司机进行处罚或者解除停运：businessId:" + businessId + ",repealResult:" + repealResult);
+            JSONObject result = MpOkHttpUtil.okHttpPostBackJson(csApiUrl + DRIVER_PUNISH_KEFU_URL_NEW, map, 1, "司机处罚或解除停运");
+            log.info("司机申诉请求客服系统，执行结果,result={}", JSONObject.toJSONString(result));
         } catch (Exception e) {
-            log.error("调用客服取消订单处罚异常.", e);
+            log.error("司机申诉调用客服取消订单处罚异常.", e);
         }
     }
 
     /**
      * 通知客服系统处罚记录状态变更
+     * @param status 稽查状态(2待申诉,3已过期; 4审核通过；6审核拒绝；7已驳回)
      */
     public void notifyKefuUpdate(DriverPunish punishEntity, Integer status) {
         try {
@@ -58,11 +65,11 @@ public class CsApiClient {
             map.put("status", status);
             //yyyy-MM-dd HH:mm:ss,申诉时间
             map.put("appealTime", DateUtil.getTimeString(punishEntity.getAppealDate()));
-            log.info("通知客服系统，司机处罚变更param:" + map);
-            JSONObject result = MpOkHttpUtil.okHttpGetBackJson(csApiUrl + DRIVER_PUNISH_KEFU_UPDATE_URL, map, 1, "处罚记录状态变更");
-            log.info("通知客服系统，司机处罚变更，执行结果,result=" + JSONObject.toJSONString(result));
+            log.info("司机申诉通知客服系统，司机处罚变更param:" + map);
+            JSONObject result = MpOkHttpUtil.okHttpPostBackJson(csApiUrl + DRIVER_PUNISH_KEFU_UPDATE_URL, map, 1, "处罚记录状态变更");
+            log.info("司机申诉通知客服系统，司机处罚变更，执行结果,result=" + JSONObject.toJSONString(result));
         } catch (Exception e) {
-            log.error("通知客服系统司机处罚变更,异常.", e);
+            log.error("司机申诉通知客服系统司机处罚变更,异常.", e);
         }
     }
 

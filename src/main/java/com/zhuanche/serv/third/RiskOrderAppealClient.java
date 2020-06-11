@@ -39,8 +39,8 @@ public class RiskOrderAppealClient {
         map.put("appealCommitBy", "sysAdmin");
         map.put("appealCommitTime", System.currentTimeMillis());
         try {
-            JSONObject resultJson = MpOkHttpUtil.okHttpGetBackJson(riskOrderComplainUrl + DRIVER_PUNISH_FK_URL, map, 1, "风控撤销订单处罚");
-            log.info("执行结果,result={}", JSONObject.toJSONString(resultJson));
+            JSONObject resultJson = MpOkHttpUtil.okHttpPostBackJson(riskOrderComplainUrl + DRIVER_PUNISH_FK_URL, map, 1, "风控撤销订单处罚");
+            log.info("申诉处理调用风控更新状态，param:{},result={}", JSONObject.toJSONString(resultJson), JSONObject.toJSONString(resultJson));
         } catch (Exception e) {
             log.error("调用风控取消订单处罚异常.", e);
         }

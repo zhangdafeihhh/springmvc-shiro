@@ -494,6 +494,7 @@ public class DriverPunishService {
             params.put("expireDate", expire);
             // 更新状态
             this.carManageSave(punishId, status, cgReason, params, currentAuditNode, auditNode, cgStatus);
+            // 同步状态到风控系统
             riskOrderAppealClient.updateStatus(punishEntity, 2);
 
             if (punishEntity.getPunishTypeName().contains(TRIPARTITE_INSPECTION)) {
