@@ -231,7 +231,8 @@ public class ProxyContollerInterceptor implements HandlerInterceptor {
                 }
             }
         }
-        if (authFlag) {
+        /*if (true) {*/
+            //暂时不关联页面是否选择城市
             logger.info("页面没有选择城市供应商则自动加上用户账号有的城市");
             SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
             SSOLoginUser currentLoginUser = myDataSourceService.getSsoLoginUser(ssoLoginUser.getLoginName());
@@ -246,7 +247,7 @@ public class ProxyContollerInterceptor implements HandlerInterceptor {
                 String supperlierIds = Joiner.on(",").join(supplierIdsSet);
                 params.put("supplierIds", supperlierIds);
             }
-        }
+       /* }*/
 
     }
 
