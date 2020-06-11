@@ -18,6 +18,7 @@ import com.zhuanche.dto.busManage.*;
 import com.zhuanche.entity.busManage.BusCostDetail;
 import com.zhuanche.entity.busManage.BusOrderPayExport;
 import com.zhuanche.entity.busManage.OrgCostInfo;
+import com.zhuanche.entity.driver.CustomerAppraisal;
 import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.MpOkHttpUtil;
@@ -28,6 +29,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.*;
 import com.zhuanche.vo.busManage.*;
+import mapper.driver.ex.CustomerAppraisalExMapper;
 import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
 import mapper.rentcar.CarBizServiceMapper;
 import mapper.rentcar.ex.*;
@@ -39,6 +41,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -81,14 +84,12 @@ public class BusAssignmentService {
     @Autowired
     private BusCarBizCarGroupExMapper busGroupExMapper;
 
-    @Autowired
-    private BusCarBizCustomerAppraisalService busCarBizCustomerAppraisalService;
+@Autowired
+private CustomerAppraisalExMapper customerAppraisalExMapper;
 
     @Autowired
     private BusCarBizCustomerAppraisalStatisticsService busCarBizCustomerAppraisalStatisticsService;
 
-    @Autowired
-    private BusDriverMongoService busDriverMongoService;
     @Autowired
     private BusCarViolatorsService busCarViolatorsService;
     @Autowired
@@ -168,7 +169,8 @@ public class BusAssignmentService {
                     }
                     // b)本单司机评分
                     if (StringUtils.isNotBlank(order.getOrderNo())) {
-                        CarBizCustomerAppraisal appraisal = busCarBizCustomerAppraisalService.queryAppraisal(order.getOrderNo());
+//                        CarBizCustomerAppraisal appraisal = busCarBizCustomerAppraisalService.queryAppraisal(order.getOrderNo());
+                        CustomerAppraisal appraisal = customerAppraisalExMapper.queryAppraisal(order.getOrderNo());
                         if (appraisal != null) {
                             order.setDriverScore(appraisal.getEvaluateScore());
                         }
@@ -564,7 +566,8 @@ public class BusAssignmentService {
         });
         //查询每一个订单的评分
         Map<String, String> appraisalMap = new HashMap<>();
-        List<CarBizCustomerAppraisal> appraisals = appraisalExMapper.queryBatchAppraisal(orderNoList);
+//        List<CarBizCustomerAppraisal> appraisals = appraisalExMapper.queryBatchAppraisal(orderNoList);
+        List<CustomerAppraisal> appraisals = customerAppraisalExMapper.queryBatchAppraisal(orderIdList);
         appraisals.forEach(o -> {
             appraisalMap.put(o.getOrderNo(), o.getEvaluateScore());
         });
