@@ -93,7 +93,7 @@ public class DriverPunishController extends BaseController {
             log.info("司机处罚审核操作成功");
             return AjaxResponse.success(null);
         } catch (ServiceException e) {
-            log.info("司机处罚审核操作失败", e);
+            log.error("司机处罚审核操作失败", e);
             return AjaxResponse.failMsg(e.getErrorCode(), e.getMessage());
         }
     }
