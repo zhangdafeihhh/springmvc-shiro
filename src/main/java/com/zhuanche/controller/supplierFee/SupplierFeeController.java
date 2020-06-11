@@ -172,7 +172,7 @@ public class SupplierFeeController {
             return AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
         }
         Integer loginId = ssoLoginUser.getId();
-        String userName = ssoLoginUser.getLoginName();
+        String userName = ssoLoginUser.getName();
         try {
             SupplierFeeRecord record = new SupplierFeeRecord();
             record.setOperate(SupplierFeeManageEnum.getFeeStatus(status).getMsg());
@@ -817,7 +817,7 @@ public class SupplierFeeController {
             record.setOperateId(loginId);
             record.setStatus(SupplierFeeManageEnum.APPLYCATCH.getCode());
             record.setRemark(null);
-            record.setOperateUser(ssoLoginUser.getLoginName());
+            record.setOperateUser(ssoLoginUser.getName());
             record.setSupplierAddress("空");
             record.setFeeOrderNo(feeOrderNo);
 
