@@ -61,7 +61,47 @@
     </if>
     order by user_id
   </select>
-  
+
+    <!-- 供应商查询用户列表 -->
+    <select id="supplierQueryUsers" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from auth_car_adm_user
+        where account_type != 1000
+        <if test="userIds!=null and userIds.size()>0">
+            and user_id in
+            <foreach collection="userIds" open="(" close=")" separator="," item="uid">
+                #{uid}
+            </foreach>
+        </if>
+        <if test="account!=null">
+            and account = #{account}
+        </if>
+        <if test="userName!=null">
+            and user_name like #{userName} ESCAPE '/'
+        </if>
+        <if test="phone!=null">
+            and phone = #{phone}
+        </if>
+        <if test="status!=null">
+            and status = #{status}
+        </if>
+        <if test="merchantId!=null">
+            and merchant_id = #{merchantId}
+        </if>
+        <if test="createStartTime != null and createStartTime != ''" >
+            AND create_date  &gt;=STR_TO_DATE(#{createStartTime},'%Y-%m-%d')
+        </if>
+        <if test="createEndTime != null and createEndTime != ''" >
+            AND create_date  &lt;= STR_TO_DATE(#{createEndTime},'%Y-%m-%d')
+        </if>
+        <if test="createUserId != null" >
+            AND create_user_id  = #{createUserId}
+        </if>
+        order by user_id
+    </select>
+
+
   <!-- 查询所有的登录账号名称 -->
   <select id="queryAccountsOfUsers" resultType="java.lang.String">
     select account from car_adm_user where account is not null 
