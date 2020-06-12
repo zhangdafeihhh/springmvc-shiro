@@ -124,96 +124,92 @@ public class CompleteOrderController{
                     element.put(Constants.BOOKING_USER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.BOOKING_USER_PHONE)));
                     element.put(Constants.RIDER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.RIDER_PHONE)));
                     element.put(Constants.DRIVER_PHONE, MobileOverlayUtil.doOverlayPhone(element.getString(Constants.DRIVER_PHONE)));
-                    element.put(Constants.COUPON_SETTLE_AMOUNT,orderService.couponSettleAmout(element.getString(Constants.ORDERNO)));
+                    String settleAmout = orderService.couponSettleAmout(element.getString(Constants.ORDERNO));
+                    element.put(Constants.COUPON_SETTLE_AMOUNT,settleAmout);
+                    element.put(Constants.IS_COUPON,StringUtils.isEmpty(settleAmout)?"否":"是");
                 });
             }
 		    return result;
 	  }
 
 
-	  private Map<String, Object> queryMap(String queryDate,
-                                           Long cityId,
-                                           String productId,
-                                           String bindVehicleTypeId,
-                                           String serviceVehicleTypeId,
-                                           String orderTypeId,
-                                           String orgnizationId,
-                                           String channelId,
-                                           String driverTypeId,
-                                           String allianceId,
-                                           String motorcardId,
-                                           String hotelId,
-                                           String driverId,
-                                           Integer supplierId,
-                                           Integer distributorId,
-                                           Integer isReductDiscount,
-                                           Integer isPlatformAmount,
-                                           Integer couponSettleAmout){
-          Map<String, Object> paramMap = new HashMap<String, Object>();
-
-          paramMap.put("queryDate", queryDate);//查询日期
+	  private Map<String, Object> queryMap(String queryDate, Long cityId,
+                                           String productId, String bindVehicleTypeId, String serviceVehicleTypeId,
+                                           String orderTypeId, String orgnizationId, String channelId, String driverTypeId,
+                                           String allianceId, String motorcardId, String hotelId, String driverId,
+                                           Integer supplierId, Integer distributorId, Integer isReductDiscount, Integer isPlatformAmount, Integer couponSettleAmout){
+          Map<String, Object> paramMap = new HashMap<String, Object>(32);
+          /**查询日期*/
+          paramMap.put("queryDate", queryDate);
           if (null != cityId) {
-              paramMap.put("cityId", cityId);//下单城市ID
+              /**下单城市ID*/
+              paramMap.put("cityId", cityId);
           }
           if (StringUtil.isNotEmpty(productId)) {
-              paramMap.put("productId", productId);//产品类型ID
+              /**产品类型ID*/
+              paramMap.put("productId", productId);
           }
           if (StringUtil.isNotEmpty(bindVehicleTypeId)) {
-              paramMap.put("bindVehicleTypeId", bindVehicleTypeId);//绑定车型ID
+              /**绑定车型ID*/
+              paramMap.put("bindVehicleTypeId", bindVehicleTypeId);
           }
           if (StringUtil.isNotEmpty(serviceVehicleTypeId)) {
-              paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);//服务车型ID
+              /**服务车型ID*/
+              paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);
           }
           if (StringUtil.isNotEmpty(orderTypeId)) {
-              paramMap.put("orderTypeId", orderTypeId);//订单类别ID
+              /**订单类别ID*/
+              paramMap.put("orderTypeId", orderTypeId);
           }
           if (StringUtil.isNotEmpty(orgnizationId)) {
-              paramMap.put("orgnizationId", orgnizationId);//机构ID
+              /**机构ID*/
+              paramMap.put("orgnizationId", orgnizationId);
           }
           if (StringUtil.isNotEmpty(channelId)) {
-              paramMap.put("channelId", channelId);//渠道ID
+              /**渠道ID*/
+              paramMap.put("channelId", channelId);
           }
           if (StringUtil.isNotEmpty(driverTypeId)) {
-              paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+              /**司机类型ID*/
+              paramMap.put("driverTypeId", driverTypeId);
           }
           if (StringUtil.isNotEmpty(allianceId)) {
-              paramMap.put("allianceId", allianceId);//加盟商ID
+              /**加盟商ID*/
+              paramMap.put("allianceId", allianceId);
           }
           if (StringUtil.isNotEmpty(motorcardId)) {
-              paramMap.put("motorcardId", motorcardId);//车队ID
+              /**车队ID*/
+              paramMap.put("motorcardId", motorcardId);
           }
           if (StringUtil.isNotEmpty(hotelId)) {
-              paramMap.put("hotelId", hotelId);//酒店ID
+              /**酒店ID*/
+              paramMap.put("hotelId", hotelId);
           }
           if (StringUtil.isNotEmpty(driverId)) {
-              paramMap.put("driverId", driverId);//司机ID
+              /**司机ID*/
+              paramMap.put("driverId", driverId);
           }
           if(distributorId != null){
               paramMap.put("distributorId",distributorId);
           }
-
           if(supplierId != null){
               paramMap.put("allianceId",supplierId);
           }
-
           if(isReductDiscount != null){
               if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isReductDiscount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isReductDiscount) ){
                   paramMap.put("isReductDiscount",isReductDiscount);
               }
           }
-
           if(isPlatformAmount != null){
               if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isPlatformAmount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isPlatformAmount) ){
                   paramMap.put("isPlatformAmount",isPlatformAmount);
               }
           }
-
           if(couponSettleAmout != null){
-              if(Constants.IS_COUPLE_SETTLE_AMOUNT.equals(couponSettleAmout)){
+              if(Constants.IS_COUPLE_SETTLE_AMOUNT.equals(couponSettleAmout) || Constants.NOT_COUPLE_SETTLE_AMOUNT.equals(couponSettleAmout)){
                   paramMap.put("couponSettleAmout",couponSettleAmout);
               }
           }
-
           return paramMap;
       }
 
@@ -279,7 +275,7 @@ public class CompleteOrderController{
 					jsonString,
 					saasBigdataApiUrl+"/completeOrderDetail/download",
 					new String("完成订单详情".getBytes("gb2312"), "iso8859-1"),
-					request.getRealPath("/")+File.separator+"template"+File.separator+"completeOrderDetail_info.csv");
+					request.getServletContext().getRealPath(File.separator)+"template"+File.separator+"completeOrderDetail_info.csv");
 			  
             }catch (Exception e){
     	        logger.error("导出完成订单详情error:{}",e);
@@ -287,89 +283,82 @@ public class CompleteOrderController{
     }
 
 
-    public Map<String,Object> exportMap(String queryDate,
-                                     Long cityId,
-                                     String productId,
-                                     String bindVehicleTypeId,
-                                     String serviceVehicleTypeId,
-                                     String orderTypeId,
-                                     String orgnizationId,
-                                     String channelId,
-                                     String driverTypeId,
-                                     String allianceId,
-                                     String motorcardId,
-                                     String hotelId,
-                                     String driverId,
-                                     Integer supplierId,
-                                     Integer distributorId,
-                                     Integer isReductDiscount,
-                                     Integer isPlatformAmount,
-                                     Integer couponSettleAmout){
-
-        Map<String, Object> paramMap = new HashMap<String, Object>();
-        //查询日期
+    public Map<String,Object> exportMap(String queryDate, Long cityId, String productId, String bindVehicleTypeId,
+                                     String serviceVehicleTypeId, String orderTypeId, String orgnizationId, String channelId,
+                                     String driverTypeId, String allianceId, String motorcardId, String hotelId,
+                                     String driverId, Integer supplierId, Integer distributorId, Integer isReductDiscount,
+                                     Integer isPlatformAmount, Integer couponSettleAmout){
+        Map<String, Object> paramMap = new HashMap<String, Object>(32);
+        /**查询日期*/
         paramMap.put("queryDate", queryDate);
-        //下单城市ID
+        /**下单城市ID*/
         paramMap.put("cityId", cityId);
         if(StringUtil.isNotEmpty(productId)){
-            paramMap.put("productId", productId);//产品类型ID
+            /**产品类型ID*/
+            paramMap.put("productId", productId);
         }
         if(StringUtil.isNotEmpty(bindVehicleTypeId)){
-            paramMap.put("bindVehicleTypeId", bindVehicleTypeId);//绑定车型ID
+            /**绑定车型ID*/
+            paramMap.put("bindVehicleTypeId", bindVehicleTypeId);
         }
         if(StringUtil.isNotEmpty(serviceVehicleTypeId)){
-            paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);//服务车型ID
+            /**服务车型ID*/
+            paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);
         }
         if(StringUtil.isNotEmpty(orderTypeId)){
-            paramMap.put("orderTypeId", orderTypeId);//订单类别ID
+            /**订单类别ID*/
+            paramMap.put("orderTypeId", orderTypeId);
         }
         if(StringUtil.isNotEmpty(orgnizationId)){
-            paramMap.put("orgnizationId", orgnizationId);//机构ID
+            /**机构ID*/
+            paramMap.put("orgnizationId", orgnizationId);
         }
         if(StringUtil.isNotEmpty(channelId)){
-            paramMap.put("channelId", channelId);//渠道ID
+            /**渠道ID*/
+            paramMap.put("channelId", channelId);
         }
         if(StringUtil.isNotEmpty(driverTypeId)){
-            paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+            /**司机类型ID*/
+            paramMap.put("driverTypeId", driverTypeId);
         }
         if(StringUtil.isNotEmpty(allianceId)){
-            paramMap.put("allianceId", allianceId);//加盟商ID
+            /**加盟商ID*/
+            paramMap.put("allianceId", allianceId);
         }
         if(StringUtil.isNotEmpty(motorcardId)){
-            paramMap.put("motorcardId", motorcardId);//车队ID
+            /**车队ID*/
+            paramMap.put("motorcardId", motorcardId);
         }
         if(StringUtil.isNotEmpty(hotelId)){
-            paramMap.put("hotelId", hotelId);//酒店ID
+            /**酒店ID*/
+            paramMap.put("hotelId", hotelId);
         }
         if(StringUtil.isNotEmpty(driverId)){
-            paramMap.put("driverId", driverId);//司机ID
+            /**司机ID*/
+            paramMap.put("driverId", driverId);
         }
         if(distributorId != null){
             paramMap.put("distributorId",distributorId);
         }
         if(supplierId != null){
-            //匹配大数据那边的字段
+            /**匹配大数据那边的字段*/
             paramMap.put("allianceId",supplierId);
         }
-
         if(isReductDiscount != null){
             if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isReductDiscount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isReductDiscount) ){
                 paramMap.put("isReductDiscount",isReductDiscount);
             }
         }
-
         if(isPlatformAmount != null){
             if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isPlatformAmount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isPlatformAmount) ){
                 paramMap.put("isPlatformAmount",isPlatformAmount);
             }
         }
-
         if(couponSettleAmout != null){
-            if(Constants.IS_COUPLE_SETTLE_AMOUNT.equals(couponSettleAmout)){
+            if(Constants.IS_COUPLE_SETTLE_AMOUNT.equals(couponSettleAmout) || Constants.NOT_COUPLE_SETTLE_AMOUNT.equals(couponSettleAmout)){
                 paramMap.put("couponSettleAmout",couponSettleAmout);
             }
         }
-
         return paramMap;
     }
 }
