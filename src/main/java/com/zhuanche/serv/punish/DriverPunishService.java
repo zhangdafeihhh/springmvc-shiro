@@ -445,7 +445,7 @@ public class DriverPunishService {
     public void doAudit(Integer punishId, Integer status, String cgReason) {
         DriverPunishDto punishEntity = driverPunishExMapper.getDetail(punishId);
         if (Objects.isNull(punishEntity) || !Objects.equals(PUNISH_AUDIT_CAR_MANAGE, punishEntity.getCurrentAuditNode())) {
-            throw new ServiceException(RestErrorCode.RECORD_DEAL_FAILURE, "没有需求车管审核的记录");
+            throw new IllegalArgumentException("没有需求车管审核的记录");
         }
 
         Map<String, Object> params = new HashMap<>();
