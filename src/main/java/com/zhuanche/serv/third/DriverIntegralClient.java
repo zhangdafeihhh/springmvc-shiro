@@ -95,4 +95,27 @@ public class DriverIntegralClient {
         }
 
     }
+
+    /**
+     * 未坐车产生费用扣分
+     *
+     * @param driverId
+     * @param orderNo
+     */
+    public void paidanfen2(Integer driverId, String orderNo) {
+        String url = driverIntegralUrl + "/paidanfen2/operate/score";
+        Map<String, Object> paramMap = new HashMap<>(4);
+        paramMap.put("driverId", driverId);
+        paramMap.put("orderNo", orderNo);
+        paramMap.put("type", 40901);
+        paramMap.put("operate", "deduct");
+        try {
+            log.info(" 调用未乘车付费投诉扣分接口 paramMap:{}", JSON.toJSONString(paramMap));
+            String resultData = HttpClientUtil.buildPostRequest(url).addParams(paramMap)
+                    .setConnectTimeOut(5000).setReadTimeOut(3000).execute();
+            log.info("paidanfen2 return: {}", resultData);
+        } catch (Exception e) {
+            log.info("调用未乘车付费投诉扣分接口出错  error:" + e);
+        }
+    }
 }

@@ -587,7 +587,7 @@ public class DriverPunishService {
             outageEntity.setOutStartDateStr(DateUtil.getTimeString(new Date()));
             driverOutageService.saveDriverOutage(outageEntity);
             //3.司机积分调用策略工具接口
-            driverIntegralClient.driverIntegralStrategyUrl(punishEntity.getDriverId(), punishEntity.getOrderNo(), punishEntity.getCreateDate(), punishEntity.getPunishReason());
+            driverIntegralClient.paidanfen2(punishEntity.getDriverId(), punishEntity.getOrderNo());
             this.sendSingleAndMessageForBadAppeal("申诉结果通知", APPEAL_UN_PASS_MSG, punishEntity.getDriverId(), phone);
         } else
         if (PUNISH_TYPE_2.equals(punishType)) {
