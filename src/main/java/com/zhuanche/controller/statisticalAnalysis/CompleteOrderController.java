@@ -207,7 +207,7 @@ public class CompleteOrderController{
           }
           if(couponSettleAmout != null){
               if(Constants.IS_COUPLE_SETTLE_AMOUNT.equals(couponSettleAmout) || Constants.NOT_COUPLE_SETTLE_AMOUNT.equals(couponSettleAmout)){
-                  paramMap.put("couponSettleAmout",couponSettleAmout);
+                  paramMap.put("couponId",couponSettleAmout);
               }
           }
           return paramMap;
@@ -250,14 +250,14 @@ public class CompleteOrderController{
                                          Integer distributorId,
                                          Integer isReductDiscount,
                                          Integer isPlatformAmount,
-                                         Integer couponSettleAmout,
+                                         Integer couponId,
                                          HttpServletRequest request,
                                          HttpServletResponse response){
     	    try{
                 logger.info("【订单管理-完成订单详情】导出,完成订单详情列表数据:queryCompleteOrderData.json");
                 Map<String, Object> paramMap = exportMap(queryDate,cityId,productId,bindVehicleTypeId,serviceVehicleTypeId,orderTypeId,
                         orgnizationId,channelId,driverTypeId,allianceId,motorcardId,hotelId,driverId,supplierId,distributorId,isReductDiscount,
-                        isPlatformAmount,couponSettleAmout);
+                        isPlatformAmount,couponId);
 		  		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
 				if(paramMap==null){
 					return;
@@ -287,7 +287,7 @@ public class CompleteOrderController{
                                      String serviceVehicleTypeId, String orderTypeId, String orgnizationId, String channelId,
                                      String driverTypeId, String allianceId, String motorcardId, String hotelId,
                                      String driverId, Integer supplierId, Integer distributorId, Integer isReductDiscount,
-                                     Integer isPlatformAmount, Integer couponSettleAmout){
+                                     Integer isPlatformAmount, Integer couponId){
         Map<String, Object> paramMap = new HashMap<String, Object>(32);
         /**查询日期*/
         paramMap.put("queryDate", queryDate);
@@ -354,9 +354,9 @@ public class CompleteOrderController{
                 paramMap.put("isPlatformAmount",isPlatformAmount);
             }
         }
-        if(couponSettleAmout != null){
-            if(Constants.IS_COUPLE_SETTLE_AMOUNT.equals(couponSettleAmout) || Constants.NOT_COUPLE_SETTLE_AMOUNT.equals(couponSettleAmout)){
-                paramMap.put("couponSettleAmout",couponSettleAmout);
+        if(couponId != null){
+            if(Constants.IS_COUPLE_SETTLE_AMOUNT.equals(couponId) || Constants.NOT_COUPLE_SETTLE_AMOUNT.equals(couponId)){
+                paramMap.put("couponId",couponId);
             }
         }
         return paramMap;
