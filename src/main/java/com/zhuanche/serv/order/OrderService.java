@@ -203,7 +203,7 @@ public class OrderService{
 		}
 		String couponSettle = "";
 		String url = orderCostUrl + UrlConstants.ORDER_COST_DETAIL;
-		String result = MpOkHttpUtil.okHttpGet(url + "?orderNo=" + orderNo,null,0,null);
+		String result = MpOkHttpUtil.okHttpGet(url + "/" + orderNo,null,0,null);
 		log.info("=======根据订单号获取优惠券折扣金额入参===========" + orderNo);
 		if(StringUtils.isNotEmpty(result)){
 			log.info("=========根据订单号获取优惠券折扣金额result====" + JSONObject.toJSONString(result));
