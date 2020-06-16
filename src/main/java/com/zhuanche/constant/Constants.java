@@ -33,6 +33,8 @@ public final class Constants {
 	public static final String REDISKEYPREFIX_DRIVERDUTYINFO = "redis_duty_driver_duty_info";
 
 
+	public static final String RESET_PASSWORD_KEY = "saas_reset_password_";
+
 	/******saas日报异步导出********/
 	public static final Integer SAAS_DAILY_EXCEL = 5;
 

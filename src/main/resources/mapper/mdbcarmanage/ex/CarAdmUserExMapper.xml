@@ -166,6 +166,15 @@
         where user_id = #{userId}
     </select>
 
+
+    <select id="queryByPhone" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List" />
+        from car_adm_user
+        where phone = #{phone} limit 1
+    </select>
+
+
     <update id="updateEmail" >
         update car_adm_user  SET  email = #{email}
 

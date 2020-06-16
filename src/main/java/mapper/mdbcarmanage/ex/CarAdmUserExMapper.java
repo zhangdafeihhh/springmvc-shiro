@@ -34,4 +34,8 @@ public interface CarAdmUserExMapper {
 
     int updateEmail(@Param("email")String email,@Param("userId")Integer userId);
 
+
+    CarAdmUser queryByPhone(@Param("phone")String phone);
+
+
 }
