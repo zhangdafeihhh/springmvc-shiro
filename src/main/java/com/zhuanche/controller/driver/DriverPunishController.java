@@ -92,6 +92,9 @@ public class DriverPunishController extends BaseController {
             driverPunishService.doAudit(punishId, status, reason);
             log.info("司机处罚审核操作成功");
             return AjaxResponse.success(null);
+        } catch (IllegalArgumentException e) {
+            log.warn("司机处罚审核操作失败, 参数校验未通过, msg:{}", e.getMessage());
+            return AjaxResponse.failMsg(RestErrorCode.RECORD_DEAL_FAILURE, e.getMessage());
         } catch (ServiceException e) {
             log.error("司机处罚审核操作失败", e);
             return AjaxResponse.failMsg(e.getErrorCode(), e.getMessage());

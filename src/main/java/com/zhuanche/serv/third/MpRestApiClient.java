@@ -51,8 +51,8 @@ public class MpRestApiClient {
                     .setBody(param.toString()).setReadTimeOut(16000)
                     .executeToJson();
         } catch (Exception e) {
-            log.error("异常");
+            log.error("updateAppraisalStatus异常", e);
         }
-        log.info("updateAppraisalStatus result:{}", JSONObject.toJSONString(result));
+        log.info("updateAppraisalStatus param:{},result:{}", param.toString(), JSONObject.toJSONString(result));
     }
 }
