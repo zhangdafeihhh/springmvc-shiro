@@ -124,9 +124,6 @@ public class CompleteOrderController{
                     element.put(Constants.BOOKING_USER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.BOOKING_USER_PHONE)));
                     element.put(Constants.RIDER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.RIDER_PHONE)));
                     element.put(Constants.DRIVER_PHONE, MobileOverlayUtil.doOverlayPhone(element.getString(Constants.DRIVER_PHONE)));
-                    String settleAmout = orderService.couponSettleAmout(element.getString(Constants.ORDERNO));
-                    element.put(Constants.COUPON_SETTLE_AMOUNT,settleAmout);
-                    element.put(Constants.IS_COUPON,StringUtils.isEmpty(settleAmout)?"否":"是");
                 });
             }
 		    return result;
