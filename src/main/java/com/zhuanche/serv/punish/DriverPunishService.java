@@ -19,7 +19,6 @@ import com.zhuanche.entity.driver.DriverPunish;
 import com.zhuanche.entity.driver.DriverPunishDto;
 import com.zhuanche.entity.driver.PunishRecordVoiceDTO;
 import com.zhuanche.entity.driver.appraisa.UpdateAppraisalVo;
-import com.zhuanche.entity.mpconfig.ConfigPunishTypeBaseEntity;
 import com.zhuanche.entity.rentcar.DriverOutage;
 import com.zhuanche.entity.rentcar.OrderVideoVO;
 import com.zhuanche.http.HttpClientUtil;
@@ -35,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import mapper.driver.DriverAppealRecordMapper;
 import mapper.driver.DriverPunishMapper;
 import mapper.driver.ex.DriverPunishExMapper;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -73,8 +72,11 @@ public class DriverPunishService {
     @Value("${punishType23}")
     private Integer punishType23;
 
-    @Resource
-    private ConfigPunishTypeBaseService configPunishTypeBaseService;
+    @Value("${prorate.new.url}")
+    private String prorateNewUrl;
+
+    @Autowired
+    private DriverOutageService driverOutageService;
     @Resource
     private CustomerAppraisalService customerAppraisalService;
     @Resource
@@ -128,10 +130,7 @@ public class DriverPunishService {
     public static final Integer PUNISH_TYPE_3 = 3;
     public static final Integer PUNISH_TYPE_4 = 4;
     public static final Integer PUNISH_TYPE_5 = 5;
-    @Value("${prorate.new.url}")
-    private String prorateNewUrl;
-    @Autowired
-    private DriverOutageService driverOutageService;
+
 
 
 
@@ -470,21 +469,20 @@ public class DriverPunishService {
      * 审核通过逻辑处理
      */
     private void logicIfPass(Integer punishId, Integer status, String cgReason, DriverPunish punishEntity, Map<String, Object> params, Integer currentAuditNode, String auditNode, Integer cgStatus, String phone, String orderNo) {
-        // 调接口看下是否还需要业务后台处理
-        ConfigPunishTypeBaseEntity punishTypeBaseEntity = convertConfigPunishTypeBaseEntity(punishEntity);
         // 查询策略配置
-        Boolean had = configPunishTypeBaseService.queryIsYwHandlePunishType(punishTypeBaseEntity);
-        log.info("审核通过是否还需要业务后台处理 参数:{},结果:{}", ToStringBuilder.reflectionToString(punishTypeBaseEntity), had);
-        if (had) {
+        Map<String, String> configMap = mpRestApiClient.getPunishConfig(punishEntity);
+        // 处理后台(0-车管后台 1-业务后台)
+        String dealBackground = Optional.ofNullable(configMap.get("dealBackground")).map(String::valueOf).orElse("");
+
+        String[] deals = dealBackground.split(",");
+        if (StringUtils.isNotBlank(dealBackground) && deals.length > 1) {
             //如果需要，处罚和申述记录都要保持状态为待审核,currentAuditNode = 2; auditNode = "业务后台";
             status = 2;
             currentAuditNode = 2;
             auditNode = "业务后台";
             params.put("ywStatus", 2);
-            // 查询策略配置
-            ConfigPunishTypeBaseEntity configPunish = configPunishTypeBaseService.queryIsHandlePuinshType(punishTypeBaseEntity);
-            // 后台处理时长
-            String dealDuration = configPunish.getDealDuration();
+            // 后台处理时长(车管,业务)
+            String dealDuration = Optional.of(configMap.get("dealDuration")).map(String::valueOf).orElse("");
             String[] dealDurations = dealDuration.split(",");
             if (dealDurations.length > 1) {
                 dealDuration = dealDurations[1];
@@ -619,13 +617,12 @@ public class DriverPunishService {
      */
     private void logicIfReject(Integer punishId, Integer status, String cgReason, DriverPunish punishEntity, Map<String, Object> params, Integer currentAuditNode, String auditNode, String phone, String orderNo) {
         // 1、查询策略配置
-        ConfigPunishTypeBaseEntity punishType = convertConfigPunishTypeBaseEntity(punishEntity);
-        ConfigPunishTypeBaseEntity configPunish = configPunishTypeBaseService.queryIsHandlePuinshType(punishType);
+        Map<String, String> configMap = mpRestApiClient.getPunishConfig(punishEntity);
 
         // 2、更新
-        Integer appealSecond = 0;
-        if (null != configPunish) {
-            appealSecond = configPunish.getAppealDurationSecond();
+        int appealSecond = 0;
+        if (null != configMap && StringUtils.isNotBlank(configMap.get("appealDurationSecond"))) {
+            appealSecond = Integer.parseInt(configMap.get("appealDurationSecond"));
             log.info("驳回添加时长.punishId=" + punishId + "appealSecond=" + appealSecond);
         }
         Date expire = org.apache.commons.lang.time.DateUtils.addHours(new Date(), appealSecond);
@@ -641,21 +638,6 @@ public class DriverPunishService {
         this.sendSingleAndMessage("审核结果通知", orderNo, punishEntity.getDriverId(), phone, punishEntity.getPunishReason(), APPEAL_RETURN_MSG);
     }
 
-
-    /**
-     * convert to ConfigPunishTypeBaseEntity
-     * @return
-     */
-    private static ConfigPunishTypeBaseEntity convertConfigPunishTypeBaseEntity(DriverPunish punishEntity) {
-        ConfigPunishTypeBaseEntity punishType = new ConfigPunishTypeBaseEntity();
-        //处罚类型Id
-        punishType.setConfigid(punishEntity.getPunishType());
-        punishType.setRelatedBasePunishId(punishEntity.getPunishType());
-        punishType.setCooperationType((byte) punishEntity.getCooperationType().intValue());
-        punishType.setServCitys(String.valueOf(punishEntity.getCityId()));
-        punishType.setDealBackground("1");
-        return punishType;
-    }
 
     /**
      * 给司机发送短信和站内信
