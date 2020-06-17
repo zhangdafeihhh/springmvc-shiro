@@ -143,7 +143,7 @@ public class SupplierUserManagementController {
 
     /**七、保存一个用户中的角色ID**/
     @RequestMapping("/supplierSaveRoleIds")
-    @RequiresPermissions(value = { "SAVE_ROLEIDS_OF_USER" } )
+    @RequiresPermissions(value = { "SUPPLIER_SAVE_ROLEIDS_OF_USER" } )
     @RequestFunction(menu = USER_ROLE_SAVE)
     public AjaxResponse supplierSaveRoleIds( @Verify(param="userId",rule="required|min(1)") Integer userId,  @Verify(param="roleIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String roleIds) {
         SysSaveOrUpdateLog sysLog = new SysSaveOrUpdateLog();

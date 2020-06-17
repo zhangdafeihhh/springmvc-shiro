@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @Author fanht
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @Version 1.0
  */
 @RequestMapping("/resetPassword")
+@RestController
 public class ResetPasswordController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -29,14 +31,15 @@ public class ResetPasswordController {
     @RequestMapping("/sendPhoneCode")
     public AjaxResponse sendPhoneCode(@Verify(param = "phone",rule = "required|mobile") String phone){
 
-        return passwordService.sendPhoneCode(phone);
+        return passwordService.sendPhoneCode(phone,SendPhoneEnum.RESET_PASSWORD.getCode());
 
     }
 
 
     /**确认验证码*/
     @RequestMapping("/verifyPhoneCode")
-    public AjaxResponse verifyPhoneCode(String phone,String msgCode){
+    public AjaxResponse verifyPhoneCode(@Verify(param = "phone",rule = "required|mobile")String phone,
+                                        @Verify(param = "msgCode",rule = "required")String msgCode){
         return passwordService.verifyPhoneCode(phone,msgCode);
     }
 

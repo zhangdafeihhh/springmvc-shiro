@@ -6,7 +6,7 @@
     <result column="role_code" property="roleCode" jdbcType="VARCHAR" />
     <result column="role_name" property="roleName" jdbcType="VARCHAR" />
     <result column="valid" property="valid" jdbcType="BIT" />
-    <result column="is_visiable" property="isisiable" jdbcType="INTEGER" />
+    <result column="is_visiable" property="isVisiable" jdbcType="INTEGER" />
 
   </resultMap>
   <sql id="Base_Column_List" >

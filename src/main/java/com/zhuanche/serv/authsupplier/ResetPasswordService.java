@@ -5,9 +5,12 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.controller.authsupplier.SendPhoneEnum;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.shiro.cache.RedisCache;
+import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.RedisSessionDAO;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.NumberUtil;
 import com.zhuanche.util.PasswordUtil;
 import mapper.mdbcarmanage.CarAdmUserMapper;
@@ -40,14 +43,20 @@ public class ResetPasswordService {
     private RedisSessionDAO redisSessionDAO;
 
     /**根据手机号发送验证码*/
-    public AjaxResponse sendPhoneCode(String phone){
+    public AjaxResponse sendPhoneCode(String phone,Integer type){
         /**用户不存在*/
         CarAdmUser admUser = userExMapper.queryByPhone(phone);
         if( admUser == null ) {
             return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST );
         }
 
-        String key = Constants.RESET_PASSWORD_KEY + phone;
+        String key = "";
+
+        if(SendPhoneEnum.RESET_PASSWORD.getCode().equals(type)){
+            key = Constants.RESET_PASSWORD_KEY + phone;
+        }else if(SendPhoneEnum.UPDATE_PHONE.getCode().equals(type)){
+            key = Constants.UPDATE_PHONE_KEY + phone;
+        }
 
 
         String msgCode =  RedisCacheUtil.get(key,String.class);
@@ -56,9 +65,18 @@ public class ResetPasswordService {
              msgCode = NumberUtil.genRandomCode(6);
         }
 
+        logger.info("手机验证码===" + msgCode);
+
         RedisCacheUtil.set(key,msgCode,2*60);
 
-        String content = "尊敬的用户，您重置密码验证码为" + msgCode + ",有效期120秒";
+        String content = "";
+
+        if(SendPhoneEnum.RESET_PASSWORD.getCode().equals(type)){
+
+            content = "尊敬的用户，您重置密码验证码为" + msgCode + ",有效期120秒";
+        }else if(SendPhoneEnum.UPDATE_PHONE.getCode().equals(type)){
+            content = "尊敬的用户，修改手机验证码为" + msgCode + ",有效期120秒";
+        }
 
         SmsSendUtil.send(phone,content);
 
@@ -131,5 +149,53 @@ public class ResetPasswordService {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
 
+    }
+
+
+    /**修改手机号码*/
+    public AjaxResponse modifyPhone(String phone,String msgCode){
+
+        logger.info("====修改手机号=======入参：phone:" + phone +",msgCode:" +msgCode);
+
+        SSOLoginUser ssoLoginUser =  WebSessionUtil.getCurrentLoginUser();
+
+        if(ssoLoginUser == null){
+            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST );
+        }
+        CarAdmUser rawuser = userMapper.selectByPrimaryKey(ssoLoginUser.getId());
+
+        if( rawuser==null ) {
+            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST );
+        }
+
+        String key = Constants.UPDATE_PHONE_KEY + phone;
+
+        if(!RedisCacheUtil.exist(key)){
+            logger.info("======验证码已过期=====");
+            return AjaxResponse.fail(RestErrorCode.MSG_CODE_INVALID);
+        }
+
+        String  cacheMsgCode = RedisCacheUtil.get(key,String.class) == null ? "" : RedisCacheUtil.get(key,String.class).trim();
+
+        logger.info("=======获取msgCode=====" + cacheMsgCode);
+        if(msgCode.equals(cacheMsgCode)){
+            logger.info("=======手机验证码正常========");
+            //验证手机号是否已被注册
+            CarAdmUser user = userExMapper.queryByPhone(phone);
+            if(user != null && user.getUserId() > 0){
+                return AjaxResponse.fail(RestErrorCode.PHONE_EXIST);
+            }
+            /**修改用户手机号*/
+            CarAdmUser newUser = new CarAdmUser();
+            newUser.setUserId(ssoLoginUser.getId());
+            newUser.setPhone(phone);
+            userMapper.updateByPrimaryKeySelective(newUser);
+            /**自动清理用户会话*/
+            redisSessionDAO.clearRelativeSession(null, null , newUser.getUserId() );
+
+            return AjaxResponse.success(null);
+        }else {
+            return AjaxResponse.fail(RestErrorCode.MSG_CODE_WRONG);
+        }
     }
 }
