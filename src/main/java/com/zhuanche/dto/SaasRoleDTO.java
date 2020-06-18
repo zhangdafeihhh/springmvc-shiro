@@ -9,6 +9,8 @@ public class SaasRoleDTO {
 
     private Boolean valid;
 
+    private Integer isVisiable;
+
     public Integer getRoleId() {
         return roleId;
     }
@@ -39,5 +41,13 @@ public class SaasRoleDTO {
 
     public void setValid(Boolean valid) {
         this.valid = valid;
+    }
+
+    public Integer getIsVisiable() {
+        return isVisiable;
+    }
+
+    public void setIsVisiable(Integer isVisiable) {
+        this.isVisiable = isVisiable;
     }
 }
