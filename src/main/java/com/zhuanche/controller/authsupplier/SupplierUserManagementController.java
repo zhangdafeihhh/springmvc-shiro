@@ -1,5 +1,6 @@
 package com.zhuanche.controller.authsupplier;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.common.paging.PageDTO;
@@ -7,6 +8,7 @@ import com.zhuanche.common.syslog.SysLogAnn;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.CarAdmUserDTO;
 import com.zhuanche.dto.mdbcarmanage.CarAdmUserDto;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.mongo.SysSaveOrUpdateLog;
@@ -136,9 +138,9 @@ public class SupplierUserManagementController {
     @RequestMapping("/supplierGetAllRoleIds")
     @RequiresPermissions(value = { "SUPPLIER_GET_ALL_ROLEIDS_OF_USER" } )
     @RequestFunction(menu = USER_ROLE_LIST)
-    public AjaxResponse supplierGetAllRoleIds( @Verify(param="userId",rule="required|min(1)") Integer userId ){
-        List<Integer> roleIds = userManagementService.getAllRoleIds(userId);
-        return AjaxResponse.success( roleIds  );
+    public AjaxResponse supplierGetAllRoleIds(  ){
+        JSONArray array = userManagementService.searchSupplierIsVisiable();
+        return AjaxResponse.success(array);
     }
 
     /**七、保存一个用户中的角色ID**/

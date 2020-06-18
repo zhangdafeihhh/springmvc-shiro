@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.mdbcarmanage.CarAdmUserDto;
@@ -279,7 +281,6 @@ public class UserManagementService{
     	}
     	List<CarAdmUserDTO> roledtos = BeanUtil.copyList(users, CarAdmUserDTO.class);
     	//3.1补充上角色ID，角色名称
-		if(WebSessionUtil.isSupperAdmin()){
 			Map<Integer,String> roleIdNameMappings = this.searchRoleIdNameMappings();
 			for( CarAdmUserDTO admUserDto : roledtos ) {
 				/**根据用户ID，查询其拥有的所有有效的角色ID*/
@@ -307,10 +308,10 @@ public class UserManagementService{
 					admUserDto.setRoleNames(roleNames);//设置角色名称
 				}
 			}
-		}else {
-			/**如果是供应商查询*/
+		/*else {
+			*//**如果是供应商查询*//*
 			roledtos = this.searchSupplierIsVisiable(roledtos);
-		}
+		}*/
     	//返回
     	return new PageDTO( page, pageSize, total , roledtos);
 	}
@@ -324,33 +325,21 @@ public class UserManagementService{
 	}
 
 	/**查询供应商可见的角色列表*/
-	private List<CarAdmUserDTO> searchSupplierIsVisiable(List<CarAdmUserDTO> roledtos){
+	public JSONArray searchSupplierIsVisiable(){
+		JSONArray array = new JSONArray();
 		List<SaasRole> allRoles =   saasRoleExMapper.queryVisiableRoles();
 		if(CollectionUtils.isNotEmpty(allRoles)){
 			/**拼接角色ID，角色名称*/
 			StringBuffer sbRoleIds   =  new StringBuffer("");
 			StringBuffer sbRoleNames =  new StringBuffer("");
 			allRoles.forEach(roles ->{
-				sbRoleIds.append(roles.getRoleId().intValue()).append(Constants.SEPERATER);
-				sbRoleNames.append(roles.getRoleName()).append(Constants.SEPERATER);
-			});
-			String roleIds = sbRoleIds.toString();
-			if(roleIds.endsWith(",")) {
-				roleIds = roleIds.substring(0, roleIds.length()-1);
-			}
- 			String roleNames = sbRoleNames.toString();
-			if(roleNames.endsWith(",")) {
-				roleNames = roleNames.substring(0, roleNames.length()-1);
-			}
-
-			String finalRoleIds = roleIds;
-			String finalRoleNames = roleNames;
-			roledtos.forEach(dto ->{
-				dto.setRoleIds(finalRoleIds);
-				dto.setRoleNames(finalRoleNames);
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("roleId",roles.getRoleId());
+				jsonObject.put("roleName",roles.getRoleName());
+				array.add(jsonObject);
 			});
 		}
-		return roledtos;
+		return array;
 	}
 
 
