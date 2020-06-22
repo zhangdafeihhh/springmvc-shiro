@@ -199,4 +199,7 @@ public final class Constants {
 
 	/**验证司机的状态*/
 	public static final String VERIFY_STATUS = "15,20,25,30";
+
+	/**查询所有的线路*/
+	public static final String AllRULE = "-1";
 }
