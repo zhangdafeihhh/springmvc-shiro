@@ -99,6 +99,7 @@
 		</property>
 		<property name="filterChainDefinitions">
 			<value>
+				/resetPassword/*.json = anon
 				/nginx.html = anon
 				/login.json = anon
 				/updateLevel.json = anon
