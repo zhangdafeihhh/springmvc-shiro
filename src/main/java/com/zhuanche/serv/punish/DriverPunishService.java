@@ -621,8 +621,8 @@ public class DriverPunishService {
 
         // 2、更新
         int appealSecond = 0;
-        if (null != configMap && StringUtils.isNotBlank(configMap.get("appealDurationSecond"))) {
-            appealSecond = Integer.parseInt(configMap.get("appealDurationSecond"));
+        if (null != configMap && StringUtils.isNotBlank(String.valueOf(configMap.get("appealDurationSecond")))) {
+            appealSecond = Integer.parseInt(String.valueOf(configMap.get("appealDurationSecond")));
             log.info("驳回添加时长.punishId=" + punishId + "appealSecond=" + appealSecond);
         }
         Date expire = org.apache.commons.lang.time.DateUtils.addHours(new Date(), appealSecond);
