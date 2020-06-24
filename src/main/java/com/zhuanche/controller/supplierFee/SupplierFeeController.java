@@ -175,17 +175,34 @@ public class SupplierFeeController {
         String userName = ssoLoginUser.getName();
         try {
             SupplierFeeRecord record = new SupplierFeeRecord();
-            record.setOperate(SupplierFeeManageEnum.getFeeStatus(status).getMsg());
+            record.setOperate(SupplierFeeManageEnum.BECONFIRMED.getMsg());
             record.setCreateTime(new Date());
             record.setUpdateTime(new Date());
             record.setOperateId(loginId);
-            record.setStatus(status);
+            record.setStatus(SupplierFeeManageEnum.BECONFIRMED.getCode());
             record.setRemark(remark);
             record.setOperateUser(userName);
             record.setSupplierAddress("空");
             record.setFeeOrderNo(feeOrderNo);
 
             int code =  recordService.insertFeeRecord(record);
+
+
+            if(status.equals(SupplierFeeManageEnum.SUBSTITUTETICKET.getCode())){
+
+                SupplierFeeRecord recordTwo = new SupplierFeeRecord();
+                recordTwo.setOperate(SupplierFeeManageEnum.APPLYCATCH.getMsg());
+                recordTwo.setCreateTime(new Date());
+                recordTwo.setUpdateTime(new Date());
+                recordTwo.setOperateId(loginId);
+                recordTwo.setStatus(SupplierFeeManageEnum.APPLYCATCH.getCode());
+                recordTwo.setRemark(remark);
+                recordTwo.setOperateUser(userName);
+                recordTwo.setSupplierAddress("空");
+                recordTwo.setFeeOrderNo(feeOrderNo);
+
+                recordService.insertFeeRecord(recordTwo);
+            }
 
             if(code > 0){
                 int feeCode = 0;
