@@ -212,7 +212,7 @@ public class DriverIntegraController {
     })
     @RequestFunction(menu = DRIVER_RANK_INTEGRAL_EXPORT)
     public String queryDriverIntegralListDataDown(DriverVoEntity driverEntity, HttpServletRequest request, HttpServletResponse response) {
-        driverEntity.setPage(1);
+        /*driverEntity.setPage(1);
         //策略当期积分接口一次支持50
         driverEntity.setPagesize(50);
         logger.info("queryDriverIntegralListDataDown:下载司机积分数据列表,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)));
@@ -360,7 +360,7 @@ public class DriverIntegraController {
             return "下载成功";
         } catch (Exception e) {
             logger.error("下载司机积分异常,driverEntity="+(driverEntity==null?"null":JSON.toJSONString(driverEntity)),e);
-        }
+        }*/
         return "下载失败，请联系管理员";
     }
 

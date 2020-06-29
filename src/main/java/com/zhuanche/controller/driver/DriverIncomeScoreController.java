@@ -24,7 +24,9 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.MobileOverlayUtil;
+import com.zhuanche.util.excel.CsvUtils;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,9 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -41,11 +46,15 @@ import static com.zhuanche.common.enums.MenuEnum.DRIVER_INFO_LIST;
 
 /**
  * 司机收入分
+ *
+ * @author wangwenli
  */
 @Controller
 @RequestMapping("/driverIncomeScore")
 public class DriverIncomeScoreController {
+
     private static final Logger logger = LoggerFactory.getLogger(DriverIncomeScoreController.class);
+
     private static final String LOGTAG = "[司机收入分信息]: ";
 
     @Autowired
@@ -95,6 +104,66 @@ public class DriverIncomeScoreController {
         carBizDriverInfoDTO.setTeamId(teamId);
         PageDTO pageDTO = driverDispatchScoreService.queryPageDriverDispatchScore(page,pageSize,carBizDriverInfoDTO);
         return AjaxResponse.success(pageDTO);
+    }
+
+    /**
+     * 导出司机派单分概括<br>
+     *     派单分2.0
+     *
+     * @param driverId      司机id
+     * @param phone         司机手机号
+     * @param licensePlates 车牌号
+     * @param cityId        城市ID
+     * @param supplierId    供应商ID
+     * @param teamId        车队ID
+     * @return String 导出结果
+     */
+    @ResponseBody
+    @RequestMapping(value = "/driverDispatchScoreExport")
+    @RequestFunction(menu = DRIVER_INFO_LIST)
+    public String driverDispatchScoreExport(Integer driverId, String phone,
+                                            String licensePlates, Integer cityId,
+                                            Integer supplierId, Integer teamId,
+                                            HttpServletRequest request, HttpServletResponse response){
+
+        if(null == cityId || cityId == 0){
+            return "请选择城市";
+        }
+        if(null == supplierId){
+            return "请选择合作商";
+        }
+
+        CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
+        carBizDriverInfoDTO.setDriverId(driverId);
+        carBizDriverInfoDTO.setPhone(phone);
+        carBizDriverInfoDTO.setLicensePlates(licensePlates);
+        carBizDriverInfoDTO.setServiceCity(cityId);
+        carBizDriverInfoDTO.setSupplierId(supplierId);
+        carBizDriverInfoDTO.setTeamId(teamId);
+
+        List<DriverDispatchScoreGeneralize> dispatchScoreGeneralizeList = driverDispatchScoreExportOriginData(carBizDriverInfoDTO);
+        if(CollectionUtils.isEmpty(dispatchScoreGeneralizeList)){
+            return "没有数据";
+        }
+
+        String fileName = "driverDispatchScoreExport_" + cityId + "_" + supplierId + ".csv";
+
+        //字段列表头
+        String columnHeader = "城市,司机ID,姓名,手机号,合作商,车队,车牌号,当前派单分,服务分,时长分,不良行为扣分,更新时间";
+
+        List<String> dataList = driverDispatchScoreExportData(dispatchScoreGeneralizeList);
+        if(CollectionUtils.isEmpty(dataList)){
+            return "没有数据";
+        }
+
+        try {
+            new CsvUtils().exportCsvV2(response,dataList,Lists.newArrayList(columnHeader),fileName,true,true);
+            return "导出成功";
+        } catch (IOException e) {
+            logger.error("DriverIncomeScoreController driverDispatchScoreExport IOException",e);
+        }
+
+        return "导出失败，请联系管理员";
     }
 
     /**
@@ -512,5 +581,69 @@ public class DriverIncomeScoreController {
         }
         return AjaxResponse.success(map);
 
+    }
+
+    private List<DriverDispatchScoreGeneralize> driverDispatchScoreExportOriginData(CarBizDriverInfoDTO carBizDriverInfoDTO){
+
+        int pageSize = 200;
+
+        PageDTO pageDTO = driverDispatchScoreService.queryPageDriverDispatchScore(1,pageSize,carBizDriverInfoDTO);
+
+        //总数
+        int total = Integer.valueOf(pageDTO.getTotal() + "");
+        if(total == 0){
+            return null;
+        }
+
+        int totalPage = total / pageSize;
+        if(total % pageSize > 0){
+            totalPage++;
+        }
+
+        List<DriverDispatchScoreGeneralize> dispatchScoreGeneralizeList = Lists.newArrayListWithCapacity(total + pageSize);
+        dispatchScoreGeneralizeList.addAll(pageDTO.getResult());
+
+        for(int i = 2;i <= totalPage; i++){
+            pageDTO = driverDispatchScoreService.queryPageDriverDispatchScore(i,pageSize,carBizDriverInfoDTO);
+            if(CollectionUtils.isNotEmpty(pageDTO.getResult())){
+                dispatchScoreGeneralizeList.addAll(pageDTO.getResult());
+            }
+        }
+
+        return dispatchScoreGeneralizeList;
+    }
+
+    private List<String> driverDispatchScoreExportData(List<DriverDispatchScoreGeneralize> dispatchScoreGeneralizeList){
+
+        if(CollectionUtils.isEmpty(dispatchScoreGeneralizeList)){
+            return null;
+        }
+
+        List<String> dataList = Lists.newArrayListWithCapacity(dispatchScoreGeneralizeList.size());
+
+        dispatchScoreGeneralizeList.forEach(x -> {
+            StringBuilder stringBuilder = new StringBuilder();
+            appendValue(x.getCityName(),stringBuilder);
+            appendValue(x.getDriverId(),stringBuilder);
+            appendValue(x.getDriverName(),stringBuilder);
+            appendValue(x.getDriverPhone(),stringBuilder);
+            appendValue(x.getSupplierName(),stringBuilder);
+            appendValue(x.getTeamName(),stringBuilder);
+            appendValue(x.getLicensePlates(),stringBuilder);
+            appendValue(x.getCurrentDispatchScore(),stringBuilder);
+            appendValue(x.getServiceBaseScore(),stringBuilder);
+            appendValue(x.getTimeLengthBaseScore(),stringBuilder);
+            appendValue(x.getBadBehaviorDeductionScore(),stringBuilder);
+            stringBuilder.append(null == x.getUpdateDate() ? "" : x.getUpdateDate());
+
+            dataList.add(stringBuilder.toString());
+        });
+
+        return dataList;
+    }
+
+    private void appendValue(Object obj,StringBuilder stringBuilder){
+        stringBuilder.append(null == obj ? "" : obj);
+        stringBuilder.append(",");
     }
 }

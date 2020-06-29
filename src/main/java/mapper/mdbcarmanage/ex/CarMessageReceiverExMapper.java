@@ -1,11 +1,14 @@
 package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.dto.mdbcarmanage.CarMessagePostDto;
+import com.zhuanche.dto.mdbcarmanage.CarMessageReplyDto;
+import com.zhuanche.entity.mdbcarmanage.CarMessageGroup;
 import com.zhuanche.entity.mdbcarmanage.CarMessageReceiver;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface CarMessageReceiverExMapper {
 
@@ -70,4 +73,20 @@ public interface CarMessageReceiverExMapper {
     List<CarMessagePostDto> queryDataInAttachment(@Param("keyword") String keyword, @Param("startDate") Date startDate, @Param("endDate") Date endDate,
                                                   @Param("idList") List<Integer> idList, @Param("userId") Integer userId,
                                                   @Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    Integer messagePostDtoCount(@Param("receiveUserId") Integer receiveUserId,
+                                     @Param("messageId") Integer messageId);
+
+    List<CarMessagePostDto> newSearchMessage(@Param("status") Integer status,@Param("keyword") String keyword, @Param("startDate") Date startDate, @Param("endDate") Date endDate,
+                                             @Param("idList") List<Integer> idList, @Param("userId") Integer userId);
+
+    int replyMessage(@Param("messageId")Integer messageId,@Param("receiveUserId")Integer receiveUserId,@Param("status")Integer status);
+
+
+    List<CarMessageReplyDto> replyQueryList(CarMessageReplyDto carMessageReplyDto);
+
+
+    List<CarMessagePostDto> messageReceiveQueryList(@Param("status") Integer status,@Param("keyword") String keyword, @Param("startDate") String startDate, @Param("endDate") String endDate,
+                                             @Param("idList") List<Integer> idList, @Param("userId") Integer userId);
+
 }

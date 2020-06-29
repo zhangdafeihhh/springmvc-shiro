@@ -18,12 +18,31 @@
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="message_status" property="messageStatus" jdbcType="INTEGER" />
     <result column="create_uid" property="createId" jdbcType="INTEGER" />
+<!--
     <result column="receive_user_id" property="receiveId" jdbcType="INTEGER" />
+-->
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="docName" property="docName" jdbcType="VARCHAR" />
+    <result column="reply_content" property="replyContent" jdbcType="VARCHAR" />
   </resultMap>
-  <sql id="Base_Column_List" >
+
+
+  <resultMap id="MessageReplyResultMap" type="com.zhuanche.dto.mdbcarmanage.CarMessageReplyDto" >
+    <result column="message_id" property="messageId" jdbcType="INTEGER" />
+<!--
+    <result column="receive_user_id" property="receiveId" jdbcType="INTEGER" />
+-->
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTimeStr" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="readTimeStr" jdbcType="TIMESTAMP" />
+    <result column="reply_content" property="replyContent" jdbcType="VARCHAR" />
+    <result column="reply_time" property="replyTimeStr" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="senderName" jdbcType="VARCHAR" />
+
+  </resultMap>
+
+  <sql id="Base_Column_List">
     id, status, receive_user_id, message_id, create_time, update_time, is_sender
   </sql>
 
@@ -80,6 +99,13 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
+
+  <update id="replyMessage" >
+    update car_message_receiver
+    set status = #{status}, update_time = now()
+    where receive_user_id = #{receiveUserId}
+    and message_id = #{messageId}
+  </update>
   <select id="queryAllCount" resultType="java.lang.Integer" >
     SELECT COUNT(DISTINCT(cmp.id)) as total FROM car_message_post cmp
     LEFT JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
@@ -294,5 +320,159 @@
   </select>
 
 
+
+
+  <select id="newSearchMessage" resultMap="MessageResultMap" >
+    SELECT
+    cdu.user_name as user_name,
+    cmp.user_id as create_uid,
+    cmr.receive_user_id as receive_user_id,
+    cmp.id as id, cmp.mesage_title as mesage_title,
+    cmr.status as status, cmp.create_time as create_time,
+    cmp.message_content as message_content,
+    cmp.status as message_status,
+    IFNULL(GROUP_CONCAT(DISTINCT cmd.doc_name),'') as docName
+    FROM car_message_post cmp
+    LEFT JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
+    INNER JOIN car_adm_user cdu ON cmp.user_id = cdu.user_id
+    LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
+    WHERE
+    1=1
+
+    <if test="status != null" >
+      AND cmp.status = #{status}
+    </if>
+    <if test="startDate != null" >
+      AND cmp.create_time &gt;=DATE_FORMAT(#{startDate},'%Y%m%d')
+    </if>
+    <if test="endDate != null" >
+      AND cmp.create_time &lt;= DATE_FORMAT(#{endDate},'%Y%m%d')
+    </if>
+
+    <if test="keyword != null" >
+      AND LOCATE(#{keyword},cmp.mesage_title) &gt; 0
+    </if>
+    <if test="idList != null" >
+      AND cmp.user_id in
+      <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+    <if test="userId != null" >
+      <!--注意此处是发件箱-->
+      AND cmp.user_id=#{userId}
+    </if>
+    GROUP BY cmp.id,mesage_title,cmp.create_time,message_content
+  </select>
+
+
+  <select id="messagePostDtoCount" resultType="java.lang.Integer" >
+    select COUNT(id)
+    from car_message_receiver
+    where receive_user_id = #{receiveUserId,jdbcType=BIGINT} AND message_id = #{messageId}
+  </select>
+
+
+
+  <select id="replyQueryList" resultMap="MessageReplyResultMap" parameterType="com.zhuanche.dto.mdbcarmanage.CarMessageReplyDto">
+
+    SELECT  c.message_id,
+    c.receive_user_id,
+    c.create_time,
+    c.update_time,
+    c.`status`,
+    r.reply_content,
+    r.create_time as reply_time,
+    cdu.user_name
+    FROM car_message_receiver c LEFT JOIN car_message_reply r on
+    c.message_id = r.message_id
+    INNER JOIN car_adm_user cdu ON c.receive_user_id = cdu.user_id
+    WHERE  1=1
+    <if test="messageId != null" >
+      AND c.message_id = #{messageId}
+    </if>
+    <if test="status != null" >
+      AND c.status = #{status}
+    </if>
+    <if test="noticeStartTime != null and noticeStartTime != ''" >
+      AND c.create_time &gt;=STR_TO_DATE(#{noticeStartTime},'%Y-%m-%d')
+    </if>
+    <if test="noticeEndTime != null and noticeEndTime != ''" >
+      AND c.create_time &lt;= STR_TO_DATE(#{noticeEndTime},'%Y-%m-%d')
+    </if>
+
+    <if test="createStartTime != null and createStartTime != ''" >
+      AND c.update_time &gt;=STR_TO_DATE(#{createStartTime},'%Y-%m-%d')
+    </if>
+    <if test="createEndTime != null and createEndTime != ''" >
+      AND c.update_time &lt;= STR_TO_DATE(#{createEndTime},'%Y-%m-%d')
+    </if>
+
+    <if test="replyStartTime != null and replyStartTime != ''" >
+      AND r.create_time  &gt;=STR_TO_DATE(#{replyStartTime},'%Y-%m-%d')
+    </if>
+    <if test="replyEndTime != null and replyEndTime != ''" >
+      AND r.create_time  &lt;= STR_TO_DATE(#{replyEndTime},'%Y-%m-%d')
+    </if>
+
+    <if test="receiveUserIds != null" >
+      AND c.receive_user_id in
+      <foreach collection="receiveUserIds" index="index" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+
+    ORDER  by c.create_time DESC
+
+  </select>
+
+
+
+
+<select id="messageReceiveQueryList" resultMap="MessageResultMap" >
+SELECT
+cdu.user_name as user_name,
+cmp.user_id as create_uid,
+cmr.receive_user_id as receive_user_id,
+cmp.id as id, cmp.mesage_title as mesage_title,
+cmr.status as status, cmp.create_time as create_time,
+cmp.message_content as message_content,
+cmp.status as message_status,
+IFNULL(GROUP_CONCAT(cmd.doc_name),'') as docName,
+r.reply_content
+FROM car_message_post cmp
+LEFT JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
+INNER JOIN car_adm_user cdu ON cmp.user_id = cdu.user_id
+LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
+LEFT JOIN car_message_reply r on cmr.id = r.message_id
+
+WHERE
+1=1
+
+<if test="status != null" >
+  AND cmr.status = #{status}
+</if>
+<if test="startDate != null and startDate != ''" >
+  AND cmp.create_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d')
+</if>
+<if test="endDate != null and endDate != ''" >
+  AND cmp.create_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d')
+</if>
+
+<if test="keyword != null and keyword != ''" >
+  AND LOCATE(#{keyword},cmp.mesage_title) &gt; 0
+</if>
+<if test="idList != null" >
+  AND cmp.user_id in
+  <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+    #{item}
+  </foreach>
+</if>
+<if test="userId != null" >
+  AND  cmr.receive_user_id=#{userId}
+</if>
+GROUP BY cmp.id,cmp.mesage_title,
+  cmp.create_time,cmp.message_content
+</select>
 
 </mapper>

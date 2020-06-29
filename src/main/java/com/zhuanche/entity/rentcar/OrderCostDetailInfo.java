@@ -13,7 +13,7 @@ import java.util.List;
 public class OrderCostDetailInfo {
     private Integer detailId;  //主键
 
-    private Integer orderId;  //订单主键
+    private Long orderId;  //订单主键
 
     private String orderNo; //订单号
 

@@ -7,11 +7,14 @@ import com.zhuanche.common.util.LbsSignUtil;
 import com.zhuanche.common.util.StaticRpcUrl;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.http.MpOkHttpUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,7 +46,8 @@ public class InterCityUtils {
      * @param boardingGetOnY
      * @return
      */
-    public String hasBoardRoutRights(Integer boardingCityId,String boardingGetOnX,String boardingGetOnY){
+    public List<String> hasBoardRoutRights(Integer boardingCityId, String boardingGetOnX, String boardingGetOnY){
+        List<String> strList = new ArrayList<>();
         //根据横纵坐标获取围栏，根据围栏获取路线
         Map<String,Object> mapX = Maps.newHashMap();
         mapX.put("token", StaticRpcUrl.lbsToken);
@@ -76,18 +80,19 @@ public class InterCityUtils {
                 JSONObject lbsRes = arrayData.getJSONObject(0);
                 if(lbsRes.get("areaId") != null){
                     getOnId = lbsRes.getString("areaId");
-                    break;
+                    strList.add(getOnId);
+                    //break;
                 }
 
             }
         }
 
-        if(StringUtils.isEmpty(getOnId)){
+        if(CollectionUtils.isEmpty(strList)){
             logger.info("上下车点不再围栏区域");
             return null;
         }
 
-        return getOnId;
+        return strList;
     }
 
 
@@ -99,7 +104,9 @@ public class InterCityUtils {
      * @param boardingGetOffY
      * @return
      */
-    public String hasBoardOffRoutRights(Integer boardingGetOffCityId, String boardingGetOffX, String boardingGetOffY){
+    public List<String> hasBoardOffRoutRights(Integer boardingGetOffCityId, String boardingGetOffX, String boardingGetOffY){
+
+        List<String> strList = new ArrayList<>();
         Map<String,Object> mapY = Maps.newHashMap();
 
         mapY.put("token",StaticRpcUrl.lbsToken);
@@ -136,16 +143,17 @@ public class InterCityUtils {
                 JSONObject lbsRes = jsonArray.getJSONObject(0);
                 if(lbsRes.get("areaId") != null){
                     getOffId = lbsRes.getString("areaId");
-                    break;
+                    strList.add(getOffId);
+                    //break;
                 }
             }
         }
 
-        if(StringUtils.isEmpty(getOffId)){
+        if(CollectionUtils.isEmpty(strList)){
             logger.info("上下车点不再围栏区域");
             return null;
         }
-        return getOffId;
+        return strList;
     }
 
     /**
