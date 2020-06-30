@@ -44,7 +44,7 @@ public class DriverMeasureDayService {
         }else{
             params.setSupplierIds("");
         }
-        IndexBiDriverMeasureDto indexBiDriverMeasureDto = biDriverMeasureDayExtMapper.findForStatistics(params)
+        IndexBiDriverMeasureDto indexBiDriverMeasureDto = biDriverMeasureDayExtMapper.findForStatistics(params);
         if(indexBiDriverMeasureDto != null){
             Integer numerator =indexBiDriverMeasureDto.getResponsibleComplaintNum();// driverMeasureDayMapper.countNumerator(params);
             Integer denominator = indexBiDriverMeasureDto.getFinishClOrderNum();// driverMeasureDayMapper.countDenominator(params);
