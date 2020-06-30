@@ -472,12 +472,12 @@ public class SupplierFeeController {
             listStr.add("入围司机营业额:"+manage.getTurnoverDrivers());
 
         }
-        if(StringUtils.isEmpty(manage.getFlowAmount())){
+        if(StringUtils.isEmpty(manage.getTotalFlow())){
             title = title.replaceAll("流水金额,","");
         }else {
-            builder.append(manage.getFlowAmount() != null ? manage.getFlowAmount() : "");
+            builder.append(manage.getTotalFlow() != null ? manage.getTotalFlow() : "");
             builder.append(",");
-            listStr.add("流水金额:"+manage.getFlowAmount());
+            listStr.add("流水金额:"+manage.getTotalFlow());
         }
 
 
