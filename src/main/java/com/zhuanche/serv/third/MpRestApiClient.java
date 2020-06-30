@@ -34,6 +34,10 @@ public class MpRestApiClient {
     @Value("${mp.restapi.url}")
     private String mpRestApiUrl;
 
+
+    @Value("${mp.rest.url}")
+    private String mpRestUrl;
+
     /**
      * 发送差评处罚信息到mp-restapi,进行扣分处理
      */
@@ -77,7 +81,7 @@ public class MpRestApiClient {
             Integer punishType = punishEntity.getPunishType();
             Integer cityId = punishEntity.getCityId();
             Integer cooperationType = punishEntity.getCooperationType();
-            String reqUrl = mpRestApiUrl + "/api/v1/punishTypeSpecial/getConfig?punishType=" + punishType + "&cityCode=" + cityId + "&couperationType=" + cooperationType;
+            String reqUrl = mpRestUrl + "/api/v1/punishTypeSpecial/getConfig?punishType=" + punishType + "&cityCode=" + cityId + "&couperationType=" + cooperationType;
             String confResult = HttpClientUtil.buildGetRequest(reqUrl, 1).setReadTimeOut(3000).setConnectTimeOut(3000).execute();
             log.info("查询策略配置特殊配置 reqUrl:{},result:{}", reqUrl, confResult);
             // 判断结果
@@ -86,7 +90,7 @@ public class MpRestApiClient {
             // 没有查询到特殊配置
             if (RESULT_NOT_RESULT.equals(String.valueOf(jsonResult.get(CODE)))) {
                 log.info("没有查询到特殊配置信息,开始查询基础配置.timestamp={}", timestamp);
-                String baseUrl = mpRestApiUrl + "/api/v1/punishTypeBase/getConfigById?configId=" + punishType;
+                String baseUrl = mpRestUrl + "/api/v1/punishTypeBase/getConfigById?configId=" + punishType;
                 String baseConf = HttpClientUtil.buildGetRequest(baseUrl, 1).setReadTimeOut(3000).setConnectTimeOut(3000).execute();
                 // 判断结果
                 JSONObject baseJson = JSONObject.parseObject(baseConf);
