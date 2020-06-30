@@ -129,6 +129,21 @@
 	        <bean class="com.zhuanche.common.web.HttpParamVerifyInterceptor"/> <!-- 请求参数规则校验 -->
 	    </mvc:interceptor>
 
+		<!--代理转发-->
+		<mvc:interceptor>
+			<mvc:mapping path="/enterprise/**"/>
+			<mvc:exclude-mapping path="/resources/**"/>
+			<mvc:exclude-mapping path="/nginx.html"/>
+			<bean class="com.zhuanche.common.web.interceptor.ProxyContollerInterceptor"><!-- 打印请求参数、打印请求状况统计 -->
+				<property name="urlDomainMapping">
+					<map>
+						<entry key="companyInfo" value="${company.info.url}">
+						</entry>
+					</map>
+				</property>
+			</bean>
+		</mvc:interceptor>
+
     </mvc:interceptors>
     <!-- 配置统一异常处理（需要区分页面请求异常、XHR请求异常、文件上传请求异常时的特殊处理） -->
 	<bean class="com.zhuanche.common.web.CustomExceptionResolver"></bean>
