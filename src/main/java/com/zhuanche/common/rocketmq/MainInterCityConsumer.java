@@ -93,6 +93,8 @@ public class MainInterCityConsumer {
 		consumer.setConsumeMessageBatchMaxSize(messageBatchMaxSize);  
 		consumer.setConsumeThreadMin(threads);
 		consumer.setMessageListener(messageListener);
+		/**todo 注意要设置不同的实例名字，如果不设置 会出现消费组都跑到第一个实例上面的情况*/
+		consumer.setInstanceName(System.currentTimeMillis()+"mainInterCityInstance");
 		consumer.start();
 		logger.info(">>>>>>>>>>>通用的RocketMQ消费者初始化成功！["+ this.topic +" : " +this.tags +"]" );
 	}
