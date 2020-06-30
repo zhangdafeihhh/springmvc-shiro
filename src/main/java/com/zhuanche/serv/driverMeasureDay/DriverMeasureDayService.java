@@ -44,18 +44,20 @@ public class DriverMeasureDayService {
         }else{
             params.setSupplierIds("");
         }
-        IndexBiDriverMeasureDto indexBiDriverMeasureDto = biDriverMeasureDayExtMapper.findForStatistics(params);
-
-        Integer numerator =indexBiDriverMeasureDto.getResponsibleComplaintNum();// driverMeasureDayMapper.countNumerator(params);
-        Integer denominator = indexBiDriverMeasureDto.getFinishClOrderNum();// driverMeasureDayMapper.countDenominator(params);
-        if(denominator != null && denominator != 0){
-            Double rate = div(numerator, denominator, 4);
-            rate = rate*100;
-            BigDecimal rate1 = new BigDecimal(rate);
-            rate = rate1.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            String result = rate.toString()+"%";
-            return result;
+        IndexBiDriverMeasureDto indexBiDriverMeasureDto = biDriverMeasureDayExtMapper.findForStatistics(params)
+        if(indexBiDriverMeasureDto != null){
+            Integer numerator =indexBiDriverMeasureDto.getResponsibleComplaintNum();// driverMeasureDayMapper.countNumerator(params);
+            Integer denominator = indexBiDriverMeasureDto.getFinishClOrderNum();// driverMeasureDayMapper.countDenominator(params);
+            if(denominator != null && denominator != 0){
+                Double rate = div(numerator, denominator, 4);
+                rate = rate*100;
+                BigDecimal rate1 = new BigDecimal(rate);
+                rate = rate1.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                String result = rate.toString()+"%";
+                return result;
+            }
         }
+
         return "0";
     }
 
