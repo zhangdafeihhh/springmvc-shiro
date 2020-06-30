@@ -247,7 +247,7 @@
         FROM car_relate_team rt
         WHERE 1=1
         <if test="driverIdSet  != null and driverIdSet.size > 0">
-            rt.driver_id in
+            AND rt.driver_id in
             <foreach collection="driverIdSet" index="index" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>
