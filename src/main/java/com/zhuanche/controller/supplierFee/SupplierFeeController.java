@@ -410,23 +410,23 @@ public class SupplierFeeController {
 
 
         if(StringUtils.isEmpty(manage.getSupplierName() )){
-            title = title.replaceAll("合作商,","");
+            title = title.replaceAll("合作商全称,","");
 
         }else {
             builder.append(manage.getSupplierName());
             builder.append(",");
-            listStr.add("合作商:"+manage.getSupplierName());
+            listStr.add("合作商全称:"+manage.getSupplierName());
         }
 
 
         if(StringUtils.isEmpty(manage.getSupplierFullName())){
-            title = title.replaceAll("合作商全称,","");
+            title = title.replaceAll("合作商,","");
             title = title.replaceAll("这列为空,","");
         }else {
             title = title.replaceAll("这列为空,",",");
             builder.append(manage.getSupplierFullName() != null ? manage.getSupplierFullName() : "").append(",");
             builder.append("").append(",");
-            listStr.add("合作商全称:"+manage.getSupplierFullName());
+            listStr.add("合作商:"+manage.getSupplierFullName());
 
         }
 
