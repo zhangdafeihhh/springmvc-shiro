@@ -118,6 +118,14 @@ public final class Constants {
 
 	public static final String DRIVER_PHONE = "driverPhone";
 
+	/**折扣金额*/
+	public static final String COUPON_SETTLE_AMOUNT = "couponSettleAmout";
+
+	/**是否使用折扣金额*/
+	public static final String IS_COUPON = "isCoupon";
+
+	public static final String ORDERNO = "orderNo";
+
 	/**新城际拼车类型**/
 	public static final Integer INTEGER_SERVICE_TYPE = 68;
 	/**调用预估价标志**/
@@ -183,6 +191,11 @@ public final class Constants {
 	public static final Integer IS_REDUCT_DISCOUNT_FALSE = 0;
 
 	public static final Integer IS_REDUCT_DISCOUNT_TRUE = 1;
+
+
+	public static final Integer IS_COUPLE_SETTLE_AMOUNT = 1;
+
+	public static final Integer NOT_COUPLE_SETTLE_AMOUNT = 0;
 
 	/**包车乘车人数*/
 	public static final Integer BAO_CHE_RIDER_COUNT = 99;

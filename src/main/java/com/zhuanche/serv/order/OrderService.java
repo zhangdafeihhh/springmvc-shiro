@@ -7,6 +7,7 @@ import com.zhuanche.common.rpc.RPCAPI;
 import com.zhuanche.common.rpc.RPCResponse;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.serv.common.UrlConstants;
 import com.zhuanche.serv.order.elasticsearch.OrderSearchOrderBy;
 import com.zhuanche.serv.order.elasticsearch.OrderSearchV1Response;
 import com.zhuanche.util.Common;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.*;
 import com.zhuanche.util.NumberUtil;
@@ -57,9 +59,12 @@ public class OrderService{
 	@Value("${order.saas.es.url}")
 	private String ORDER_SEARCH_API_V1                = "http://inside-order-search-api.01zhuanche.com";//方便于自测，直接初始化一下
 	private String ORDER_SEARCH_API_V1_transId     = "transId";  //请求唯一标识的HTTP参数名
-	
+
 	/**生成请求唯一标识**/
 	private static final String SEED_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+	@Value("${ordercost.server.api.base.url}")
+	private String orderCostUrl;
 
 	private static String genTransId() {
 		int length = 8;//生成8位随机字符
@@ -190,7 +195,36 @@ public class OrderService{
 		return null;
 	}
 
-	
+
+	/**根据订单号获取优惠券抵扣金额*/
+	public String couponSettleAmout(String orderNo){
+		if(StringUtils.isEmpty(orderNo)){
+			return null;
+		}
+		String couponSettle = "";
+		String url = orderCostUrl + UrlConstants.ORDER_COST_DETAIL;
+		String result = MpOkHttpUtil.okHttpGet(url + "/" + orderNo,null,0,null);
+		log.info("=======根据订单号获取优惠券折扣金额入参===========" + orderNo);
+		if(StringUtils.isNotEmpty(result)){
+			log.info("=========根据订单号获取优惠券折扣金额result====" + JSONObject.toJSONString(result));
+			JSONObject jsonResult = JSONObject.parseObject(result);
+			if(jsonResult.get(Constants.CODE) != null &&  jsonResult.getInteger(Constants.CODE) == 0){
+				JSONObject jsonData = jsonResult.getJSONObject(Constants.DATA);
+				if(jsonData != null && jsonData.get("couponSettleAmout") != null){
+					log.info("=======获取折扣优惠券======" + jsonData.getString("couponSettleAmout"));
+					couponSettle = jsonData.getString("couponSettleAmout");
+				}
+			}
+		}
+		if(StringUtils.isNotEmpty(couponSettle)){
+			BigDecimal bigDecimal = new BigDecimal(couponSettle);
+			if(bigDecimal.compareTo(BigDecimal.ZERO ) > 0){
+				return couponSettle;
+			}
+		}
+
+		return null;
+	}
 
 	//--------------------------------------------------------------------------------------for debug
 	public static void main(String[] args) {

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.serv.order.OrderService;
 import com.zhuanche.util.MobileOverlayUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -51,6 +52,9 @@ public class CompleteOrderController{
 	 
 	 @Autowired
 	 private StatisticalAnalysisService statisticalAnalysisService;
+
+	 @Autowired
+     private OrderService orderService;
 	 
 	 	/**
 	     * 查询完成订单列表
@@ -78,74 +82,20 @@ public class CompleteOrderController{
 	                                              Integer distributorId,
 	                                              Integer isReductDiscount,
                                                   Integer isPlatformAmount,
+	                                              Integer couponSettleAmout,
 	                                              @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                              @Verify(param = "pageSize",rule = "required") Integer pageSize){
 	        logger.info("【运营管理-统计分析】完成订单列表数据:queryCompleteOrderData");
-            Map<String, Object> paramMap = new HashMap<String, Object>();
-            paramMap.put("queryDate", queryDate);//查询日期
-            if (null != cityId) {
-                paramMap.put("cityId", cityId);//下单城市ID
-            }
-            if (StringUtil.isNotEmpty(productId)) {
-                paramMap.put("productId", productId);//产品类型ID
-            }
-            if (StringUtil.isNotEmpty(bindVehicleTypeId)) {
-                paramMap.put("bindVehicleTypeId", bindVehicleTypeId);//绑定车型ID
-            }
-            if (StringUtil.isNotEmpty(serviceVehicleTypeId)) {
-                paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);//服务车型ID
-            }
-            if (StringUtil.isNotEmpty(orderTypeId)) {
-                paramMap.put("orderTypeId", orderTypeId);//订单类别ID
-            }
-            if (StringUtil.isNotEmpty(orgnizationId)) {
-                paramMap.put("orgnizationId", orgnizationId);//机构ID
-            }
-            if (StringUtil.isNotEmpty(channelId)) {
-                paramMap.put("channelId", channelId);//渠道ID
-            }
-            if (StringUtil.isNotEmpty(driverTypeId)) {
-                paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-            }
-            if (StringUtil.isNotEmpty(allianceId)) {
-                paramMap.put("allianceId", allianceId);//加盟商ID
-            }
-            if (StringUtil.isNotEmpty(motorcardId)) {
-                paramMap.put("motorcardId", motorcardId);//车队ID
-            }
-            if (StringUtil.isNotEmpty(hotelId)) {
-                paramMap.put("hotelId", hotelId);//酒店ID
-            }
-            if (StringUtil.isNotEmpty(driverId)) {
-                paramMap.put("driverId", driverId);//司机ID
-            }
-            if(distributorId != null){
-                paramMap.put("distributorId",distributorId);
-            }
+            Map<String, Object> paramMap = this.queryMap(queryDate,cityId,productId,bindVehicleTypeId,serviceVehicleTypeId,orderTypeId,orgnizationId,
+                    channelId,driverTypeId,allianceId,motorcardId,hotelId,driverId,supplierId,distributorId,isReductDiscount,isPlatformAmount,couponSettleAmout);
 
-            if(supplierId != null){
-                paramMap.put("allianceId",supplierId);
-            }
-
-            if(isReductDiscount != null){
-                if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isReductDiscount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isReductDiscount) ){
-                    paramMap.put("isReductDiscount",isReductDiscount);
-                }
-            }
-
-            if(isPlatformAmount != null){
-                if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isPlatformAmount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isPlatformAmount) ){
-                    paramMap.put("isPlatformAmount",isPlatformAmount);
-                }
-            }
-            // 数据权限设置
+            /** 数据权限设置*/
             paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap, cityId, allianceId, motorcardId);
 
 
-            //如果选择了城际拼车并且选择了供应商
+            /**如果选择了城际拼车并且选择了供应商*/
             if(StringUtils.isNotEmpty(productId) && Constants.INTEGER_SERVICE_TYPE.toString().equals(productId)){
                 if(supplierId != null && supplierId > 0){
-                    //visibleCityIds
                     paramMap.remove("visibleCityIds");
                 }
             }
@@ -153,15 +103,17 @@ public class CompleteOrderController{
                 return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
             }
             if (null != pageNo && pageNo > 0){
-                paramMap.put("pageNo", pageNo);//页号
+                /**页号*/
+                paramMap.put("pageNo", pageNo);
             }
 	        if(null != pageSize && pageSize > 0) {
-                paramMap.put("pageSize", pageSize);//每页记录数
+                /**每页记录数*/
+                paramMap.put("pageSize", pageSize);
             }
 
 		    String jsonString = JSON.toJSONString(paramMap);
 		    logger.info("【运营管理-统计分析】完成订单列表请求参数--"+jsonString);
-		    //从大数据仓库获取统计数据
+		    /**从大数据仓库获取统计数据*/
             logger.info("调用请求域名:" + (saasBigdataApiUrl+"/completeOrderDetail/queryList"));
 		    AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/completeOrderDetail/queryList",paramMap);
             if (result.isSuccess()){
@@ -176,6 +128,87 @@ public class CompleteOrderController{
             }
 		    return result;
 	  }
+
+
+	  private Map<String, Object> queryMap(String queryDate, Long cityId,
+                                           String productId, String bindVehicleTypeId, String serviceVehicleTypeId,
+                                           String orderTypeId, String orgnizationId, String channelId, String driverTypeId,
+                                           String allianceId, String motorcardId, String hotelId, String driverId,
+                                           Integer supplierId, Integer distributorId, Integer isReductDiscount, Integer isPlatformAmount, Integer couponSettleAmout){
+          Map<String, Object> paramMap = new HashMap<String, Object>(32);
+          /**查询日期*/
+          paramMap.put("queryDate", queryDate);
+          if (null != cityId) {
+              /**下单城市ID*/
+              paramMap.put("cityId", cityId);
+          }
+          if (StringUtil.isNotEmpty(productId)) {
+              /**产品类型ID*/
+              paramMap.put("productId", productId);
+          }
+          if (StringUtil.isNotEmpty(bindVehicleTypeId)) {
+              /**绑定车型ID*/
+              paramMap.put("bindVehicleTypeId", bindVehicleTypeId);
+          }
+          if (StringUtil.isNotEmpty(serviceVehicleTypeId)) {
+              /**服务车型ID*/
+              paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);
+          }
+          if (StringUtil.isNotEmpty(orderTypeId)) {
+              /**订单类别ID*/
+              paramMap.put("orderTypeId", orderTypeId);
+          }
+          if (StringUtil.isNotEmpty(orgnizationId)) {
+              /**机构ID*/
+              paramMap.put("orgnizationId", orgnizationId);
+          }
+          if (StringUtil.isNotEmpty(channelId)) {
+              /**渠道ID*/
+              paramMap.put("channelId", channelId);
+          }
+          if (StringUtil.isNotEmpty(driverTypeId)) {
+              /**司机类型ID*/
+              paramMap.put("driverTypeId", driverTypeId);
+          }
+          if (StringUtil.isNotEmpty(allianceId)) {
+              /**加盟商ID*/
+              paramMap.put("allianceId", allianceId);
+          }
+          if (StringUtil.isNotEmpty(motorcardId)) {
+              /**车队ID*/
+              paramMap.put("motorcardId", motorcardId);
+          }
+          if (StringUtil.isNotEmpty(hotelId)) {
+              /**酒店ID*/
+              paramMap.put("hotelId", hotelId);
+          }
+          if (StringUtil.isNotEmpty(driverId)) {
+              /**司机ID*/
+              paramMap.put("driverId", driverId);
+          }
+          if(distributorId != null){
+              paramMap.put("distributorId",distributorId);
+          }
+          if(supplierId != null){
+              paramMap.put("allianceId",supplierId);
+          }
+          if(isReductDiscount != null){
+              if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isReductDiscount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isReductDiscount) ){
+                  paramMap.put("isReductDiscount",isReductDiscount);
+              }
+          }
+          if(isPlatformAmount != null){
+              if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isPlatformAmount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isPlatformAmount) ){
+                  paramMap.put("isPlatformAmount",isPlatformAmount);
+              }
+          }
+          if(couponSettleAmout != null){
+              if(Constants.IS_COUPLE_SETTLE_AMOUNT.equals(couponSettleAmout) || Constants.NOT_COUPLE_SETTLE_AMOUNT.equals(couponSettleAmout)){
+                  paramMap.put("couponId",couponSettleAmout);
+              }
+          }
+          return paramMap;
+      }
 
     /**
      * 导出完成订单列表
@@ -214,78 +247,21 @@ public class CompleteOrderController{
                                          Integer distributorId,
                                          Integer isReductDiscount,
                                          Integer isPlatformAmount,
+                                         Integer couponId,
                                          HttpServletRequest request,
                                          HttpServletResponse response){
     	    try{
                 logger.info("【订单管理-完成订单详情】导出,完成订单详情列表数据:queryCompleteOrderData.json");
-                Map<String, Object> paramMap = new HashMap<String, Object>();
-                //查询日期
-                paramMap.put("queryDate", queryDate);
-                //下单城市ID
-                paramMap.put("cityId", cityId);
-                if(StringUtil.isNotEmpty(productId)){
-                    paramMap.put("productId", productId);//产品类型ID
-                }
-                if(StringUtil.isNotEmpty(bindVehicleTypeId)){
-                    paramMap.put("bindVehicleTypeId", bindVehicleTypeId);//绑定车型ID
-                }
-                if(StringUtil.isNotEmpty(serviceVehicleTypeId)){
-                    paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);//服务车型ID
-                }
-                if(StringUtil.isNotEmpty(orderTypeId)){
-                    paramMap.put("orderTypeId", orderTypeId);//订单类别ID
-                }
-                if(StringUtil.isNotEmpty(orgnizationId)){
-                    paramMap.put("orgnizationId", orgnizationId);//机构ID
-                }
-                if(StringUtil.isNotEmpty(channelId)){
-                    paramMap.put("channelId", channelId);//渠道ID
-                }
-                if(StringUtil.isNotEmpty(driverTypeId)){
-                    paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-                }
-                if(StringUtil.isNotEmpty(allianceId)){
-                    paramMap.put("allianceId", allianceId);//加盟商ID
-                }
-                if(StringUtil.isNotEmpty(motorcardId)){
-                    paramMap.put("motorcardId", motorcardId);//车队ID
-                }
-                if(StringUtil.isNotEmpty(hotelId)){
-                    paramMap.put("hotelId", hotelId);//酒店ID
-                }
-                if(StringUtil.isNotEmpty(driverId)){
-                    paramMap.put("driverId", driverId);//司机ID
-                }
-                if(distributorId != null){
-                    paramMap.put("distributorId",distributorId);
-                }
-                if(supplierId != null){
-                    //匹配大数据那边的字段
-                    paramMap.put("allianceId",supplierId);
-                }
-
-                if(isReductDiscount != null){
-                    if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isReductDiscount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isReductDiscount) ){
-                        paramMap.put("isReductDiscount",isReductDiscount);
-                    }
-                }
-
-                if(isPlatformAmount != null){
-                    if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isPlatformAmount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isPlatformAmount) ){
-                        paramMap.put("isPlatformAmount",isPlatformAmount);
-                    }
-                }
-
-
+                Map<String, Object> paramMap = exportMap(queryDate,cityId,productId,bindVehicleTypeId,serviceVehicleTypeId,orderTypeId,
+                        orgnizationId,channelId,driverTypeId,allianceId,motorcardId,hotelId,driverId,supplierId,distributorId,isReductDiscount,
+                        isPlatformAmount,couponId);
 		  		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
 				if(paramMap==null){
 					return;
 				}
-
-                //如果选择了城际拼车并且选择了供应商
+                /**如果选择了城际拼车并且选择了供应商*/
                 if(StringUtils.isNotEmpty(productId) && Constants.INTEGER_SERVICE_TYPE.toString().equals(productId)){
                     if(supplierId != null && supplierId > 0){
-                        //visibleCityIds
                         paramMap.remove("visibleCityIds");
                     }
                 }
@@ -296,10 +272,90 @@ public class CompleteOrderController{
 					jsonString,
 					saasBigdataApiUrl+"/completeOrderDetail/download",
 					new String("完成订单详情".getBytes("gb2312"), "iso8859-1"),
-					request.getRealPath("/")+File.separator+"template"+File.separator+"completeOrderDetail_info.csv");
+					request.getServletContext().getRealPath(File.separator)+"template"+File.separator+"completeOrderDetail_info.csv");
 			  
             }catch (Exception e){
     	        logger.error("导出完成订单详情error:{}",e);
             }
+    }
+
+
+    public Map<String,Object> exportMap(String queryDate, Long cityId, String productId, String bindVehicleTypeId,
+                                     String serviceVehicleTypeId, String orderTypeId, String orgnizationId, String channelId,
+                                     String driverTypeId, String allianceId, String motorcardId, String hotelId,
+                                     String driverId, Integer supplierId, Integer distributorId, Integer isReductDiscount,
+                                     Integer isPlatformAmount, Integer couponId){
+        Map<String, Object> paramMap = new HashMap<String, Object>(32);
+        /**查询日期*/
+        paramMap.put("queryDate", queryDate);
+        /**下单城市ID*/
+        paramMap.put("cityId", cityId);
+        if(StringUtil.isNotEmpty(productId)){
+            /**产品类型ID*/
+            paramMap.put("productId", productId);
+        }
+        if(StringUtil.isNotEmpty(bindVehicleTypeId)){
+            /**绑定车型ID*/
+            paramMap.put("bindVehicleTypeId", bindVehicleTypeId);
+        }
+        if(StringUtil.isNotEmpty(serviceVehicleTypeId)){
+            /**服务车型ID*/
+            paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);
+        }
+        if(StringUtil.isNotEmpty(orderTypeId)){
+            /**订单类别ID*/
+            paramMap.put("orderTypeId", orderTypeId);
+        }
+        if(StringUtil.isNotEmpty(orgnizationId)){
+            /**机构ID*/
+            paramMap.put("orgnizationId", orgnizationId);
+        }
+        if(StringUtil.isNotEmpty(channelId)){
+            /**渠道ID*/
+            paramMap.put("channelId", channelId);
+        }
+        if(StringUtil.isNotEmpty(driverTypeId)){
+            /**司机类型ID*/
+            paramMap.put("driverTypeId", driverTypeId);
+        }
+        if(StringUtil.isNotEmpty(allianceId)){
+            /**加盟商ID*/
+            paramMap.put("allianceId", allianceId);
+        }
+        if(StringUtil.isNotEmpty(motorcardId)){
+            /**车队ID*/
+            paramMap.put("motorcardId", motorcardId);
+        }
+        if(StringUtil.isNotEmpty(hotelId)){
+            /**酒店ID*/
+            paramMap.put("hotelId", hotelId);
+        }
+        if(StringUtil.isNotEmpty(driverId)){
+            /**司机ID*/
+            paramMap.put("driverId", driverId);
+        }
+        if(distributorId != null){
+            paramMap.put("distributorId",distributorId);
+        }
+        if(supplierId != null){
+            /**匹配大数据那边的字段*/
+            paramMap.put("allianceId",supplierId);
+        }
+        if(isReductDiscount != null){
+            if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isReductDiscount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isReductDiscount) ){
+                paramMap.put("isReductDiscount",isReductDiscount);
+            }
+        }
+        if(isPlatformAmount != null){
+            if(Constants.IS_REDUCT_DISCOUNT_FALSE.equals(isPlatformAmount) || Constants.IS_REDUCT_DISCOUNT_TRUE.equals(isPlatformAmount) ){
+                paramMap.put("isPlatformAmount",isPlatformAmount);
+            }
+        }
+        if(couponId != null){
+            if(Constants.IS_COUPLE_SETTLE_AMOUNT.equals(couponId) || Constants.NOT_COUPLE_SETTLE_AMOUNT.equals(couponId)){
+                paramMap.put("couponId",couponId);
+            }
+        }
+        return paramMap;
     }
 }

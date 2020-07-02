@@ -755,6 +755,12 @@ public class OrderController{
 		// 等待时间明细
 		List<CarBizOrderWaitingPeriod>  carBizOrderWaitingPeriodList = this.carFactOrderInfoService.selectWaitingPeriodListSlave(order.getOrderNo());
 		order.setCarBizOrderWaitingPeriodList(carBizOrderWaitingPeriodList);
+		/**通过计费接口获取优惠券折扣wiki地址http://inside-yapi.01zhuanche.com/project/88/interface/api/19524*/
+		try {
+			order.setCouponSettleAmout(orderService.couponSettleAmout(orderNo));
+		} catch (Exception e) {
+			logger.info("获取折扣优惠券异常" + e);
+		}
 		return AjaxResponse.success(order);
 	}
 

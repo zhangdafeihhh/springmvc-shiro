@@ -455,6 +455,9 @@ public class CarFactOrderInfo extends BaseEntity {
 		return driverInfoServiceFee;
 	}
 
+	/**优惠券折扣*/
+	public String couponSettleAmout;
+
 	public void setDriverInfoServiceFee(BigDecimal driverInfoServiceFee) {
 		this.driverInfoServiceFee = driverInfoServiceFee;
 	}
@@ -2274,5 +2277,13 @@ public class CarFactOrderInfo extends BaseEntity {
 
 	public void setFactBookingGroupId(Integer factBookingGroupId) {
 		this.factBookingGroupId = factBookingGroupId;
+	}
+
+	public String getCouponSettleAmout() {
+		return couponSettleAmout;
+	}
+
+	public void setCouponSettleAmout(String couponSettleAmout) {
+		this.couponSettleAmout = couponSettleAmout;
 	}
 }

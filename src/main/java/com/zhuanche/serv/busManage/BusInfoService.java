@@ -99,9 +99,14 @@ public class BusInfoService {
     //存入mongoDB的Collection名称
     private static String mongoCollectionName = "carInfoDTO";
 
+    @Autowired
+    private CarBizCarGroupExMapper groupExMapper;
+
 
     public PageInfo<BusInfoVO> queryList(BusInfoDTO infoDTO) {
-        PageInfo<BusInfoVO> pageInfo = PageHelper.startPage(infoDTO.getPageNum(), infoDTO.getPageSize(), true).doSelectPageInfo(() -> busInfoExMapper.selectList(infoDTO));
+        List<Integer> groupIdList = groupExMapper.queryBusGroup();
+
+        PageInfo<BusInfoVO> pageInfo = PageHelper.startPage(infoDTO.getPageNum(), infoDTO.getPageSize(), true).doSelectPageInfo(() -> busInfoExMapper.selectList(infoDTO,groupIdList));
         return pageInfo;
     }
 
