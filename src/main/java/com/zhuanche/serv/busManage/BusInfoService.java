@@ -103,12 +103,14 @@ public class BusInfoService {
 
 
     public PageInfo<BusInfoVO> queryList(BusInfoDTO infoDTO) {
-
+        logger.info("===查询条件入参====" + JSONObject.toJSONString(infoDTO));
         List<Integer> groupIdList = groupExMapper.queryBusGroup();
+        logger.info("=====groupIdList====" + JSONObject.toJSONString(groupIdList));
         if(groupIdList != null){
             infoDTO.setGroupIdList(groupIdList);
         }
         PageInfo<BusInfoVO> pageInfo = PageHelper.startPage(infoDTO.getPageNum(), infoDTO.getPageSize(), true).doSelectPageInfo(() -> busInfoExMapper.selectList(infoDTO));
+        logger.info("=======巴士查询结果===" + JSONObject.toJSONString(pageInfo));
         return pageInfo;
     }
 
