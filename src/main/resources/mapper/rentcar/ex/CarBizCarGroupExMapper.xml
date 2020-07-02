@@ -171,4 +171,13 @@
         from
         car_biz_car_group
     </select>
+
+    <select id="queryBusGroup" resultMap="Integer">
+        select
+          group_id
+        from
+          car_biz_car_group
+          where type = 2
+    </select>
+
 </mapper>

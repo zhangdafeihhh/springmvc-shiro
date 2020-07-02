@@ -49,4 +49,11 @@ public interface CarBizCarGroupExMapper {
 
     List<CarBizCarGroup> queryAllGroup();
 
+    /***
+     * 查询所有的bus类型的groupId
+     * @return
+     */
+    List<Integer> queryBusGroup();
+
+
 }
