@@ -99,8 +99,7 @@ public class BusInfoService {
     //存入mongoDB的Collection名称
     private static String mongoCollectionName = "carInfoDTO";
 
-    @Autowired
-    private CarBizCarGroupExMapper groupExMapper;
+
 
 
     public PageInfo<BusInfoVO> queryList(BusInfoDTO infoDTO) {
