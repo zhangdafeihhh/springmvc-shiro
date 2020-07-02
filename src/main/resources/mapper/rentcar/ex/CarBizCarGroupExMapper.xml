@@ -141,7 +141,7 @@
     </select>
   
   	<!-- 根据groupId查询车型类别座位数 -->
-	<select id="getSeatNumByGroupId" resultType="int">
+	<select id="getSeatNumByGroupId" resultType="java.lang.Integer">
 		SELECT
 			seat_num
 		FROM
@@ -172,7 +172,7 @@
         car_biz_car_group
     </select>
 
-    <select id="queryBusGroup" resultMap="Integer">
+    <select id="queryBusGroup" resultType="java.lang.Integer">
         select
           group_id
         from
