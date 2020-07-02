@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface BusInfoExMapper {
     /*查询车辆列表*/
-    List<BusInfoVO> selectList(BusInfoDTO busInfoDTO,List<Integer> groupIdList);
+    List<BusInfoVO> selectList(BusInfoDTO busInfoDTO);
     /*查询车辆详情*/
     BusDetailVO selectCarByCarId(Integer carId);
     /*新增车辆信息*/

@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @program: mp-manage
@@ -30,5 +31,7 @@ public class BusInfoDTO extends BaseDTO{
     private String createDateStart;
     /**创建时间（结束）*/
     private String createDateEnd;
+    /**groupId*/
+    private List<Integer> groupIdList;
 
 }
