@@ -103,9 +103,12 @@ public class BusInfoService {
 
 
     public PageInfo<BusInfoVO> queryList(BusInfoDTO infoDTO) {
-        List<Integer> groupIdList = groupExMapper.queryBusGroup();
 
-        PageInfo<BusInfoVO> pageInfo = PageHelper.startPage(infoDTO.getPageNum(), infoDTO.getPageSize(), true).doSelectPageInfo(() -> busInfoExMapper.selectList(infoDTO,groupIdList));
+        List<Integer> groupIdList = groupExMapper.queryBusGroup();
+        if(groupIdList != null){
+            infoDTO.setGroupIdList(groupIdList);
+        }
+        PageInfo<BusInfoVO> pageInfo = PageHelper.startPage(infoDTO.getPageNum(), infoDTO.getPageSize(), true).doSelectPageInfo(() -> busInfoExMapper.selectList(infoDTO));
         return pageInfo;
     }
 
