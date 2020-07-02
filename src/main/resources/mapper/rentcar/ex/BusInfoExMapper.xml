@@ -69,7 +69,7 @@
         <result property="carPurchaseDate" column="car_purchase_date"/>
     </resultMap>
     <!--巴士saas 查询车辆列表信息-->
-    <select id="selectList" parameterType="com.zhuanche.dto.busManage.BusInfoDTO" resultMap="BasicCarInfoVOMap">
+    <select id="selectList"  resultMap="BasicCarInfoVOMap">
         SELECT
         info.car_id,
         info.license_plates,
