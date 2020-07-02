@@ -48,6 +48,7 @@
     <appender name="LOGSTASHERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>/u01/tomcat_docker_8080/logs/sq_error.json</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
