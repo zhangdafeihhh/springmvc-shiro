@@ -1,5 +1,6 @@
 package com.zhuanche.serv.message;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
@@ -388,6 +389,7 @@ public class MessageService {
         try {
             CarMessagePost carMessagePost = postExMapper.selectByPrimaryKey(Long.valueOf(messageId));
 
+            logger.info("获取查询内容===" + JSONObject.toJSONString(carMessagePost));
             if(carMessagePost != null) {
 
                 CarMessageDetailDto detailDto = new CarMessageDetailDto(
@@ -412,7 +414,8 @@ public class MessageService {
                 if (StringUtils.isNotBlank(levelToStr)) {
                     detailDto.setLevelToStr(levelToStr.substring(0, levelToStr.length() - 1));
                 }
-                //创建人才能查看阅读记录
+                logger.info("=======获取主表内容end==============");
+                /**创建人才能查看阅读记录*/
                 SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 
                 if (user.getId().equals(carMessagePost.getUserId())) {
@@ -494,7 +497,7 @@ public class MessageService {
                     }
 
 
-                    //已读
+                    /***已读*/
                     List<CarMessageReceiver> list = receiverExMapper.carMessageReceiverList(messageId, null, CarMessageReceiver.ReadStatus.read.getValue());
                     List<Integer> listUsers = new ArrayList<>();
                     for (CarMessageReceiver receiver : list) {
@@ -549,12 +552,10 @@ public class MessageService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
                 return detailDto;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info(e.getMessage());
             throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));
         }
         return null;
