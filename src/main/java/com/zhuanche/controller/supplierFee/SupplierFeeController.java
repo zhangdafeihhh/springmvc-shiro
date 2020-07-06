@@ -369,8 +369,8 @@ public class SupplierFeeController {
         try {
             SupplierFeeManage manage = supplierFeeService.queryByOrderNo(feeOrderNo);
             List<String> headerList = new ArrayList<>();
-            String titles = "序号,合作商,合作商全称,这列为空,结算开始日期,结算结束日期,总营业额,入围司机营业额,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月总流水,流水增幅,增长系数,司机贡献金合计," +
-                    "合规奖励合计,佣金合计,差评率,活跃司机数量,剔除佣金,上月暂扣金额,是否补发,合计费用," +
+            String titles = "供应商ID,合作商,合作商全称,这列为空,结算开始日期,结算结束日期,总营业额,入围司机营业额,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月总流水,上月运营车辆数,运营车辆增幅,流水增幅,增长系数,司机贡献金合计," +
+                    "合规奖励合计,佣金合计,差评率,有责投诉率,司机头像运营率,活跃司机数量,基础分佣比例,剔除佣金,上月暂扣金额,是否补发,合计费用," +
                     "合规司机奖励,差评罚金,扣款差评数量,花园权益奖励,其它增加金额,稽查罚金,其它扣款项,管理费合计,推广系数，城市经理评级";
 
 
@@ -418,32 +418,32 @@ public class SupplierFeeController {
 
         List<String> headList = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
-        if(StringUtils.isEmpty(manage.getSerialNumber())){
-            title = title.replaceAll("序号,","");
+        if(StringUtils.isEmpty(manage.getSupplierId()+"")){
+            title = title.replaceAll("供应商ID,","");
         }else {
-            builder.append(manage.getSerialNumber()).append(",");
-            listStr.add("序号:"+manage.getSerialNumber());
+            builder.append(manage.getSupplierId()).append(",");
+            listStr.add("供应商ID:"+manage.getSupplierId());
         }
 
 
         if(StringUtils.isEmpty(manage.getSupplierName() )){
-            title = title.replaceAll("合作商,","");
+            title = title.replaceAll("合作商全称,","");
 
         }else {
             builder.append(manage.getSupplierName());
             builder.append(",");
-            listStr.add("合作商:"+manage.getSupplierName());
+            listStr.add("合作商全称:"+manage.getSupplierName());
         }
 
 
         if(StringUtils.isEmpty(manage.getSupplierFullName())){
-            title = title.replaceAll("合作商全称,","");
+            title = title.replaceAll("合作商,","");
             title = title.replaceAll("这列为空,","");
         }else {
             title = title.replaceAll("这列为空,",",");
             builder.append(manage.getSupplierFullName() != null ? manage.getSupplierFullName() : "").append(",");
             builder.append("").append(",");
-            listStr.add("合作商全称:"+manage.getSupplierFullName());
+            listStr.add("合作商:"+manage.getSupplierFullName());
 
         }
 
@@ -492,10 +492,9 @@ public class SupplierFeeController {
         if(StringUtils.isEmpty(manage.getFlowAmount())){
             title = title.replaceAll("流水金额,","");
         }else {
-            builder.append(manage.getFlowAmount() != null ? manage.getFlowAmount() : "");
+            builder.append(manage.getFlowAmount() != null ? manage.getTotalFlow() : "");
             builder.append(",");
             listStr.add("流水金额:"+manage.getFlowAmount());
-
         }
 
 
@@ -558,6 +557,24 @@ public class SupplierFeeController {
 
         }
 
+        if(StringUtils.isEmpty(manage.getPreRunCarNum())){
+            title = title.replaceAll("上月运营车辆数,","");
+        }else {
+            builder.append(manage.getPreRunCarNum() != null ? manage.getPreRunCarNum() : "");
+            builder.append(",");
+            listStr.add("上月运营车辆数:"+manage.getPreRunCarNum());
+
+        }
+
+
+        if(StringUtils.isEmpty(manage.getRunCarIncreaseRate())){
+            title = title.replaceAll("运营车辆增幅,","");
+        }else {
+            builder.append(manage.getRunCarIncreaseRate() != null ? manage.getRunCarIncreaseRate() : "");
+            builder.append(",");
+            listStr.add("运营车辆增幅:"+manage.getRunCarIncreaseRate());
+
+        }
 
         if(StringUtils.isEmpty(manage.getFlowIncrease())){
             title = title.replaceAll("流水增幅,","");
@@ -613,6 +630,34 @@ public class SupplierFeeController {
             listStr.add("差评率:"+manage.getBadRatings());
 
         }
+
+        if(StringUtils.isEmpty(manage.getResponsibleComplainRate())){
+            title = title.replaceAll("有责投诉率,","");
+        }else {
+            builder.append(manage.getResponsibleComplainRate() != null ? this.getTwoPoint(manage.getResponsibleComplainRate()) : "");
+            builder.append(",");
+            listStr.add("有责投诉率:"+manage.getResponsibleComplainRate());
+
+        }
+
+
+        if(StringUtils.isEmpty(manage.getDriverHeadPhotoRunRate())){
+            title = title.replaceAll("司机头像运营率,","");
+        }else {
+            builder.append(manage.getDriverHeadPhotoRunRate() != null ? this.getTwoPoint(manage.getDriverHeadPhotoRunRate()) : "");
+            builder.append(",");
+            listStr.add("司机头像运营率:"+manage.getDriverHeadPhotoRunRate());
+        }
+
+
+        if(StringUtils.isEmpty(manage.getBaseShareRate())){
+            title = title.replaceAll("基础分佣比例,","");
+        }else {
+            builder.append(manage.getBaseShareRate() != null ? this.getTwoPoint(manage.getBaseShareRate()) : "");
+            builder.append(",");
+            listStr.add("基础分佣比例:"+manage.getBaseShareRate());
+        }
+
 
 
         if(manage.getNumberOfActiveDrivers() == null || manage.getNumberOfActiveDrivers() == 0){

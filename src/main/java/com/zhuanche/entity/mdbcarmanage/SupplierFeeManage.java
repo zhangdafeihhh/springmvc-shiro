@@ -125,6 +125,17 @@ public class SupplierFeeManage {
     /**供应商是否审核1未审核2 审核 */
     private Integer supplierStatus;
 
+    /**上月运营车辆数*/
+    private String preRunCarNum;
+    /**运营车辆增幅*/
+    private String runCarIncreaseRate;
+    /**有责投诉率*/
+    private String responsibleComplainRate;
+    /**司机头像运营率*/
+    private String driverHeadPhotoRunRate;
+    /**基础分佣比例*/
+    private String baseShareRate;
+
     public Integer getId() {
         return id;
     }
@@ -571,5 +582,45 @@ public class SupplierFeeManage {
 
     public void setSupplierStatus(Integer supplierStatus) {
         this.supplierStatus = supplierStatus;
+    }
+
+    public String getPreRunCarNum() {
+        return preRunCarNum;
+    }
+
+    public void setPreRunCarNum(String preRunCarNum) {
+        this.preRunCarNum = preRunCarNum;
+    }
+
+    public String getRunCarIncreaseRate() {
+        return runCarIncreaseRate;
+    }
+
+    public void setRunCarIncreaseRate(String runCarIncreaseRate) {
+        this.runCarIncreaseRate = runCarIncreaseRate;
+    }
+
+    public String getResponsibleComplainRate() {
+        return responsibleComplainRate;
+    }
+
+    public void setResponsibleComplainRate(String responsibleComplainRate) {
+        this.responsibleComplainRate = responsibleComplainRate;
+    }
+
+    public String getDriverHeadPhotoRunRate() {
+        return driverHeadPhotoRunRate;
+    }
+
+    public void setDriverHeadPhotoRunRate(String driverHeadPhotoRunRate) {
+        this.driverHeadPhotoRunRate = driverHeadPhotoRunRate;
+    }
+
+    public String getBaseShareRate() {
+        return baseShareRate;
+    }
+
+    public void setBaseShareRate(String baseShareRate) {
+        this.baseShareRate = baseShareRate;
     }
 }

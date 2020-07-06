@@ -54,6 +54,11 @@
     <result column="generalization_efficient" property="generalizationfficient" jdbcType="VARCHAR" />
     <result column="city_manage_rating" property="cityManageRating" jdbcType="VARCHAR" />
     <result column="supplier_status" property="supplierStatus" jdbcType="INTEGER" />
+    <result column="pre_run_car_num" property="preRunCarNum" jdbcType="VARCHAR" />
+    <result column="run_car_increase_rate" property="runCarIncreaseRate" jdbcType="VARCHAR" />
+    <result column="responsible_complain_rate" property="responsibleComplainRate" jdbcType="VARCHAR" />
+    <result column="driver_head_photo_run_rate" property="driverHeadPhotoRunRate" jdbcType="VARCHAR" />
+    <result column="base_share_rate" property="baseShareRate" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, fee_order_no, city_id, supplier_name, supplier_id, settle_start_date, settle_end_date, 
@@ -64,7 +69,9 @@
     status, amount_status, payment_time, create_time, update_time, create_user,amount_status_time,
     turnover_drivers, total_driver_contribution, total_compliance_awards,
     number_of_active_drivers, rejection_amount, is_reissue, other_increase_amount, garden_award,
-    supplier_full_name,serial_number,generalization_efficient,city_manage_rating,supplier_status
+    supplier_full_name,serial_number,generalization_efficient,city_manage_rating,supplier_status,
+    pre_run_car_num,run_car_increase_rate,responsible_complain_rate,driver_head_photo_run_rate,
+    base_share_rate
   </sql>
 
 
