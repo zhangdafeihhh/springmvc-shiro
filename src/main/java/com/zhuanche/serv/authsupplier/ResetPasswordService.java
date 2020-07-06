@@ -15,10 +15,13 @@ import com.zhuanche.util.NumberUtil;
 import com.zhuanche.util.PasswordUtil;
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @Author fanht
@@ -115,8 +118,8 @@ public class ResetPasswordService {
      */
     public AjaxResponse resetPasswordByPhone(String phone,String newPassword,String msgCode){
         logger.info("====手机号码重置密码start=======入参：newPassword:" + newPassword +",phone:" +phone);
-        CarAdmUser carAdmUser = userExMapper.queryByPhone(phone);
-        if(carAdmUser == null){
+        List<CarAdmUser> carAdmUserList = userExMapper.queryAllAccountByPhone(phone);
+        if(CollectionUtils.isEmpty(carAdmUserList)){
             logger.info("======手机号码不存在=====");
             return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
         }
@@ -134,17 +137,24 @@ public class ResetPasswordService {
             return AjaxResponse.fail(RestErrorCode.MSG_CODE_WRONG);
         }
 
+        final boolean[] bl = {false};
+        carAdmUserList.forEach(carAdmUser ->  {
+            carAdmUser.setPassword(PasswordUtil.md5(newPassword , carAdmUser.getAccount()) );
+            int code = userMapper.updateByPrimaryKeySelective(carAdmUser);
+            if(code > 0){
+                bl[0] = true;
+            }else {
+                bl[0] = false;
+            }
+        });
 
-        carAdmUser.setPassword(PasswordUtil.md5(newPassword , carAdmUser.getAccount()) );
-
-
-        int upCode = userMapper.updateByPrimaryKeySelective(carAdmUser);
-
-        if(upCode > 0){
+        if(bl[0]){
             RedisCacheUtil.delete(Constants.RESET_PASSWORD_KEY + phone);
              logger.info("=======更改密码成功end========");
-            //调用监听用户退出登录
-            redisSessionDAO.clearRelativeSession(null,null, carAdmUser.getUserId());
+            /**调用监听用户退出登录*/
+            carAdmUserList.forEach(carAdmUser -> {
+                redisSessionDAO.clearRelativeSession(null,null, carAdmUser.getUserId());
+            });
 
             return AjaxResponse.success(null);
         }else {

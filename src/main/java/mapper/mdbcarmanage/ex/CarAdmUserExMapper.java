@@ -37,5 +37,6 @@ public interface CarAdmUserExMapper {
 
     CarAdmUser queryByPhone(@Param("phone")String phone);
 
+    List<CarAdmUser> queryAllAccountByPhone(@Param("phone") String phone);
 
 }

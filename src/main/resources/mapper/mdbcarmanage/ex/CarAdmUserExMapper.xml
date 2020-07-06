@@ -177,4 +177,12 @@
         where user_id = #{userId,jdbcType=INTEGER}
     </update>
 
+    <select id="queryAllAccountByPhone" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List" />
+        from car_adm_user
+        where phone = #{phone}
+    </select>
+
+
 </mapper>
