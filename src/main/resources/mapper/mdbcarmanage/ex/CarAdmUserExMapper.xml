@@ -181,7 +181,7 @@
         select
         <include refid="Base_Column_List" />
         from car_adm_user
-        where phone = #{phone}
+        where phone = #{phone} and status = 200
     </select>
 
 
