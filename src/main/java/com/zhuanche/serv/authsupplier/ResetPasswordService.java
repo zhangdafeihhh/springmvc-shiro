@@ -45,9 +45,11 @@ public class ResetPasswordService {
     /**根据手机号发送验证码*/
     public AjaxResponse sendPhoneCode(String phone,Integer type){
         /**用户不存在*/
-        CarAdmUser admUser = userExMapper.queryByPhone(phone);
-        if( admUser == null ) {
-            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST );
+        if(type.equals(SendPhoneEnum.RESET_PASSWORD.getCode())){
+            CarAdmUser admUser = userExMapper.queryByPhone(phone);
+            if( admUser == null ) {
+                return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST );
+            }
         }
 
         String key = "";
