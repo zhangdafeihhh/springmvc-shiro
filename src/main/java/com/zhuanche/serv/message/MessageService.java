@@ -554,6 +554,7 @@ public class MessageService {
                 return detailDto;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));
         }
         return null;
