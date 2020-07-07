@@ -381,7 +381,10 @@
     c.create_time,
     c.update_time,
     c.`status`,
-    r.reply_content,
+    CASE c.`status`
+    WHEN 3 THEN
+    r.reply_content
+    ELSE '' END as replyContent,
     r.create_time as reply_time,
     cdu.user_name
     FROM car_message_receiver c LEFT JOIN car_message_reply r on
