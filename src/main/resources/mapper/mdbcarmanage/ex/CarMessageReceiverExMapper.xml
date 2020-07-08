@@ -379,7 +379,10 @@
     SELECT  c.message_id,
     c.receive_user_id,
     c.create_time,
-    c.update_time,
+    CASE c.`status`
+    WHEN 1 THEN
+    c.update_time
+    ELSE '' END as update_time,
     c.`status`,
     CASE c.`status`
     WHEN 3 THEN
