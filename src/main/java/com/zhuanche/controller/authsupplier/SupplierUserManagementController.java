@@ -7,6 +7,7 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.syslog.SysLogAnn;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.CarAdmUserDTO;
 import com.zhuanche.dto.mdbcarmanage.CarAdmUserDto;
@@ -17,6 +18,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.elasticsearch.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +86,11 @@ public class SupplierUserManagementController {
         }
         else {
             user.setLevel(WebSessionUtil.getCurrentLoginUser().getLevel());
+        }
+        /**判断可见级别是否大于当前创建人的可见级别*/
+        if(user.getLevel() < WebSessionUtil.getCurrentLoginUser().getLevel()){
+            logger.info("可见级别大于当前创建人级别");
+            return AjaxResponse.fail(RestErrorCode.BIGGER_LEVEL);
         }
         AjaxResponse ajaxResponse = userManagementService.addUser(user);
 

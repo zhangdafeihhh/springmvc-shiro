@@ -67,6 +67,9 @@ public final class RestErrorCode{
 	@ResultMessage("手机号已存在")
 	public static final int PHONE_EXIST                          = 1014;
 
+	@ResultMessage("用户的可见级别不能大于当前用户可见级别")
+	public static final int BIGGER_LEVEL                          = 1020;
+
 	//----------------------------------------------权限管理
 	@ResultMessage("父权限不存在")
 	public static final int PARENT_PERMISSION_NOT_EXIST           = 10001;
