@@ -104,7 +104,7 @@ public class MessageManagerController {
         logger.info(MessageFormat.format("postMessage入参：status:{0},creater:{1},messageTitle:{2},messageContent:{3}," +
                 "level:{4},cities:{5},suppliers:{6},teamId{7},docName:{8},docUrl:{9},messageId:{10},publicRange:{11}" +
                         ",messageGroupIds:{12}",
-                String.valueOf(status),creater,messageTitle,messageContent,String.valueOf(level),cities,
+                String.valueOf(status),null,messageTitle,messageContent,String.valueOf(level),cities,
                 suppliers,teamId,docName,docUrl,messageId,publicRange,messageGroupIds));
 
         if ( StringUtils.isBlank(String.valueOf(status)) ){
@@ -157,7 +157,7 @@ public class MessageManagerController {
     /**
      * 更新草稿状态
      * @param status 1 草稿 2 发送
-     * @param creater 创建人
+     * @param  创建人
      * @param messageTitle 消息标题
      * @param messageContent 消息内容
      * @param level 级别 1；全国权限2；城市权限4；加盟商权限8；车队权限16；可以多个组合
