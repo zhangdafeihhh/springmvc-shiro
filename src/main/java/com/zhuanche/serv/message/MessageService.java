@@ -915,6 +915,7 @@ public class MessageService {
             SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 
             data.forEach(dto ->{
+                dto.setMessageTitle(dto.getMesageTitle());
                 if (dto.getMessageStatus().equals(CarMessagePost.Status.publish.getMessageStatus())){
                     dto.setMessageStatus(user.getId().equals(dto.getCreateId()) ?
                             CarMessagePost.Status.publish.getMessageStatus() : CarMessagePost.Status.receive.getMessageStatus());

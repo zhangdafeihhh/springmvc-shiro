@@ -37,6 +37,9 @@ public class CarMessagePostDto {
     /**回复内容**/
     private String replyContent;
 
+    /**冗余字段 返回显示用的*/
+    private String messageTitle;
+
 
     public Long getId() {
         return id;
@@ -140,5 +143,13 @@ public class CarMessagePostDto {
 
     public void setReplyContent(String replyContent) {
         this.replyContent = replyContent;
+    }
+
+    public String getMessageTitle() {
+        return messageTitle;
+    }
+
+    public void setMessageTitle(String messageTitle) {
+        this.messageTitle = messageTitle;
     }
 }
