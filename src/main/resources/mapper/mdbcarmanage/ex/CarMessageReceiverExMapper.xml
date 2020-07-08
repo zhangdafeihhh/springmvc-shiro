@@ -447,7 +447,7 @@ FROM car_message_post cmp
 LEFT JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
 INNER JOIN car_adm_user cdu ON cmp.user_id = cdu.user_id
 LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
-LEFT JOIN car_message_reply r on cmr.id = r.message_id
+LEFT JOIN car_message_reply r on cmp.id = r.message_id
 
 WHERE
 1=1
