@@ -70,7 +70,6 @@ public class MessageManagerController {
     /**
      * 发送消息接口
      * @param status 1 草稿 2 发送
-     * @param creater 创建人
      * @param messageTitle 消息标题
      * @param messageContent 消息内容
      * @param level 级别 1；全国权限2；城市权限4；加盟商权限8；车队权限16；可以多个组合
@@ -89,7 +88,6 @@ public class MessageManagerController {
     })
     public AjaxResponse postMessage(@RequestParam(value = "messageId",required = false)Integer messageId,
                                     @Verify(param = "status",rule = "required") Integer status,
-                                    @RequestParam(value = "creater",required = false) String creater,
                                     @RequestParam(value = "messageTitle",required = false) String messageTitle,
                                     @RequestParam(value = "messageContent",required = false) String messageContent,
                                     @RequestParam(value = "level",required = false) Integer level,
@@ -109,7 +107,7 @@ public class MessageManagerController {
                 String.valueOf(status),creater,messageTitle,messageContent,String.valueOf(level),cities,
                 suppliers,teamId,docName,docUrl,messageId,publicRange,messageGroupIds));
 
-        if (StringUtils.isBlank(creater) || StringUtils.isBlank(String.valueOf(status)) ){
+        if ( StringUtils.isBlank(String.valueOf(status)) ){
             logger.info("消息为发布状态，必传参数为空");
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
         }
@@ -128,7 +126,7 @@ public class MessageManagerController {
         }
 
         if(CarMessagePost.Status.publish.equals(status)){
-          if (StringUtils.isBlank(creater) || StringUtils.isBlank(messageTitle) || StringUtils.isBlank(messageContent)
+          if (StringUtils.isBlank(messageTitle) || StringUtils.isBlank(messageContent)
                   || StringUtils.isBlank(String.valueOf(level)) ){
               logger.info("消息为发布状态，必传参数为空");
               return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
@@ -136,8 +134,13 @@ public class MessageManagerController {
         }
 
         AjaxResponse response = AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        if(loginUser == null){
+            logger.info("用户未登录");
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
         try {
-            int code = messageService.postMessage(messageId,status, Integer.valueOf(creater), messageTitle, messageContent, level, cities, suppliers, teamId, docName, docUrl,
+            int code = messageService.postMessage(messageId,status,loginUser.getId(),messageTitle, messageContent, level, cities, suppliers, teamId, docName, docUrl,
                     file,request,publicRange,messageGroupIds);
 
             if (code > 0){
@@ -172,7 +175,6 @@ public class MessageManagerController {
     })
     public AjaxResponse updateDraftMessage(@RequestParam(value = "messageId",required = true)String messageId,
                                            @Verify(param = "status",rule = "required") Integer status,
-                                           @RequestParam(value = "creater",required = false) String creater,
                                            @RequestParam(value = "messageTitle",required = false) String messageTitle,
                                            @RequestParam(value = "messageContent",required = false) String messageContent,
                                            @RequestParam(value = "level",required = false) Integer level,
@@ -187,18 +189,18 @@ public class MessageManagerController {
                                            String messageGroupIds){
         logger.info(MessageFormat.format("updateDraftMessage入参：status:{0},creater:{1},messageTitle:{2},messageContent:{3}," +
                         "level:{4},cities:{5},suppliers:{6},teamId{7},docName:{8},docUrl:{9}",
-                String.valueOf(status),creater,messageTitle,messageContent,String.valueOf(level),cities,
+                String.valueOf(status),null,messageTitle,messageContent,String.valueOf(level),cities,
                 suppliers,teamId,docName,docUrl));
 
 
-        if (StringUtils.isBlank(creater) || StringUtils.isBlank(String.valueOf(status)) ){
+        if ( StringUtils.isBlank(String.valueOf(status)) ){
             logger.info("消息为发布状态，必传参数为空");
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
         }
 
 
         if(status.equals(CarMessagePost.Status.publish)){
-            if (StringUtils.isBlank(creater) || StringUtils.isBlank(messageTitle) || StringUtils.isBlank(messageContent)
+            if (StringUtils.isBlank(messageTitle) || StringUtils.isBlank(messageContent)
                     || StringUtils.isBlank(String.valueOf(level)) ){
                 logger.info("消息为发布状态，必传参数为空");
                 return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
@@ -206,8 +208,15 @@ public class MessageManagerController {
             }
         }
         AjaxResponse response = AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        if(loginUser == null){
+            logger.info("用户未登录");
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
+
         try {
-            int code = messageService.postMessage(Integer.valueOf(messageId),status, Integer.valueOf(creater), messageTitle, messageContent, level, cities, suppliers, teamId, docName, docUrl,
+            int code = messageService.postMessage(Integer.valueOf(messageId),status, loginUser.getId(), messageTitle, messageContent, level, cities, suppliers, teamId, docName, docUrl,
                     file,request,publicRange,messageGroupIds);
             if (code > 0){
                 logger.info("消息发送成功");
@@ -489,7 +498,6 @@ public class MessageManagerController {
                 "replyStartTime:{6},replyEndTIme:{7},status:[8]",messageId,senderName,noticeStartTime,
                 noticeEndTime,createStartTime,createEndTime,replyStartTime,replyEndTime,status));
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-        Integer userId = loginUser.getId();
         List<Integer> idList = null;
         if (StringUtils.isNotBlank(senderName)){
             idList = carAdmUserExMapper.queryIdListByName(senderName);
