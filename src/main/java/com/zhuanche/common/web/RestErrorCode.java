@@ -44,7 +44,7 @@ public final class RestErrorCode{
 	//-----------------------------------------------用户
 	@ResultMessage("获取验证码太频繁,请{0}分钟后重试")
 	public static final int GET_MSGCODE_EXCEED           = 1000;
-	@ResultMessage("用户名或密码错误")
+	@ResultMessage("用户不存在")
 	public static final int USER_NOT_EXIST                      = 1001;
 	@ResultMessage("用户名或密码错误")
 	public static final int USER_PASSWORD_WRONG      = 1002;
@@ -66,6 +66,9 @@ public final class RestErrorCode{
 	public static final int DO_LOGIN_FREQUENTLY           = 1013;
 	@ResultMessage("手机号已存在")
 	public static final int PHONE_EXIST                          = 1014;
+
+	@ResultMessage("用户的可见级别不能大于当前用户可见级别")
+	public static final int BIGGER_LEVEL                          = 1020;
 
 	//----------------------------------------------权限管理
 	@ResultMessage("父权限不存在")

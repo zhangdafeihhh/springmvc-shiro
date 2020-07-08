@@ -2929,15 +2929,12 @@ public class IntegerCityController {
                 JSONObject jsonResult = JSONObject.parseObject(lineResult);
                 if (jsonResult != null && jsonResult.getInteger(Constants.CODE) == 0) {
                     if (jsonResult.get(Constants.DATA) != null) {
-
                         /**如果长度超过500 传 -1 ,因为订单那边有参数长度限制*/
                         String ruleBatchResult = jsonResult.get(Constants.DATA).toString();
 
                         if(ruleBatchResult.split(Constants.SEPERATER).length > 500){
                             return Constants.AllRULE;
                         }
-
-
                         return jsonResult.get(Constants.DATA).toString();
                     }
                 }

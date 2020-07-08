@@ -11,7 +11,12 @@ public interface CarAdmUserExMapper {
     CarAdmUser queryByAccount(@Param("account") String account);
     /**查询用户列表**/
     List<CarAdmUser> queryUsers(  @Param("userIds") List<Integer> userIds,  @Param("account") String account, @Param("userName") String userName, @Param("phone") String phone , @Param("status") Integer status );
-    
+
+    /**供应商查询用户列表**/
+    List<CarAdmUser> supplierQueryUsers(  @Param("userIds") List<Integer> userIds,  @Param("account") String account,
+                                          @Param("userName") String userName, @Param("phone") String phone ,
+                                          @Param("status") Integer status,@Param("createUserId")Integer createUserId );
+
     /**查询所有的登录账号名称**/
     List<String> queryAccountsOfUsers( @Param("userIds") List<Integer> userIds );
 
@@ -28,5 +33,10 @@ public interface CarAdmUserExMapper {
     String queryNameById(@Param("userId")Integer userId);
 
     int updateEmail(@Param("email")String email,@Param("userId")Integer userId);
+
+
+    CarAdmUser queryByPhone(@Param("phone")String phone);
+
+    List<CarAdmUser> queryAllAccountByPhone(@Param("phone") String phone);
 
 }

@@ -14,5 +14,10 @@ public interface SaasRoleExMapper{
 	List<Integer> queryRoleIdsOfUser( @Param("userId") Integer userId );
 	/**根据用户ID，查询其拥有的所有有效的角色代码**/
 	List<String> queryRoleCodesOfUser( @Param("userId") Integer userId );
+	/**查询供应商可见的角色列表**/
+	List<SaasRole> queryVisiableRoles();
+	/**更新供应商可见的角色**/
+	int updateIsVisable(@Param("roleId")  Integer roleId,
+						@Param("isVisiable")  Integer isVisiable );
 	
 }

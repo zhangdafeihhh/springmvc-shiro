@@ -137,4 +137,12 @@ public class RolemanagementController{
 	public AjaxResponse deleteSaasRole ( @Verify(param="roleId",rule="required|min(1)") Integer roleId ) {
 		return roleManagementService.deleteSaasRole(roleId);
 	}
+
+	/**十、让某个角色供应商可见**/
+	@RequestMapping("/visiableSaasRole")
+	@RequestFunction(menu = ROLE_DELETE)
+	public AjaxResponse visiableSaasRole ( @Verify(param="roleId",rule="required|min(1)") Integer roleId,
+										   @Verify(param = "isVisiable",rule = "required|min(0)|max(1)")Integer isVisiable) {
+		return roleManagementService.visiableSaasRole(roleId,isVisiable);
+	}
 }

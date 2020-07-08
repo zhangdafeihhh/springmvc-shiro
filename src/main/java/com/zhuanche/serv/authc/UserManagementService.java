@@ -9,10 +9,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.enums.PermissionLevelEnum;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.mdbcarmanage.CarAdmUserDto;
 import com.zhuanche.entity.mdbcarmanage.DriverTelescopeUser;
 import mapper.mdbcarmanage.ex.DriverTelescopeUserExMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,6 +105,7 @@ public class UserManagementService{
 		user.setRemark( ssoLoginUser.getLoginName() );
 		user.setCreateUser( ssoLoginUser.getName()  );
 		user.setCreateDate(new Date());
+		user.setCreateUserId(ssoLoginUser.getId());
 		if( StringUtils.isEmpty(user.getCities()) ) {
 			user.setCities("");
 		}
@@ -260,7 +265,11 @@ public class UserManagementService{
     	List<CarAdmUser> users = null;
     	Page p = PageHelper.startPage( page, pageSize, true );
     	try{
-    		users = carAdmUserExMapper.queryUsers( userIds ,  account, userName, phone, status );
+    		if(WebSessionUtil.isSupperAdmin()){
+				users = carAdmUserExMapper.queryUsers( userIds ,  account, userName, phone, status );
+			}else {
+				users = carAdmUserExMapper.supplierQueryUsers( userIds ,  account, userName, phone, status,WebSessionUtil.getCurrentLoginUser().getId() );
+			}
         	total    = (int)p.getTotal();
     	}finally {
         	PageHelper.clearPage();
@@ -272,32 +281,37 @@ public class UserManagementService{
     	}
     	List<CarAdmUserDTO> roledtos = BeanUtil.copyList(users, CarAdmUserDTO.class);
     	//3.1补充上角色ID，角色名称
-    	Map<Integer,String> roleIdNameMappings = this.searchRoleIdNameMappings();
-    	for( CarAdmUserDTO admUserDto : roledtos ) {
-    		List<Integer> roleIdsOfthisUser = saasRoleExMapper.queryRoleIdsOfUser(admUserDto.getUserId());//根据用户ID，查询其拥有的所有有效的角色ID
-    		//拼接角色ID，角色名称
-    		StringBuffer sbRoleIds       =  new StringBuffer("");
-    		StringBuffer sbRoleNames =  new StringBuffer("");
-			for( Integer rid : roleIdsOfthisUser) {
-				sbRoleIds.append(rid.intValue()).append(",");
-				String rname = roleIdNameMappings.get(rid);
-				if( StringUtils.isNotEmpty(rname) ) {
-					sbRoleNames.append(rname).append(",");
+			Map<Integer,String> roleIdNameMappings = this.searchRoleIdNameMappings();
+			for( CarAdmUserDTO admUserDto : roledtos ) {
+				/**根据用户ID，查询其拥有的所有有效的角色ID*/
+				List<Integer> roleIdsOfthisUser = saasRoleExMapper.queryRoleIdsOfUser(admUserDto.getUserId());
+				/**拼接角色ID，角色名称*/
+				StringBuffer sbRoleIds       =  new StringBuffer("");
+				StringBuffer sbRoleNames =  new StringBuffer("");
+				for( Integer rid : roleIdsOfthisUser) {
+					sbRoleIds.append(rid.intValue()).append(",");
+					String rname = roleIdNameMappings.get(rid);
+					if( StringUtils.isNotEmpty(rname) ) {
+						sbRoleNames.append(rname).append(",");
+					}
+				}
+				String roleIds = sbRoleIds.toString();
+				if(roleIds.endsWith(",")) {
+					roleIds = roleIds.substring(0, roleIds.length()-1);
+				}
+				admUserDto.setRoleIds(roleIds);
+				String roleNames = sbRoleNames.toString();
+				if(roleNames.endsWith(",")) {
+					roleNames = roleNames.substring(0, roleNames.length()-1);
+				}
+				if(StringUtils.isNotEmpty(roleNames)) {
+					admUserDto.setRoleNames(roleNames);//设置角色名称
 				}
 			}
-			String roleIds = sbRoleIds.toString();
-			if(roleIds.endsWith(",")) {
-				roleIds = roleIds.substring(0, roleIds.length()-1);
-			}
-			admUserDto.setRoleIds(roleIds);//设置角色ID
-			String roleNames = sbRoleNames.toString();
-			if(roleNames.endsWith(",")) {
-				roleNames = roleNames.substring(0, roleNames.length()-1);
-			}
-			if(StringUtils.isNotEmpty(roleNames)) {
-				admUserDto.setRoleNames(roleNames);//设置角色名称
-			}
-    	}
+		/*else {
+			*//**如果是供应商查询*//*
+			roledtos = this.searchSupplierIsVisiable(roledtos);
+		}*/
     	//返回
     	return new PageDTO( page, pageSize, total , roledtos);
 	}
@@ -309,7 +323,26 @@ public class UserManagementService{
 		}
 		return result;
 	}
-	
+
+	/**查询供应商可见的角色列表*/
+	public JSONArray searchSupplierIsVisiable(){
+		JSONArray array = new JSONArray();
+		List<SaasRole> allRoles =   saasRoleExMapper.queryVisiableRoles();
+		if(CollectionUtils.isNotEmpty(allRoles)){
+			/**拼接角色ID，角色名称*/
+			StringBuffer sbRoleIds   =  new StringBuffer("");
+			StringBuffer sbRoleNames =  new StringBuffer("");
+			allRoles.forEach(roles ->{
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("roleId",roles.getRoleId());
+				jsonObject.put("roleName",roles.getRoleName());
+				array.add(jsonObject);
+			});
+		}
+		return array;
+	}
+
+
 
 	/**九、重置密码**/
 	public AjaxResponse resetPassword( Integer userId ) {

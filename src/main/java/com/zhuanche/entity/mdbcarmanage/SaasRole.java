@@ -11,6 +11,8 @@ public class SaasRole {
     private String roleName;
     @Column(desc="导航菜单Id")
     private String permissionIds;
+    @Column(desc = "是否对供应商可见")
+    private Integer isVisiable;
 
     private Boolean valid;
 
@@ -52,5 +54,13 @@ public class SaasRole {
 
     public void setPermissionIds(String permissionIds) {
         this.permissionIds = permissionIds;
+    }
+
+    public Integer getIsVisiable() {
+        return isVisiable;
+    }
+
+    public void setIsVisiable(Integer isVisiable) {
+        this.isVisiable = isVisiable;
     }
 }
