@@ -363,6 +363,7 @@
       AND cmp.user_id=#{userId}
     </if>
     GROUP BY cmp.id,mesage_title,cmp.create_time,message_content
+    ORDER BY cmp.id DESC
   </select>
 
 
@@ -482,6 +483,7 @@ WHERE
 </if>
 GROUP BY cmp.id,cmp.mesage_title,
   cmp.create_time,cmp.message_content
+  order BY  cmp.id desc
 </select>
 
 </mapper>
