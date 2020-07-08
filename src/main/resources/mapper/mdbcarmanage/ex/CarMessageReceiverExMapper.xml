@@ -363,6 +363,7 @@
       AND cmp.user_id=#{userId}
     </if>
     GROUP BY cmp.id,mesage_title,cmp.create_time,message_content
+    ORDER BY cmp.id DESC
   </select>
 
 
@@ -379,10 +380,19 @@
     SELECT  c.message_id,
     c.receive_user_id,
     c.create_time,
-    c.update_time,
+    CASE c.`status`
+    WHEN 1 THEN
+    c.update_time
+    ELSE '' END as update_time,
     c.`status`,
-    r.reply_content,
-    r.create_time as reply_time,
+    CASE c.`status`
+    WHEN 3 THEN
+    r.reply_content
+    ELSE '' END as reply_content,
+    CASE c.`status`
+    WHEN 3 THEN
+    r.create_time
+    ELSE '' END as reply_time,
     cdu.user_name
     FROM car_message_receiver c LEFT JOIN car_message_reply r on
     c.message_id = r.message_id
@@ -444,7 +454,7 @@ FROM car_message_post cmp
 LEFT JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
 INNER JOIN car_adm_user cdu ON cmp.user_id = cdu.user_id
 LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
-LEFT JOIN car_message_reply r on cmr.id = r.message_id
+LEFT JOIN car_message_reply r on cmp.id = r.message_id
 
 WHERE
 1=1
@@ -473,6 +483,7 @@ WHERE
 </if>
 GROUP BY cmp.id,cmp.mesage_title,
   cmp.create_time,cmp.message_content
+  order BY  cmp.id desc
 </select>
 
 </mapper>
