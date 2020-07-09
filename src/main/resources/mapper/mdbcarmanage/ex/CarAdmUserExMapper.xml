@@ -86,10 +86,6 @@
         <if test="status!=null">
             and status = #{status}
         </if>
-        
-        <if test="createDate != null and createDate != ''" >
-            AND create_date  &gt;=STR_TO_DATE(#{createDate},'%Y-%m-%d')
-        </if>
 
         <if test="createUserId != null" >
             AND create_user_id  = #{createUserId}
