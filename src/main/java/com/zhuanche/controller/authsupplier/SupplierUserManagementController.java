@@ -138,6 +138,11 @@ public class SupplierUserManagementController {
         newUser.setSuppliers( supplierIds );
         newUser.setTeamId( teamIds );
         newUser.setGroupIds(groupIds);
+        /**判断可见级别是否大于当前创建人的可见级别*/
+        if(newUser.getLevel() < WebSessionUtil.getCurrentLoginUser().getLevel()){
+            logger.info("可见级别大于当前创建人级别");
+            return AjaxResponse.fail(RestErrorCode.BIGGER_LEVEL);
+        }
         return userManagementService.changeUser(newUser);
     }
 
