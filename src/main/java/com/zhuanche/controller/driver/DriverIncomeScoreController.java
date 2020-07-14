@@ -80,7 +80,8 @@ public class DriverIncomeScoreController {
     @ResponseBody
     @RequestMapping(value = "/queryPageDriverDispatchScore")
     @RequestFunction(menu = DRIVER_INFO_LIST)
-    public AjaxResponse queryPageDriverDispatchScore(Integer driverId, String phone,
+    public AjaxResponse queryPageDriverDispatchScore(@Verify(param = "driverId",rule="maxLength(10)") Integer driverId,
+                                                     @Verify(param = "phone",rule="maxLength(11)") String phone,
                                                      String licensePlates, Integer cityId,
                                                      Integer supplierId, Integer teamId,
                                                      @RequestParam(value = "page", defaultValue = "0") Integer page,
