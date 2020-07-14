@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.InterCityTeamDriverRelExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.IntercityTeamDriverRel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="create_id" property="createId" jdbcType="INTEGER" />
+    <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driver_id, team_id, create_id, create_user, create_time, update_time
+  </sql>
+
+  <insert id="insertDriversBatch">
+    insert into inter_city_team_driver_rel (driver_id, team_id,create_id,create_user,create_time)
+    values
+    <foreach collection="teamDriverRel" open="" close="" separator=","  item="rel">
+      (#{rel.driverId,jdbcType=INTEGER}, #{rel.teamId,jdbcType=INTEGER},#{rel.createId,jdbcType=INTEGER},
+      #{rel.createUser,jdbcType=VARCHAR},#{rel.createTime,jdbcType=TIMESTAMP})
+    </foreach>
+  </insert>
+
+</mapper>

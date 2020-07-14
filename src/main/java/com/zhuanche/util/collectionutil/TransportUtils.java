@@ -1,6 +1,9 @@
 package com.zhuanche.util.collectionutil;
 
 
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.constant.Constants;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -83,7 +86,7 @@ public class TransportUtils {
 
 
     /**
-     * 获取数组里面的最小值
+     * 获取数组里面的最大值
      * @param strArr
      * @return
      */
@@ -104,6 +107,16 @@ public class TransportUtils {
 
     }
 
+
+    public static List<Integer> listInteger(String params){
+     String[] strArr =   params.split(Constants.SEPERATER);
+     List<Integer> listInt = new ArrayList<>();
+     for(int i = 0;i<strArr.length;i++){
+         listInt.add(Integer.valueOf(strArr[i]));
+     }
+      return listInt;
+    }
+
     public static void main(String[] args) {
 
         String[] strArr = new String[]{"34","244","4","22"};
@@ -111,5 +124,6 @@ public class TransportUtils {
         System.out.println(getDoubleMaxValue(strArr));
         System.out.println(getMinIntegerValu(strArr));
         System.out.println(getMaxIntegerValu(strArr));
+        System.out.println(JSONObject.toJSONString(listInteger("55,333,54554,2223,2233")));
     }
 }
