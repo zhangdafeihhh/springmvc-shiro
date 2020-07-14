@@ -60,6 +60,7 @@ public class SupplierUserManagementController {
             @Verify(param="account",rule="required|RegExp(^[a-zA-Z0-9_\\-]{3,30}$)") String account,
             @Verify(param="userName",rule="required") String userName,
             @Verify(param="phone",rule="required|mobile") String phone,
+            @Verify(param="level",rule="required") Integer level,
             @Verify(param="cityIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String cityIds,
             @Verify(param="supplierIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String supplierIds,
             @Verify(param="teamIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String teamIds,
@@ -72,21 +73,7 @@ public class SupplierUserManagementController {
         user.setSuppliers( supplierIds );
         user.setTeamId( teamIds );
         user.setGroupIds(groupIds);
-        if (StringUtils.isNotBlank(groupIds)){
-            user.setLevel(PermissionLevelEnum.GROUP.getCode());
-        }
-        else if (StringUtils.isNotBlank(teamIds)){
-            user.setLevel(PermissionLevelEnum.TEAM.getCode());
-        }
-        else if (StringUtils.isNotBlank(supplierIds)){
-            user.setLevel(PermissionLevelEnum.SUPPLIER.getCode());
-        }
-        else if (StringUtils.isNotBlank(cityIds)){
-            user.setLevel(PermissionLevelEnum.CITY.getCode());
-        }
-        else {
-            user.setLevel(WebSessionUtil.getCurrentLoginUser().getLevel());
-        }
+        user.setLevel(level);
         /**判断可见级别是否大于当前创建人的可见级别*/
         if(user.getLevel() < WebSessionUtil.getCurrentLoginUser().getLevel()){
             logger.info("可见级别大于当前创建人级别");
@@ -126,6 +113,7 @@ public class SupplierUserManagementController {
             @Verify(param="userId",rule="required|min(1)") Integer userId,
             @Verify(param="userName",rule="required") String userName,
             @Verify(param="phone",rule="required|mobile") String phone,
+            @Verify(param="level",rule="required") Integer level,
             @RequestParam("cityIds") String cityIds,
             @RequestParam("supplierIds") String supplierIds,
             @RequestParam("teamIds") String teamIds,
@@ -138,6 +126,12 @@ public class SupplierUserManagementController {
         newUser.setSuppliers( supplierIds );
         newUser.setTeamId( teamIds );
         newUser.setGroupIds(groupIds);
+        newUser.setLevel(level);
+        /**判断可见级别是否大于当前创建人的可见级别*/
+        if(newUser.getLevel() < WebSessionUtil.getCurrentLoginUser().getLevel()){
+            logger.info("可见级别大于当前创建人级别");
+            return AjaxResponse.fail(RestErrorCode.BIGGER_LEVEL);
+        }
         return userManagementService.changeUser(newUser);
     }
 

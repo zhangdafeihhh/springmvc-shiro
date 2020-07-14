@@ -1,7 +1,7 @@
 package com.zhuanche.common.enums;
 
 public enum PermissionLevelEnum {
-    ALL("全国",1),CITY("城市",2),SUPPLIER("供应商",4),TEAM("车队",8),GROUP("班组",16);
+    ALL("全国",1),CITY("城市",2),SUPPLIER("合作商",4),TEAM("车队",8),GROUP("班组",16);
 
     private String name;
     private Integer code;
