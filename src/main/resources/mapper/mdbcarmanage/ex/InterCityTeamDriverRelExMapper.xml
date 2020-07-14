@@ -23,4 +23,8 @@
     </foreach>
   </insert>
 
+  <delete id="deleteDriver">
+
+    DELETE  FROM  inter_city_team_driver_rel WHERE  driver_id = #{driverId} and teamId = #{teamId}
+  </delete>
 </mapper>

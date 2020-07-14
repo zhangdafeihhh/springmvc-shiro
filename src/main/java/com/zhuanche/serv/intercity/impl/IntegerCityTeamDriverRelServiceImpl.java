@@ -44,6 +44,11 @@ public class IntegerCityTeamDriverRelServiceImpl implements IntegerCityTeamDrive
             rel.setCreateUser(loginUser.getLoginName());
             relList.add(rel);
         });
-        return relExMapper.insertBatch(relList);
+        return relExMapper.insertDriversBatch(relList);
+    }
+
+    @Override
+    public int del(Integer driverId, Integer teamId) {
+        return relExMapper.deleteDriver(driverId,teamId);
     }
 }

@@ -1,8 +1,12 @@
 package com.zhuanche.controller.intercity;
 
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.mdbcarmanage.InterDriverTeamRelDto;
+import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
+import com.zhuanche.serv.intercity.DriverInfoInterCityService;
 import com.zhuanche.serv.intercity.IntegerCityTeamDriverRelService;
 import com.zhuanche.serv.intercity.IntegerCityTeamService;
 import org.slf4j.Logger;
@@ -11,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 /**
  * @Author fanht
@@ -29,6 +35,10 @@ public class InterCityEchelonController extends IntegerCityController{
 
     @Autowired
     private IntegerCityTeamDriverRelService relService;
+
+
+    @Autowired
+    private DriverInfoInterCityService cityService;
 
     @RequestMapping("/addTeam")
     @ResponseBody
@@ -83,15 +93,27 @@ public class InterCityEchelonController extends IntegerCityController{
     }
 
 
-    public AjaxResponse queryList(){
+    /***
+     * 查询列表
+     * @param driverInfoInterCity
+     * @param teamId
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    public AjaxResponse queryList(DriverInfoInterCity driverInfoInterCity,
+                                  Integer teamId,
+                                  @Verify(param = "pageNo",rule = "required") Integer pageNo,
+                                  @Verify(param = "pageSize",rule = "required") Integer pageSize){
 
-        return AjaxResponse.success(null);
+        PageDTO pageDTO = cityService.queryDriverRelTeam(pageSize,pageNo,driverInfoInterCity,teamId);
+        return AjaxResponse.success(pageDTO);
     }
 
     @RequestMapping("/deleteDriver")
     @ResponseBody
     public AjaxResponse deleteDriver(Integer driverId){
-
+        relService
         return AjaxResponse.success(null);
     }
 }

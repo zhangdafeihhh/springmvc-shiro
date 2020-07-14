@@ -1,5 +1,6 @@
 package mapper.mdbcarmanage.ex;
 
+import com.zhuanche.dto.mdbcarmanage.InterDriverTeamRelDto;
 import com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import org.apache.ibatis.annotations.Param;
@@ -26,4 +27,11 @@ public interface DriverInfoInterCityExMapper {
                                                     @Param("driverPhone")String driverPhone,
                                                     @Param("licensePlates")String licensePlates,
                                                     @Param("driverIds")String driverIds);
+    /**查询城际拼车司机车队列表*/
+    List<InterDriverTeamRelDto> queryDriverRelTeam(@Param("cityId")Integer cityId,
+                                                   @Param("supplierId")Integer supplierId,
+                                                   @Param("driverName")String driverName,
+                                                   @Param("driverPhone")String driverPhone,
+                                                   @Param("licensePlates")String licensePlates,
+                                                   @Param("teamId")Integer teamId);
 }

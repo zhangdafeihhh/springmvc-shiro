@@ -12,5 +12,5 @@ public interface IntegerCityTeamDriverRelService {
 
     int addDriver(String driverIds, Integer teamId);
 
-
+    int del(Integer driverId,Integer teamId);
 }
