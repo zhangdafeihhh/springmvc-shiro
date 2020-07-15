@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.InterCityEchelonMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.InterCityEchelon" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="echelon_date" property="echelonDate" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="echelon_name" property="echelonName" jdbcType="VARCHAR" />
+    <result column="echelon_month" property="echelonMonth" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, team_id, sort, echelon_date, create_time, update_time, echelon_name, echelon_month
+  </sql>
+  <select id="queryTeamId" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from inter_city_echelon
+    where team_id = #{teamId,jdbcType=INTEGER}
+    and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
+  </select>
+
+</mapper>

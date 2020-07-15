@@ -379,6 +379,12 @@ public final class RestErrorCode{
 	@ResultMessage("状态不是待确认状态，不能进行提现申请")
 	public static final int APPLY_NOT                 =85002;
 
+	//---------------------------------------------------------------
+
+	//------------------------城际系统派单2.0start--------------------------------------
+	@ResultMessage("同一日期仅可存在于一个梯队中")
+	public static final int SAME_ECHELON                 =90000;
+	//------------------------城际系统派单2.0end--------------------------------------
 
 	@ResultMessage("请稍后再试,禁止频繁使用！")
 	public static final int SEND_MSG_LOCK=90001;

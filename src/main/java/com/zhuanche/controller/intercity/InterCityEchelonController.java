@@ -9,6 +9,7 @@ import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.serv.intercity.DriverInfoInterCityService;
 import com.zhuanche.serv.intercity.IntegerCityTeamDriverRelService;
 import com.zhuanche.serv.intercity.IntegerCityTeamService;
+import com.zhuanche.serv.mdbcarmanage.service.InterCityEchelonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,11 @@ public class InterCityEchelonController extends IntegerCityController{
 
     @Autowired
     private DriverInfoInterCityService cityService;
+
+    @Autowired
+    private InterCityEchelonService interCityEchelonService;
+
+
 
     @RequestMapping("/addTeam")
     @ResponseBody
@@ -112,8 +118,19 @@ public class InterCityEchelonController extends IntegerCityController{
 
     @RequestMapping("/deleteDriver")
     @ResponseBody
-    public AjaxResponse deleteDriver(Integer driverId){
-        relService
+    public AjaxResponse deleteDriver(Integer driverId,Integer teamId){
+        relService.del(driverId,teamId);
+        return AjaxResponse.success(null);
+    }
+
+
+    public AjaxResponse addEchelon(Integer cityId,
+                                   Integer supplierId,
+                                   Integer teamId,
+                                   String echelonDate,
+                                   Integer sort,
+                                   String echelonMonth){
+        interCityEchelonService.insertSelective(cityId,supplierId,teamId,echelonDate,sort,echelonMonth);
         return AjaxResponse.success(null);
     }
 }

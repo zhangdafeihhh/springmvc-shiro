@@ -12,4 +12,7 @@ public interface InterCityEchelonMapper {
     int updateByPrimaryKeySelective(InterCityEchelon record);
 
     int updateByPrimaryKey(InterCityEchelon record);
+
+
+
 }
