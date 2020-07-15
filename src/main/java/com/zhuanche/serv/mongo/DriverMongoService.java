@@ -254,7 +254,7 @@ public class DriverMongoService {
 				}
 				String driverIdsStr = stringBuilder.toString();
 				if(StringUtils.isNotEmpty(driverIdsStr)){
-					driverIdsStr = driverIdsStr.substring(0,driverIds.lastIndexOf(","));
+					driverIdsStr = driverIdsStr.substring(0,driverIdsStr.length()-1);
 				}
 				Map<String,Object> params = new HashMap<String,Object>();
 				params.put("businessId", Common.DRIVER_MONGO_HTTP_BUSINESSID);
