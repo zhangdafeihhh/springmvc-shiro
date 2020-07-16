@@ -432,6 +432,7 @@
       </foreach>
     </if>
 
+    GROUP BY c.receive_user_id
     ORDER  by c.create_time DESC
 
   </select>
