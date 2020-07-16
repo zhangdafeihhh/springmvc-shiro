@@ -47,6 +47,7 @@ public class IntegerCityTeamServiceImpl implements IntegerCityTeamService{
         team.setCreateId(loginUser.getId());
         team.setCreateName(loginUser.getLoginName());
         team.setCreateTime(new Date());
+        team.setId(id);
         return teamMapper.updateByPrimaryKeySelective(team);
      }
 }

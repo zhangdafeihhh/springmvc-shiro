@@ -384,6 +384,12 @@ public final class RestErrorCode{
 	//------------------------城际系统派单2.0start--------------------------------------
 	@ResultMessage("同一日期仅可存在于一个梯队中")
 	public static final int SAME_ECHELON                 =90000;
+	@ResultMessage("该日期该梯队已存在车队”")
+	public static final int ECHELON_HAS_EXIST                 =90010;
+
+	@ResultMessage("司机已经加入车队”")
+	public static final int DRIVER_HAS_TEAM                 =90011;
+
 	//------------------------城际系统派单2.0end--------------------------------------
 
 	@ResultMessage("请稍后再试,禁止频繁使用！")

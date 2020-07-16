@@ -11,7 +11,8 @@ import com.zhuanche.entity.mdbcarmanage.InterCityEchelon;
  */
 public interface InterCityEchelonService {
 
-    AjaxResponse insertSelective(Integer cityId,
+    AjaxResponse insertSelective(Integer id,
+                                 Integer cityId,
                                  Integer supplierId,
                                  Integer teamId,
                                  String echelonDate,
@@ -20,4 +21,6 @@ public interface InterCityEchelonService {
 
     int updateByPrimaryKey(InterCityEchelon record);
 
+
+    InterCityEchelon echelonDetail(Integer id);
 }

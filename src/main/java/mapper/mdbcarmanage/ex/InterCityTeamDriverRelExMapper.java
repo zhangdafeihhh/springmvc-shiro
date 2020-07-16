@@ -8,9 +8,11 @@ import java.util.List;
 
 public interface InterCityTeamDriverRelExMapper {
     /**批量插入数据库*/
-    int insertDriversBatch(List<IntercityTeamDriverRel> teamDriverRel);
+    int insertDriversBatch(@Param("teamDriverRel") List<IntercityTeamDriverRel> teamDriverRel);
 
     /**删除司机*/
     int deleteDriver(@Param("DriverId")Integer driverId,
                      @Param("teamId")Integer teamId);
+
+    List<IntercityTeamDriverRel> teamRelList(@Param("driverIds") List driverIds);
 }

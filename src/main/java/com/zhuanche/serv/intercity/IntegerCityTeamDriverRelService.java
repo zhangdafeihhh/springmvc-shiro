@@ -1,5 +1,7 @@
 package com.zhuanche.serv.intercity;
 
+import com.zhuanche.common.web.AjaxResponse;
+
 import java.util.List;
 
 /**
@@ -10,7 +12,7 @@ import java.util.List;
  */
 public interface IntegerCityTeamDriverRelService {
 
-    int addDriver(String driverIds, Integer teamId);
+    AjaxResponse addDriver(String driverIds, Integer teamId);
 
     int del(Integer driverId,Integer teamId);
 }

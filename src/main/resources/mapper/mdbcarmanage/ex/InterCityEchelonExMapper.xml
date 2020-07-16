@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="mapper.mdbcarmanage.InterCityEchelonMapper" >
+<mapper namespace="mapper.mdbcarmanage.ex.InterCityEchelonExMapper" >
   <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.InterCityEchelon" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="team_id" property="teamId" jdbcType="INTEGER" />
@@ -21,5 +21,20 @@
     where team_id = #{teamId,jdbcType=INTEGER}
     and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
   </select>
+
+
+  <select id="queryTeamIds" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from inter_city_echelon
+    where 1=1
+
+    and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
+    and teamId in
+    <foreach collection="teamIdList" open="(" close=")" separator=","  item="teamId">
+      #{teamId}
+    </foreach>
+  </select>
+
 
 </mapper>

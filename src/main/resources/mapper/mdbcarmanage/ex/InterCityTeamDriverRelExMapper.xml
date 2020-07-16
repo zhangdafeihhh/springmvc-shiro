@@ -14,6 +14,15 @@
     id, driver_id, team_id, create_id, create_user, create_time, update_time
   </sql>
 
+  <select id="teamRelList" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM inter_city_team_driver_rel
+    WHERE driver_id IN
+    <foreach collection="driverIds" item="driverId" open="(" close=")">
+      #{driverId}
+    </foreach>
+  </select>
   <insert id="insertDriversBatch">
     insert into inter_city_team_driver_rel (driver_id, team_id,create_id,create_user,create_time)
     values
@@ -22,6 +31,7 @@
       #{rel.createUser,jdbcType=VARCHAR},#{rel.createTime,jdbcType=TIMESTAMP})
     </foreach>
   </insert>
+
 
   <delete id="deleteDriver">
 

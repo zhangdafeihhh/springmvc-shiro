@@ -1,5 +1,7 @@
 package com.zhuanche.serv.intercity.impl;
 
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.mdbcarmanage.IntercityTeamDriverRel;
 import com.zhuanche.serv.intercity.IntegerCityTeamDriverRelService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -7,10 +9,14 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.collectionutil.TransportUtils;
 import mapper.mdbcarmanage.IntercityTeamDriverRelMapper;
 import mapper.mdbcarmanage.ex.InterCityTeamDriverRelExMapper;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -23,14 +29,19 @@ import java.util.List;
 @Service
 public class IntegerCityTeamDriverRelServiceImpl implements IntegerCityTeamDriverRelService{
 
-    @Autowired
-    private IntercityTeamDriverRelMapper relMapper;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private InterCityTeamDriverRelExMapper relExMapper;
 
     @Override
-    public int addDriver(String driverIds, Integer teamId) {
+    public AjaxResponse addDriver(String driverIds, Integer teamId) {
+        /**校验司机是否已经加入车队*/
+        List<IntercityTeamDriverRel> driverRelList = relExMapper.teamRelList(TransportUtils.listInteger(driverIds));
+        if(CollectionUtils.isNotEmpty(driverRelList)){
+            logger.info("司机已经加入过车队");
+            return AjaxResponse.fail(RestErrorCode.DRIVER_HAS_TEAM);
+        }
         List<IntercityTeamDriverRel> relList = new ArrayList<>();
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
@@ -44,7 +55,9 @@ public class IntegerCityTeamDriverRelServiceImpl implements IntegerCityTeamDrive
             rel.setCreateUser(loginUser.getLoginName());
             relList.add(rel);
         });
-        return relExMapper.insertDriversBatch(relList);
+         relExMapper.insertDriversBatch(relList);
+         return AjaxResponse.success(null);
+
     }
 
     @Override
