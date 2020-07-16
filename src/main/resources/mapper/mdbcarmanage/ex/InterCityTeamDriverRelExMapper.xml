@@ -35,6 +35,6 @@
 
   <delete id="deleteDriver">
 
-    DELETE  FROM  inter_city_team_driver_rel WHERE  driver_id = #{driverId} and teamId = #{teamId}
+    DELETE  FROM  inter_city_team_driver_rel WHERE  driver_id = #{driverId} and team_id = #{teamId}
   </delete>
 </mapper>

@@ -1,5 +1,10 @@
 package com.zhuanche.serv.intercity;
 
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.entity.mdbcarmanage.InterCityTeam;
+
+import java.util.List;
+
 /**
  * @Author fanht
  * @Description
@@ -9,9 +14,11 @@ package com.zhuanche.serv.intercity;
 public interface IntegerCityTeamService {
 
     /**添加车队*/
-    int addTeam(Integer cityId,Integer supplierId,String teamName);
+    AjaxResponse addTeam(Integer cityId, Integer supplierId, String teamName);
 
     /**编辑车队*/
-    int updateTeam(Integer id,Integer cityId,Integer supplierId,String teamName);
+    AjaxResponse updateTeam(Integer id,Integer cityId,Integer supplierId,String teamName);
 
+
+    InterCityTeam teamDetail(Integer id);
 }

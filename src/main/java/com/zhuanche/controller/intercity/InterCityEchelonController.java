@@ -4,6 +4,7 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.mdbcarmanage.InterCityEchelonDto;
 import com.zhuanche.dto.mdbcarmanage.InterDriverTeamRelDto;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.InterCityEchelon;
@@ -29,7 +30,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/interCityEchelonController")
-public class InterCityEchelonController{
+public class InterCityEchelonController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -47,58 +48,64 @@ public class InterCityEchelonController{
     private InterCityEchelonService interCityEchelonService;
 
 
-
     @RequestMapping("/addTeam")
     @ResponseBody
-    public AjaxResponse addTeam(@Verify(param = "cityId",rule = "required") Integer cityId,
-                                @Verify(param = "supplierId",rule = "required")Integer supplierId,
-                                @Verify(param = "teamName",rule = "required|min(1)|max(99)")Integer teamName){
+    public AjaxResponse addTeam(@Verify(param = "cityId", rule = "required") Integer cityId,
+                                @Verify(param = "supplierId", rule = "required") Integer supplierId,
+                                @Verify(param = "teamName", rule = "required|min(1)|max(99)") Integer teamName) {
 
-        logger.info(MessageFormat.format("新增车队入参：cityId:{0},supplierId:{1},teamName:{2}",cityId,supplierId,teamName));
-        int code = 0;
+        logger.info(MessageFormat.format("新增车队入参：cityId:{0},supplierId:{1},teamName:{2}", cityId, supplierId, teamName));
         try {
-            code = teamService.addTeam(cityId,supplierId,teamName.toString());
+            return teamService.addTeam(cityId, supplierId, teamName.toString());
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-        if(code > 0){
-            return AjaxResponse.success(null);
-        }else {
-            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
-        }
+        return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
     }
 
     @RequestMapping("/updateTeam")
     @ResponseBody
-    public AjaxResponse addTeam(@Verify(param = "id",rule = "required") Integer id,
-                                @Verify(param = "cityId",rule = "required") Integer cityId,
-                                @Verify(param = "supplierId",rule = "required")Integer supplierId,
-                                @Verify(param = "teamName",rule = "required|min(1)|max(99)")Integer teamName){
+    public AjaxResponse addTeam(@Verify(param = "id", rule = "required") Integer id,
+                                @Verify(param = "cityId", rule = "required") Integer cityId,
+                                @Verify(param = "supplierId", rule = "required") Integer supplierId,
+                                @Verify(param = "teamName", rule = "required|min(1)|max(99)") Integer teamName) {
 
-        logger.info(MessageFormat.format("修改车队入参：cityId:{0},supplierId:{1},teamName:{2}",cityId,supplierId,teamName));
-        int code = 0;
+        logger.info(MessageFormat.format("修改车队入参：cityId:{0},supplierId:{1},teamName:{2}", cityId, supplierId, teamName));
         try {
-           String  teamNameStr = teamName.toString();
-            code = teamService.updateTeam(id,cityId,supplierId,teamNameStr);
+            String teamNameStr = teamName.toString();
+            return teamService.updateTeam(id, cityId, supplierId, teamNameStr);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-        if(code > 0){
-            return AjaxResponse.success(null);
-        }else {
-            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+    }
+
+
+    @RequestMapping("/teamDetail")
+    @ResponseBody
+    public AjaxResponse addTeam(@Verify(param = "id", rule = "required") Integer id) {
+
+        logger.info(MessageFormat.format("车队详情入参：id:{0}", id));
+        try {
+            return AjaxResponse.success(teamService.teamDetail(id));
+        } catch (Exception e) {
+            logger.error(e.getMessage());
         }
+        return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
     }
 
 
     @RequestMapping("/addDriver")
     @ResponseBody
-    public AjaxResponse addDriver(@Verify(param = "driverIds",rule = "required") String driverIds,
-                                  @Verify(param = "teamId",rule = "required") Integer teamId){
-        logger.info(MessageFormat.format("新城际拼车车队添加司机入参:driverIds:{0},teamId:{1}",driverIds,teamId));
-        relService.addDriver(driverIds,teamId);
-
-        return AjaxResponse.success(null);
+    public AjaxResponse addDriver(@Verify(param = "driverIds", rule = "required") String driverIds,
+                                  @Verify(param = "teamId", rule = "required") Integer teamId) {
+        logger.info(MessageFormat.format("新城际拼车车队添加司机入参:driverIds:{0},teamId:{1}", driverIds, teamId));
+        try {
+            return relService.addDriver(driverIds, teamId);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
     }
 
 
@@ -113,51 +120,56 @@ public class InterCityEchelonController{
     @RequestMapping("/queryDriverTeamList")
     @ResponseBody
     public AjaxResponse queryDriverTeamList(DriverInfoInterCity driverInfoInterCity,
-                                  Integer teamId,
-                                  @Verify(param = "pageNo",rule = "required") Integer pageNo,
-                                  @Verify(param = "pageSize",rule = "required") Integer pageSize){
+                                            Integer teamId,
+                                            @Verify(param = "pageNo", rule = "required|min(0)") Integer pageNo,
+                                            @Verify(param = "pageSize", rule = "required|min(10)") Integer pageSize) {
 
-        PageDTO pageDTO = cityService.queryDriverRelTeam(pageSize,pageNo,driverInfoInterCity,teamId);
+        PageDTO pageDTO = cityService.queryDriverRelTeam(pageSize, pageNo, driverInfoInterCity, teamId);
         return AjaxResponse.success(pageDTO);
     }
 
     /**
      * 删除
+     *
      * @param driverId
      * @param teamId
      * @return
      */
     @RequestMapping("/deleteDriver")
     @ResponseBody
-    public AjaxResponse deleteDriver(Integer driverId,Integer teamId){
-        logger.info("删除入参driverId:{0},teamId:{1}",driverId,teamId);
-        relService.del(driverId,teamId);
+    public AjaxResponse deleteDriver(Integer driverId, Integer teamId) {
+        logger.info("删除入参driverId:{0},teamId:{1}", driverId, teamId);
+        try {
+            relService.del(driverId, teamId);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
         return AjaxResponse.success(null);
     }
 
 
-    /**/
-
-    @RequestMapping("/addEchelon")
+    /**
+     * 添加编辑梯队
+     */
+    @RequestMapping("/addOrEditEchelon")
     @ResponseBody
     public AjaxResponse addOrEditEchelon(Integer id,
-                                   Integer cityId,
-                                   Integer supplierId,
-                                   Integer teamId,
-                                   String echelonDate,
-                                   Integer sort,
-                                   String echelonMonth){
-        interCityEchelonService.insertSelective(id,cityId,supplierId,teamId,echelonDate,sort,echelonMonth);
-        return AjaxResponse.success(null);
+                                         Integer cityId,
+                                         Integer supplierId,
+                                         Integer teamId,
+                                         String echelonDate,
+                                         Integer sort,
+                                         String echelonMonth) {
+        return interCityEchelonService.addOrEdit(id, cityId, supplierId, teamId, echelonDate, sort, echelonMonth);
     }
 
 
     @RequestMapping("/editEchelon")
     @ResponseBody
-    public AjaxResponse editEchelon(@Verify(param = "id",rule = "required") Integer id){
+    public AjaxResponse editEchelon(@Verify(param = "id", rule = "required") Integer id) {
 
-        InterCityEchelon echelon =  interCityEchelonService.echelonDetail(id);
-         return AjaxResponse.success(echelon);
+        InterCityEchelonDto dtoEchelon = interCityEchelonService.echelonDetail(id);
+        return AjaxResponse.success(dtoEchelon);
     }
 
 }

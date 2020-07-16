@@ -151,13 +151,14 @@
 
 
   <select id="queryDriverRelTeam" resultType="com.zhuanche.dto.mdbcarmanage.InterDriverTeamRelDto">
-    SELECT t.id,t.city_name,t.supplier_name,t.driver_id,r.team_id
+    SELECT t.id,t.city_name as cityName ,t.supplier_name as supplierName,
+    t.driver_id as driverId,r.team_id as teamId
     FROM driver_info_inter_city t INNER JOIN
     inter_city_team_driver_rel r on t.driver_id = r.driver_id
-    <if test="cityId!=null and cityId!=''">
+    <if test="cityId!=null and cityId!='0'">
       and t.city_id = #{cityId}
     </if>
-    <if test="supplierId!=null and supplierId!=''">
+    <if test="supplierId!=null and supplierId!='0'">
       and t.supplier_id = #{supplierId}
     </if>
     <if test="driverName!=null and driverName!=''">

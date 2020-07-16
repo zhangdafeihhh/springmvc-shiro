@@ -117,6 +117,15 @@ public class TransportUtils {
       return listInt;
     }
 
+    public static List<String> listStr(String params){
+        String[] strArr =   params.split(Constants.SEPERATER);
+        List<String> listStr = new ArrayList<>();
+        for(int i = 0;i<strArr.length;i++){
+            listStr.add(strArr[i]);
+        }
+        return listStr;
+    }
+
     public static void main(String[] args) {
 
         String[] strArr = new String[]{"34","244","4","22"};

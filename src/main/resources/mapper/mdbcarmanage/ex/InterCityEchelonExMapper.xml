@@ -30,7 +30,7 @@
     where 1=1
 
     and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
-    and teamId in
+    and team_id in
     <foreach collection="teamIdList" open="(" close=")" separator=","  item="teamId">
       #{teamId}
     </foreach>

@@ -11,7 +11,7 @@ public interface InterCityTeamDriverRelExMapper {
     int insertDriversBatch(@Param("teamDriverRel") List<IntercityTeamDriverRel> teamDriverRel);
 
     /**删除司机*/
-    int deleteDriver(@Param("DriverId")Integer driverId,
+    int deleteDriver(@Param("driverId")Integer driverId,
                      @Param("teamId")Integer teamId);
 
     List<IntercityTeamDriverRel> teamRelList(@Param("driverIds") List driverIds);

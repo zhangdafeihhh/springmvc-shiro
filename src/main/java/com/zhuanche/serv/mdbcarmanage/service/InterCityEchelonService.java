@@ -1,6 +1,7 @@
 package com.zhuanche.serv.mdbcarmanage.service;
 
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.dto.mdbcarmanage.InterCityEchelonDto;
 import com.zhuanche.entity.mdbcarmanage.InterCityEchelon;
 
 /**
@@ -11,16 +12,16 @@ import com.zhuanche.entity.mdbcarmanage.InterCityEchelon;
  */
 public interface InterCityEchelonService {
 
-    AjaxResponse insertSelective(Integer id,
-                                 Integer cityId,
-                                 Integer supplierId,
-                                 Integer teamId,
-                                 String echelonDate,
-                                 Integer sort,
-                                 String echelonMonth);
+    AjaxResponse addOrEdit(Integer id,
+                           Integer cityId,
+                           Integer supplierId,
+                           Integer teamId,
+                           String echelonDate,
+                           Integer sort,
+                           String echelonMonth);
 
     int updateByPrimaryKey(InterCityEchelon record);
 
 
-    InterCityEchelon echelonDetail(Integer id);
+    InterCityEchelonDto echelonDetail(Integer id);
 }

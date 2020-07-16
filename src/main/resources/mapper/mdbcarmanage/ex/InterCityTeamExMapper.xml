@@ -22,4 +22,24 @@
     and supplier_id = #{supplierId,jdbcType=INTEGER}
   </select>
 
+  <select id="verifyTeam" resultMap="BaseResultMap"   >
+    select
+    <include refid="Base_Column_List" />
+    from inter_city_team
+    where city_id = #{cityId,jdbcType=INTEGER}
+    and supplier_id = #{supplierId,jdbcType=INTEGER}
+    and team_name = #{teamName,jdbcType=VARCHAR}
+  </select>
+
+
+  <select id="listTeamByIds" resultMap="BaseResultMap"  >
+    select id, team_name
+    from inter_city_team
+    where 1=1
+    and id in
+    <foreach collection="ids" open="(" close=")" item="id" >
+      #{id}
+    </foreach>
+  </select>
+
 </mapper>
