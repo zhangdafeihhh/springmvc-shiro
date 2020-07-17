@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.*;
@@ -267,7 +268,7 @@ public class SupplierFeeController {
 
 
             PdfPTable table1 = new PdfPTable(titles.length); //创建一个表格,参数为一行有几栏
-            int width1[] = {250,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300};//每栏的宽度
+            int[] width1 = {250,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300};//每栏的宽度
             table1.setKeepTogether(false);
             table1.setHorizontalAlignment(Element.ALIGN_LEFT);
             /**设置表格大小为可用空白区域的300%*/
@@ -469,7 +470,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getTotalFlow())){
+        if(StringUtils.isEmpty(manage.getTotalFlow()) || paramIsNull(manage.getTotalFlow())){
             title = title.replaceAll("总营业额,","");
         }else {
             builder.append(manage.getTotalFlow() != null ? manage.getTotalFlow() : "");
@@ -481,7 +482,7 @@ public class SupplierFeeController {
 
 
 
-        if(StringUtils.isEmpty(manage.getTurnoverDrivers())){
+        if(StringUtils.isEmpty(manage.getTurnoverDrivers()) || paramIsNull(manage.getTurnoverDrivers())){
             title = title.replaceAll("入围司机营业额,","");
 
         }else {
@@ -489,7 +490,7 @@ public class SupplierFeeController {
             listStr.add("入围司机营业额:"+manage.getTurnoverDrivers());
 
         }
-        if(StringUtils.isEmpty(manage.getFlowAmount())){
+        if(StringUtils.isEmpty(manage.getFlowAmount()) || paramIsNull(manage.getFlowAmount())){
             title = title.replaceAll("流水金额,","");
         }else {
             builder.append(manage.getFlowAmount() != null ? manage.getTotalFlow() : "");
@@ -498,7 +499,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getWindControlAmount())){
+        if(StringUtils.isEmpty(manage.getWindControlAmount()) || paramIsNull(manage.getWindControlAmount())){
             title = title.replaceAll("风控金额,","");
         }else {
             builder.append(manage.getWindControlAmount() != null ? manage.getWindControlAmount() : "");
@@ -509,7 +510,7 @@ public class SupplierFeeController {
 
 
 
-        if(StringUtils.isEmpty(manage.getExtraCharge())){
+        if(StringUtils.isEmpty(manage.getExtraCharge()) || paramIsNull(manage.getExtraCharge())){
             title = title.replaceAll("价外费,","");
         }else {
             builder.append(manage.getExtraCharge() != null ? manage.getExtraCharge() : "");
@@ -519,7 +520,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getCancelCharge())){
+        if(StringUtils.isEmpty(manage.getCancelCharge()) || paramIsNull(manage.getCancelCharge())){
             title = title.replaceAll("取消费,","");
         }else {
             builder.append(manage.getCancelCharge() != null ? manage.getCancelCharge() : "");
@@ -529,7 +530,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getTotalAmountWater())){
+        if(StringUtils.isEmpty(manage.getTotalAmountWater()) || paramIsNull(manage.getTotalAmountWater())){
             title = title.replaceAll("流水合计金额,","");
         }else {
             builder.append(manage.getTotalAmountWater() != null ? manage.getTotalAmountWater() : "");
@@ -539,7 +540,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getScaleEfficient())){
+        if(StringUtils.isEmpty(manage.getScaleEfficient()) || paramIsNull(manage.getScaleEfficient())){
             title = title.replaceAll("规模系数,","");
         }else {
             builder.append(manage.getScaleEfficient() != null ? this.getTwoPoint(manage.getScaleEfficient()): "");
@@ -548,7 +549,7 @@ public class SupplierFeeController {
 
         }
 
-        if(StringUtils.isEmpty(manage.getTotalFlowLastMonth())){
+        if(StringUtils.isEmpty(manage.getTotalFlowLastMonth()) || paramIsNull(manage.getTotalFlowLastMonth())){
             title = title.replaceAll("上月总流水,","");
         }else {
             builder.append(manage.getTotalFlowLastMonth() != null ? manage.getTotalFlowLastMonth() : "");
@@ -557,7 +558,7 @@ public class SupplierFeeController {
 
         }
 
-        if(StringUtils.isEmpty(manage.getPreRunCarNum())){
+        if(StringUtils.isEmpty(manage.getPreRunCarNum()) || paramIsNull(manage.getPreRunCarNum())){
             title = title.replaceAll("上月运营车辆数,","");
         }else {
             builder.append(manage.getPreRunCarNum() != null ? manage.getPreRunCarNum() : "");
@@ -567,7 +568,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getRunCarIncreaseRate())){
+        if(StringUtils.isEmpty(manage.getRunCarIncreaseRate()) || paramIsNull(manage.getRunCarIncreaseRate())){
             title = title.replaceAll("运营车辆增幅,","");
         }else {
             builder.append(manage.getRunCarIncreaseRate() != null ? manage.getRunCarIncreaseRate() : "");
@@ -576,7 +577,7 @@ public class SupplierFeeController {
 
         }
 
-        if(StringUtils.isEmpty(manage.getFlowIncrease())){
+        if(StringUtils.isEmpty(manage.getFlowIncrease() ) || paramIsNull(manage.getFlowIncrease())) {
             title = title.replaceAll("流水增幅,","");
         }else {
             builder.append(manage.getFlowIncrease() != null ? this.getTwoPoint(manage.getFlowIncrease()) : "");
@@ -586,7 +587,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getGrowthFactor())){
+        if(StringUtils.isEmpty(manage.getGrowthFactor())  || paramIsNull(manage.getGrowthFactor())){
             title = title.replaceAll("增长系数,","");
         }else {
             builder.append(manage.getGrowthFactor() != null ? this.getTwoPoint(manage.getGrowthFactor()) : "");
@@ -596,7 +597,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getTotalDriverContribution())){
+        if(StringUtils.isEmpty(manage.getTotalDriverContribution()) || paramIsNull(manage.getTotalDriverContribution())){
             title = title.replaceAll("司机贡献金合计,","");
         }else {
             builder.append(manage.getTotalDriverContribution() != null ? manage.getTotalDriverContribution() : "").append(",");
@@ -604,7 +605,7 @@ public class SupplierFeeController {
 
         }
 
-        if(StringUtils.isEmpty(manage.getTotalComplianceAwards())){
+        if(StringUtils.isEmpty(manage.getTotalComplianceAwards()) || paramIsNull(manage.getTotalComplianceAwards())){
             title = title.replaceAll("合规奖励合计,","");
         }else {
             builder.append(manage.getTotalComplianceAwards() != null ? manage.getTotalComplianceAwards() : "").append(",");
@@ -612,7 +613,7 @@ public class SupplierFeeController {
 
         }
 
-        if(StringUtils.isEmpty(manage.getMonthCommission())){
+        if(StringUtils.isEmpty(manage.getMonthCommission()) || paramIsNull(manage.getMonthCommission())){
             title = title.replaceAll("佣金合计,","");
         }else {
             builder.append(manage.getMonthCommission() != null ? manage.getMonthCommission() : "");
@@ -622,40 +623,40 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getBadRatings())){
+        if(StringUtils.isEmpty(manage.getBadRatings()) || paramIsNull(manage.getBadRatings())){
             title = title.replaceAll("差评率,","");
         }else {
-            builder.append(manage.getBadRatings() != null ? this.getTwoPoint(manage.getBadRatings()) : "");
+            builder.append(manage.getBadRatings() != null ? this.rateToPertent(manage.getBadRatings()) : "");
             builder.append(",");
-            listStr.add("差评率:"+manage.getBadRatings());
+            listStr.add("差评率:"+this.rateToPertent(manage.getBadRatings()));
 
         }
 
-        if(StringUtils.isEmpty(manage.getResponsibleComplainRate())){
+        if(StringUtils.isEmpty(manage.getResponsibleComplainRate()) || paramIsNull(manage.getResponsibleComplainRate())){
             title = title.replaceAll("有责投诉率,","");
         }else {
-            builder.append(manage.getResponsibleComplainRate() != null ? this.getTwoPoint(manage.getResponsibleComplainRate()) : "");
+            builder.append(manage.getResponsibleComplainRate() != null ? this.rateToPertent(manage.getResponsibleComplainRate()) : "");
             builder.append(",");
-            listStr.add("有责投诉率:"+manage.getResponsibleComplainRate());
+            listStr.add("有责投诉率:"+this.rateToPertent(manage.getResponsibleComplainRate()));
 
         }
 
 
-        if(StringUtils.isEmpty(manage.getDriverHeadPhotoRunRate())){
+        if(StringUtils.isEmpty(manage.getDriverHeadPhotoRunRate()) || paramIsNull(manage.getDriverHeadPhotoRunRate())){
             title = title.replaceAll("司机头像运营率,","");
         }else {
-            builder.append(manage.getDriverHeadPhotoRunRate() != null ? this.getTwoPoint(manage.getDriverHeadPhotoRunRate()) : "");
+            builder.append(manage.getDriverHeadPhotoRunRate() != null ? this.rateToPertent(manage.getDriverHeadPhotoRunRate()) : "");
             builder.append(",");
-            listStr.add("司机头像运营率:"+manage.getDriverHeadPhotoRunRate());
+            listStr.add("司机头像运营率:"+this.rateToPertent(manage.getDriverHeadPhotoRunRate()));
         }
 
 
-        if(StringUtils.isEmpty(manage.getBaseShareRate())){
+        if(StringUtils.isEmpty(manage.getBaseShareRate()) || paramIsNull(manage.getBaseShareRate())){
             title = title.replaceAll("基础分佣比例,","");
         }else {
-            builder.append(manage.getBaseShareRate() != null ? this.getTwoPoint(manage.getBaseShareRate()) : "");
+            builder.append(manage.getBaseShareRate() != null ? this.rateToPertent(manage.getBaseShareRate()) : "");
             builder.append(",");
-            listStr.add("基础分佣比例:"+manage.getBaseShareRate());
+            listStr.add("基础分佣比例:"+this.rateToPertent(manage.getBaseShareRate()));
         }
 
 
@@ -668,7 +669,7 @@ public class SupplierFeeController {
 
         }
 
-        if(StringUtils.isEmpty(manage.getExcludeCommission())){
+        if(StringUtils.isEmpty(manage.getExcludeCommission()) || paramIsNull(manage.getExcludeCommission())){
             title = title.replaceAll("剔除佣金,","");
         }else {
             builder.append(manage.getExcludeCommission() != null ? manage.getExcludeCommission() : "");
@@ -678,7 +679,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getDeductionAmountLastMonth() )){
+        if(StringUtils.isEmpty(manage.getDeductionAmountLastMonth()) || paramIsNull(manage.getDeductionAmountLastMonth())){
             title = title.replaceAll("上月暂扣金额,","");
         }else {
             builder.append(manage.getDeductionAmountLastMonth() != null ? manage.getDeductionAmountLastMonth() : "");
@@ -695,7 +696,7 @@ public class SupplierFeeController {
             listStr.add("是否补发:"+manage.getIsReissue());
         }
 
-        if(StringUtils.isEmpty(manage.getTotal() )){
+        if(StringUtils.isEmpty(manage.getTotal()) || paramIsNull(manage.getTotal())){
             title = title.replaceAll("合计费用,","");
         }else {
             builder.append(manage.getTotal() != null ? manage.getTotal() : "");
@@ -704,7 +705,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getComplianceDriverAward())){
+        if(StringUtils.isEmpty(manage.getComplianceDriverAward()) || paramIsNull(manage.getComplianceDriverAward())){
             title = title.replaceAll("合规司机奖励,","");
         }else {
             builder.append(manage.getComplianceDriverAward() != null ? manage.getComplianceDriverAward() : "");
@@ -714,7 +715,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getBadRatingsAward())){
+        if(StringUtils.isEmpty(manage.getBadRatingsAward()) || paramIsNull(manage.getBadRatingsAward())){
             title = title.replaceAll("差评罚金,","");
         }else {
             builder.append(manage.getBadRatingsAward() != null ? manage.getBadRatingsAward() : "");
@@ -724,7 +725,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getAmountAssessmentSum())){
+        if(StringUtils.isEmpty(manage.getAmountAssessmentSum()) || paramIsNull(manage.getAmountAssessmentSum())){
             title = title.replaceAll("扣款差评数量,","");
         }else {
             builder.append(manage.getAmountAssessmentSum() != null ? manage.getAmountAssessmentSum() : "");
@@ -734,7 +735,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getGardenAward())){
+        if(StringUtils.isEmpty(manage.getGardenAward()) || paramIsNull(manage.getGardenAward())){
             title = title.replaceAll("花园权益奖励,","");
         }else {
             builder.append(manage.getGardenAward() != null ? manage.getGardenAward() : "").append(",");
@@ -742,7 +743,7 @@ public class SupplierFeeController {
 
         }
 
-        if(StringUtils.isEmpty(manage.getOtherIncreaseAmount())){
+        if(StringUtils.isEmpty(manage.getOtherIncreaseAmount()) || paramIsNull(manage.getOtherIncreaseAmount())){
             title = title.replaceAll("其它增加金额,","");
         }else {
             builder.append(manage.getOtherIncreaseAmount() != null ? manage.getOtherIncreaseAmount() : "").append(",");
@@ -750,7 +751,7 @@ public class SupplierFeeController {
 
         }
 
-        if(StringUtils.isEmpty(manage.getInspectionFines())){
+        if(StringUtils.isEmpty(manage.getInspectionFines()) || paramIsNull(manage.getInspectionFines())){
             title = title.replaceAll("稽查罚金,","");
         }else {
             builder.append(manage.getInspectionFines() != null ? manage.getInspectionFines() : "");
@@ -760,7 +761,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getOthers())){
+        if(StringUtils.isEmpty(manage.getOthers()) || paramIsNull(manage.getOthers())){
             title = title.replaceAll("其它扣款项,","");
         }else {
             builder.append(manage.getOthers() != null ? manage.getOthers() : "");
@@ -770,7 +771,7 @@ public class SupplierFeeController {
         }
 
 
-        if(StringUtils.isEmpty(manage.getTotalManageFees())){
+        if(StringUtils.isEmpty(manage.getTotalManageFees()) || paramIsNull(manage.getTotalManageFees())){
             title = title.replaceAll("管理费合计,","");
         }else {
             builder.append(manage.getTotalManageFees() != null ? manage.getTotalManageFees() : "");
@@ -779,7 +780,7 @@ public class SupplierFeeController {
 
         }
 
-        if(StringUtils.isEmpty(manage.getGeneralizationfficient())){
+        if(StringUtils.isEmpty(manage.getGeneralizationfficient()) || paramIsNull(manage.getGeneralizationfficient())){
             title = title.replaceAll("推广系数,","");
         }else {
             builder.append(manage.getGeneralizationfficient() != null ? manage.getGeneralizationfficient() : "");
@@ -788,7 +789,7 @@ public class SupplierFeeController {
 
         }
 
-        if(StringUtils.isEmpty(manage.getCityManageRating())){
+        if(StringUtils.isEmpty(manage.getCityManageRating()) || paramIsNull(manage.getCityManageRating())){
             title = title.replaceAll("城市经理评级,","");
         }else {
             builder.append(manage.getCityManageRating() != null ? manage.getCityManageRating() : "");
@@ -907,5 +908,37 @@ public class SupplierFeeController {
         }
 
         return AjaxResponse.success(null);
+    }
+
+
+    /**同步的数据 有0.00 和 0.0000 则不导出对应字段*/
+    private boolean paramIsNull(String param){
+        if(StringUtils.isEmpty(param)){
+            return true;
+        }
+
+        if(param.equals("0.00") || param.equals("0.0000")){
+            return true;
+        }
+
+        return false;
+    }
+
+    /**转化为百分比*/
+    private String rateToPertent(String param){
+
+        try {
+            if(StringUtils.isEmpty(param)){
+                return null;
+            }
+
+            BigDecimal bigDecimal = new BigDecimal(param);
+
+            BigDecimal newParam =  bigDecimal.multiply(new BigDecimal(100)).setScale(2,BigDecimal.ROUND_DOWN);
+            return  String.valueOf(newParam) + "%";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return param;
     }
 }
