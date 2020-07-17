@@ -231,7 +231,7 @@ public class InterCityActivityServiceImpl implements InterCityActivityService {
             if (StringUtils.isNotEmpty(lineResult)) {
                 JSONObject jsonResult = JSONObject.parseObject(lineResult);
                 if (jsonResult != null && jsonResult.getInteger(Constants.CODE) == 0) {
-                    if (jsonResult.get(Constants.CODE) != null) {
+                    if (jsonResult.get(Constants.CODE) != null && jsonResult.get(Constants.DATA) != null) {
                         return jsonResult.get("data").toString();
                     }
                 }
