@@ -543,9 +543,9 @@ public class SupplierFeeController {
         if(StringUtils.isEmpty(manage.getScaleEfficient()) || paramIsNull(manage.getScaleEfficient())){
             title = title.replaceAll("规模系数,","");
         }else {
-            builder.append(manage.getScaleEfficient() != null ? this.getTwoPoint(manage.getScaleEfficient()): "");
+            builder.append(manage.getScaleEfficient() != null ? this.rateToPertent(manage.getScaleEfficient()): "");
             builder.append(",");
-            listStr.add("规模系数:"+manage.getScaleEfficient());
+            listStr.add("规模系数:"+this.rateToPertent(manage.getScaleEfficient()));
 
         }
 
@@ -571,18 +571,18 @@ public class SupplierFeeController {
         if(StringUtils.isEmpty(manage.getRunCarIncreaseRate()) || paramIsNull(manage.getRunCarIncreaseRate())){
             title = title.replaceAll("运营车辆增幅,","");
         }else {
-            builder.append(manage.getRunCarIncreaseRate() != null ? manage.getRunCarIncreaseRate() : "");
+            builder.append(manage.getRunCarIncreaseRate() != null ? this.rateToPertent(manage.getRunCarIncreaseRate()) : "");
             builder.append(",");
-            listStr.add("运营车辆增幅:"+manage.getRunCarIncreaseRate());
+            listStr.add("运营车辆增幅:"+this.rateToPertent(manage.getRunCarIncreaseRate()) );
 
         }
 
         if(StringUtils.isEmpty(manage.getFlowIncrease() ) || paramIsNull(manage.getFlowIncrease())) {
             title = title.replaceAll("流水增幅,","");
         }else {
-            builder.append(manage.getFlowIncrease() != null ? this.getTwoPoint(manage.getFlowIncrease()) : "");
+            builder.append(manage.getFlowIncrease() != null ? this.rateToPertent(manage.getFlowIncrease()) : "");
             builder.append(",");
-            listStr.add("流水增幅:"+manage.getFlowIncrease());
+            listStr.add("流水增幅:"+this.rateToPertent(manage.getFlowIncrease()));
 
         }
 
@@ -590,9 +590,9 @@ public class SupplierFeeController {
         if(StringUtils.isEmpty(manage.getGrowthFactor())  || paramIsNull(manage.getGrowthFactor())){
             title = title.replaceAll("增长系数,","");
         }else {
-            builder.append(manage.getGrowthFactor() != null ? this.getTwoPoint(manage.getGrowthFactor()) : "");
+            builder.append(manage.getGrowthFactor() != null ? this.rateToPertent(manage.getGrowthFactor()) : "");
             builder.append(",");
-            listStr.add("增长系数:"+manage.getGrowthFactor());
+            listStr.add("增长系数:"+this.rateToPertent(manage.getGrowthFactor()));
 
         }
 
