@@ -230,7 +230,7 @@ public class IntegerCityController {
                 endCreateDate, beginCostEndDate, endCostEndDate, riderPhone, distributorId, lineBeforeName, bookingDateSort, payFlag, offlineIntercityServiceType));
         Map<String, Object> map = Maps.newHashMap();
         if(StringUtils.isNotEmpty(lineBeforeName) || StringUtils.isNotEmpty(lineAfterName)){
-            String ruleBatch = this.ruleBatch(lineBeforeName.trim(),lineAfterName.trim());
+            String ruleBatch = this.ruleBatch(lineBeforeName,lineAfterName);
             if (StringUtils.isEmpty(ruleBatch)) {
                 logger.info("=====未查询到匹配的线路====");
                 return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
@@ -279,7 +279,7 @@ public class IntegerCityController {
         List<Integer>  ruleBeforeList = null;
         if (StringUtils.isNotEmpty(lineBeforeName)) {
             ruleBeforeList = this.getRuleIdBatch(Constants.BEFORE,lineBeforeName);
-            if(CollectionUtils.isEmpty(ruleBeforeList)){
+            if(CollectionUtils.isNotEmpty(ruleBeforeList)){
                 logger.info("=======起点区域为空");
                 return "";
             }
@@ -287,7 +287,7 @@ public class IntegerCityController {
         List<Integer> ruleAfterList = null;
         if(StringUtils.isNotEmpty(lineAfterName)){
             ruleAfterList = this.getRuleIdBatch(Constants.AFTER,lineAfterName);
-            if(CollectionUtils.isEmpty(ruleAfterList)){
+            if(CollectionUtils.isNotEmpty(ruleAfterList)){
                 logger.info("======终点区域为空=");
                 return "";
             }
@@ -3318,7 +3318,7 @@ public class IntegerCityController {
         boolean bl = false;
         switch (lineType){
             case 1:
-                String before = lineName.substring(0,lineName.indexOf(Constants.SHORT_STOKE));
+                String before = lineName.substring(0,lineName.indexOf(Constants.SHORT_STOKE)>0?lineName.indexOf(Constants.SHORT_STOKE):lineName.length());
 
                 if(before.contains(param)){
                     bl = true;
@@ -3326,7 +3326,8 @@ public class IntegerCityController {
                 break;
             case 2:
 
-                String after = lineName.substring(lineName.indexOf(Constants.SHORT_STOKE)+1,lineName.length());
+                Integer index = lineName.indexOf(Constants.SHORT_STOKE)>0 ? (lineName.indexOf(Constants.SHORT_STOKE)+1): 0 ;
+                String after = lineName.substring(index,lineName.length());
 
                 if(after.contains(param)){
                     bl = true;
