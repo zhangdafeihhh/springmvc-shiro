@@ -279,7 +279,7 @@ public class IntegerCityController {
         List<Integer>  ruleBeforeList = null;
         if (StringUtils.isNotEmpty(lineBeforeName)) {
             ruleBeforeList = this.getRuleIdBatch(Constants.BEFORE,lineBeforeName);
-            if(CollectionUtils.isNotEmpty(ruleBeforeList)){
+            if(CollectionUtils.isEmpty(ruleBeforeList)){
                 logger.info("=======起点区域为空");
                 return "";
             }
@@ -287,7 +287,7 @@ public class IntegerCityController {
         List<Integer> ruleAfterList = null;
         if(StringUtils.isNotEmpty(lineAfterName)){
             ruleAfterList = this.getRuleIdBatch(Constants.AFTER,lineAfterName);
-            if(CollectionUtils.isNotEmpty(ruleAfterList)){
+            if(CollectionUtils.isEmpty(ruleAfterList)){
                 logger.info("======终点区域为空=");
                 return "";
             }
@@ -3333,6 +3333,9 @@ public class IntegerCityController {
                     bl = true;
                 }
                 break;
+
+            default:
+                return bl;
         }
 
         return bl;
