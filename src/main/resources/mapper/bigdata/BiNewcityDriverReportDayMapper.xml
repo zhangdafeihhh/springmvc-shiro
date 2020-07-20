@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.bigdata.BiNewcityDriverReportDayMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.bigdata.BiNewcityDriverReportDay" >
+    <id column="tableau_id" property="tableauId" jdbcType="BIGINT" />
+    <result column="data_date" property="dataDate" jdbcType="DATE" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="bind_order_num" property="bindOrderNum" jdbcType="INTEGER" />
+    <result column="settle_order_num" property="settleOrderNum" jdbcType="INTEGER" />
+    <result column="total_amount" property="totalAmount" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    tableau_id, data_date, driver_id, driver_name, driver_phone, license_plates, city_id, 
+    city_name, supplier_id, supplier_name, bind_order_num, settle_order_num, total_amount
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from bi_newcity_driver_report_day
+    where tableau_id = #{tableauId,jdbcType=BIGINT}
+  </select>
+  <insert id="insert" parameterType="com.zhuanche.entity.bigdata.BiNewcityDriverReportDay" >
+    insert into bi_newcity_driver_report_day (tableau_id, data_date, driver_id, 
+      driver_name, driver_phone, license_plates, 
+      city_id, city_name, supplier_id, 
+      supplier_name, bind_order_num, settle_order_num, 
+      total_amount)
+    values (#{tableauId,jdbcType=BIGINT}, #{dataDate,jdbcType=DATE}, #{driverId,jdbcType=INTEGER}, 
+      #{driverName,jdbcType=VARCHAR}, #{driverPhone,jdbcType=VARCHAR}, #{licensePlates,jdbcType=VARCHAR}, 
+      #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER}, 
+      #{supplierName,jdbcType=VARCHAR}, #{bindOrderNum,jdbcType=INTEGER}, #{settleOrderNum,jdbcType=INTEGER}, 
+      #{totalAmount,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.bigdata.BiNewcityDriverReportDay" >
+    insert into bi_newcity_driver_report_day
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="tableauId != null" >
+        tableau_id,
+      </if>
+      <if test="dataDate != null" >
+        data_date,
+      </if>
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="driverName != null" >
+        driver_name,
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone,
+      </if>
+      <if test="licensePlates != null" >
+        license_plates,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="supplierName != null" >
+        supplier_name,
+      </if>
+      <if test="bindOrderNum != null" >
+        bind_order_num,
+      </if>
+      <if test="settleOrderNum != null" >
+        settle_order_num,
+      </if>
+      <if test="totalAmount != null" >
+        total_amount,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="tableauId != null" >
+        #{tableauId,jdbcType=BIGINT},
+      </if>
+      <if test="dataDate != null" >
+        #{dataDate,jdbcType=DATE},
+      </if>
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null" >
+        #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="licensePlates != null" >
+        #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="bindOrderNum != null" >
+        #{bindOrderNum,jdbcType=INTEGER},
+      </if>
+      <if test="settleOrderNum != null" >
+        #{settleOrderNum,jdbcType=INTEGER},
+      </if>
+      <if test="totalAmount != null" >
+        #{totalAmount,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.bigdata.BiNewcityDriverReportDay" >
+    update bi_newcity_driver_report_day
+    <set >
+      <if test="dataDate != null" >
+        data_date = #{dataDate,jdbcType=DATE},
+      </if>
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="licensePlates != null" >
+        license_plates = #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="bindOrderNum != null" >
+        bind_order_num = #{bindOrderNum,jdbcType=INTEGER},
+      </if>
+      <if test="settleOrderNum != null" >
+        settle_order_num = #{settleOrderNum,jdbcType=INTEGER},
+      </if>
+      <if test="totalAmount != null" >
+        total_amount = #{totalAmount,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where tableau_id = #{tableauId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.bigdata.BiNewcityDriverReportDay" >
+    update bi_newcity_driver_report_day
+    set data_date = #{dataDate,jdbcType=DATE},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      license_plates = #{licensePlates,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      bind_order_num = #{bindOrderNum,jdbcType=INTEGER},
+      settle_order_num = #{settleOrderNum,jdbcType=INTEGER},
+      total_amount = #{totalAmount,jdbcType=DECIMAL}
+    where tableau_id = #{tableauId,jdbcType=BIGINT}
+  </update>
+</mapper>

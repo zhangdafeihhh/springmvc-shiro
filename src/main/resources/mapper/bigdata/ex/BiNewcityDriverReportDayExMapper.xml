@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.bigdata.ex.BiNewcityDriverReportDayExMapper">
+    <resultMap id="BaseResultMap" type="com.zhuanche.entity.bigdata.BiNewcityDriverReportDay">
+        <id column="tableau_id" property="tableauId" jdbcType="BIGINT"/>
+        <result column="data_date" property="dataDate" jdbcType="DATE"/>
+        <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
+        <result column="driver_name" property="driverName" jdbcType="VARCHAR"/>
+        <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR"/>
+        <result column="license_plates" property="licensePlates" jdbcType="VARCHAR"/>
+        <result column="city_id" property="cityId" jdbcType="INTEGER"/>
+        <result column="city_name" property="cityName" jdbcType="VARCHAR"/>
+        <result column="supplier_id" property="supplierId" jdbcType="INTEGER"/>
+        <result column="supplier_name" property="supplierName" jdbcType="VARCHAR"/>
+        <result column="bind_order_num" property="bindOrderNum" jdbcType="INTEGER"/>
+        <result column="settle_order_num" property="settleOrderNum" jdbcType="INTEGER"/>
+        <result column="total_amount" property="totalAmount" jdbcType="DECIMAL"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    tableau_id, data_date, driver_id, driver_name, driver_phone, license_plates, city_id, 
+    city_name, supplier_id, supplier_name, bind_order_num, settle_order_num, total_amount
+  </sql>
+    <select id="queryFlowList" resultMap="BaseResultMap">
+        SELECT  <include refid="Base_Column_List"/>
+        FROM bi_newcity_driver_report_day t
+        WHERE 1= 1
+        <if test="dateType != null and dateType == 1">
+            and  data_date = str_to_date(#{dataBeginDate},'%Y-%m-%d')
+        </if>
+
+        <if test="dateType != null and (dateType == 2 or dateType == 3)">
+            and data_date between str_to_date(#{dataBeginDate},'%Y-%m-%d') and  str_to_date(#{dataEndDate},'%Y-%m-%d')
+        </if>
+
+        <if test="driverName != null">
+            and driver_name LIKE CONCAT(#{driverName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="driverPhone != null">
+            and driver_phone = #{driverPhone}
+        </if>
+        <if test="licensePlates != null">
+            and license_plates LIKE CONCAT(#{licensePlates,jdbcType=VARCHAR},'%')
+        </if>
+
+        <if test="supplierId != null">
+            and supplier_id = #{supplierId}
+        </if>
+        <if test="cityId != null">
+            and city_id = #{cityId}
+        </if>
+
+        ORDER  by data_date DESC
+    </select>
+
+    <select id="queryFlowTotal" resultType="com.zhuanche.dto.bigdata.BiNewcityDriverReportDayDto">
+        SELECT
+        sum(t.total_amount) as totalAmountTotal,
+        sum(t.bind_order_num) as bindOrderNumTotal,
+        sum(t.settle_order_num ) as settleOrderNumTotal,
+        count(t.driver_id) as driverTotal
+        FROM bi_newcity_driver_report_day t
+        WHERE 1= 1
+        <if test="dateType != null and dateType == 1">
+            and  data_date = str_to_date(#{dataBeginDate},'%Y-%m-%d')
+        </if>
+
+        <if test="dateType != null and (dateType == 2 or dateType == 3)">
+            and data_date between str_to_date(#{dataBeginDate},'%Y-%m-%d') and  str_to_date(#{dataEndDate},'%Y-%m-%d')
+        </if>
+
+        <if test="driverName != null">
+            and driver_name LIKE CONCAT(#{driverName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="driverPhone != null">
+            and driver_phone = #{driverPhone}
+        </if>
+        <if test="licensePlates != null">
+            and license_plates LIKE CONCAT(#{licensePlates,jdbcType=VARCHAR},'%')
+        </if>
+
+        <if test="supplierId != null">
+            and supplier_id = #{supplierId}
+        </if>
+        <if test="cityId != null">
+            and city_id = #{cityId}
+        </if>
+
+        ORDER  by data_date DESC
+    </select>
+
+</mapper>
