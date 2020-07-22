@@ -216,4 +216,12 @@ public final class Constants {
 
 	/**查询所有的线路*/
 	public static final String AllRULE = "-1";
+
+	/**查询线路名称前*/
+	public static final Integer BEFORE = 1;
+
+	/**查询线路名称后*/
+	public static final Integer AFTER = 2;
+
+
 }

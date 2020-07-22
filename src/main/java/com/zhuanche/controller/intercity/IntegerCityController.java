@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import com.zhuanche.common.enums.OrderStateEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.util.LbsSignUtil;
+import com.zhuanche.common.util.TransportUtils;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -213,7 +214,8 @@ public class IntegerCityController {
                                    String endCostEndDate,
                                    String riderPhone,
                                    String distributorId,
-                                   String lineName,
+                                   String lineBeforeName,
+                                   String lineAfterName,
                                    String bookingDateSort,
                                    String isCrossDiscountReduction,
                                    Integer payFlag,
@@ -225,10 +227,10 @@ public class IntegerCityController {
                         "bookingDateSort:{24},payFlag:{25},offlineIntercityServiceType:{26}", pageNum,
                 pageSize, cityId, supplierId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone, distributorId, lineName, bookingDateSort, payFlag, offlineIntercityServiceType));
+                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone, distributorId, lineBeforeName, bookingDateSort, payFlag, offlineIntercityServiceType));
         Map<String, Object> map = Maps.newHashMap();
-        if (StringUtils.isNotEmpty(lineName)) {
-            String ruleBatch = this.getRuleIdBatch(lineName);
+        if(StringUtils.isNotEmpty(lineBeforeName) || StringUtils.isNotEmpty(lineAfterName)){
+            String ruleBatch = this.ruleBatch(lineBeforeName,lineAfterName);
             if (StringUtils.isEmpty(ruleBatch)) {
                 logger.info("=====未查询到匹配的线路====");
                 return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
@@ -236,8 +238,7 @@ public class IntegerCityController {
             map.put("ruleIdBatch", ruleBatch);
         }
         map = this.getQueryParam(pageNum, pageSize, cityId, supplierId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource, driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo,
-                mainOrderNo, beginCreateDate, endCreateDate, beginCostEndDate, endCostEndDate, riderPhone, distributorId, lineName, bookingDateSort, isCrossDiscountReduction, payFlag, offlineIntercityServiceType, map);
-
+                mainOrderNo, beginCreateDate, endCreateDate, beginCostEndDate, endCostEndDate, riderPhone, distributorId, lineBeforeName, bookingDateSort, isCrossDiscountReduction, payFlag, offlineIntercityServiceType, map);
         String supplierIdBatch = this.supplierBatch(cityId, supplierId);
         if (StringUtils.isNotEmpty(supplierIdBatch)) {
             map.put("supplierIdBatch", supplierIdBatch);
@@ -250,7 +251,6 @@ public class IntegerCityController {
         String transId = sdf.format(new Date());
         map.put("transId", transId);
         String url = esOrderDataSaasUrl + "/order/v2/search";
-
         String result = MpOkHttpUtil.okHttpGet(url, map, 0, null);
         if (StringUtils.isNotEmpty(result)) {
             JSONObject jsonObject = JSONObject.parseObject(result);
@@ -268,6 +268,42 @@ public class IntegerCityController {
         return AjaxResponse.success(null);
     }
 
+
+    /***
+     * 根据起点名称或者终点名称查询是否有满足的线路id
+     * @param lineBeforeName
+     * @param lineAfterName
+     * @return
+     */
+    private String ruleBatch(String lineBeforeName,String lineAfterName){
+        List<Integer>  ruleBeforeList = null;
+        if (StringUtils.isNotEmpty(lineBeforeName)) {
+            ruleBeforeList = this.getRuleIdBatch(Constants.BEFORE,lineBeforeName);
+            if(CollectionUtils.isEmpty(ruleBeforeList)){
+                logger.info("=======起点区域为空");
+                return "";
+            }
+        }
+        List<Integer> ruleAfterList = null;
+        if(StringUtils.isNotEmpty(lineAfterName)){
+            ruleAfterList = this.getRuleIdBatch(Constants.AFTER,lineAfterName);
+            if(CollectionUtils.isEmpty(ruleAfterList)){
+                logger.info("======终点区域为空=");
+                return "";
+            }
+        }
+
+        String ruleBatch = "";
+        if(StringUtils.isNotEmpty(lineBeforeName) && StringUtils.isNotEmpty(lineAfterName)){
+            ruleBeforeList.retainAll(ruleAfterList);
+            ruleBatch = StringUtils.join(ruleBeforeList.toArray(),Constants.SEPERATER);
+        }else if(StringUtils.isNotEmpty(lineBeforeName) ){
+            ruleBatch = StringUtils.join(ruleBeforeList.toArray(),Constants.SEPERATER);
+        }else if(StringUtils.isNotEmpty(lineAfterName)){
+            ruleBatch = StringUtils.join(ruleAfterList.toArray(),Constants.SEPERATER);
+        }
+        return ruleBatch;
+    }
 
     /**
      * 获取供应商
@@ -3232,11 +3268,12 @@ public class IntegerCityController {
     }
 
     /**
+     * lineType 1 路线起点 2 路线终点
      * 获取所有的线路名称和id
      */
-    private String getRuleIdBatch(String lineName) {
+    private List<Integer> getRuleIdBatch(Integer lineType,String lineName) {
         logger.info("====获取所有线路和名称=====start");
-        StringBuffer stringBuffer = new StringBuffer();
+        List<Integer> listLineIds = new ArrayList<>();
         try {
             Map<String, Object> requestMap = new HashMap<>(4);
             requestMap.put("lineModel", 2);
@@ -3255,19 +3292,53 @@ public class IntegerCityController {
                     jsonArray.forEach(json -> {
                         JSONObject jsonObject = (JSONObject) json;
                         if (jsonObject.get(Constants.LINEID) != null) {
-                            stringBuffer.append(jsonObject.get("lineId")).append(",");
+                            String allLineName = jsonObject.get("lineName").toString();
+                            if(beforeOrAfter(lineType,lineName,allLineName)){
+                                listLineIds.add(jsonObject.getInteger("lineId"));
+
+                            }
                         }
                     });
                 }
             }
-            logger.info("==========获取配置后台线路end==============" + JSONObject.toJSONString(stringBuffer.toString()));
+            logger.info("==========获取配置后台线路end==============" + JSONObject.toJSONString(listLineIds));
         } catch (Exception e) {
             logger.info("获取配置后台线路异常" + e);
         }
-        if (stringBuffer.length() > 0) {
-            return stringBuffer.substring(0, stringBuffer.length());
+
+        return listLineIds;
+    }
+
+    /**
+     * 1 路线起点 2 路线终点
+     * @param lineType
+     * @return
+     */
+    private boolean beforeOrAfter(Integer lineType,String param,String lineName){
+        boolean bl = false;
+        switch (lineType){
+            case 1:
+                String before = lineName.substring(0,lineName.indexOf(Constants.SHORT_STOKE)>0?lineName.indexOf(Constants.SHORT_STOKE):lineName.length());
+
+                if(before.contains(param)){
+                    bl = true;
+                }
+                break;
+            case 2:
+
+                Integer index = lineName.indexOf(Constants.SHORT_STOKE)>0 ? (lineName.indexOf(Constants.SHORT_STOKE)+1): 0 ;
+                String after = lineName.substring(index,lineName.length());
+
+                if(after.contains(param)){
+                    bl = true;
+                }
+                break;
+
+            default:
+                return bl;
         }
-        return null;
+
+        return bl;
     }
 
 }
