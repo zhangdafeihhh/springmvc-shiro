@@ -216,8 +216,7 @@ public class DriverPunishService {
 
 
         try {
-
-            String result = HttpClientUtil.buildGetRequest(url).execute();
+            String result = HttpClientUtil.buildGetRequest(url).setReadTimeOut(3000).setConnectTimeOut(3000).execute();
             JSONObject jsonObject = JSON.parseObject(result);
             log.info("查询 处罚列表 录音 url = "+ url + "查询处罚列表返回结果 : " + result);
 

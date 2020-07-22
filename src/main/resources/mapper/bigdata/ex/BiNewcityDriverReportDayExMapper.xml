@@ -57,7 +57,7 @@
         sum(t.total_amount) as totalAmountTotal,
         sum(t.bind_order_num) as bindOrderNumTotal,
         sum(t.settle_order_num ) as settleOrderNumTotal,
-        count(t.driver_id) as driverTotal
+        count(distinct(driver_id)) as driverTotal
         FROM bi_newcity_driver_report_day t
         WHERE 1= 1
         <if test="dateType != null and dateType == 1">
