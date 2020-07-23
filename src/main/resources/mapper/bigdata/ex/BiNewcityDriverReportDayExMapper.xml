@@ -21,7 +21,10 @@
     city_name, supplier_id, supplier_name, bind_order_num, settle_order_num, total_amount
   </sql>
     <select id="queryFlowList" resultMap="BaseResultMap">
-        SELECT  <include refid="Base_Column_List"/>
+        SELECT  t.driver_id,t.driver_name,t.driver_phone,t.license_plates,
+        sum(t.total_amount) as total_amount,
+        sum(t.bind_order_num) as bind_order_num,
+        sum(t.settle_order_num ) as settle_order_num
         FROM bi_newcity_driver_report_day t
         WHERE 1= 1
         <if test="dateType != null and dateType == 1">
@@ -48,7 +51,7 @@
         <if test="cityId != null">
             and city_id = #{cityId}
         </if>
-
+        GROUP BY driver_id
         ORDER  by data_date DESC
     </select>
 
