@@ -2,13 +2,17 @@ package com.zhuanche.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +28,11 @@ public class MainController{
     private String loginpageUrl;  //前端UI登录页面
 	@Value("${homepage.url}")
 	private String homepageUrl; //前端UI首页页面
-	
+
+	private static final String LOGIN_KEY = "REMOTE_";
+
+	@Autowired
+	private RedisTemplate<String, Serializable > redisTemplate;
     
     /**运维监控心跳检测 **/
     @RequestMapping("/nginx")
@@ -46,9 +54,16 @@ public class MainController{
 	@RequestMapping("/login")
     public String login(HttpServletRequest request , HttpServletResponse response) throws Exception{
 		Boolean isAjax = (Boolean) request.getAttribute("X_IS_AJAX");
+		/**防止出现多次跳转到首页*/
+		String remoteAddr = LOGIN_KEY + request.getRemoteAddr();
 		if(  isAjax  ) {
-			AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
-			this.outJson(response, ajaxResponse);
+			if(!redisTemplate.hasKey(remoteAddr)){
+				AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
+				this.outJson(response, ajaxResponse);
+				/**存储10s 10后自动过期*/
+				redisTemplate.opsForValue().set(remoteAddr,remoteAddr,10, TimeUnit.SECONDS);
+			}
+
 		}else {
 			response.sendRedirect(loginpageUrl);
 		}
