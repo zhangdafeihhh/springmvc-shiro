@@ -8,10 +8,8 @@ import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.bigdata.MaxAndMinId;
-import com.zhuanche.entity.driver.DriverAppealRecord;
 import com.zhuanche.entity.driver.DriverPunishDto;
-import com.zhuanche.entity.rentcar.OrderVideoVO;
-import com.zhuanche.serv.punish.DriverPunishService;
+import com.zhuanche.serv.punish.DriverPunishClientService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
@@ -47,7 +45,7 @@ public class DriverPunishController extends BaseController {
     private static final Logger log = LoggerFactory.getLogger(DriverPunishController.class);
 
     @Autowired
-    private DriverPunishService driverPunishService;
+    private DriverPunishClientService driverPunishService;
 
 
     @RequestMapping("/getDriverPunishList")
@@ -83,19 +81,16 @@ public class DriverPunishController extends BaseController {
      * @return
      */
     @PostMapping(value = "/examineDriverPunish")
-    public AjaxResponse examineDriverPunish(Integer punishId, Integer status, String reason) {
+    public AjaxResponse examineDriverPunish(Integer punishId, Integer status, String reason,String cgPictures) {
         if (Objects.isNull(punishId) || Objects.isNull(status)) {
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
         log.info("司机处罚审核操作 punishId:{},status:{},reason:{}", punishId, status, reason);
         try {
-            driverPunishService.doAudit(punishId, status, reason);
+            driverPunishService.doAudit(punishId, status, reason, cgPictures);
             log.info("司机处罚审核操作成功");
             return AjaxResponse.success(null);
-        } catch (IllegalArgumentException e) {
-            log.warn("司机处罚审核操作失败, 参数校验未通过, msg:{}", e.getMessage());
-            return AjaxResponse.failMsg(RestErrorCode.RECORD_DEAL_FAILURE, e.getMessage());
-        } catch (ServiceException e) {
+        }  catch (ServiceException e) {
             log.error("司机处罚审核操作失败", e);
             return AjaxResponse.failMsg(e.getErrorCode(), e.getMessage());
         }
@@ -131,25 +126,13 @@ public class DriverPunishController extends BaseController {
         if (Objects.isNull(punishId)) {
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
-        Map<String, Object> data = new HashMap<>(4);
         try {
-            log.info("查询详情,punishId为--{}", punishId);
-            DriverPunishDto driverPunish = driverPunishService.getDetail(punishId);
-            List<DriverAppealRecord> recordList = driverPunishService.selectDriverAppealRocordByPunishId(punishId);
-
-            String orderNo = driverPunish.getOrderNo();
-            String sign = com.zhuanche.util.Common.MAIN_ORDER_KEY;
-            String businessId = com.zhuanche.util.Common.BUSSINESSID;
-            List<OrderVideoVO> orderVideoVOList = driverPunishService.getOrderVideoVOList(orderNo, businessId, sign);
-
-            data.put("driverPunish", driverPunish);
-            data.put("rocordList", Optional.ofNullable(recordList).orElse(Collections.emptyList()));
-            data.put("orderVideoVOList", orderVideoVOList);
-            return AjaxResponse.success(data);
-        } catch (Exception e) {
-            log.error("查询列表出现异常", e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            return AjaxResponse.success(driverPunishService.getDriverPunishDetail(punishId));
+        }  catch (ServiceException e) {
+            log.error("司机处罚审核查询失败", e);
+            return AjaxResponse.failMsg(e.getErrorCode(), e.getMessage());
         }
+
     }
 
     @RequestMapping("/exportDriverPunishList")

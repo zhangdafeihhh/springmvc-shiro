@@ -59,7 +59,6 @@ import java.util.*;
  * @Description:
  */
 @Slf4j
-@Service
 public class DriverPunishService {
 
     @Value("${virtual.url}")
@@ -440,7 +439,7 @@ public class DriverPunishService {
      * @param status   3:通过, 4:拒绝, 5:驳回
      * @param cgReason
      */
-    public void doAudit(Integer punishId, Integer status, String cgReason) {
+    public void doAudit(Integer punishId, Integer status, String cgReason, String cgPictures) {
         DriverPunishDto punishEntity = driverPunishExMapper.getDetail(punishId);
         if (Objects.isNull(punishEntity) || !Objects.equals(PUNISH_AUDIT_CAR_MANAGE, punishEntity.getCurrentAuditNode())) {
             throw new IllegalArgumentException("没有需求车管审核的记录");
