@@ -34,15 +34,15 @@ public class IntegerCityTeamServiceImpl implements IntegerCityTeamService{
     @Autowired
     private InterCityTeamExMapper exMapper;
 
-    @Override
-    public AjaxResponse addTeam(Integer cityId, Integer supplierId, String teamName) {
 
+    @Override
+    public AjaxResponse saveOrupdateTeam(Integer id,Integer cityId, Integer supplierId, String teamName) {
         /**校验是否已存在*/
         if(!isExist(cityId,supplierId,teamName)){
             return AjaxResponse.fail(RestErrorCode.TEAM_EXIST);
         }
-        InterCityTeam team = new InterCityTeam();
 
+        InterCityTeam team = new InterCityTeam();
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
         team.setCityId(cityId);
         team.setSupplierId(supplierId);
@@ -50,32 +50,17 @@ public class IntegerCityTeamServiceImpl implements IntegerCityTeamService{
         team.setCreateId(loginUser.getId());
         team.setCreateName(loginUser.getLoginName());
         team.setCreateTime(new Date());
-        int code = teamMapper.insertSelective(team);
 
-        if(code > 0){
-            return AjaxResponse.success(null);
+        int code = 0;
+
+        if(id != null && id > 0){
+            team.setId(id);
+
+            code = teamMapper.updateByPrimaryKeySelective(team);
+
         }else {
-            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+            code = teamMapper.insertSelective(team);
         }
-    }
-
-    @Override
-    public AjaxResponse updateTeam(Integer id,Integer cityId, Integer supplierId, String teamName) {
-
-        if(!isExist(cityId,supplierId,teamName)){
-            return AjaxResponse.fail(RestErrorCode.TEAM_EXIST);
-        }
-
-        InterCityTeam team = new InterCityTeam();
-        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-        team.setCityId(cityId);
-        team.setSupplierId(supplierId);
-        team.setTeamName(teamName);
-        team.setCreateId(loginUser.getId());
-        team.setCreateName(loginUser.getLoginName());
-        team.setCreateTime(new Date());
-        team.setId(id);
-        int code = teamMapper.updateByPrimaryKeySelective(team);
 
         if(code > 0){
             return AjaxResponse.success(null);

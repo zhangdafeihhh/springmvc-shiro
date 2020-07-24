@@ -13,11 +13,9 @@ import java.util.List;
  */
 public interface IntegerCityTeamService {
 
-    /**添加车队*/
-    AjaxResponse addTeam(Integer cityId, Integer supplierId, String teamName);
 
-    /**编辑车队*/
-    AjaxResponse updateTeam(Integer id,Integer cityId,Integer supplierId,String teamName);
+    /**添加编辑车队*/
+    AjaxResponse saveOrupdateTeam(Integer id,Integer cityId,Integer supplierId,String teamName);
 
 
     InterCityTeam teamDetail(Integer id);

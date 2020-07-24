@@ -1,5 +1,6 @@
 package mapper.mdbcarmanage.ex;
 
+import com.zhuanche.dto.mdbcarmanage.IntegerDriverInfoDto;
 import com.zhuanche.dto.mdbcarmanage.InterDriverTeamRelDto;
 import com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
@@ -34,4 +35,9 @@ public interface DriverInfoInterCityExMapper {
                                                    @Param("driverPhone")String driverPhone,
                                                    @Param("licensePlates")String licensePlates,
                                                    @Param("teamId")Integer teamId);
+
+    /**根据司机的查询司机信息*/
+    List<IntegerDriverInfoDto> driverDtoList(@Param("driverIds") List<Integer> driverIds);
+
+    List<DriverInfoInterCity> queryDriverByParam(@Param("queryParam") String  queryParam);
 }

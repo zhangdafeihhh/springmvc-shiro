@@ -15,4 +15,8 @@ public interface InterCityTeamDriverRelExMapper {
                      @Param("teamId")Integer teamId);
 
     List<IntercityTeamDriverRel> teamRelList(@Param("driverIds") List driverIds);
+
+    /**查询司机Id*/
+    List<Integer> queryDriverIds(@Param("teamId") Integer teamId);
+
 }

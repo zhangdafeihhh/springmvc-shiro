@@ -174,7 +174,27 @@
     <if test="teamId!=null and teamId!=''">
       and r.team_id = #{teamId}
     </if>
+    ORDER BY r.create_time desc
   </select>
 
 
+  <select id="driverDtoList" resultType="com.zhuanche.dto.mdbcarmanage.IntegerDriverInfoDto">
+    SELECT  t.driver_id as driverId,
+    t.driver_name as driverName
+     FROM  driver_info_inter_city t WHERE  1=1
+     and t.driver_id in
+     <foreach collection="driverIds" open="(" close=")" separator="," item="driver">
+       #{driver}
+     </foreach>
+  </select>
+
+
+  <select id="queryDriverByParam" resultMap="BaseResultMap" parameterType="java.lang.String">
+    SELECT  t.driver_id ,
+    t.driver_name,
+    t.driver_phone,
+    t.license_plates
+    FROM  driver_info_inter_city t WHERE  1=1
+    AND (t.driver_name = #{queryParam} or t.driver_phone= #{queryParam} or t.license_plates=#{queryParam} )
+  </select>
 </mapper>

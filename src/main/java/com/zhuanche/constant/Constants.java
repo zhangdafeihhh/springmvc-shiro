@@ -216,4 +216,6 @@ public final class Constants {
 
 	/**查询所有的线路*/
 	public static final String AllRULE = "-1";
+
+	public static final String TEAMNAME = "第%s车队";
 }

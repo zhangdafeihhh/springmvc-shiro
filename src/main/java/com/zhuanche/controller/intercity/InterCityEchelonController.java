@@ -56,9 +56,9 @@ public class InterCityEchelonController {
 
         logger.info(MessageFormat.format("新增车队入参：cityId:{0},supplierId:{1},teamName:{2}", cityId, supplierId, teamName));
         try {
-            return teamService.addTeam(cityId, supplierId, teamName.toString());
+            return teamService.saveOrupdateTeam(null,cityId, supplierId, teamName.toString());
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("新增车队异常",e);
         }
         return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
     }
@@ -73,9 +73,9 @@ public class InterCityEchelonController {
         logger.info(MessageFormat.format("修改车队入参：cityId:{0},supplierId:{1},teamName:{2}", cityId, supplierId, teamName));
         try {
             String teamNameStr = teamName.toString();
-            return teamService.updateTeam(id, cityId, supplierId, teamNameStr);
+            return teamService.saveOrupdateTeam(id, cityId, supplierId, teamNameStr);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("修改车队异常",e);
         }
         return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
     }
@@ -89,7 +89,7 @@ public class InterCityEchelonController {
         try {
             return AjaxResponse.success(teamService.teamDetail(id));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("获取详情异常" , e);
         }
         return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
     }
@@ -103,7 +103,7 @@ public class InterCityEchelonController {
         try {
             return relService.addDriver(driverIds, teamId);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("添加司机异常",e);
         }
         return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
     }
@@ -124,8 +124,13 @@ public class InterCityEchelonController {
                                             @Verify(param = "pageNo", rule = "required|min(0)") Integer pageNo,
                                             @Verify(param = "pageSize", rule = "required|min(10)") Integer pageSize) {
 
-        PageDTO pageDTO = cityService.queryDriverRelTeam(pageSize, pageNo, driverInfoInterCity, teamId);
-        return AjaxResponse.success(pageDTO);
+        try {
+            PageDTO pageDTO = cityService.queryDriverRelTeam(pageSize, pageNo, driverInfoInterCity, teamId);
+            return AjaxResponse.success(pageDTO);
+        } catch (Exception e) {
+           logger.info("查询列表异常",e);
+        }
+        return null;
     }
 
     /**
@@ -142,7 +147,7 @@ public class InterCityEchelonController {
         try {
             relService.del(driverId, teamId);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("删除异常",e);
         }
         return AjaxResponse.success(null);
     }
@@ -160,16 +165,53 @@ public class InterCityEchelonController {
                                          String echelonDate,
                                          Integer sort,
                                          String echelonMonth) {
-        return interCityEchelonService.addOrEdit(id, cityId, supplierId, teamId, echelonDate, sort, echelonMonth);
+        try {
+            return interCityEchelonService.addOrEdit(id, cityId, supplierId, teamId, echelonDate, sort, echelonMonth);
+        } catch (Exception e) {
+           logger.error("添加编辑车队异常",e);
+        }
+        return AjaxResponse.success(null);
     }
 
 
-    @RequestMapping("/editEchelon")
+    @RequestMapping("/editEchelonDetail")
     @ResponseBody
-    public AjaxResponse editEchelon(@Verify(param = "id", rule = "required") Integer id) {
+    public AjaxResponse editEchelonDetail(@Verify(param = "id", rule = "required") Integer id) {
 
-        InterCityEchelonDto dtoEchelon = interCityEchelonService.echelonDetail(id);
-        return AjaxResponse.success(dtoEchelon);
+        try {
+            InterCityEchelonDto dtoEchelon = interCityEchelonService.echelonDetail(id);
+            return AjaxResponse.success(dtoEchelon);
+        } catch (Exception e) {
+            logger.error("获取编辑梯队详情异常",e);
+        }
+        return AjaxResponse.success(null);
     }
 
+
+    /***
+     * 查询小队下的司机
+     * @param teamId
+     * @return
+     */
+    @RequestMapping("/queryDriverByTeamId")
+    @ResponseBody
+    public AjaxResponse queryDriverByTeamId(@Verify(param = "teamId",rule = "required | min(1)") Integer teamId){
+        logger.info("查询车队下的司机入参：teamId:" + teamId);
+        return cityService.queryDriverByTeam(teamId);
+    }
+
+
+
+
+    /**
+     * 查询司机
+     * @param queryParam
+     * @return
+     */
+    @RequestMapping("/queryDriver")
+    @ResponseBody
+    public AjaxResponse queryDriver(@Verify(param = "queryParam",rule = "required") String queryParam){
+        logger.info("查询司机信息入参" + queryParam );
+        return cityService.queryDriverByParam(queryParam);
+    }
 }
