@@ -28,5 +28,7 @@ public class InterEchelonDto {
 
     private Date updateTime;
 
+    private String echelonMonth;
+
     private List<InterCityEchelon> echelonList;
 }

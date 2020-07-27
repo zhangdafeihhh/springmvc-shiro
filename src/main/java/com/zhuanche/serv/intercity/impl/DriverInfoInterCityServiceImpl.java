@@ -10,21 +10,26 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.mdbcarmanage.IntegerDriverInfoDto;
 import com.zhuanche.dto.mdbcarmanage.InterDriverTeamRelDto;
+import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.InterCityTeam;
+import com.zhuanche.serv.common.SupplierCommonService;
 import com.zhuanche.serv.intercity.DriverInfoInterCityService;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.mdbcarmanage.ex.InterCityTeamDriverRelExMapper;
 import mapper.mdbcarmanage.ex.InterCityTeamExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @Author fanht
@@ -46,6 +51,9 @@ public class DriverInfoInterCityServiceImpl implements DriverInfoInterCityServic
     @Autowired
     private InterCityTeamDriverRelExMapper relExMapper;
 
+    @Autowired
+    private SupplierCommonService commonService;
+
     @Override
     public PageDTO queryDriverRelTeam(Integer pageSize,
                                       Integer pageNo,
@@ -53,28 +61,37 @@ public class DriverInfoInterCityServiceImpl implements DriverInfoInterCityServic
                                       Integer teamId) {
         Page page = PageHelper.startPage(pageNo, pageSize, true);
 
-        List<InterDriverTeamRelDto> dtoList = null;
         int total = 0;
 
+        List<InterDriverTeamRelDto> dtoList = new ArrayList<>();
+
         try {
-            dtoList = exMapper.queryDriverRelTeam(driverInfoInterCity.getCityId(), driverInfoInterCity.getSupplierId(),
-                    driverInfoInterCity.getDriverName(), driverInfoInterCity.getDriverPhone(),
-                    driverInfoInterCity.getLicensePlates(), teamId);
-            if(CollectionUtils.isNotEmpty(dtoList)){
-                List<Integer> idList = new ArrayList<>();
-                dtoList.forEach(dto -> {
-                    idList.add(dto.getTeamId());
-                });
-                List<InterCityTeam> teamNamesList = teamExMapper.listTeamByIds(idList);
-                Map<Integer,String> map = Maps.newHashMap();
-                teamNamesList.forEach(teamName ->{
-                    map.put(teamName.getId(),String.format(Constants.TEAMNAME,teamName.getTeamName()));
-                });
-                logger.info("----->teamNamesList====" + JSONObject.toJSONString(teamNamesList));
-                dtoList.forEach(dto ->{
-                    dto.setTeamName(map.get(dto.getTeamId()));
+            Set<Integer> setCityIds = WebSessionUtil.isSupperAdmin() ? null : WebSessionUtil.getCurrentLoginUser().getCityIds();
+            Set<Integer> setSupplierIds = WebSessionUtil.isSupperAdmin() ? null : WebSessionUtil.getCurrentLoginUser().getSupplierIds();
+            List<InterCityTeam>  cityTeamList = teamExMapper.queryTeamsByParam(driverInfoInterCity.getCityId(),driverInfoInterCity.getSupplierId(),driverInfoInterCity.getTeamId(),null,
+                    setCityIds,setSupplierIds);
+
+            if(CollectionUtils.isNotEmpty(cityTeamList)){
+
+                Map<Integer, CarBizSupplierDTO> supplierMap =  commonService.supplierMap(cityTeamList);
+
+
+                cityTeamList.forEach(cityTeam ->{
+
+                    InterDriverTeamRelDto driverTeamRelDto = new InterDriverTeamRelDto();
+
+                    BeanUtils.copyProperties(cityTeam,driverTeamRelDto);
+
+                    try {
+                        driverTeamRelDto.setCityName(supplierMap == null ? null:supplierMap.get(cityTeam.getSupplierId()).getCityName());
+                        driverTeamRelDto.setSupplierName(supplierMap == null ? null:supplierMap.get(cityTeam.getSupplierId()).getSupplierFullName());
+                    } catch (Exception e) {
+                        logger.error("异常",e);
+                    }
+                    dtoList.add(driverTeamRelDto);
                 });
             }
+
         } catch (Exception e){
             logger.error("查询异常",e);
         }finally {

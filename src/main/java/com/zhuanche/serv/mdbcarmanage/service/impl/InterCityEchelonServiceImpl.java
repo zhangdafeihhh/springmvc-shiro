@@ -14,6 +14,7 @@ import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.InterCityEchelon;
 import com.zhuanche.entity.mdbcarmanage.InterCityTeam;
+import com.zhuanche.serv.common.SupplierCommonService;
 import com.zhuanche.serv.mdbcarmanage.service.InterCityEchelonService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.collectionutil.TransportUtils;
@@ -71,6 +72,9 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
     @Autowired
     private CarBizSupplierExMapper carBizSupplierExMapper;
 
+
+    @Autowired
+    private SupplierCommonService commonService;
 
     @Override
     public AjaxResponse addOrEdit(Integer id,
@@ -197,43 +201,13 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
     }
 
 
-    /**
-     * 根据供应商id获取城市名称和供应商名称
-     * @param cityTeamList
-     * @return
-     */
-    private Map<Integer, CarBizSupplierDTO> supplierMap(List<InterCityTeam>  cityTeamList){
-        try {
-            StringBuilder supplierIds = new StringBuilder();
-
-            cityTeamList.forEach(cityTeam ->{
-                supplierIds.append(cityTeam.getSupplierId()).append(Constants.SEPERATER);
-            });
-            String querySupplierIds = supplierIds.toString().substring(0,supplierIds.toString().length()-1);
-
-            Map<Integer, CarBizSupplierDTO> supplierMap = Maps.newHashMap();
-            if (StringUtils.isNotEmpty(querySupplierIds)) {
-                List<CarBizSupplierDTO> supplierList = carBizSupplierExMapper.queryNameBySupplierIds(querySupplierIds);
-                if (CollectionUtils.isNotEmpty(supplierList)) {
-                    supplierList.forEach(supplierDTO -> {
-                        supplierMap.put(supplierDTO.getSupplierId(), supplierDTO);
-                    });
-                }
-            }
-            return supplierMap;
-        } catch (Exception e) {
-            logger.error("获取名称异常");
-        }
-        return null;
-
-    }
 
 
 
     private List<InterEchelonDto> echelonDtoList(List<InterCityTeam>  cityTeamList,String echelonMonth){
 
         /**拼接名称*/
-        Map<Integer, CarBizSupplierDTO> supplierMap = this.supplierMap(cityTeamList);
+        Map<Integer, CarBizSupplierDTO> supplierMap = commonService.supplierMap(cityTeamList);
 
 
         List<InterEchelonDto> echelonDtoList = new ArrayList<>();
@@ -256,6 +230,7 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
 
                 List<InterCityEchelon> queryTeamIds = echelonExMapper.queryTeamId(cityTeam.getId(),echelonMonth);
                 dto.setEchelonList(queryTeamIds);
+                dto.setEchelonMonth(echelonMonth);
                 echelonDtoList.add(dto);
             });
         } catch (Exception e) {

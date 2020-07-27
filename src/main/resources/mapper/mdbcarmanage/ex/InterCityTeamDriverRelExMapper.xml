@@ -47,6 +47,11 @@
   </delete>
 
 
+
+  <delete id="delByTeamId">
+    DELETE  FROM  inter_city_team_driver_rel WHERE  team_id = #{teamId}
+  </delete>
+
   <select id="queryRelTeamIds" resultType="java.lang.Integer">
     SELECT r.team_id as teamId
     FROM driver_info_inter_city t INNER JOIN

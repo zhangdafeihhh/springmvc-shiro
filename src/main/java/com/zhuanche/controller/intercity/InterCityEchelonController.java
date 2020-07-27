@@ -230,7 +230,7 @@ public class InterCityEchelonController {
     @ResponseBody
     @RequestMapping("/queryEchelonList")
     public AjaxResponse queryEchelonList(DriverInfoInterCity driverInfoInterCity,
-                                         String  echelonMonth,
+                                         @Verify(param = "echelonMonth",rule = "required") String  echelonMonth,
                                          @Verify(param = "pageNo", rule = "required|min(0)") Integer pageNo,
                                          @Verify(param = "pageSize", rule = "required|min(10)") Integer pageSize){
         logger.info(MessageFormat.format("查询梯队列表入参,driverInfoInterCity:{0},echelonMonth:{1},pageNo:{1},pageSize:{2}", JSONObject.toJSON(driverInfoInterCity),

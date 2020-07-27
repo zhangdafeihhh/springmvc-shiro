@@ -23,5 +23,8 @@ public interface InterCityTeamDriverRelExMapper {
     List<Integer> queryRelTeamIds(@Param("cityId")Integer cityId,
                           @Param("supplierId")Integer supplierId,
                           @Param("teamId")Integer teamId);
+    /**删除车队的司机*/
+    int delByTeamId(Integer teamId);
+
 
 }

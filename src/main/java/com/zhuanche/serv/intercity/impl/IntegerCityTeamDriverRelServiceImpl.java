@@ -36,15 +36,12 @@ public class IntegerCityTeamDriverRelServiceImpl implements IntegerCityTeamDrive
 
     @Override
     public AjaxResponse addDriver(String driverIds, Integer teamId) {
-        /**校验司机是否已经加入车队*/
-        List<IntercityTeamDriverRel> driverRelList = relExMapper.teamRelList(TransportUtils.listInteger(driverIds));
-        if(CollectionUtils.isNotEmpty(driverRelList)){
-            logger.info("司机已经加入过车队");
-            return AjaxResponse.fail(RestErrorCode.DRIVER_HAS_TEAM);
-        }
+
         List<IntercityTeamDriverRel> relList = new ArrayList<>();
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
+        /**批量加入前先删*/
+        relExMapper.delByTeamId(teamId);
         List<Integer> driverIdList = TransportUtils.listInteger(driverIds);
         driverIdList.forEach(driverId ->{
             IntercityTeamDriverRel rel = new IntercityTeamDriverRel();
