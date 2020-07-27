@@ -6,9 +6,11 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.InterCityEchelonDto;
+import com.zhuanche.dto.mdbcarmanage.InterCityTeamDto;
 import com.zhuanche.dto.mdbcarmanage.InterDriverTeamRelDto;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.InterCityEchelon;
+import com.zhuanche.entity.mdbcarmanage.InterCityTeam;
 import com.zhuanche.serv.intercity.DriverInfoInterCityService;
 import com.zhuanche.serv.intercity.IntegerCityTeamDriverRelService;
 import com.zhuanche.serv.intercity.IntegerCityTeamService;
@@ -235,5 +237,19 @@ public class InterCityEchelonController {
                 echelonMonth,pageNo,pageSize));
         return interCityEchelonService.queryEchelonList(driverInfoInterCity,echelonMonth,pageNo,pageSize);
 
+    }
+
+    @ResponseBody
+    @RequestMapping("/queryTeam")
+    public AjaxResponse queryTeam(@Verify(param = "cityId", rule = "required|min(0)") Integer cityId,
+                                  @Verify(param = "supplierId", rule = "required") Integer supplierId){
+        logger.info(MessageFormat.format("获取车堵入参,cityId:{0},supplierId:{1}",cityId,supplierId));
+        try {
+            List<InterCityTeamDto> queryTeamDto = interCityEchelonService.queryTeam(cityId,supplierId);
+            return AjaxResponse.success(queryTeamDto);
+        } catch (Exception e) {
+            logger.error("获取车队异常",e);
+        }
+        return AjaxResponse.success(null);
     }
 }

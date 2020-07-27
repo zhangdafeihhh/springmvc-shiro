@@ -18,8 +18,19 @@
     select 
     <include refid="Base_Column_List" />
     from inter_city_team
-    where city_id = #{cityId,jdbcType=INTEGER}
-    and supplier_id = #{supplierId,jdbcType=INTEGER}
+    where 1=1
+
+
+    <if test="cityId != null" >
+      AND city_id = #{cityId,jdbcType=INTEGER}
+    </if>
+
+
+    <if test="supplierId != null" >
+      and supplier_id = #{supplierId,jdbcType=INTEGER}
+    </if>
+
+
   </select>
 
   <select id="verifyTeam" resultMap="BaseResultMap"   >
@@ -30,8 +41,10 @@
     <if test="cityId != null" >
       AND city_id = #{cityId,jdbcType=INTEGER}
     </if>
-    and supplier_id = #{supplierId,jdbcType=INTEGER}
-    and team_name = #{teamName,jdbcType=VARCHAR}
+    <if test="supplierId != null" >
+      and supplier_id = #{supplierId,jdbcType=INTEGER}
+    </if>
+     and team_name = #{teamName,jdbcType=VARCHAR}
   </select>
 
 

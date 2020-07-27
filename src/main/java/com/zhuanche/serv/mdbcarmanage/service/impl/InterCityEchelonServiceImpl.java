@@ -8,6 +8,7 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.dto.mdbcarmanage.InterCityTeamDto;
 import com.zhuanche.dto.mdbcarmanage.InterEchelonDto;
 import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
@@ -169,7 +170,22 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
         return AjaxResponse.success(null);
     }
 
+    @Override
+    public List<InterCityTeamDto> queryTeam(Integer cityId, Integer supplierId) {
+         List<InterCityTeam> teamList = teamExMapper.queryTeam(cityId,supplierId);
 
+         if(CollectionUtils.isNotEmpty(teamList)){
+             List<InterCityTeamDto> teamDtoList = new ArrayList<>();
+             teamList.forEach(team ->{
+                 InterCityTeamDto dto = new InterCityTeamDto();
+                 dto.setTeamId(team.getId());
+                 dto.setTeamName(String.format(Constants.TEAMNAME,team.getTeamName()));
+                 teamDtoList.add(dto);
+             });
+             return teamDtoList;
+         }
+        return null;
+    }
 
 
     /**根据月份获取所有的teamId*/
