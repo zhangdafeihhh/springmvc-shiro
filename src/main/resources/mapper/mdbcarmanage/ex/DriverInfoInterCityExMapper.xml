@@ -155,6 +155,7 @@
     t.driver_id as driverId,r.team_id as teamId
     FROM driver_info_inter_city t INNER JOIN
     inter_city_team_driver_rel r on t.driver_id = r.driver_id
+    WHERE  1= 1
     <if test="cityId!=null and cityId!='0'">
       and t.city_id = #{cityId}
     </if>
@@ -176,6 +177,9 @@
     </if>
     ORDER BY r.create_time desc
   </select>
+
+
+
 
 
   <select id="driverDtoList" resultType="com.zhuanche.dto.mdbcarmanage.IntegerDriverInfoDto">

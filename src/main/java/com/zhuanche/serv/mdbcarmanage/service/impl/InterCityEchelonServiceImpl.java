@@ -1,17 +1,28 @@
 package com.zhuanche.serv.mdbcarmanage.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Maps;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.dto.mdbcarmanage.InterCityEchelonDto;
+import com.zhuanche.constant.Constants;
+import com.zhuanche.dto.mdbcarmanage.InterEchelonDto;
+import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
+import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.InterCityEchelon;
 import com.zhuanche.entity.mdbcarmanage.InterCityTeam;
 import com.zhuanche.serv.mdbcarmanage.service.InterCityEchelonService;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.collectionutil.TransportUtils;
 import mapper.mdbcarmanage.InterCityEchelonMapper;
 import mapper.mdbcarmanage.InterCityTeamMapper;
+import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.mdbcarmanage.ex.InterCityEchelonExMapper;
+import mapper.mdbcarmanage.ex.InterCityTeamDriverRelExMapper;
 import mapper.mdbcarmanage.ex.InterCityTeamExMapper;
+import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,9 +32,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +61,16 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
     @Autowired
     private InterCityTeamMapper teamMapper;
 
+    @Autowired
+    private InterCityTeamDriverRelExMapper relExMapper;
+
+    @Autowired
+    private DriverInfoInterCityExMapper driverInfoInterCityExMapper;
+
+    @Autowired
+    private CarBizSupplierExMapper carBizSupplierExMapper;
+
+
     @Override
     public AjaxResponse addOrEdit(Integer id,
                                   Integer cityId,
@@ -67,7 +86,7 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
         /**去掉转义符*/
         String repeatDate = StringEscapeUtils.unescapeJava(this.isTrue(echelonList, echelonDateList));
         if (StringUtils.isNotEmpty(repeatDate)) {
-            logger.info("同一日期仅可存在于一个梯队中”");
+            logger.info("同一日期仅可存在于一个梯队中");
             return AjaxResponse.fail(RestErrorCode.SAME_ECHELON, repeatDate);
         }
 
@@ -92,6 +111,7 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
         echelon.setEchelonDate(echelonDate);
         echelon.setEchelonMonth(echelonMonth);
         echelon.setTeamId(teamId);
+        echelon.setEchelonName(String.format(Constants.TEAMNAME,teamId.toString()));
         echelon.setSort(sort);
         if (id != null && id > 0) {
             echelon.setId(id);
@@ -109,20 +129,124 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
     }
 
     @Override
-    public InterCityEchelonDto echelonDetail(Integer id) {
-        InterCityEchelon echelon = echelonMapper.selectByPrimaryKey(id);
+    public List<InterCityEchelon> detailList(Integer teamId) {
 
-        InterCityEchelonDto dto = new InterCityEchelonDto();
+        List<InterCityEchelon> queryTeamIds = echelonExMapper.queryTeamId(teamId,null);
 
-        BeanUtils.copyProperties(echelon,dto);
 
-        InterCityTeam team = teamMapper.selectByPrimaryKey(id);
 
-        dto.setCityId(team.getCityId());
+        return queryTeamIds;
+    }
 
-        dto.setSupplierId(team.getSupplierId());
+    @Override
+    public AjaxResponse queryEchelonList(DriverInfoInterCity driverInfoInterCity, String echelonMonth, Integer pageNo, Integer pageSize) {
+        try {
+            List<Integer> teamIdList = this.teamIdList(echelonMonth);
+            /**获取权限*/
+            Set<Integer> setCityIds = WebSessionUtil.isSupperAdmin() ? null : WebSessionUtil.getCurrentLoginUser().getCityIds();
+            Set<Integer> setSupplierIds = WebSessionUtil.isSupperAdmin() ? null : WebSessionUtil.getCurrentLoginUser().getSupplierIds();
 
-        return dto;
+            Page page = PageHelper.startPage(pageNo,pageSize,true);
+            /**查询车队*/
+            List<InterCityTeam>  cityTeamList = teamExMapper.queryTeamsByParam(driverInfoInterCity.getCityId(),driverInfoInterCity.getSupplierId(),driverInfoInterCity.getTeamId(),teamIdList,
+                    setCityIds,setSupplierIds);
+
+            Integer count = cityTeamList.size();
+
+            if(CollectionUtils.isNotEmpty(cityTeamList)){
+
+
+                List<InterEchelonDto> echelonDtoList = this.echelonDtoList(cityTeamList,echelonMonth);
+
+                PageDTO pageDTO = new PageDTO(pageNo,pageSize,count,echelonDtoList);
+
+                return AjaxResponse.success(pageDTO);
+            }
+        } catch (Exception e) {
+            logger.error("==========查询梯队列表信息异常========",e);
+        }
+
+        return AjaxResponse.success(null);
+    }
+
+
+
+
+    /**根据月份获取所有的teamId*/
+    private List<Integer> teamIdList(String echelonMonth){
+        if(StringUtils.isNotEmpty(echelonMonth)){
+            return echelonExMapper.teamIdListByMonth(echelonMonth);
+        }
+        return null;
+    }
+
+
+    /**
+     * 根据供应商id获取城市名称和供应商名称
+     * @param cityTeamList
+     * @return
+     */
+    private Map<Integer, CarBizSupplierDTO> supplierMap(List<InterCityTeam>  cityTeamList){
+        try {
+            StringBuilder supplierIds = new StringBuilder();
+
+            cityTeamList.forEach(cityTeam ->{
+                supplierIds.append(cityTeam.getSupplierId()).append(Constants.SEPERATER);
+            });
+            String querySupplierIds = supplierIds.toString().substring(0,supplierIds.toString().length()-1);
+
+            Map<Integer, CarBizSupplierDTO> supplierMap = Maps.newHashMap();
+            if (StringUtils.isNotEmpty(querySupplierIds)) {
+                List<CarBizSupplierDTO> supplierList = carBizSupplierExMapper.queryNameBySupplierIds(querySupplierIds);
+                if (CollectionUtils.isNotEmpty(supplierList)) {
+                    supplierList.forEach(supplierDTO -> {
+                        supplierMap.put(supplierDTO.getSupplierId(), supplierDTO);
+                    });
+                }
+            }
+            return supplierMap;
+        } catch (Exception e) {
+            logger.error("获取名称异常");
+        }
+        return null;
+
+    }
+
+
+
+    private List<InterEchelonDto> echelonDtoList(List<InterCityTeam>  cityTeamList,String echelonMonth){
+
+        /**拼接名称*/
+        Map<Integer, CarBizSupplierDTO> supplierMap = this.supplierMap(cityTeamList);
+
+
+        List<InterEchelonDto> echelonDtoList = new ArrayList<>();
+
+        try {
+            cityTeamList.forEach(cityTeam ->{
+
+                InterEchelonDto dto = new InterEchelonDto();
+
+                BeanUtils.copyProperties(cityTeam,dto);
+                /**注意id属性*/
+                dto.setTeamId(cityTeam.getId());
+
+                try {
+                    dto.setCityName(supplierMap == null ? null:supplierMap.get(cityTeam.getSupplierId()).getCityName());
+                    dto.setSupplierName(supplierMap == null ? null:supplierMap.get(cityTeam.getSupplierId()).getSupplierFullName());
+                } catch (Exception e) {
+                    logger.error("异常",e);
+                }
+
+                List<InterCityEchelon> queryTeamIds = echelonExMapper.queryTeamId(cityTeam.getId(),echelonMonth);
+                dto.setEchelonList(queryTeamIds);
+                echelonDtoList.add(dto);
+            });
+        } catch (Exception e) {
+            logger.error("获取列表异常",e);
+        }
+
+        return echelonDtoList;
     }
 
 

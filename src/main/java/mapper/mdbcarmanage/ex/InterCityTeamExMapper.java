@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface InterCityTeamExMapper {
 
@@ -19,5 +20,14 @@ public interface InterCityTeamExMapper {
 
     List<InterCityTeam> listTeamByIds(@Param("ids") List<Integer> ids);
 
+
+
+    /**查询小组*/
+    List<InterCityTeam> queryTeamsByParam(@Param("cityId") Integer cityId,
+                                   @Param("supplierId") Integer supplierId,
+                                   @Param("teamId")Integer teamId,
+                                   @Param("teamIdList")List<Integer> teamIdList,
+                                          @Param("cityIds") Set<Integer> cityIds,
+                                          @Param("supplierIds") Set<Integer> supplierIds);
 
 }

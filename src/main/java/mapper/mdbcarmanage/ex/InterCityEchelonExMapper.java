@@ -15,4 +15,8 @@ public interface InterCityEchelonExMapper {
     List<InterCityEchelon> queryTeamIds(@Param("teamIdList") List<Integer> teamIdList,
                                         @Param("echelonMonth") String echelonMonth);
 
+    /**查询某个月份的数据*/
+    List<Integer> teamIdListByMonth(@Param("echelonMonth") String echelonMonth);
+
+
 }

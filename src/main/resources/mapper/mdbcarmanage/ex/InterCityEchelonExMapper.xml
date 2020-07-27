@@ -18,8 +18,15 @@
     select 
     <include refid="Base_Column_List" />
     from inter_city_echelon
-    where team_id = #{teamId,jdbcType=INTEGER}
-    and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
+    where 1=1
+    <if test="teamId != null and teamId != ''">
+      and team_id = #{teamId,jdbcType=INTEGER}
+    </if>
+
+    <if test="echelonMonth != null and echelonMonth != ''">
+      and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
+    </if>
+
   </select>
 
 
@@ -29,11 +36,26 @@
     from inter_city_echelon
     where 1=1
 
-    and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
+    <if test="echelonMonth != null and echelonMonth != ''">
+      and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
+    </if>
     and team_id in
     <foreach collection="teamIdList" open="(" close=")" separator=","  item="teamId">
       #{teamId}
     </foreach>
+  </select>
+
+
+  <select id="teamIdListByMonth" resultType="java.lang.Integer">
+    select team_id as teamId
+    from inter_city_echelon
+    where 1=1
+
+    <if test="echelonMonth != null and echelonMonth != ''">
+      and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
+    </if>
+
+    GROUP BY team_id
   </select>
 
 

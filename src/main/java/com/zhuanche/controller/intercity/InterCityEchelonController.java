@@ -1,5 +1,6 @@
 package com.zhuanche.controller.intercity;
 
+import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -176,11 +177,11 @@ public class InterCityEchelonController {
 
     @RequestMapping("/editEchelonDetail")
     @ResponseBody
-    public AjaxResponse editEchelonDetail(@Verify(param = "id", rule = "required") Integer id) {
+    public AjaxResponse editEchelonDetail(@Verify(param = "teamId", rule = "required") Integer teamId) {
 
         try {
-            InterCityEchelonDto dtoEchelon = interCityEchelonService.echelonDetail(id);
-            return AjaxResponse.success(dtoEchelon);
+            List<InterCityEchelon> echelonList= interCityEchelonService.detailList(teamId);
+            return AjaxResponse.success(echelonList);
         } catch (Exception e) {
             logger.error("获取编辑梯队详情异常",e);
         }
@@ -213,5 +214,26 @@ public class InterCityEchelonController {
     public AjaxResponse queryDriver(@Verify(param = "queryParam",rule = "required") String queryParam){
         logger.info("查询司机信息入参" + queryParam );
         return cityService.queryDriverByParam(queryParam);
+    }
+
+
+    /**
+     * 查询梯队列表
+     * @param driverInfoInterCity
+     * @param echelonMonth
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/queryEchelonList")
+    public AjaxResponse queryEchelonList(DriverInfoInterCity driverInfoInterCity,
+                                         String  echelonMonth,
+                                         @Verify(param = "pageNo", rule = "required|min(0)") Integer pageNo,
+                                         @Verify(param = "pageSize", rule = "required|min(10)") Integer pageSize){
+        logger.info(MessageFormat.format("查询梯队列表入参,driverInfoInterCity:{0},echelonMonth:{1},pageNo:{1},pageSize:{2}", JSONObject.toJSON(driverInfoInterCity),
+                echelonMonth,pageNo,pageSize));
+        return interCityEchelonService.queryEchelonList(driverInfoInterCity,echelonMonth,pageNo,pageSize);
+
     }
 }

@@ -40,4 +40,6 @@ public interface DriverInfoInterCityExMapper {
     List<IntegerDriverInfoDto> driverDtoList(@Param("driverIds") List<Integer> driverIds);
 
     List<DriverInfoInterCity> queryDriverByParam(@Param("queryParam") String  queryParam);
+
+
 }

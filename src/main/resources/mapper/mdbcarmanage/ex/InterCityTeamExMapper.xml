@@ -40,9 +40,55 @@
     from inter_city_team
     where 1=1
     and id in
-    <foreach collection="ids" open="(" close=")" item="id" >
+    <foreach collection="ids" open="(" close=")" item="id" separator="," >
       #{id}
     </foreach>
   </select>
+
+
+
+  <select id="queryTeamsByParam" resultMap="BaseResultMap"   >
+    select
+    <include refid="Base_Column_List" />
+    from inter_city_team
+    where  1=1
+    <if test="cityId != null" >
+      AND city_id = #{cityId,jdbcType=INTEGER}
+    </if>
+
+    <if test="supplierId != null" >
+      and supplier_id = #{supplierId,jdbcType=INTEGER}
+    </if>
+
+    <if test="teamId != null" >
+      and id = #{teamId,jdbcType=INTEGER}
+    </if>
+
+    <if test="teamIdList != null and teamIdList.size() > 0" >
+      and id in
+      <foreach collection="teamIdList" open="(" close=")" item="id" separator="," >
+        #{id}
+      </foreach>
+    </if>
+
+
+    <if test="cityIds != null and cityIds.size() > 0" >
+      and city_id in
+      <foreach collection="cityIds" open="(" close=")" item="cityId" separator="," >
+        #{cityId}
+      </foreach>
+    </if>
+
+
+    <if test="supplierIds != null and supplierIds.size() > 0" >
+      and supplier_id in
+      <foreach collection="supplierIds" open="(" close=")" item="supplierId" separator="," >
+        #{supplierId}
+      </foreach>
+    </if>
+
+    ORDER BY update_time DESC
+  </select>
+
 
 </mapper>

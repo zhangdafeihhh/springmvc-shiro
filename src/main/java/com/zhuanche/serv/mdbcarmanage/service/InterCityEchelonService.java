@@ -2,7 +2,10 @@ package com.zhuanche.serv.mdbcarmanage.service;
 
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.mdbcarmanage.InterCityEchelonDto;
+import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.InterCityEchelon;
+
+import java.util.List;
 
 /**
  * @Author fanht
@@ -23,5 +26,10 @@ public interface InterCityEchelonService {
     int updateByPrimaryKey(InterCityEchelon record);
 
 
-    InterCityEchelonDto echelonDetail(Integer id);
+    List<InterCityEchelon> detailList(Integer teamId);
+
+    AjaxResponse queryEchelonList(DriverInfoInterCity driverInfoInterCity,
+                                  String  echelonMonth,
+                                  Integer pageNo,
+                                  Integer pageSize);
 }
