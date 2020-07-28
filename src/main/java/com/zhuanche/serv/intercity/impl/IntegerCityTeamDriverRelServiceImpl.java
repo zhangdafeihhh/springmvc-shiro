@@ -15,10 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Author fanht
@@ -43,8 +40,15 @@ public class IntegerCityTeamDriverRelServiceImpl implements IntegerCityTeamDrive
         /**校验司机是否已经加入车队*/
         List<IntercityTeamDriverRel> driverRelList = relExMapper.teamRelList(TransportUtils.listInteger(driverIds));
         if(CollectionUtils.isNotEmpty(driverRelList)){
-            logger.info("司机已经加入过车队");
-            return AjaxResponse.fail(RestErrorCode.DRIVER_HAS_TEAM);
+            Set<Integer> teamSet =new HashSet<>();
+            driverRelList.forEach(driverRel ->{
+                teamSet.add(driverRel.getTeamId());
+            });
+            if(teamSet.size()>1){
+                logger.info("司机已经加入过车队");
+                return AjaxResponse.fail(RestErrorCode.DRIVER_HAS_TEAM);
+            }
+
         }
 
 
