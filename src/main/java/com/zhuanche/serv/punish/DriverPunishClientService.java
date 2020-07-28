@@ -104,16 +104,15 @@ public class DriverPunishClientService extends DriverPunishService {
         InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
-            Response response1 = call.execute();
-            if (response1 != null && response1.isSuccessful() && Objects.nonNull(response1.body())) {
-                inputStream = response1.body().byteStream();
-                outputStream = getOutputStream("司机申诉列表", response);
+            Response okHttpResponse = call.execute();
+            if (okHttpResponse != null && okHttpResponse.isSuccessful() && Objects.nonNull(okHttpResponse.body())) {
+                inputStream = okHttpResponse.body().byteStream();
+                outputStream = getOutputStream("司机处罚列表", response);
                 IoUtil.copy(inputStream, outputStream);
                 outputStream.flush();
             }
         } catch (Exception e) {
             log.error("司机申诉列表下载失败", e);
-            e.printStackTrace();
         } finally {
             IoUtil.close(inputStream);
             IoUtil.close(outputStream);
@@ -125,7 +124,7 @@ public class DriverPunishClientService extends DriverPunishService {
             fileName = fileName + ExcelTypeEnum.XLSX.getValue();
         }
         fileName = URLEncoder.encode(fileName, "UTF-8");
-        response.setContentType("application/vnd.ms-excel");
+        response.setContentType("multipart/form-data");
         response.setCharacterEncoding("utf8");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
         return response.getOutputStream();
