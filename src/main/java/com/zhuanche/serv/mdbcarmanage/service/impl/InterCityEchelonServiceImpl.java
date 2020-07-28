@@ -1,9 +1,10 @@
 package com.zhuanche.serv.mdbcarmanage.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.google.common.collect.Maps;
+import com.zhuanche.common.jsonobject.EchelonJsonData;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -77,53 +79,58 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
     private SupplierCommonService commonService;
 
     @Override
-    public AjaxResponse addOrEdit(Integer id,
-                                  Integer cityId,
-                                  Integer supplierId,
-                                  Integer teamId,
-                                  String echelonDate,
-                                  Integer sort,
-                                  String echelonMonth) {
+    //@Transactional
+    public AjaxResponse addOrEdit(EchelonJsonData echelonJsonData) {
 
-        List<InterCityEchelon> echelonList = echelonExMapper.queryTeamId(teamId, echelonMonth);
-        List<String> echelonDateList = TransportUtils.listStr(echelonDate);
+        Integer cityId = echelonJsonData.getCityId();
+        Integer supplierId = echelonJsonData.getSupplierId();
+        Integer teamId = echelonJsonData.getTeamId();
+        String echelonMonth = echelonJsonData.getEchelonMonth();
+        List<InterCityEchelon> echelonList = echelonJsonData.getEchelonList();
 
-        /**去掉转义符*/
-        String repeatDate = StringEscapeUtils.unescapeJava(this.isTrue(echelonList, echelonDateList));
-        if (StringUtils.isNotEmpty(repeatDate)) {
+        /**需要验证传的日期是不是有重复的*/
+        List<String> repeatDateList = verifyHasRepeatDate(echelonList);
+        if(CollectionUtils.isNotEmpty(repeatDateList)){
             logger.info("同一日期仅可存在于一个梯队中");
-            return AjaxResponse.fail(RestErrorCode.SAME_ECHELON, repeatDate);
+            return AjaxResponse.fail(RestErrorCode.SAME_ECHELON, JSONObject.toJSON(repeatDateList));
         }
 
+        String repeatDateStr = this.repeat(teamId,echelonMonth,echelonList);
+        if(StringUtils.isNotEmpty(repeatDateStr)){
+            logger.info("===该日期该梯队已存在车队===",repeatDateStr);
+            return AjaxResponse.fail(RestErrorCode.SAME_ECHELON, repeatDateStr);
+        }
 
-        /**不同车队在同一日期*/
-        List<InterCityTeam> teamList = teamExMapper.queryTeam(cityId, supplierId);
-        List<Integer> teamIds = new ArrayList<>();
-        teamList.forEach(team -> {
-            teamIds.add(team.getId());
+        String repeateTeamDate = this.repeatTeam(cityId,supplierId,echelonMonth,echelonList);
+
+        if(StringUtils.isNotEmpty(repeateTeamDate)){
+            return AjaxResponse.fail(RestErrorCode.ECHELON_HAS_EXIST, repeateTeamDate);
+        }
+        echelonList.forEach(cityEchelon ->{
+
+            String echelonDate = cityEchelon.getEchelonDate();
+
+            Integer id = cityEchelon.getId();
+
+            Integer sort = cityEchelon.getSort();
+
+            InterCityEchelon echelon = new InterCityEchelon();
+            echelon.setCreateTime(new Date());
+            echelon.setEchelonDate(echelonDate);
+            echelon.setEchelonMonth(echelonMonth);
+            echelon.setTeamId(teamId);
+            echelon.setEchelonName(String.format(Constants.TEAMNAME,teamId.toString()));
+            echelon.setSort(sort);
+            if (id != null && id > 0) {
+                echelon.setId(id);
+                echelonMapper.updateByPrimaryKeySelective(echelon);
+            } else {
+                echelonMapper.insertSelective(echelon);
+            }
+
         });
-        List<InterCityEchelon> echelonLists = echelonExMapper.queryTeamIds(teamIds, echelonMonth);
 
-        repeatDate = StringEscapeUtils.unescapeJava(this.isTrue(echelonLists, echelonDateList));
 
-        if (StringUtils.isNotEmpty(repeatDate)) {
-            logger.info("===该日期该梯队已存在车队===");
-            return AjaxResponse.fail(RestErrorCode.ECHELON_HAS_EXIST, repeatDate);
-        }
-
-        InterCityEchelon echelon = new InterCityEchelon();
-        echelon.setCreateTime(new Date());
-        echelon.setEchelonDate(echelonDate);
-        echelon.setEchelonMonth(echelonMonth);
-        echelon.setTeamId(teamId);
-        echelon.setEchelonName(String.format(Constants.TEAMNAME,teamId.toString()));
-        echelon.setSort(sort);
-        if (id != null && id > 0) {
-            echelon.setId(id);
-            echelonMapper.updateByPrimaryKeySelective(echelon);
-        } else {
-            echelonMapper.insertSelective(echelon);
-        }
         return AjaxResponse.success(null);
     }
 
@@ -258,5 +265,76 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
             });
         }
         return repeatStr[0];
+    }
+
+    /***
+     * 判断是否有重复的
+     * @param echelonList
+     * @return
+     */
+    private List<String> verifyHasRepeatDate(List<InterCityEchelon> echelonList){
+        List<String> repeatDate = new ArrayList<>();
+        List<String> list = new ArrayList<>();
+        echelonList.forEach(echelon ->{
+            String echelonDate = echelon.getEchelonDate();
+
+            List<String> dateList = TransportUtils.listStr(echelonDate);
+            dateList.forEach(strDate -> {
+                if(list.contains(strDate)){
+                    repeatDate.add(echelonDate);
+                }
+            });
+        });
+        return repeatDate;
+    }
+
+
+
+    private String repeat(Integer teamId,String echelonMonth,List<InterCityEchelon> echList){
+        final String[] repeatStr = {""};
+        echList.forEach(echelon ->{
+            String echelonDate = echelon.getEchelonDate();
+
+            List<InterCityEchelon> echelonList = echelonExMapper.queryTeamId(teamId, echelonMonth);
+            List<String> echelonDateList = TransportUtils.listStr(echelonDate);
+
+            /**去掉转义符*/
+            String repeatDate = StringEscapeUtils.unescapeJava(this.isTrue(echelonList, echelonDateList));
+            if (StringUtils.isNotEmpty(repeatDate)) {
+                repeatStr[0] = repeatDate;
+            }
+
+        });
+        return repeatStr[0];
+    }
+
+
+    private String repeatTeam(Integer cityId,Integer supplierId,String echelonMonth, List<InterCityEchelon> echList){
+
+        final String[] repeatTeamDate = {""};
+        echList.forEach(echelon ->{
+
+            String echelonDate = echelon.getEchelonDate();
+
+            /**不同车队在同一日期*/
+            List<InterCityTeam> teamList = teamExMapper.queryTeam(cityId, supplierId);
+            List<Integer> teamIds = new ArrayList<>();
+            teamList.forEach(team -> {
+                teamIds.add(team.getId());
+            });
+            List<InterCityEchelon> echelonLists = echelonExMapper.queryTeamIds(teamIds, echelonMonth);
+
+            List<String> echelonDateList = TransportUtils.listStr(echelonDate);
+
+
+            String repeatDate = StringEscapeUtils.unescapeJava(this.isTrue(echelonLists, echelonDateList));
+
+            if (StringUtils.isNotEmpty(repeatDate)) {
+                logger.info("===该日期该梯队已存在车队===",repeatDate);
+                repeatTeamDate[0] = repeatDate;
+            }
+
+        });
+        return repeatTeamDate[0];
     }
 }

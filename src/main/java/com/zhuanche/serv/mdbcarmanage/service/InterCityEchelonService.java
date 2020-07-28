@@ -1,5 +1,7 @@
 package com.zhuanche.serv.mdbcarmanage.service;
 
+import com.alibaba.fastjson.JSONArray;
+import com.zhuanche.common.jsonobject.EchelonJsonData;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.mdbcarmanage.InterCityEchelonDto;
 import com.zhuanche.dto.mdbcarmanage.InterCityTeamDto;
@@ -17,13 +19,7 @@ import java.util.List;
  */
 public interface InterCityEchelonService {
 
-    AjaxResponse addOrEdit(Integer id,
-                           Integer cityId,
-                           Integer supplierId,
-                           Integer teamId,
-                           String echelonDate,
-                           Integer sort,
-                           String echelonMonth);
+    AjaxResponse addOrEdit(EchelonJsonData echelon);
 
     int updateByPrimaryKey(InterCityEchelon record);
 

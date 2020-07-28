@@ -1,6 +1,8 @@
 package com.zhuanche.controller.intercity;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.jsonobject.EchelonJsonData;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -19,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.MessageFormat;
@@ -161,15 +165,11 @@ public class InterCityEchelonController {
      */
     @RequestMapping("/addOrEditEchelon")
     @ResponseBody
-    public AjaxResponse addOrEditEchelon(Integer id,
-                                         Integer cityId,
-                                         Integer supplierId,
-                                         Integer teamId,
-                                         String echelonDate,
-                                         Integer sort,
-                                         String echelonMonth) {
+    public AjaxResponse addOrEditEchelon(
+                                         @RequestBody(required = true)EchelonJsonData echelon) {
         try {
-            return interCityEchelonService.addOrEdit(id, cityId, supplierId, teamId, echelonDate, sort, echelonMonth);
+            logger.info("入参：" + JSONObject.toJSONString(echelon));
+            return interCityEchelonService.addOrEdit(echelon);
         } catch (Exception e) {
            logger.error("添加编辑车队异常",e);
         }
