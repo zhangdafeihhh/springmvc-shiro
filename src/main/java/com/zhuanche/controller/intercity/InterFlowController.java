@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.MessageFormat;
@@ -47,13 +48,14 @@ public class InterFlowController {
                                       @Verify(param = "pageSize",rule = "required") Integer pageSize,
                                       Integer dataType,
                                       String dataBeginDate,
-                                      String dataEndDate){
+                                      String dataEndDate,
+                                      @Verify(param = "sort",rule = "max(2) ")@RequestParam(value = "pageNum",defaultValue = "1")Integer sort){
         logger.info(MessageFormat.format("=====查询司机流水列表=======入参", JSONObject.toJSON(reportDay),pageNum,pageSize,dataType,dataBeginDate,dataEndDate));
 
         Map<String,Object> map = Maps.newHashMap();
         PageDTO pageDTO = null;
         try {
-            pageDTO = service.pageInfoList(reportDay,pageNum,pageSize,dataType,dataBeginDate,dataEndDate);
+            pageDTO = service.pageInfoList(reportDay,pageNum,pageSize,dataType,dataBeginDate,dataEndDate,sort);
 
             BiNewcityDriverReportDayDto dto = service.flowTotal(reportDay,dataType,dataBeginDate,dataEndDate);
 

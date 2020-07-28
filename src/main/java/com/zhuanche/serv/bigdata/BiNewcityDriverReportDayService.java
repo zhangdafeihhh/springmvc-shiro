@@ -31,14 +31,15 @@ public class BiNewcityDriverReportDayService {
                                 Integer pageNo,
                                 Integer pageNum,Integer dataType,
                                 String dataBeginDate,
-                                String dataEndDate){
+                                String dataEndDate,
+                                Integer sort){
 
         Page page = PageHelper.startPage(pageNo,pageNum,true);
 
         int count = 0;
 
         List<BiNewcityDriverReportDay> dtoList = exMapper.queryFlowList(reportDay.getCityId(),
-                reportDay.getSupplierId(),reportDay.getDriverName(),reportDay.getDriverPhone(), reportDay.getLicensePlates(),dataType,dataBeginDate,dataEndDate);
+                reportDay.getSupplierId(),reportDay.getDriverName(),reportDay.getDriverPhone(), reportDay.getLicensePlates(),dataType,dataBeginDate,dataEndDate,sort);
 
 
         count = (int) page.getTotal();

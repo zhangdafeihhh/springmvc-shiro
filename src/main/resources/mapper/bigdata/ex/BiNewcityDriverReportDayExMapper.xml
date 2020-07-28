@@ -52,7 +52,17 @@
             and city_id = #{cityId}
         </if>
         GROUP BY driver_id
-        ORDER  by data_date DESC
+
+
+
+        <if test="sort != null and sort == 1">
+            ORDER  by sum(t.total_amount)  DESC
+        </if>
+
+        <if test="sort != null and sort == 2">
+            ORDER  by sum(t.bind_order_num)  DESC
+        </if>
+
     </select>
 
     <select id="queryFlowTotal" resultType="com.zhuanche.dto.bigdata.BiNewcityDriverReportDayDto">
@@ -87,8 +97,6 @@
         <if test="cityId != null">
             and city_id = #{cityId}
         </if>
-
-        ORDER  by data_date DESC
     </select>
 
 </mapper>
