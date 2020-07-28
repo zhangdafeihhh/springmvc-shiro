@@ -53,7 +53,7 @@ public class DriverPunishClientService extends DriverPunishService {
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         paramMap.put("punishId", punishId);
         paramMap.put("status", status);
-        paramMap.put("cgReason", cgReason);
+        paramMap.put("reason", cgReason);
         paramMap.put("cgPictures", cgPictures);
         paramMap.put("updateUserId", currentLoginUser.getId());
         paramMap.put("updateUserName", currentLoginUser.getName());

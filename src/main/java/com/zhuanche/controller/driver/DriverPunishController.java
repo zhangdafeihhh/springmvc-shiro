@@ -87,7 +87,7 @@ public class DriverPunishController extends BaseController {
         if (Objects.isNull(punishId) || Objects.isNull(status)) {
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
-        log.info("司机处罚审核操作 punishId:{},status:{},reason:{}", punishId, status, reason);
+        log.info("司机处罚审核操作 punishId:{},status:{},reason:{},cgPictures:{}", punishId, status, reason, cgPictures);
         try {
             driverPunishService.doAudit(punishId, status, reason, cgPictures);
             log.info("司机处罚审核操作成功");
