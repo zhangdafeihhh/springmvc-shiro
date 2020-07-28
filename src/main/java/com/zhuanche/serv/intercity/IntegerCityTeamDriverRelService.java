@@ -16,4 +16,6 @@ public interface IntegerCityTeamDriverRelService {
 
     int del(Integer driverId,Integer teamId);
 
+    int delByTeamId(Integer teamId);
+
 }

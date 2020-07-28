@@ -141,18 +141,17 @@ public class InterCityEchelonController {
     }
 
     /**
-     * 删除
+     * 清空小队的司机
      *
-     * @param driverId
      * @param teamId
      * @return
      */
-    @RequestMapping("/deleteDriver")
+    @RequestMapping("/delByTeamId")
     @ResponseBody
-    public AjaxResponse deleteDriver(Integer driverId, Integer teamId) {
-        logger.info("删除入参driverId:{0},teamId:{1}", driverId, teamId);
+    public AjaxResponse delByTeamId(@Verify(param = "teamId",rule = "required") Integer teamId) {
+        logger.info("teamId:{0}",  teamId);
         try {
-            relService.del(driverId, teamId);
+            relService.delByTeamId(teamId);
         } catch (Exception e) {
             logger.error("删除异常",e);
         }

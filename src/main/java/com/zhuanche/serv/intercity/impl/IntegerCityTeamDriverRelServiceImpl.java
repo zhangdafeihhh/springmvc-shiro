@@ -40,8 +40,21 @@ public class IntegerCityTeamDriverRelServiceImpl implements IntegerCityTeamDrive
         List<IntercityTeamDriverRel> relList = new ArrayList<>();
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
+        /**校验司机是否已经加入车队*/
+        List<IntercityTeamDriverRel> driverRelList = relExMapper.teamRelList(TransportUtils.listInteger(driverIds));
+        if(CollectionUtils.isNotEmpty(driverRelList)){
+            logger.info("司机已经加入过车队");
+            return AjaxResponse.fail(RestErrorCode.DRIVER_HAS_TEAM);
+        }
+
+
         /**批量加入前先删*/
-        relExMapper.delByTeamId(teamId);
+        try {
+            relExMapper.batchDelete(TransportUtils.listInteger(driverIds));
+        } catch (Exception e) {
+            logger.error("删除异常",e);
+        }
+
         List<Integer> driverIdList = TransportUtils.listInteger(driverIds);
         driverIdList.forEach(driverId ->{
             IntercityTeamDriverRel rel = new IntercityTeamDriverRel();
@@ -60,5 +73,10 @@ public class IntegerCityTeamDriverRelServiceImpl implements IntegerCityTeamDrive
     @Override
     public int del(Integer driverId, Integer teamId) {
         return relExMapper.deleteDriver(driverId,teamId);
+    }
+
+    @Override
+    public int delByTeamId(Integer teamId) {
+        return relExMapper.delByTeamId(teamId);
     }
 }

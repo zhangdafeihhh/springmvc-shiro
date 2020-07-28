@@ -26,5 +26,5 @@ public interface InterCityTeamDriverRelExMapper {
     /**删除车队的司机*/
     int delByTeamId(Integer teamId);
 
-
+    int batchDelete(@Param("driverIdList") List<Integer> driverIdList);
 }
