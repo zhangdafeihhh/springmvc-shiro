@@ -163,7 +163,7 @@ public class InterCityEchelonController {
     @RequestMapping("/addOrEditEchelon")
     @ResponseBody
     public AjaxResponse addOrEditEchelon(
-                                         @RequestBody(required = true)EchelonJsonData echelon) {
+                                        /* @RequestBody(required = true)*/EchelonJsonData echelon) {
         try {
             logger.info("入参：" + JSONObject.toJSONString(echelon));
             return interCityEchelonService.addOrEdit(echelon);

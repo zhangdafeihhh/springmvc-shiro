@@ -1,5 +1,6 @@
 package com.zhuanche.common.jsonobject;
 
+import com.alibaba.fastjson.JSONArray;
 import com.zhuanche.entity.mdbcarmanage.InterCityEchelon;
 import lombok.Data;
 
@@ -25,4 +26,7 @@ public class EchelonJsonData {
     private String echelonMonth;
 
     private List<InterCityEchelon> echelonList;
+
+
+    private String jsonArray;
 }

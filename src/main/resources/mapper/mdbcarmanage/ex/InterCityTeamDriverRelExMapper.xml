@@ -19,7 +19,7 @@
     <include refid="Base_Column_List"/>
     FROM inter_city_team_driver_rel
     WHERE driver_id IN
-    <foreach collection="driverIds" item="driverId" open="(" close=")">
+    <foreach collection="driverIds" item="driverId" open="(" close=")" separator=",">
       #{driverId}
     </foreach>
   </select>

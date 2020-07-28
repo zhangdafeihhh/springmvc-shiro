@@ -79,14 +79,24 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
     private SupplierCommonService commonService;
 
     @Override
-    //@Transactional
     public AjaxResponse addOrEdit(EchelonJsonData echelonJsonData) {
 
         Integer cityId = echelonJsonData.getCityId();
         Integer supplierId = echelonJsonData.getSupplierId();
         Integer teamId = echelonJsonData.getTeamId();
         String echelonMonth = echelonJsonData.getEchelonMonth();
-        List<InterCityEchelon> echelonList = echelonJsonData.getEchelonList();
+
+        JSONArray array = JSONArray.parseArray(echelonJsonData.getJsonArray());
+
+        List<InterCityEchelon> echelonList = new ArrayList<>();
+        array.forEach(arr ->{
+            JSONObject object = (JSONObject) arr;
+            InterCityEchelon interCityEchelon = new InterCityEchelon();
+            interCityEchelon.setId(object.get("id") == null ? null : object.getInteger("id"));
+            interCityEchelon.setEchelonDate(object.get("echelonDate") == null ? null : object.getString("echelonDate"));
+            interCityEchelon.setSort(object.get("sort") == null ? null : object.getInteger("sort"));
+            echelonList.add(interCityEchelon);
+        });
 
         /**需要验证传的日期是不是有重复的*/
         List<String> repeatDateList = verifyHasRepeatDate(echelonList);
