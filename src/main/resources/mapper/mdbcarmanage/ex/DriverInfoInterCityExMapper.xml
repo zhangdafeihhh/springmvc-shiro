@@ -180,6 +180,30 @@
 
 
 
+  <select id="queryTeamIds" resultType="java.lang.Integer">
+    SELECT r.team_id as teamId
+    FROM driver_info_inter_city t INNER JOIN
+    inter_city_team_driver_rel r on t.driver_id = r.driver_id
+    WHERE  1= 1
+    <if test="cityId!=null and cityId!='0'">
+      and t.city_id = #{cityId}
+    </if>
+    <if test="supplierId!=null and supplierId!='0'">
+      and t.supplier_id = #{supplierId}
+    </if>
+    <if test="driverName!=null and driverName!=''">
+      and t.driver_name  like CONCAT(#{driverName},'%')
+    </if>
+    <if test="driverPhone!=null and driverPhone!=''">
+      and t.driver_phone = #{driverPhone}
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      and t.license_plates = #{licensePlates}
+    </if>
+
+
+   </select>
+
 
 
   <select id="driverDtoList" resultType="com.zhuanche.dto.mdbcarmanage.IntegerDriverInfoDto">

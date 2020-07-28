@@ -20,6 +20,7 @@ import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.mdbcarmanage.ex.InterCityTeamDriverRelExMapper;
 import mapper.mdbcarmanage.ex.InterCityTeamExMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -59,6 +60,19 @@ public class DriverInfoInterCityServiceImpl implements DriverInfoInterCityServic
                                       Integer pageNo,
                                       DriverInfoInterCity driverInfoInterCity,
                                       Integer teamId) {
+
+        List<Integer> teamList = null;
+        if(StringUtils.isNotEmpty(driverInfoInterCity.getDriverName())
+                || StringUtils.isNotEmpty(driverInfoInterCity.getDriverPhone())
+                || StringUtils.isNotEmpty(driverInfoInterCity.getLicensePlates())){
+            teamList  = exMapper.queryTeamIds(driverInfoInterCity.getCityId(),driverInfoInterCity.getSupplierId(),
+                    driverInfoInterCity.getDriverName(),driverInfoInterCity.getDriverPhone(),driverInfoInterCity.getLicensePlates());
+            if(CollectionUtils.isEmpty(teamList)){
+                return new PageDTO(pageNo, pageSize, 0, null);
+            }
+        }
+
+
         Page page = PageHelper.startPage(pageNo, pageSize, true);
 
         int total = 0;
@@ -68,7 +82,9 @@ public class DriverInfoInterCityServiceImpl implements DriverInfoInterCityServic
         try {
             Set<Integer> setCityIds = WebSessionUtil.isSupperAdmin() ? null : WebSessionUtil.getCurrentLoginUser().getCityIds();
             Set<Integer> setSupplierIds = WebSessionUtil.isSupperAdmin() ? null : WebSessionUtil.getCurrentLoginUser().getSupplierIds();
-            List<InterCityTeam>  cityTeamList = teamExMapper.queryTeamsByParam(driverInfoInterCity.getCityId(),driverInfoInterCity.getSupplierId(),driverInfoInterCity.getTeamId(),null,
+
+
+            List<InterCityTeam>  cityTeamList = teamExMapper.queryTeamsByParam(driverInfoInterCity.getCityId(),driverInfoInterCity.getSupplierId(),driverInfoInterCity.getTeamId(),teamList,
                     setCityIds,setSupplierIds);
 
             if(CollectionUtils.isNotEmpty(cityTeamList)){
