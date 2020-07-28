@@ -10,6 +10,7 @@ import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.bigdata.MaxAndMinId;
 import com.zhuanche.entity.driver.DriverPunishDto;
 import com.zhuanche.serv.punish.DriverPunishClientService;
+import com.zhuanche.serv.punish.query.DriverPunishQuery;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -44,7 +46,7 @@ public class DriverPunishController extends BaseController {
 
     private static final Logger log = LoggerFactory.getLogger(DriverPunishController.class);
 
-    @Autowired
+    @Resource
     private DriverPunishClientService driverPunishService;
 
 
@@ -136,49 +138,29 @@ public class DriverPunishController extends BaseController {
     }
 
     @RequestMapping("/exportDriverPunishList")
-    public void daochu(DriverPunishDto params, HttpServletRequest request, HttpServletResponse response){
+    public AjaxResponse export(DriverPunishQuery params, HttpServletResponse response){
         if(params.getCityId() == null){
             log.error("城市为必传项");
-            return;
+            return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "城市为必传项");
         }
         try {
             //数据层权限
             SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
-            if(CollectionUtils.isNotEmpty(ssoLoginUser.getSupplierIds())){
+            if (Objects.nonNull(ssoLoginUser) && CollectionUtils.isNotEmpty(ssoLoginUser.getSupplierIds())) {
                 Set<Integer> set = ssoLoginUser.getSupplierIds();
-                String supplierIds = StringUtils.join(set.toArray(), Constants.SEPERATER);
-                params.setSupplierIds(supplierIds);
+                params.setSupplierIds(set);
             }
-            log.info("处罚列表导出，参数为--{}", params.toString());
             String endDate = DateUtils.formatDate(new Date(),DateUtils.dateTimeFormat_parttern);
             Date startDate = DateUtils.afterMonth(new Date(),-3);
             String start = DateUtils.formatDate(startDate,DateUtils.dateTimeFormat_parttern);
-
-            MaxAndMinId maxAndMinId = driverPunishService.queryMaxAndMin(start,endDate);
-            if(maxAndMinId != null){
-                params.setMaxId(maxAndMinId.getMaxId());
-                params.setMinId(maxAndMinId.getMinId());
-            }
-
-            Integer pageIndex =1;
-            params.setPagesize(200);
-            params.setPage(pageIndex);
-            List<DriverPunishDto> rows = new ArrayList<>();
-            PageInfo<DriverPunishDto> page = driverPunishService.selectList(params, false);
-            while (page.getList() != null && page.getList().size() != 0){
-                rows.addAll(page.getList());
-                pageIndex++;
-                params.setPage(pageIndex);
-
-                page = driverPunishService.selectList(params);
-            }
-            Workbook wb = driverPunishService.exportExcel(rows,request.getSession().getServletContext().getRealPath("/")+ File.separator+"template"+File.separator+"driver_punish.xlsx");
-            super.exportExcelFromTemplet(request, response, wb, new String("司机处罚列表".getBytes(StandardCharsets.UTF_8), "iso8859-1"));
-        } catch (IOException e) {
-            log.error("daochu error", e);
+            params.setCreateDateStart(start);
+            params.setCreateDateEnd(endDate);
+            driverPunishService.exportExcel(params, response);
+            return AjaxResponse.success(null);
         } catch (Exception e) {
-            log.error("daochu error", e);
-
+            log.error("export error", e);
+            return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, e.getMessage());
         }
+
     }
 }
