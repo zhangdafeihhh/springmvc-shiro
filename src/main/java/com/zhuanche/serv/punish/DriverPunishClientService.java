@@ -3,7 +3,6 @@ package com.zhuanche.serv.punish;
 import cn.hutool.core.io.IoUtil;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 import com.google.common.collect.Maps;
 import com.le.config.dict.Dicts;
 import com.sq.common.okhttp.OkHttpUtil;
@@ -13,6 +12,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.serv.punish.query.DriverPunishQuery;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.excel.ExportExcelUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -71,7 +70,6 @@ public class DriverPunishClientService extends DriverPunishService {
 
     /**
      * 查询申诉详情
-     *
      * @param punishId
      * @return
      */
@@ -94,12 +92,16 @@ public class DriverPunishClientService extends DriverPunishService {
         throw new ServiceException(RestErrorCode.HTTP_SYSTEM_ERROR, jsonObject.getString("msg"));
     }
 
+    /**
+     * 调用新车管平台，下载excel
+     * @param params
+     * @param response
+     */
     public void exportExcel(DriverPunishQuery params, HttpServletResponse response) {
         log.info("处罚列表导出，参数: {}", params.toString());
-        Map<String, Object> paramMap = JSONObject.parseObject(JSONObject.toJSONString(params), new TypeReference<HashMap<String, Object>>() {
-        });
         String url = Dicts.getString("mp.transport.url") + PUNISH_EXPORT;
-        Request okHttpRequest = new Request.Builder().url(buildGetUrl(url, paramMap)).build();
+        RequestBody body = RequestBody.create( MediaType.parse("application/json; charset=utf-8"), JSONObject.toJSONString(params));
+        Request okHttpRequest = new Request.Builder().url(url).post(body).build();
         Call call = OK_HTTP_CLIENT.newCall(okHttpRequest);
         InputStream inputStream = null;
         OutputStream outputStream = null;
@@ -107,7 +109,7 @@ public class DriverPunishClientService extends DriverPunishService {
             Response okHttpResponse = call.execute();
             if (okHttpResponse != null && okHttpResponse.isSuccessful() && Objects.nonNull(okHttpResponse.body())) {
                 inputStream = okHttpResponse.body().byteStream();
-                outputStream = getOutputStream("司机处罚列表", response);
+                outputStream = ExportExcelUtil.getOutputStream("司机处罚列表", response);
                 IoUtil.copy(inputStream, outputStream);
                 outputStream.flush();
             }
@@ -117,51 +119,6 @@ public class DriverPunishClientService extends DriverPunishService {
             IoUtil.close(inputStream);
             IoUtil.close(outputStream);
         }
-    }
-
-    private static OutputStream getOutputStream(String fileName, HttpServletResponse response) throws Exception {
-        if (!fileName.contains(ExcelTypeEnum.XLSX.getValue())) {
-            fileName = fileName + ExcelTypeEnum.XLSX.getValue();
-        }
-        fileName = URLEncoder.encode(fileName, "UTF-8");
-        response.setContentType("multipart/form-data");
-        response.setCharacterEncoding("utf8");
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-        return response.getOutputStream();
-    }
-
-
-    private static String buildGetUrl(String url, Map<String, ?> params) {
-        StringBuilder builder = null;
-        if (params != null) {
-            for (String key : params.keySet()) {
-                if (key != null && params.get(key) != null) {
-                    if (builder == null) {
-                        builder = new StringBuilder(url);
-                        builder.append((!url.contains("?")) ? "?" : "&");
-                    } else {
-                        builder.append("&");
-                    }
-                    builder.append(key).append("=");
-                    if (params.get(key) != null) {
-                        builder.append(encodeParams(params.get(key).toString()));
-                    } else {
-                        builder.append(CHAR_NULL);
-                    }
-                }
-            }
-        }
-        builder = (builder != null) ? builder : new StringBuilder(url);
-
-        return builder.toString();
-    }
-
-    private static String encodeParams(String params) {
-        try {
-            params = URLEncoder.encode(params, "UTF-8");
-        } catch (UnsupportedEncodingException ignored) {
-        }
-        return params;
     }
 
 
