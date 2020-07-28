@@ -97,7 +97,7 @@ public class DriverPunishClientService extends DriverPunishService {
      * @param params
      * @param response
      */
-    public void exportExcel(DriverPunishQuery params, HttpServletResponse response) {
+    public void exportExcel(DriverPunishQuery params, HttpServletResponse response) throws Exception {
         log.info("处罚列表导出，参数: {}", params.toString());
         String url = Dicts.getString("mp.transport.url") + PUNISH_EXPORT;
         RequestBody body = RequestBody.create( MediaType.parse("application/json; charset=utf-8"), JSONObject.toJSONString(params));
@@ -114,7 +114,8 @@ public class DriverPunishClientService extends DriverPunishService {
                 outputStream.flush();
             }
         } catch (Exception e) {
-            log.error("司机申诉列表下载失败", e);
+            log.error("司机申诉列表请求失败", e);
+            throw e;
         } finally {
             IoUtil.close(inputStream);
             IoUtil.close(outputStream);

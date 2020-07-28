@@ -158,7 +158,7 @@ public class DriverPunishController extends BaseController {
             driverPunishService.exportExcel(params, response);
             return AjaxResponse.success(null);
         } catch (Exception e) {
-            log.error("export error", e);
+            log.error("driverPunish export error", e);
             return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, e.getMessage());
         }
 
