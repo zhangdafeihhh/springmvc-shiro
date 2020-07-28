@@ -85,6 +85,7 @@ public class DriverInfoInterCityServiceImpl implements DriverInfoInterCityServic
                     try {
                         driverTeamRelDto.setCityName(supplierMap == null ? null:supplierMap.get(cityTeam.getSupplierId()).getCityName());
                         driverTeamRelDto.setSupplierName(supplierMap == null ? null:supplierMap.get(cityTeam.getSupplierId()).getSupplierFullName());
+                        driverTeamRelDto.setTeamId(cityTeam.getId());
                     } catch (Exception e) {
                         logger.error("异常",e);
                     }
