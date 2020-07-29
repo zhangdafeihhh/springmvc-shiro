@@ -293,6 +293,7 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
                 if(list.contains(strDate)){
                     repeatDate.add(echelonDate);
                 }
+                list.add(strDate);
             });
         });
         return repeatDate;
