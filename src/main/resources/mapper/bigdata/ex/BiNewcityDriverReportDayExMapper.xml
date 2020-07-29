@@ -56,12 +56,22 @@
 
 
         <if test="sort != null and sort == 1">
-            ORDER  by sum(t.total_amount)  DESC
+            ORDER  by sum(t.settle_order_num)  asc
         </if>
 
         <if test="sort != null and sort == 2">
-            ORDER  by sum(t.settle_order_num)  DESC
+            ORDER  by sum(t.settle_order_num)  desc
         </if>
+
+        <if test="amountSort != null and amountSort == 1">
+            ORDER  by sum(t.total_amount)  asc
+        </if>
+
+        <if test="amountSort != null and amountSort == 2">
+            ORDER  by sum(t.total_amount)  desc
+        </if>
+
+
 
     </select>
 
