@@ -152,11 +152,9 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
     }
 
     @Override
-    public List<InterCityEchelon> detailList(Integer teamId) {
+    public List<InterCityEchelon> detailList(Integer teamId,String echelonMonth) {
 
-        List<InterCityEchelon> queryTeamIds = echelonExMapper.queryTeamId(teamId,null);
-
-
+        List<InterCityEchelon> queryTeamIds = echelonExMapper.queryTeamId(teamId,echelonMonth);
 
         return queryTeamIds;
     }

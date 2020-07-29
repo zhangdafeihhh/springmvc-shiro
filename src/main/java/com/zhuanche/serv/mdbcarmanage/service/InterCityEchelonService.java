@@ -24,7 +24,7 @@ public interface InterCityEchelonService {
     int updateByPrimaryKey(InterCityEchelon record);
 
 
-    List<InterCityEchelon> detailList(Integer teamId);
+    List<InterCityEchelon> detailList(Integer teamId,String echelonMonth);
 
     AjaxResponse queryEchelonList(DriverInfoInterCity driverInfoInterCity,
                                   String  echelonMonth,

@@ -176,10 +176,11 @@ public class InterCityEchelonController {
 
     @RequestMapping("/editEchelonDetail")
     @ResponseBody
-    public AjaxResponse editEchelonDetail(@Verify(param = "teamId", rule = "required") Integer teamId) {
+    public AjaxResponse editEchelonDetail(@Verify(param = "teamId", rule = "required") Integer teamId,
+                                          @Verify(param = "echelonMonth", rule = "required") String echelonMonth) {
 
         try {
-            List<InterCityEchelon> echelonList= interCityEchelonService.detailList(teamId);
+            List<InterCityEchelon> echelonList= interCityEchelonService.detailList(teamId,echelonMonth);
             return AjaxResponse.success(echelonList);
         } catch (Exception e) {
             logger.error("获取编辑梯队详情异常",e);
