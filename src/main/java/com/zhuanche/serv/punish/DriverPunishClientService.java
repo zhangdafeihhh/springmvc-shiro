@@ -44,6 +44,13 @@ public class DriverPunishClientService extends DriverPunishService {
     }};
 
 
+    /**
+     * 司机申诉审核
+     * @param punishId
+     * @param status
+     * @param cgReason
+     * @param cgPictures
+     */
     public void doAudit(Integer punishId, Integer status, String cgReason, String cgPictures) {
         Map<String, Object> paramMap = Maps.newHashMapWithExpectedSize(5);
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
@@ -107,7 +114,7 @@ public class DriverPunishClientService extends DriverPunishService {
                 inputStream = okHttpResponse.body().byteStream();
                 outputStream = ExportExcelUtil.getOutputStream("司机处罚列表", response);
                 IoUtil.copy(inputStream, outputStream);
-                outputStream.flush();
+                IoUtil.flush(outputStream);
             }
         } catch (Exception e) {
             log.error("司机申诉列表请求失败", e);
