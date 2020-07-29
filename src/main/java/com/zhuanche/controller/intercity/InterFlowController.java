@@ -49,13 +49,14 @@ public class InterFlowController {
                                       Integer dataType,
                                       String dataBeginDate,
                                       String dataEndDate,
-                                      @Verify(param = "sort",rule = "max(2) ")@RequestParam(value = "pageNum",defaultValue = "1")Integer sort){
-        logger.info(MessageFormat.format("=====查询司机流水列表=======入参", JSONObject.toJSON(reportDay),pageNum,pageSize,dataType,dataBeginDate,dataEndDate));
+                                      @Verify(param = "sort",rule = "max(2)")Integer sort,
+                                      @Verify(param = "amountSort",rule = "max(2) ")Integer amountSort){
+        logger.info(MessageFormat.format("=====查询司机流水列表=======入参", JSONObject.toJSON(reportDay),pageNum,pageSize,dataType,dataBeginDate,dataEndDate,sort,amountSort));
 
         Map<String,Object> map = Maps.newHashMap();
         PageDTO pageDTO = null;
         try {
-            pageDTO = service.pageInfoList(reportDay,pageNum,pageSize,dataType,dataBeginDate,dataEndDate,sort);
+            pageDTO = service.pageInfoList(reportDay,pageNum,pageSize,dataType,dataBeginDate,dataEndDate,sort,amountSort);
 
             BiNewcityDriverReportDayDto dto = service.flowTotal(reportDay,dataType,dataBeginDate,dataEndDate);
 

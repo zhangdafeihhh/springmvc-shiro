@@ -17,7 +17,8 @@ public interface BiNewcityDriverReportDayExMapper {
                                                  @Param("dateType") Integer dateType,
                                                  @Param("dataBeginDate") String dataBeginDate,
                                                  @Param("dataEndDate") String dataEndDate,
-                                                 @Param("sort")Integer sort);
+                                                 @Param("sort")Integer sort,
+                                                 @Param("amountSort")Integer amountSort);
 
     /**汇总查询*/
     BiNewcityDriverReportDayDto queryFlowTotal(@Param("cityId") Integer cityId,
