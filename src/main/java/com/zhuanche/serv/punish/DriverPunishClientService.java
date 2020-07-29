@@ -1,7 +1,6 @@
 package com.zhuanche.serv.punish;
 
 import cn.hutool.core.io.IoUtil;
-import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.le.config.dict.Dicts;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -36,7 +34,6 @@ public class DriverPunishClientService extends DriverPunishService {
     private static final String PUNISH_DETAIL = "/driverPunish/findDriverPunishDetail";
     private static final String PUNISH_EXPORT = "/driverPunish/export";
     private static final String CODE = "code";
-    private static final String CHAR_NULL = "";
     private static final OkHttpClient OK_HTTP_CLIENT = new OkHttpClient() {{
         new Builder()
                 .connectTimeout(3, TimeUnit.SECONDS)
@@ -47,7 +44,6 @@ public class DriverPunishClientService extends DriverPunishService {
     }};
 
 
-    @Override
     public void doAudit(Integer punishId, Integer status, String cgReason, String cgPictures) {
         Map<String, Object> paramMap = Maps.newHashMapWithExpectedSize(5);
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
