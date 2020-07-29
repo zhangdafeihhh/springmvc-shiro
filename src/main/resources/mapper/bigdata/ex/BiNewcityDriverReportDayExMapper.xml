@@ -60,7 +60,7 @@
         </if>
 
         <if test="sort != null and sort == 2">
-            ORDER  by sum(t.bind_order_num)  DESC
+            ORDER  by sum(t.settle_order_num)  DESC
         </if>
 
     </select>
