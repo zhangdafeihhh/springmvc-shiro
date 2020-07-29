@@ -39,10 +39,14 @@
     <if test="echelonMonth != null and echelonMonth != ''">
       and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
     </if>
-    and team_id in
-    <foreach collection="teamIdList" open="(" close=")" separator=","  item="teamId">
-      #{teamId}
-    </foreach>
+
+    <if test="teamIdList != null and teamIdList.size() > 0">
+      and team_id in
+      <foreach collection="teamIdList" open="(" close=")" separator=","  item="teamId">
+        #{teamId}
+      </foreach>
+    </if>
+
   </select>
 
 
