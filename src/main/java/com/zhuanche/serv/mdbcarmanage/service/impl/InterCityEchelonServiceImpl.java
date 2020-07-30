@@ -117,30 +117,8 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
             logger.info("===该日期该梯队已存在车队===");
             return AjaxResponse.fail(RestErrorCode.ECHELON_HAS_EXIST, repeateTeamDate);
         }
-        echelonList.forEach(cityEchelon ->{
 
-            String echelonDate = cityEchelon.getEchelonDate();
-
-            Integer id = cityEchelon.getId();
-
-            Integer sort = cityEchelon.getSort();
-
-            InterCityEchelon echelon = new InterCityEchelon();
-            echelon.setCreateTime(new Date());
-            echelon.setEchelonDate(echelonDate);
-            echelon.setEchelonMonth(echelonMonth);
-            echelon.setTeamId(teamId);
-            echelon.setEchelonName(String.format(Constants.TEAMNAME,teamId.toString()));
-            echelon.setSort(sort);
-            if (id != null && id > 0) {
-                echelon.setId(id);
-                echelonMapper.updateByPrimaryKeySelective(echelon);
-            } else {
-                echelonMapper.insertSelective(echelon);
-            }
-
-        });
-
+        this.addEchelonData(echelonList,echelonMonth,teamId);
 
         return AjaxResponse.success(null);
     }
@@ -292,7 +270,7 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
                 List<String> dateList = TransportUtils.listStr(echelonDate);
                 dateList.forEach(strDate -> {
                     if(list.contains(strDate)){
-                        repeatDate.add(echelonDate);
+                        repeatDate.add(strDate);
                     }
                     list.add(strDate);
                 });
@@ -312,15 +290,17 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
         final String[] repeatStr = {""};
         echList.forEach(echelon ->{
             if(echelon.getId() == null || echelon.getId() == 0){
-                String echelonDate = echelon.getEchelonDate();
+                if(StringUtils.isNotEmpty(echelon.getEchelonDate())){
+                    String echelonDate = echelon.getEchelonDate();
 
-                List<InterCityEchelon> echelonList = echelonExMapper.queryTeamId(teamId, echelonMonth);
-                List<String> echelonDateList = TransportUtils.listStr(echelonDate);
+                    List<InterCityEchelon> echelonList = echelonExMapper.queryTeamId(teamId, echelonMonth);
+                    List<String> echelonDateList = TransportUtils.listStr(echelonDate);
 
-                /**去掉转义符*/
-                String repeatDate = StringEscapeUtils.unescapeJava(this.isTrue(echelonList, echelonDateList));
-                if (StringUtils.isNotEmpty(repeatDate)) {
-                    repeatStr[0] = repeatDate;
+                    /**去掉转义符*/
+                    String repeatDate = StringEscapeUtils.unescapeJava(this.isTrue(echelonList, echelonDateList));
+                    if (StringUtils.isNotEmpty(repeatDate)) {
+                        repeatStr[0] = repeatDate;
+                    }
                 }
             }
 
@@ -380,5 +360,30 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
 
         });
         return repeatTeamDate[0];
+    }
+
+
+    /**
+     * 添加梯队规则数据
+     * @param echelonList
+     * @param echelonMonth
+     * @param teamId
+     */
+    private void addEchelonData(List<InterCityEchelon> echelonList,String echelonMonth,Integer teamId){
+        echelonExMapper.batchDeleteEchelon(teamId,echelonMonth);
+        echelonList.forEach(cityEchelon ->{
+            String echelonDate = cityEchelon.getEchelonDate();
+            Integer sort = cityEchelon.getSort();
+
+            InterCityEchelon echelon = new InterCityEchelon();
+            echelon.setCreateTime(new Date());
+            echelon.setEchelonDate(echelonDate);
+            echelon.setEchelonMonth(echelonMonth);
+            echelon.setTeamId(teamId);
+            echelon.setEchelonName(String.format(Constants.TEAMNAME,teamId.toString()));
+            echelon.setSort(sort);
+
+            echelonMapper.insertSelective(echelon);
+        });
     }
 }

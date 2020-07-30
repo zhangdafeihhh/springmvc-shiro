@@ -19,4 +19,7 @@ public interface InterCityEchelonExMapper {
     List<Integer> teamIdListByMonth(@Param("echelonMonth") String echelonMonth);
 
 
+    /**批量删除*/
+    int batchDeleteEchelon(@Param("teamId") Integer teamId,
+                    @Param("echelonMonth") String echelonMonth);
 }

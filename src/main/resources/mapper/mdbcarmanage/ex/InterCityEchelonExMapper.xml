@@ -63,4 +63,11 @@
   </select>
 
 
+  <delete id="batchDeleteEchelon">
+
+    DELETE  from inter_city_echelon WHERE 1=1
+          and team_id = #{teamId,jdbcType=INTEGER}
+          and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
+  </delete>
+
 </mapper>
