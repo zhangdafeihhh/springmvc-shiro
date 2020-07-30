@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.jsonobject.EchelonJsonData;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
@@ -352,8 +353,29 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
                 String repeatDate = StringEscapeUtils.unescapeJava(this.isTrue(echelonLists, echelonDateList));
 
                 if (StringUtils.isNotEmpty(repeatDate)) {
-                    logger.info("===该日期该梯队已存在车队===",repeatDate);
-                    repeatTeamDate[0] = repeatDate;
+                    /**如果仍有相同的，比较相同梯队是否有相同的日期。如果有不允许创建*/
+                    Map<Integer,String> map = Maps.newHashMap();
+                   echList.forEach(ech ->{
+                       map.put(ech.getSort(),ech.getEchelonDate());
+                   });
+
+                   echelonLists.forEach(echs ->{
+                       if(map.get(echs.getSort()) != null){
+                          String curDate = map.get(echs.getSort());
+                          String beforeDate = echs.getEchelonDate();
+
+                          List<String> curList = TransportUtils.listStr(curDate);
+                           List<String> beforeList = TransportUtils.listStr(beforeDate);
+
+                           List<String>  sameList = curList.stream().filter(t -> beforeList.contains(t)).collect(Collectors.toList());
+
+                           if(CollectionUtils.isNotEmpty(sameList)){
+                               logger.info("===该日期该梯队已存在车队===",JSONObject.toJSONString(sameList));
+                               repeatTeamDate[0] = JSONObject.toJSONString(sameList);
+                          }
+                       }
+                   });
+
                 }
             }
 
