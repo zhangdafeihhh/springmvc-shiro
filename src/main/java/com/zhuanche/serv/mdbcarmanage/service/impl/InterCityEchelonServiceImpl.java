@@ -311,7 +311,7 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
     private String repeat(Integer teamId,String echelonMonth,List<InterCityEchelon> echList){
         final String[] repeatStr = {""};
         echList.forEach(echelon ->{
-            if(echelon.getId() != null && echelon.getId() > 0){
+            if(echelon.getId() == null || echelon.getId() == 0){
                 String echelonDate = echelon.getEchelonDate();
 
                 List<InterCityEchelon> echelonList = echelonExMapper.queryTeamId(teamId, echelonMonth);
