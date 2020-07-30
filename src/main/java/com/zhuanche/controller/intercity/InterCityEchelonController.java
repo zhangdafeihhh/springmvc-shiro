@@ -17,6 +17,7 @@ import com.zhuanche.serv.intercity.DriverInfoInterCityService;
 import com.zhuanche.serv.intercity.IntegerCityTeamDriverRelService;
 import com.zhuanche.serv.intercity.IntegerCityTeamService;
 import com.zhuanche.serv.mdbcarmanage.service.InterCityEchelonService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,10 +103,14 @@ public class InterCityEchelonController {
 
     @RequestMapping("/addDriver")
     @ResponseBody
-    public AjaxResponse addDriver(@Verify(param = "driverIds", rule = "required") String driverIds,
+    public AjaxResponse addDriver(String driverIds,
                                   @Verify(param = "teamId", rule = "required") Integer teamId) {
         logger.info(MessageFormat.format("新城际拼车车队添加司机入参:driverIds:{0},teamId:{1}", driverIds, teamId));
         try {
+            if(StringUtils.isEmpty(driverIds)){
+                relService.delByTeamId(teamId);
+                return AjaxResponse.success(null);
+            }
             return relService.addDriver(driverIds, teamId);
         } catch (Exception e) {
             logger.error("添加司机异常",e);
@@ -211,9 +216,10 @@ public class InterCityEchelonController {
      */
     @RequestMapping("/queryDriver")
     @ResponseBody
-    public AjaxResponse queryDriver(@Verify(param = "queryParam",rule = "required") String queryParam){
+    public AjaxResponse queryDriver(@Verify(param = "queryParam",rule = "required") String queryParam,
+                                    @Verify(param = "supplierId",rule = "required") Integer supplierId){
         logger.info("查询司机信息入参" + queryParam );
-        return cityService.queryDriverByParam(queryParam);
+        return cityService.queryDriverByParam(queryParam,supplierId);
     }
 
 

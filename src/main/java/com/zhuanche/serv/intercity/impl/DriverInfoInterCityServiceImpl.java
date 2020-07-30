@@ -101,6 +101,8 @@ public class DriverInfoInterCityServiceImpl implements DriverInfoInterCityServic
                     try {
                         driverTeamRelDto.setCityName(supplierMap == null ? null:supplierMap.get(cityTeam.getSupplierId()).getCityName());
                         driverTeamRelDto.setSupplierName(supplierMap == null ? null:supplierMap.get(cityTeam.getSupplierId()).getSupplierFullName());
+                        driverTeamRelDto.setSupplierId(cityTeam.getSupplierId());
+                        driverTeamRelDto.setCityId(cityTeam.getCityId());
                         driverTeamRelDto.setTeamId(cityTeam.getId());
                     } catch (Exception e) {
                         logger.error("异常",e);
@@ -144,9 +146,9 @@ public class DriverInfoInterCityServiceImpl implements DriverInfoInterCityServic
 
 
     @Override
-    public AjaxResponse queryDriverByParam(String queryParam){
+    public AjaxResponse queryDriverByParam(String queryParam,Integer supplierId){
         try {
-            List<DriverInfoInterCity> queryDriverByParam = exMapper.queryDriverByParam(queryParam);
+            List<DriverInfoInterCity> queryDriverByParam = exMapper.queryDriverByParam(queryParam,supplierId);
             return AjaxResponse.success(queryDriverByParam);
         } catch (Exception e) {
             logger.error("查询异常",e);

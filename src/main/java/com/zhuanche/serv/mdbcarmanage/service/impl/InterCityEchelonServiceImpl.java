@@ -340,7 +340,6 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
                     teamIds.add(team.getId());
                 }
 
-
             });
 
             /**如果编辑的是同一个车队 则没必要校验*/

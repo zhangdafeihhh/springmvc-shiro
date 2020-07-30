@@ -39,7 +39,8 @@ public interface DriverInfoInterCityExMapper {
     /**根据司机的查询司机信息*/
     List<IntegerDriverInfoDto> driverDtoList(@Param("driverIds") List<Integer> driverIds);
 
-    List<DriverInfoInterCity> queryDriverByParam(@Param("queryParam") String  queryParam);
+    List<DriverInfoInterCity> queryDriverByParam(@Param("queryParam") String  queryParam,
+                                                 @Param("supplierId") Integer  supplierId);
 
     List<Integer> queryTeamIds(@Param("cityId")Integer cityId,
                                @Param("supplierId")Integer supplierId,

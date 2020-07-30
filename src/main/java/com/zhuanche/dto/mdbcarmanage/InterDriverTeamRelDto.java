@@ -15,4 +15,8 @@ public class InterDriverTeamRelDto {
     private String supplierName;
     private String teamName;
     private Integer teamId;
+
+    private Integer supplierId;
+
+    private Integer cityId;
 }

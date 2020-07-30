@@ -21,6 +21,7 @@ public interface DriverInfoInterCityService {
 
     AjaxResponse queryDriverByTeam(Integer teamId);
 
-    AjaxResponse queryDriverByParam(String queryParam);
+    AjaxResponse queryDriverByParam(String queryPara,
+                                    Integer supplierId);
 }
 

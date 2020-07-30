@@ -223,6 +223,7 @@
     t.driver_phone,
     t.license_plates
     FROM  driver_info_inter_city t WHERE  1=1
+    and supplier_id = #{supplierId}
     AND (t.driver_name = #{queryParam} or t.driver_phone= #{queryParam} or t.license_plates=#{queryParam} )
   </select>
 </mapper>
