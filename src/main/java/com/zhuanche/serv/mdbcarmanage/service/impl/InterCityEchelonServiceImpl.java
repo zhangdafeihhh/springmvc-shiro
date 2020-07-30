@@ -267,13 +267,16 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
 
                 String echelonDate = echelon.getEchelonDate();
 
-                List<String> dateList = TransportUtils.listStr(echelonDate);
-                dateList.forEach(strDate -> {
-                    if(list.contains(strDate)){
-                        repeatDate.add(strDate);
-                    }
-                    list.add(strDate);
-                });
+                if(StringUtils.isNotEmpty(echelonDate)){
+                    List<String> dateList = TransportUtils.listStr(echelonDate);
+                    dateList.forEach(strDate -> {
+                        if(list.contains(strDate)){
+                            repeatDate.add(strDate);
+                        }
+                        list.add(strDate);
+                    });
+                }
+
         });
         return repeatDate;
     }
