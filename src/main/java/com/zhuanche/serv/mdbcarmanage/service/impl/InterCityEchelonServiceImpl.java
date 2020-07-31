@@ -151,12 +151,14 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
             List<InterCityTeam>  cityTeamList = teamExMapper.queryTeamsByParam(driverInfoInterCity.getCityId(),driverInfoInterCity.getSupplierId(),driverInfoInterCity.getTeamId(),teamIdList,
                     setCityIds,setSupplierIds);
 
-            Integer count = cityTeamList.size();
+            Integer count = 0;
 
             if(CollectionUtils.isNotEmpty(cityTeamList)){
 
 
                 List<InterEchelonDto> echelonDtoList = this.echelonDtoList(cityTeamList,echelonMonth);
+
+                count = echelonDtoList.size();
 
                 PageDTO pageDTO = new PageDTO(pageNo,pageSize,count,echelonDtoList);
 
@@ -226,7 +228,10 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
                 List<InterCityEchelon> queryTeamIds = echelonExMapper.queryTeamId(cityTeam.getId(),echelonMonth);
                 dto.setEchelonList(queryTeamIds);
                 dto.setEchelonMonth(echelonMonth);
-                echelonDtoList.add(dto);
+                if(CollectionUtils.isNotEmpty(queryTeamIds)){
+                    echelonDtoList.add(dto);
+                }
+
             });
         } catch (Exception e) {
             logger.error("获取列表异常",e);
