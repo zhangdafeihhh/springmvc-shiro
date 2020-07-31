@@ -1,6 +1,8 @@
 package com.zhuanche.serv.deiver;
 
+import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.enums.CarInfoAuditEnum;
+import com.zhuanche.common.exception.ServiceException;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.mdbcarmanage.CarBizCarInfoTempDTO;
@@ -19,6 +21,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.MyRestTemplate;
 import mapper.mdbcarmanage.CarBizCarInfoAuditMapper;
 import mapper.mdbcarmanage.CarBizCarInfoTempMapper;
 import mapper.mdbcarmanage.ex.CarBizCarInfoTempExMapper;
@@ -27,7 +30,11 @@ import mapper.rentcar.CarBizModelMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
+import org.apache.commons.fileupload.MultipartStream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.ibatis.annotations.Param;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -35,8 +42,11 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -61,6 +71,10 @@ public class CarBizCarInfoTempService {
 
     @Autowired
     private CarBizCarInfoTempMapper carBizCarInfoTempMapper;
+
+    @Autowired
+    @Qualifier("wwwApiTemplate")
+    private MyRestTemplate wwwApiTemplate;
 
     @Autowired
     private CarBizCarInfoAuditMapper carBizCarInfoAuditMapper;
@@ -2374,6 +2388,52 @@ public class CarBizCarInfoTempService {
                 });
             });
         });
+    }
 
+    private final String picturePath = "/upload/public";
+
+    /**
+     * 上传文件
+     *
+     * @param type 上传类型
+     * @param multipartFile 文件
+     * @return 文件的真实路径
+     */
+    public String uploadImage(String type, String carId, MultipartFile multipartFile) {
+        if (StringUtils.isBlank(carId)) {
+            throw new IllegalArgumentException("没有传递车辆id信息");
+        }
+        String path = uploadToImageServer(type, multipartFile);
+        carBizCarInfoTempMapper.updateImageInfo(Integer.valueOf(carId), type, path);
+        return path;
+    }
+
+    public String uploadToImageServer(String type,  MultipartFile multipartFile) {
+        String path = "";
+        if(StringUtils.isBlank(type)) {
+            throw new IllegalArgumentException("上传图片没有执行类型");
+        }
+
+        if (multipartFile == null || multipartFile.getSize() == 0) {
+            throw new IllegalArgumentException("文件能为空");
+        }
+
+        try (InputStream in = multipartFile.getInputStream()) {
+            ContentBody contentBody = new InputStreamBody(in, multipartFile.getOriginalFilename());
+            Map<String, Object> param = new HashMap();
+            param.put(multipartFile.getOriginalFilename(), contentBody);
+            param.put("create_uid", WebSessionUtil.getCurrentLoginUser().getId());
+            String result = wwwApiTemplate.postMultipartData(picturePath, String.class, param);
+            if (result == null) {
+                throw new IllegalArgumentException("上传图片服务器没有获取到返回结果,请重新上传");
+            }
+            JSONObject response = JSONObject.parseObject(result);
+            if (response.getIntValue("code") == 1) {
+                path = response.getJSONArray("data").getJSONObject(0).getString("path");
+            }
+        } catch (Exception e) {
+            throw new ServiceException(500, e.getMessage(), e);
+        }
+        return path;
     }
 }

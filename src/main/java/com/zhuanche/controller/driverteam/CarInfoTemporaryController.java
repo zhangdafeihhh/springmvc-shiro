@@ -633,4 +633,21 @@ public class CarInfoTemporaryController extends BaseController {
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/uploadImage",method = RequestMethod.POST)
+    public AjaxResponse uploadImage(HttpServletRequest request, MultipartFile multipartFile) {
+        // uploadType = car / drivingLicense
+        log.info("上传图片类型[{}], 车辆id[{}]", request.getParameter("uploadType"), request.getParameter("carId"));
+        try {
+            return AjaxResponse.success(carBizCarInfoTempService.uploadImage(request.getParameter("uploadType"),
+                    request.getParameter("carId"), multipartFile));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
+
+
+
 }
