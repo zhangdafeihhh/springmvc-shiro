@@ -289,6 +289,46 @@ public class CarBizCarInfoTempDTO {
 
     private String vehiclesafe;
 
+    /**
+     * 审核状态列
+     */
+    private String statusDesc;
+
+    /**
+     * 操作code
+     */
+    private String carInfoOpsCode;
+
+    /**
+     * 操作描述,查看,修改
+     */
+    private String carInfoOpsDesc;
+
+
+    public String getStatusDesc() {
+        return statusDesc;
+    }
+
+    public void setStatusDesc(String statusDesc) {
+        this.statusDesc = statusDesc;
+    }
+
+    public String getCarInfoOpsCode() {
+        return carInfoOpsCode;
+    }
+
+    public void setCarInfoOpsCode(String carInfoOpsCode) {
+        this.carInfoOpsCode = carInfoOpsCode;
+    }
+
+    public String getCarInfoOpsDesc() {
+        return carInfoOpsDesc;
+    }
+
+    public void setCarInfoOpsDesc(String carInfoOpsDesc) {
+        this.carInfoOpsDesc = carInfoOpsDesc;
+    }
+
     private Long newBrandId = null;
     private String newBrandName = null;
 

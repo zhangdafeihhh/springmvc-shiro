@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="mapper.mdbcarmanage.CarBizCarInfoAuditMapper">
-    <!-- mapper基础标准: 当前表所有字段映射结果集 -->
     <resultMap id="baseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarBizCarInfoAudit">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <id column="car_biz_car_info_temp_id" property="carBizCarInfoTempId" jdbcType="INTEGER"/>
@@ -17,6 +16,9 @@
       id,car_biz_car_info_temp_id,status_code,status_desc,remark,create_user,create_date,update_date
     </sql>
 
+    <select id="selectAuditStatusByCarTempId" parameterType="integer" resultMap="baseResultMap">
+        select * from car_biz_car_info_audit where car_biz_car_info_temp_id = #{carId} order by create_date desc limit 1
+    </select>
     <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizCarInfoAudit">
         insert into car_biz_car_info_audit(
 			car_biz_car_info_temp_id,

@@ -23,6 +23,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.excel.ExportExcelUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
@@ -153,6 +154,10 @@ public class CarInfoTemporaryController extends BaseController {
             }
         }
         List<CarBizCarInfoTempDTO> carBizCarInfoTempDTOList = BeanUtil.copyList(carBizCarInfoTempList,CarBizCarInfoTempDTO.class);
+
+        if (CollectionUtils.isNotEmpty(carBizCarInfoTempDTOList)) {
+            carBizCarInfoTempService.buildAuditStatusInfo(carBizCarInfoTempDTOList);
+        }
         PageDTO pageDto = new PageDTO(page,pageSize,(int)total,carBizCarInfoTempDTOList);
         return AjaxResponse.success(pageDto);
 	}

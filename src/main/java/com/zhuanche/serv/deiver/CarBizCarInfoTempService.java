@@ -3,6 +3,7 @@ package com.zhuanche.serv.deiver;
 import com.zhuanche.common.enums.CarInfoAuditEnum;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.dto.mdbcarmanage.CarBizCarInfoTempDTO;
 import com.zhuanche.entity.driver.DriverBrand;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoAudit;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
@@ -2356,5 +2357,23 @@ public class CarBizCarInfoTempService {
         }catch (Exception e) {
             return 0;
         }
+    }
+
+    /**
+     * 绑定司机审核信息
+     *
+     * @param carBizCarInfoTempDTOs 列表对象
+     */
+    public void buildAuditStatusInfo(List<CarBizCarInfoTempDTO> carBizCarInfoTempDTOs) {
+        carBizCarInfoTempDTOs.forEach(carBizCarInfoTempDTO -> {
+            Optional.ofNullable(carBizCarInfoAuditMapper.selectAuditStatusByCarTempId(carBizCarInfoTempDTO.getCarId())).ifPresent(auditInfo -> {
+                carBizCarInfoTempDTO.setStatusDesc(auditInfo.getStatusDesc());
+                Optional.ofNullable(CarInfoAuditEnum.getOperationInfo(auditInfo.getStatusCode())).ifPresent(pair ->{
+                    carBizCarInfoTempDTO.setCarInfoOpsCode(pair.getLeft());
+                    carBizCarInfoTempDTO.setCarInfoOpsDesc(pair.getRight());
+                });
+            });
+        });
+
     }
 }
