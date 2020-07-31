@@ -217,7 +217,7 @@
   </select>
 
 
-  <select id="queryDriverByParam" resultMap="BaseResultMap" parameterType="java.lang.String">
+  <select id="queryDriverByParam" resultMap="BaseResultMap">
     SELECT  t.driver_id ,
     t.driver_name,
     t.driver_phone,
