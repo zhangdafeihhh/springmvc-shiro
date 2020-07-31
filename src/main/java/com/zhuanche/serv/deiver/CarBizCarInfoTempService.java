@@ -1,10 +1,13 @@
 package com.zhuanche.serv.deiver;
 
+import com.zhuanche.common.enums.CarInfoAuditEnum;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.driver.DriverBrand;
+import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoAudit;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
+import com.zhuanche.entity.rentcar.CarBizCarInfo;
 import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
@@ -15,6 +18,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.Common;
+import mapper.mdbcarmanage.CarBizCarInfoAuditMapper;
 import mapper.mdbcarmanage.CarBizCarInfoTempMapper;
 import mapper.mdbcarmanage.ex.CarBizCarInfoTempExMapper;
 import mapper.mdbcarmanage.ex.CarBizDriverInfoTempExMapper;
@@ -35,6 +39,8 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author wzq
@@ -54,6 +60,9 @@ public class CarBizCarInfoTempService {
 
     @Autowired
     private CarBizCarInfoTempMapper carBizCarInfoTempMapper;
+
+    @Autowired
+    private CarBizCarInfoAuditMapper carBizCarInfoAuditMapper;
 
     @Autowired
     private CarBizDriverInfoTempExMapper carBizDriverInfoTempExMapper;
@@ -108,9 +117,10 @@ public class CarBizCarInfoTempService {
     }
 
     /**
-     * 新增
-     * @param carBizCarInfoTemp
-     * @return
+     * 新增车辆信息到临时表,并且维护状态信息列表
+     *
+     * @param carBizCarInfoTemp 车辆实体
+     * @return  返回成功结果
      */
     public AjaxResponse add(CarBizCarInfoTemp carBizCarInfoTemp) {
         String license = carBizCarInfoTemp.getLicensePlates();
@@ -121,8 +131,17 @@ public class CarBizCarInfoTempService {
             return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_EXIST);
         }
         int code =  carBizCarInfoTempMapper.insertSelective(carBizCarInfoTemp);
+
         if(code > 0 ){
-            return AjaxResponse.success(RestErrorCode.SUCCESS);
+            CarBizCarInfoAudit carBizCarInfoAudit = CarBizCarInfoAudit.builder().carBizCarInfoTempId(carBizCarInfoTemp.getCarId())
+                    .statusCode(CarInfoAuditEnum.STATUS_1.getStatusCode())
+                    .statusDesc(CarInfoAuditEnum.STATUS_1.getStatusDesc())
+                    .remark("sass系统添加车辆,初始化待提交状态")
+                    .createDate(new Date())
+                    .updateDate(new Date())
+                    .createUser(carBizCarInfoTemp.getCreateBy().toString()).build();
+            code = carBizCarInfoAuditMapper.insert(carBizCarInfoAudit);
+            return code > 0 ?  AjaxResponse.success(RestErrorCode.SUCCESS): AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }else{
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
@@ -2286,5 +2305,56 @@ public class CarBizCarInfoTempService {
 
     public void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType) {
         carBizCarInfoTempExMapper.updateDriverCooperationTypeBySupplierId(supplierId, cooperationType);
+    }
+
+    private final String SCNT= "sCnt";
+    private final String TCNT = "tCnt";
+    private final int groupSize = 500;
+    /**
+     * 1.分组
+     * 2.批量插入
+     * @return
+     */
+    public Map<String, Integer> flushData() {
+        Map<String, Integer> result = new HashMap<>();
+        result.put(SCNT,0);
+        result.put(TCNT,0);
+        List<Integer> carIdList = carBizCarInfoTempExMapper.selectAllNoAuditStatusCarId();
+        if(Objects.isNull(carIdList)) {
+            return result;
+        }
+        result.put(TCNT, carIdList.size());
+        String key= "groupData";
+        HashMap<String, List<List<Integer>>> map = new HashMap<>();
+        Optional.ofNullable(carIdList).ifPresent(origin -> {
+            int block = (origin.size() + groupSize -1) / groupSize;
+            List<List<Integer>>  carIdGroup=  IntStream.range(0,block).boxed().map(i->{
+                int start = i*groupSize;
+                int end = Math.min(start + groupSize, origin.size());
+                return origin.subList(start,end);
+            }).collect(Collectors.toList());
+            map.put(key, carIdGroup);
+        });
+
+        List<List<Integer>> idList = map.getOrDefault(key, null);
+        idList.forEach(list -> {
+            int count = batchInsertCarInfoAudit(list);
+            result.put(SCNT, result.get(SCNT) + count);
+        });
+        System.out.println("carIdList = " + carIdList);
+        return result;
+    }
+
+
+    public int batchInsertCarInfoAudit(List<Integer> carIdList) {
+        try {
+            List<CarBizCarInfoAudit> carBizCarInfoAudits = new ArrayList<>();
+            carIdList.forEach(carId -> {
+                carBizCarInfoAudits.add(CarBizCarInfoAudit.init(carId));
+            });
+            return carBizCarInfoAuditMapper.insertBatch(carBizCarInfoAudits);
+        }catch (Exception e) {
+            return 0;
+        }
     }
 }

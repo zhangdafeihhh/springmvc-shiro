@@ -201,7 +201,13 @@
 		WHERE car_id = #{carId}
 		LIMIT 1
 	</select>
-	
+
+	<select id="selectAllNoAuditStatusCarId" resultType="Integer">
+		select ct.car_id from car_biz_car_info_temp as ct
+		left join car_biz_car_info_audit as ca on
+		ct.car_id = ca.car_biz_car_info_temp_id where ca.car_biz_car_info_temp_id is null
+	</select>
+
 	<select id="selectBylicensePlates" resultType="com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp"  parameterType="java.util.Map">
 		SELECT
 		car_id carId,

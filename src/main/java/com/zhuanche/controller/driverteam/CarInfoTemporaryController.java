@@ -397,6 +397,7 @@ public class CarInfoTemporaryController extends BaseController {
         carBizCarInfoTemp.setCreateBy(userId);
         carBizCarInfoTemp.setVehicleDrivingLicense(StringUtils.isBlank(vehicleDrivingLicense)?null:vehicleDrivingLicense);
         carBizCarInfoTemp.setCarPhotograph(StringUtils.isBlank(carPhotograph)?null:carPhotograph);
+
         return carBizCarInfoTempService.add(carBizCarInfoTemp);
     }
 
@@ -613,5 +614,18 @@ public class CarInfoTemporaryController extends BaseController {
         }
     }
 
-
+    /**
+     * 刷新数据
+     */
+    @ResponseBody
+    @RequestMapping(value = "/flushData",method = RequestMethod.POST)
+    public AjaxResponse flushData(String string) {
+        log.info("刷新数据-将临时表中不存在审核状态记录的数据刷新成为初始化状态");
+        try {
+            return AjaxResponse.success(carBizCarInfoTempService.flushData());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
 }
