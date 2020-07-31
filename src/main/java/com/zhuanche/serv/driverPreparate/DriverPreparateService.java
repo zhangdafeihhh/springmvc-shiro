@@ -82,7 +82,9 @@ public class DriverPreparateService {
 			String sign = getMD5ToKefuApi(paramMap, AK);
 			url += "&sign="+sign;
 
+			log.info("设备查询url===" + url);
 			JSONObject result = driverPreparateTemplate.getForObject(url,JSONObject.class);
+			log.info("==查询结果==" + result.toString());
 			int code = result.getIntValue("code");
 			String msg = result.getString("msg");
 			if (code == 1) {
@@ -113,7 +115,7 @@ public class DriverPreparateService {
 				return map;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("==查询设备异常==",e);
 		}
 		return map;
 	}
