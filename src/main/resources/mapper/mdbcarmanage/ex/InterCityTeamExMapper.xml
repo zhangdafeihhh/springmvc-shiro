@@ -65,8 +65,8 @@
     <include refid="Base_Column_List" />
     from inter_city_team
     where  1=1
-    <if test="cityId != null" >
-      AND city_id = #{cityId,jdbcType=INTEGER}
+    <if test="cityIdParam != null" >
+      AND city_id = #{cityIdParam,jdbcType=INTEGER}
     </if>
 
     <if test="supplierId != null" >

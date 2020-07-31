@@ -23,7 +23,7 @@ public interface InterCityTeamExMapper {
 
 
     /**查询小组*/
-    List<InterCityTeam> queryTeamsByParam(@Param("cityId") Integer cityId,
+    List<InterCityTeam> queryTeamsByParam(@Param("cityIdParam") Integer cityIdParam,
                                    @Param("supplierId") Integer supplierId,
                                    @Param("teamId")Integer teamId,
                                    @Param("teamIdList")List<Integer> teamIdList,

@@ -387,7 +387,7 @@ public final class RestErrorCode{
 	@ResultMessage("该日期该梯队已存在车队,重复的梯队日期为:{0}")
 	public static final int ECHELON_HAS_EXIST                 =90010;
 
-	@ResultMessage("司机已经加入车队")
+	@ResultMessage("司机已存于其他车队")
 	public static final int DRIVER_HAS_TEAM                 =90011;
 
 	@ResultMessage("车队已存在")

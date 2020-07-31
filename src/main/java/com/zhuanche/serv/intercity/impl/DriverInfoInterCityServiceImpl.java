@@ -84,8 +84,12 @@ public class DriverInfoInterCityServiceImpl implements DriverInfoInterCityServic
             Set<Integer> setSupplierIds = WebSessionUtil.isSupperAdmin() ? null : WebSessionUtil.getCurrentLoginUser().getSupplierIds();
 
 
-            List<InterCityTeam>  cityTeamList = teamExMapper.queryTeamsByParam(driverInfoInterCity.getCityId(),driverInfoInterCity.getSupplierId(),driverInfoInterCity.getTeamId(),teamList,
-                    setCityIds,setSupplierIds);
+            List<InterCityTeam>  cityTeamList = teamExMapper.queryTeamsByParam(driverInfoInterCity.getCityId(),
+                    driverInfoInterCity.getSupplierId(),
+                    driverInfoInterCity.getTeamId(),
+                    teamList,
+                    setCityIds,
+                    setSupplierIds);
 
             if(CollectionUtils.isNotEmpty(cityTeamList)){
 

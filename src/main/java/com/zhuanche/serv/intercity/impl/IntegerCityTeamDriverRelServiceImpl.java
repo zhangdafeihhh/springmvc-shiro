@@ -42,9 +42,12 @@ public class IntegerCityTeamDriverRelServiceImpl implements IntegerCityTeamDrive
         if(CollectionUtils.isNotEmpty(driverRelList)){
             Set<Integer> teamSet =new HashSet<>();
             driverRelList.forEach(driverRel ->{
-                teamSet.add(driverRel.getTeamId());
+                if(!teamId.equals(driverRel.getTeamId()) ){
+                    teamSet.add(driverRel.getTeamId());
+                }
+
             });
-            if(teamSet.size()>1){
+            if(teamSet.size()>0){
                 logger.info("司机已经加入过车队");
                 return AjaxResponse.fail(RestErrorCode.DRIVER_HAS_TEAM);
             }
