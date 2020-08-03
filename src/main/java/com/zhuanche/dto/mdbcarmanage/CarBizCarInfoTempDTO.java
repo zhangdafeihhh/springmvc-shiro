@@ -324,17 +324,6 @@ public class CarBizCarInfoTempDTO {
         this.operationInfos = operationInfos;
     }
 
-
-    //    /**
-//     * 操作code
-//     */
-//    private String carInfoOpsCode;
-//
-//    /**
-//     * 操作描述,查看,修改
-//     */
-//    private String carInfoOpsDesc;
-
     /**
      * 车辆审批状态日志
      */
@@ -355,22 +344,6 @@ public class CarBizCarInfoTempDTO {
     public void setStatusDesc(String statusDesc) {
         this.statusDesc = statusDesc;
     }
-
-//    public String getCarInfoOpsCode() {
-//        return carInfoOpsCode;
-//    }
-//
-//    public void setCarInfoOpsCode(String carInfoOpsCode) {
-//        this.carInfoOpsCode = carInfoOpsCode;
-//    }
-//
-//    public String getCarInfoOpsDesc() {
-//        return carInfoOpsDesc;
-//    }
-//
-//    public void setCarInfoOpsDesc(String carInfoOpsDesc) {
-//        this.carInfoOpsDesc = carInfoOpsDesc;
-//    }
 
     private Long newBrandId = null;
     private String newBrandName = null;
