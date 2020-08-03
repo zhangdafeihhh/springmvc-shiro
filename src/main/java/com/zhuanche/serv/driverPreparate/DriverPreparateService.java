@@ -7,11 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.sq.common.okhttp.OkHttpUtil;
+import com.zhuanche.http.MpOkHttpUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONArray;
@@ -39,6 +42,9 @@ public class DriverPreparateService {
 	private MyRestTemplate driverPreparateTemplate;
 	@Autowired
 	private OrderService orderService;
+
+	@Value("${driver.preparate.url}")
+	private String driverPreUrl;
 
 	/**
      * @param orderNo
@@ -83,8 +89,7 @@ public class DriverPreparateService {
 			url += "&sign="+sign;
 
 			log.info("设备查询url===" + url);
-			JSONObject result = driverPreparateTemplate.getForObject(url,JSONObject.class);
-			log.info("==查询结果==" + result.toString());
+			JSONObject result = MpOkHttpUtil.okHttpGetBackJson(driverPreUrl + url,null,1,"");
 			int code = result.getIntValue("code");
 			String msg = result.getString("msg");
 			if (code == 1) {
