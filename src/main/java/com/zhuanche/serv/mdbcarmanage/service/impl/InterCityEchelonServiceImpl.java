@@ -100,7 +100,7 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
             echelonList.add(interCityEchelon);
         });
 
-        if(verifyTeamExist(teamId,ope)){
+        if(verifyTeamExist(teamId,echelonMonth,ope)){
             logger.info("该车队下已经有梯队,请编辑");
             return AjaxResponse.fail(RestErrorCode.HAS_ECHELON);
 
@@ -409,12 +409,12 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
      * @param teamId
      * @return
      */
-    private boolean verifyTeamExist(Integer teamId,Integer ope){
+    private boolean verifyTeamExist(Integer teamId,String echelonMonth,Integer ope){
 
         boolean[] bl = {false};
 
         if(Constants.ADD.equals(ope)){
-            List<InterCityEchelon> echelonList =  echelonExMapper.queryTeamId(teamId,null);
+            List<InterCityEchelon> echelonList =  echelonExMapper.queryTeamId(teamId,echelonMonth);
 
             if(CollectionUtils.isNotEmpty(echelonList)){
                 logger.info("车队下已经存在梯队");
