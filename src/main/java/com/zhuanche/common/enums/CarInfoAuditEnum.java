@@ -56,4 +56,6 @@ public enum CarInfoAuditEnum {
         }
         return Pair.of(carInfoAuditEnum.getOperation(), carInfoAuditEnum.getOperationDesc());
     }
+
+
 }

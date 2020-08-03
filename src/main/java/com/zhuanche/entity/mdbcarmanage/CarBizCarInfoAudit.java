@@ -44,4 +44,5 @@ public class CarBizCarInfoAudit {
                 .updateDate(new Date())
                 .createUser("系统刷新").build();
     }
+
 }

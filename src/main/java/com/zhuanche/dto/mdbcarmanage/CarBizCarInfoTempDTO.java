@@ -1,6 +1,11 @@
 package com.zhuanche.dto.mdbcarmanage;
 
+import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoAudit;
+import lombok.Data;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class CarBizCarInfoTempDTO {
     private Integer carId;
@@ -294,16 +299,54 @@ public class CarBizCarInfoTempDTO {
      */
     private String statusDesc;
 
-    /**
-     * 操作code
-     */
-    private String carInfoOpsCode;
+    @Data
+    public static class OperationInfo {
+        /** 操作code*/
+        private String carInfoOpsCode;
+
+        /** 操作描述,查看,修改*/
+        private String carInfoOpsDesc;
+
+        public OperationInfo(String carInfoOpsCode, String carInfoOpsDesc) {
+            this.carInfoOpsCode = carInfoOpsCode;
+            this.carInfoOpsDesc = carInfoOpsDesc;
+        }
+    }
+
+
+    private List<OperationInfo> operationInfos = new ArrayList<>();
+
+    public List<OperationInfo> getOperationInfos() {
+        return operationInfos;
+    }
+
+    public void setOperationInfos(List<OperationInfo> operationInfos) {
+        this.operationInfos = operationInfos;
+    }
+
+
+    //    /**
+//     * 操作code
+//     */
+//    private String carInfoOpsCode;
+//
+//    /**
+//     * 操作描述,查看,修改
+//     */
+//    private String carInfoOpsDesc;
 
     /**
-     * 操作描述,查看,修改
+     * 车辆审批状态日志
      */
-    private String carInfoOpsDesc;
+    private List<CarBizCarInfoAudit> carBizCarInfoAuditList;
 
+    public List<CarBizCarInfoAudit> getCarBizCarInfoAuditList() {
+        return carBizCarInfoAuditList;
+    }
+
+    public void setCarBizCarInfoAuditList(List<CarBizCarInfoAudit> carBizCarInfoAuditList) {
+        this.carBizCarInfoAuditList = carBizCarInfoAuditList;
+    }
 
     public String getStatusDesc() {
         return statusDesc;
@@ -313,21 +356,21 @@ public class CarBizCarInfoTempDTO {
         this.statusDesc = statusDesc;
     }
 
-    public String getCarInfoOpsCode() {
-        return carInfoOpsCode;
-    }
-
-    public void setCarInfoOpsCode(String carInfoOpsCode) {
-        this.carInfoOpsCode = carInfoOpsCode;
-    }
-
-    public String getCarInfoOpsDesc() {
-        return carInfoOpsDesc;
-    }
-
-    public void setCarInfoOpsDesc(String carInfoOpsDesc) {
-        this.carInfoOpsDesc = carInfoOpsDesc;
-    }
+//    public String getCarInfoOpsCode() {
+//        return carInfoOpsCode;
+//    }
+//
+//    public void setCarInfoOpsCode(String carInfoOpsCode) {
+//        this.carInfoOpsCode = carInfoOpsCode;
+//    }
+//
+//    public String getCarInfoOpsDesc() {
+//        return carInfoOpsDesc;
+//    }
+//
+//    public void setCarInfoOpsDesc(String carInfoOpsDesc) {
+//        this.carInfoOpsDesc = carInfoOpsDesc;
+//    }
 
     private Long newBrandId = null;
     private String newBrandName = null;

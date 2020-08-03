@@ -19,6 +19,11 @@
     <select id="selectAuditStatusByCarTempId" parameterType="integer" resultMap="baseResultMap">
         select * from car_biz_car_info_audit where car_biz_car_info_temp_id = #{carId} order by create_date desc limit 1
     </select>
+
+    <select id="selectAuditStatusListByCarTempId" parameterType="integer" resultMap="baseResultMap">
+        select * from car_biz_car_info_audit where car_biz_car_info_temp_id = #{carId} order by create_date desc
+    </select>
+
     <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizCarInfoAudit">
         insert into car_biz_car_info_audit(
 			car_biz_car_info_temp_id,

@@ -32,6 +32,7 @@ import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.fileupload.MultipartStream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.ibatis.annotations.Param;
@@ -167,7 +168,11 @@ public class CarBizCarInfoTempService {
      * @param entity
      * @return
      */
-    public AjaxResponse update(CarBizCarInfoTemp entity) {
+    public AjaxResponse update(CarBizCarInfoTemp entity, String opThype) {
+        if (StringUtils.isBlank(opThype)) {
+            throw new IllegalArgumentException("操作类型不存在,请重新输入");
+        }
+
         try{
             if (!entity.getLicensePlates().equals(entity.getOldLicensePlates())) {
                 Map<String, Object> resultCar = this.checkLicensePlates(entity.getLicensePlates());
@@ -204,6 +209,21 @@ public class CarBizCarInfoTempService {
                     carBizDriverInfoTempExMapper.update(carDriver);
                 }
             }
+
+            /**
+             * add by mingku.jia 提交审核记录日志审核信息
+             */
+            if (Objects.equals(opThype, "submit")) {
+                CarBizCarInfoAudit carBizCarInfoAudit = CarBizCarInfoAudit.builder().carBizCarInfoTempId(entity.getCarId())
+                        .statusCode(CarInfoAuditEnum.STATUS_2.getStatusCode())
+                        .statusDesc(CarInfoAuditEnum.STATUS_2.getStatusDesc())
+                        .remark("sass系统,提交车辆审核")
+                        .createDate(new Date())
+                        .updateDate(new Date())
+                        .createUser(WebSessionUtil.getCurrentLoginUser().getName()).build();
+                carBizCarInfoAuditMapper.insert(carBizCarInfoAudit);
+            }
+
             return AjaxResponse.success(RestErrorCode.SUCCESS);
         }catch (Exception e){
             e.printStackTrace();
@@ -2383,11 +2403,36 @@ public class CarBizCarInfoTempService {
             Optional.ofNullable(carBizCarInfoAuditMapper.selectAuditStatusByCarTempId(carBizCarInfoTempDTO.getCarId())).ifPresent(auditInfo -> {
                 carBizCarInfoTempDTO.setStatusDesc(auditInfo.getStatusDesc());
                 Optional.ofNullable(CarInfoAuditEnum.getOperationInfo(auditInfo.getStatusCode())).ifPresent(pair ->{
-                    carBizCarInfoTempDTO.setCarInfoOpsCode(pair.getLeft());
-                    carBizCarInfoTempDTO.setCarInfoOpsDesc(pair.getRight());
+                    carBizCarInfoTempDTO.getOperationInfos().add(new CarBizCarInfoTempDTO.OperationInfo(pair.getLeft(), pair.getRight()));
                 });
             });
         });
+    }
+
+    /**
+     * 绑定司机审核信息列表
+     * 1.设置审核list
+     * 2.设置操作信息列表
+     * 2.1 获取当前状态信息
+     * @param carBizCarInfoTempDTO 列表对象
+     */
+    public void buildCarAuditStatusInfoListAndOpsList(CarBizCarInfoTempDTO carBizCarInfoTempDTO) {
+
+        // 1.
+        carBizCarInfoTempDTO.setCarBizCarInfoAuditList(carBizCarInfoAuditMapper.selectAuditStatusListByCarTempId(carBizCarInfoTempDTO.getCarId()));
+
+        // 2.
+        CarBizCarInfoAudit carBizCarInfoAudit = carBizCarInfoAuditMapper.selectAuditStatusByCarTempId(carBizCarInfoTempDTO.getCarId());
+
+        Pair<String, String> pair = CarInfoAuditEnum.getOperationInfo(carBizCarInfoAudit.getStatusCode());
+        String operation =  pair.getLeft();
+        if (Objects.equals(operation, "query")) {
+            carBizCarInfoTempDTO.getOperationInfos().add(new CarBizCarInfoTempDTO.OperationInfo("return", "返回"));
+        } else if (Objects.equals(operation, "update")) {
+            carBizCarInfoTempDTO.getOperationInfos().add(new CarBizCarInfoTempDTO.OperationInfo("save", "保存"));
+            carBizCarInfoTempDTO.getOperationInfos().add(new CarBizCarInfoTempDTO.OperationInfo("submit", "提交"));
+            carBizCarInfoTempDTO.getOperationInfos().add(new CarBizCarInfoTempDTO.OperationInfo("return", "返回"));
+        }
     }
 
     private final String picturePath = "/upload/public";

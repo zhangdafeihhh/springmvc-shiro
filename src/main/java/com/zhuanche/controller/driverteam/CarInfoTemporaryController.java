@@ -259,6 +259,9 @@ public class CarInfoTemporaryController extends BaseController {
             return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
         }
         CarBizCarInfoTempDTO carBizCarInfoTempDTO = BeanUtil.copyObject(carBizCarInfoTemp, CarBizCarInfoTempDTO.class);
+
+        carBizCarInfoTempService.buildCarAuditStatusInfoListAndOpsList(carBizCarInfoTempDTO);
+
         return AjaxResponse.success(carBizCarInfoTempDTO);
     }
 
@@ -505,7 +508,7 @@ public class CarInfoTemporaryController extends BaseController {
                                     @Verify(param = "oldCity",rule="required") Integer oldCity,
                                     @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId,
                                     @RequestParam(value = "vehicleDrivingLicense",required = false) String vehicleDrivingLicense,
-                                    @RequestParam(value = "carPhotograph",required = false) String carPhotograph) {
+                                    @RequestParam(value = "carPhotograph",required = false) String carPhotograph, String opType) {
         log.info("修改Id:"+carId);
         CarBizCarInfoTemp carBizCarInfoTemp = new CarBizCarInfoTemp();
         carBizCarInfoTemp.setCarId(carId);
@@ -558,7 +561,9 @@ public class CarInfoTemporaryController extends BaseController {
         carBizCarInfoTemp.setUpdateBy(userId);
         carBizCarInfoTemp.setVehicleDrivingLicense(StringUtils.isBlank(vehicleDrivingLicense)?null:vehicleDrivingLicense);
         carBizCarInfoTemp.setCarPhotograph(StringUtils.isBlank(carPhotograph)?null:carPhotograph);
-        return carBizCarInfoTempService.update(carBizCarInfoTemp);
+
+
+        return carBizCarInfoTempService.update(carBizCarInfoTemp, opType);
     }
 
     /**
@@ -634,20 +639,23 @@ public class CarInfoTemporaryController extends BaseController {
         }
     }
 
+    /**
+     * 上传车辆图片,回写临时表的地址
+     *
+     * @param request       请求对象
+     * @param multipartFile 文件对象
+     * @return  包含图片路径
+     */
     @ResponseBody
     @RequestMapping(value = "/uploadImage",method = RequestMethod.POST)
     public AjaxResponse uploadImage(HttpServletRequest request, MultipartFile multipartFile) {
         // uploadType = car / drivingLicense
         log.info("上传图片类型[{}], 车辆id[{}]", request.getParameter("uploadType"), request.getParameter("carId"));
         try {
-            return AjaxResponse.success(carBizCarInfoTempService.uploadImage(request.getParameter("uploadType"),
-                    request.getParameter("carId"), multipartFile));
+            return AjaxResponse.success(carBizCarInfoTempService.uploadImage(request.getParameter("uploadType"), request.getParameter("carId"), multipartFile));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("uploadImage exception :"+ e.getMessage(), e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
-
-
-
 }

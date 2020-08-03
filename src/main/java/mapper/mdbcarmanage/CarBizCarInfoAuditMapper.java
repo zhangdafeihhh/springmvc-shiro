@@ -17,4 +17,6 @@ public interface CarBizCarInfoAuditMapper {
     int insertBatch(List<CarBizCarInfoAudit> list);
 
     CarBizCarInfoAudit selectAuditStatusByCarTempId(Integer carId);
+
+    List<CarBizCarInfoAudit> selectAuditStatusListByCarTempId(Integer carId);
 }
