@@ -1903,6 +1903,18 @@ public class CarBizCarInfoTempService {
                 if (isTrue && carBizCarInfo != null) {
                     try {
                         carBizCarInfoTempMapper.insertSelective(carBizCarInfo);
+                        /**
+                         * 插入数的时候初始化状态表
+                         * add by mingku.jia
+                         */
+                        CarBizCarInfoAudit carBizCarInfoAudit = CarBizCarInfoAudit.builder().carBizCarInfoTempId(carBizCarInfo.getCarId())
+                                .statusCode(CarInfoAuditEnum.STATUS_1.getStatusCode())
+                                .statusDesc(CarInfoAuditEnum.STATUS_1.getStatusDesc())
+                                .remark("sass系统添加车辆, 导入初始化")
+                                .createDate(new Date())
+                                .updateDate(new Date())
+                                .createUser(carBizCarInfo.getCreateBy().toString()).build();
+                        carBizCarInfoAuditMapper.insert(carBizCarInfoAudit);
                     } catch (Exception e) {
                         log.info("导入车辆保存  error：" + e);
                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
