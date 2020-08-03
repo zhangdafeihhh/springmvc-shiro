@@ -218,4 +218,7 @@ public final class Constants {
 	public static final String AllRULE = "-1";
 
 	public static final String TEAMNAME = "第%s车队";
+
+	/**验证是添加or编辑*/
+	public static final Integer ADD = 1;
 }

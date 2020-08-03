@@ -86,6 +86,7 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
         Integer supplierId = echelonJsonData.getSupplierId();
         Integer teamId = echelonJsonData.getTeamId();
         String echelonMonth = echelonJsonData.getEchelonMonth();
+        Integer ope = echelonJsonData.getOpe();
 
         JSONArray array = JSONArray.parseArray(echelonJsonData.getJsonArray());
 
@@ -98,6 +99,12 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
             interCityEchelon.setSort(object.get("sort") == null ? null : object.getInteger("sort"));
             echelonList.add(interCityEchelon);
         });
+
+        if(verifyTeamExist(teamId,ope)){
+            logger.info("该车队下已经有梯队,请编辑");
+            return AjaxResponse.fail(RestErrorCode.HAS_ECHELON);
+
+        }
 
         /**需要验证传的日期是不是有重复的*/
         List<String> repeatDateList = verifyHasRepeatDate(echelonList);
@@ -396,6 +403,27 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
         return repeatTeamDate[0];
     }
 
+
+    /**
+     * 验证是否存在梯队
+     * @param teamId
+     * @return
+     */
+    private boolean verifyTeamExist(Integer teamId,Integer ope){
+
+        boolean[] bl = {false};
+
+        if(Constants.ADD.equals(ope)){
+            List<InterCityEchelon> echelonList =  echelonExMapper.queryTeamId(teamId,null);
+
+            if(CollectionUtils.isNotEmpty(echelonList)){
+                logger.info("车队下已经存在梯队");
+                bl[0] = true;
+            }
+        }
+
+      return bl[0];
+    }
 
     /**
      * 添加梯队规则数据

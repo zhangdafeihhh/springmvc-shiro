@@ -27,6 +27,7 @@ public class EchelonJsonData {
 
     private List<InterCityEchelon> echelonList;
 
-
     private String jsonArray;
+
+    private Integer ope;
 }

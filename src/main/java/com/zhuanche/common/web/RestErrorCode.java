@@ -394,6 +394,10 @@ public final class RestErrorCode{
 	public static final int TEAM_EXIST                 =90012;
 
 
+	@ResultMessage("该车队下已经有梯队,请编辑")
+	public static final int HAS_ECHELON                 =90013;
+
+
 	//------------------------城际系统派单2.0end--------------------------------------
 
 	@ResultMessage("请稍后再试,禁止频繁使用！")
