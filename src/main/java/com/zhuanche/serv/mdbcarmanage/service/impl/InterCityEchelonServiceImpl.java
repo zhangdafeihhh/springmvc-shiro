@@ -213,7 +213,9 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
 
                 InterEchelonDto dto = new InterEchelonDto();
 
+                /**todo updateTime是小队的时间 */
                 BeanUtils.copyProperties(cityTeam, dto);
+
                 /**注意id属性*/
                 dto.setTeamId(cityTeam.getId());
 
@@ -228,6 +230,8 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
                 dto.setEchelonList(queryTeamIds);
                 dto.setEchelonMonth(echelonMonth);
                 if (CollectionUtils.isNotEmpty(queryTeamIds)) {
+                    /**更新时间显示*/
+                    dto.setUpdateTime(queryTeamIds.get(0).getUpdateTime());
                     echelonDtoList.add(dto);
                 }
 
@@ -363,7 +367,9 @@ public class InterCityEchelonServiceImpl implements InterCityEchelonService {
                         /**如果仍有相同的，比较相同梯队是否有相同的日期。如果有则不允许创建*/
                         Map<Integer, String> map = Maps.newHashMap();
                         echList.forEach(ech -> {
-                            map.put(ech.getSort(), ech.getEchelonDate());
+                            if(StringUtils.isNotEmpty(ech.getEchelonDate())){
+                                map.put(ech.getSort(), ech.getEchelonDate());
+                            }
                         });
 
                         echelonLists.forEach(echs -> {
