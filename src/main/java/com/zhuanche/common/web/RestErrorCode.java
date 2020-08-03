@@ -379,6 +379,26 @@ public final class RestErrorCode{
 	@ResultMessage("状态不是待确认状态，不能进行提现申请")
 	public static final int APPLY_NOT                 =85002;
 
+	//---------------------------------------------------------------
+
+	//------------------------城际系统派单2.0start--------------------------------------
+	@ResultMessage("同一日期仅可存在于一个梯队中,重复的梯队日期为:{0}")
+	public static final int SAME_ECHELON                 =90000;
+	@ResultMessage("该日期该梯队已存在车队,重复的梯队日期为:{0}")
+	public static final int ECHELON_HAS_EXIST                 =90010;
+
+	@ResultMessage("司机已存于其他车队")
+	public static final int DRIVER_HAS_TEAM                 =90011;
+
+	@ResultMessage("车队已存在")
+	public static final int TEAM_EXIST                 =90012;
+
+
+	@ResultMessage("该车队下已经有梯队,请编辑")
+	public static final int HAS_ECHELON                 =90013;
+
+
+	//------------------------城际系统派单2.0end--------------------------------------
 
 	@ResultMessage("请稍后再试,禁止频繁使用！")
 	public static final int SEND_MSG_LOCK=90001;

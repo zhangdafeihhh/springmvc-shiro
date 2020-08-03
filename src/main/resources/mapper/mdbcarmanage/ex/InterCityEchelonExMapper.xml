@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.InterCityEchelonExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.InterCityEchelon" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="echelon_date" property="echelonDate" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="echelon_name" property="echelonName" jdbcType="VARCHAR" />
+    <result column="echelon_month" property="echelonMonth" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, team_id, sort, echelon_date, create_time, update_time, echelon_name, echelon_month
+  </sql>
+  <select id="queryTeamId" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from inter_city_echelon
+    where 1=1
+    <if test="teamId != null and teamId != ''">
+      and team_id = #{teamId,jdbcType=INTEGER}
+    </if>
+
+    <if test="echelonMonth != null and echelonMonth != ''">
+      and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
+    </if>
+
+  </select>
+
+
+  <select id="queryTeamIds" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from inter_city_echelon
+    where 1=1
+
+    <if test="echelonMonth != null and echelonMonth != ''">
+      and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
+    </if>
+
+    <if test="teamIdList != null and teamIdList.size() > 0">
+      and team_id in
+      <foreach collection="teamIdList" open="(" close=")" separator=","  item="teamId">
+        #{teamId}
+      </foreach>
+    </if>
+
+  </select>
+
+
+  <select id="teamIdListByMonth" resultType="java.lang.Integer">
+    select team_id as teamId
+    from inter_city_echelon
+    where 1=1
+
+    <if test="echelonMonth != null and echelonMonth != ''">
+      and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
+    </if>
+
+    GROUP BY team_id
+  </select>
+
+
+  <delete id="batchDeleteEchelon">
+
+    DELETE  from inter_city_echelon WHERE 1=1
+          and team_id = #{teamId,jdbcType=INTEGER}
+          and echelon_month = #{echelonMonth,jdbcType=VARCHAR}
+  </delete>
+
+</mapper>

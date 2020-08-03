@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.InterCityTeamDriverRelExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.IntercityTeamDriverRel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="create_id" property="createId" jdbcType="INTEGER" />
+    <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driver_id, team_id, create_id, create_user, create_time, update_time
+  </sql>
+
+  <select id="teamRelList" resultMap="BaseResultMap" parameterType="java.lang.String">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM inter_city_team_driver_rel
+    WHERE driver_id IN
+    <foreach collection="driverIds" item="driverId" open="(" close=")" separator=",">
+      #{driverId}
+    </foreach>
+  </select>
+
+
+  <select id="queryDriverIds"  resultType="java.lang.Integer"  parameterType="java.lang.Integer">
+    SELECT driver_id as driverId
+    FROM inter_city_team_driver_rel
+    WHERE team_id  = #{teamId}
+  </select>
+
+  <insert id="insertDriversBatch">
+    insert into inter_city_team_driver_rel (driver_id, team_id,create_id,create_user,create_time)
+    values
+    <foreach collection="teamDriverRel" open="" close="" separator=","  item="rel">
+      (#{rel.driverId,jdbcType=INTEGER}, #{rel.teamId,jdbcType=INTEGER},#{rel.createId,jdbcType=INTEGER},
+      #{rel.createUser,jdbcType=VARCHAR},#{rel.createTime,jdbcType=TIMESTAMP})
+    </foreach>
+  </insert>
+
+
+  <delete id="deleteDriver">
+
+    DELETE  FROM  inter_city_team_driver_rel WHERE  driver_id = #{driverId} and team_id = #{teamId}
+  </delete>
+
+
+
+  <delete id="delByTeamId">
+    DELETE  FROM  inter_city_team_driver_rel WHERE  team_id = #{teamId}
+  </delete>
+
+
+  <delete id="batchDelete">
+    DELETE  FROM  inter_city_team_driver_rel WHERE
+    driver_id in
+     <foreach collection="driverIdList" item="driverId" separator="," open="(" close=")">
+       #{driverId}
+     </foreach>
+  </delete>
+
+
+  <select id="queryRelTeamIds" resultType="java.lang.Integer">
+    SELECT r.team_id as teamId
+    FROM driver_info_inter_city t INNER JOIN
+    inter_city_team_driver_rel r on t.driver_id = r.driver_id
+    <if test="cityId!=null and cityId!='0'">
+      and t.city_id = #{cityId}
+    </if>
+    <if test="supplierId!=null and supplierId!='0'">
+      and t.supplier_id = #{supplierId}
+    </if>
+    <if test="teamId!=null and teamId!=''">
+      and r.team_id = #{teamId}
+    </if>
+  </select>
+
+</mapper>
