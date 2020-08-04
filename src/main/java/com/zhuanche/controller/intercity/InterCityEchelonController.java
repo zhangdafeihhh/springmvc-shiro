@@ -107,7 +107,7 @@ public class InterCityEchelonController {
                                   @Verify(param = "teamId", rule = "required") Integer teamId) {
         logger.info(MessageFormat.format("新城际拼车车队添加司机入参:driverIds:{0},teamId:{1}", driverIds, teamId));
         try {
-            if(StringUtils.isEmpty(driverIds)){
+            if(StringUtils.isNotEmpty(driverIds)){
                 relService.delByTeamId(teamId);
                 return AjaxResponse.success(null);
             }
