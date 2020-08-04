@@ -57,7 +57,7 @@ public class IntegerCityTeamDriverRelServiceImpl implements IntegerCityTeamDrive
 
         /**批量加入前先删*/
         try {
-            relExMapper.batchDelete(TransportUtils.listInteger(driverIds));
+            relExMapper.delByTeamId(teamId);
         } catch (Exception e) {
             logger.error("删除异常",e);
         }
