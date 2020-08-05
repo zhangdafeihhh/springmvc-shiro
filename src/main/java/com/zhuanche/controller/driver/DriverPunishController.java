@@ -7,7 +7,6 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
-import com.zhuanche.entity.bigdata.MaxAndMinId;
 import com.zhuanche.entity.driver.DriverPunishDto;
 import com.zhuanche.serv.punish.DriverPunishClientService;
 import com.zhuanche.serv.punish.query.DriverPunishQuery;
@@ -16,22 +15,17 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * @Author:qxx
@@ -103,21 +97,40 @@ public class DriverPunishController extends BaseController {
 
     /**
      * 根据订单查询司机录音
+     *
      * @param params
      * @return
      */
     @GetMapping(value = "/initVideoData")
-    public AjaxResponse initVideoData(DriverPunishDto params) {
+    public AjaxResponse initVideoData(DriverPunishDto params, HttpServletRequest request) {
         if (Objects.isNull(params.getOrderNo())) {
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
         try {
-            return AjaxResponse.success(driverPunishService.videoRecordQuery(params.getOrderNo()));
+            return AjaxResponse.success(driverPunishService.videoRecordQuery(params.getOrderNo(), request));
         } catch (ServiceException e) {
             log.error("司机处罚根据订单查询司机录音异常", e);
             return AjaxResponse.fail(e.getErrorCode());
         }
     }
+
+    /**
+     * 渲染行程录音
+     * @param filePath
+     * @param response
+     * @return
+     */
+    @RequestMapping("/renderVideo")
+    public AjaxResponse render(@RequestParam(name = "filePath") String filePath, HttpServletResponse response) {
+
+        try {
+            driverPunishService.renderVideo(filePath, response);
+        } catch (IOException e) {
+            return AjaxResponse.failMsg(RestErrorCode.HTTP_FORBIDDEN,"渲染失败");
+        }
+        return AjaxResponse.success(null);
+    }
+
 
 
     /**
@@ -136,7 +149,6 @@ public class DriverPunishController extends BaseController {
             log.error("司机处罚审核查询失败", e);
             return AjaxResponse.failMsg(e.getErrorCode(), e.getMessage());
         }
-
     }
 
     @RequestMapping("/exportDriverPunishList")

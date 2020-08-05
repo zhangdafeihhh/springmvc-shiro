@@ -25,8 +25,6 @@ public class DriverPunishService {
 
 
     @Resource
-    private MpManageRestClient mpManageRestClient;
-    @Resource
     private DriverPunishExMapper driverPunishExMapper;
 
 
@@ -73,14 +71,7 @@ public class DriverPunishService {
         return null;
     }
 
-    /**
-     * 查询司机录音
-     * @param orderNo 订单
-     * @return
-     */
-    public List<PunishRecordVoiceDTO> videoRecordQuery(String orderNo) {
-        return mpManageRestClient.driverPunishVideoQuery(orderNo);
-    }
+
 
 
 }

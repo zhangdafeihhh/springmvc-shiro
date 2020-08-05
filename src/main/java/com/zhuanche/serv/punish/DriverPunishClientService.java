@@ -1,6 +1,7 @@
 package com.zhuanche.serv.punish;
 
 import cn.hutool.core.io.IoUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.le.config.dict.Dicts;
@@ -8,21 +9,23 @@ import com.sq.common.okhttp.OkHttpUtil;
 import com.sq.common.okhttp.result.OkResponseResult;
 import com.zhuanche.common.exception.ServiceException;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constant.Constants;
+import com.zhuanche.entity.driver.PunishRecordVoiceDTO;
 import com.zhuanche.serv.punish.query.DriverPunishQuery;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.OkHttpStreamUtil;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author kjeakiry
@@ -30,18 +33,13 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class DriverPunishClientService extends DriverPunishService {
+
+    private static final String RENDER_URL = "/driverPunish/renderVideo?filePath=";
     private static final String DO_AUDIT = "/driverPunish/examineDriverPunish";
     private static final String PUNISH_DETAIL = "/driverPunish/findDriverPunishDetail";
     private static final String PUNISH_EXPORT = "/driverPunish/export";
+    private static final String INIT_VIDEO = "/driverPunish/initVideoData";
     private static final String CODE = "code";
-    private static final OkHttpClient OK_HTTP_CLIENT = new OkHttpClient() {{
-        new Builder()
-                .connectTimeout(3, TimeUnit.SECONDS)
-                .readTimeout(3, TimeUnit.SECONDS)
-                .writeTimeout(3, TimeUnit.SECONDS)
-                .retryOnConnectionFailure(true)
-                .build();
-    }};
 
 
     /**
@@ -61,13 +59,7 @@ public class DriverPunishClientService extends DriverPunishService {
         paramMap.put("updateUserId", currentLoginUser.getId());
         paramMap.put("updateUserName", currentLoginUser.getName());
         OkResponseResult result = OkHttpUtil.getIntance().doPost(Dicts.getString("mp.transport.url") + DO_AUDIT, null, paramMap, "司机申诉审核");
-        if (!result.isSuccessful()) {
-            throw new ServiceException(RestErrorCode.RECORD_DEAL_FAILURE, result.getErrorMsg());
-        }
-        JSONObject jsonObject = JSONObject.parseObject(result.getResponseBody());
-        if (!Objects.equals(0, jsonObject.getInteger(CODE))) {
-            throw new ServiceException(RestErrorCode.RECORD_DEAL_FAILURE, jsonObject.getString("msg"));
-        }
+        log.info("司机申诉审核结果:{}",getDataString(result));
     }
 
 
@@ -80,19 +72,33 @@ public class DriverPunishClientService extends DriverPunishService {
         Map<String, Object> paramMap = Maps.newHashMapWithExpectedSize(1);
         paramMap.put("punishId", punishId);
         OkResponseResult result = OkHttpUtil.getIntance().doGet(Dicts.getString("mp.transport.url") + PUNISH_DETAIL, null, paramMap, "查询申诉详情");
-        if (!result.isSuccessful()) {
-            throw new ServiceException(RestErrorCode.HTTP_SYSTEM_ERROR, result.getErrorMsg());
-        }
-        JSONObject jsonObject = JSONObject.parseObject(result.getResponseBody());
-        if (Objects.nonNull(jsonObject) && Objects.equals(0, jsonObject.getInteger(CODE))) {
-            JSONObject data = jsonObject.getJSONObject("data");
-            Map<String, Object> resultMap = new HashMap<>(4);
-            resultMap.put("driverPunish", data.getJSONObject("driverPunish"));
-            resultMap.put("rocordList", data.getJSONArray("rocordList"));
-            resultMap.put("orderVideoVOList", data.getJSONArray("videoList"));
-            return resultMap;
-        }
-        throw new ServiceException(RestErrorCode.HTTP_SYSTEM_ERROR, jsonObject.getString("msg"));
+        JSONObject jsonObject = JSONObject.parseObject(getDataString(result));
+        JSONObject data = jsonObject.getJSONObject("data");
+        Map<String, Object> resultMap = new HashMap<>(4);
+        resultMap.put("driverPunish", data.getJSONObject("driverPunish"));
+        resultMap.put("rocordList", data.getJSONArray("rocordList"));
+        resultMap.put("orderVideoVOList", data.getJSONArray("videoList"));
+        return resultMap;
+    }
+
+    /**
+     * 查询司机录音
+     *
+     * @param orderNo 订单
+     * @return
+     */
+    public List<PunishRecordVoiceDTO> videoRecordQuery(String orderNo, HttpServletRequest request) {
+        Map<String, Object> paramMap = Maps.newHashMapWithExpectedSize(1);
+        paramMap.put("orderNo", orderNo);
+        OkResponseResult result = OkHttpUtil.getIntance().doGet(Dicts.getString("mp.transport.url") + INIT_VIDEO, null, paramMap, "查询行程录音");
+        String data = getDataString(result);
+        StringBuffer url = request.getRequestURL();
+        String hostUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).toString();
+        List<PunishRecordVoiceDTO> list = JSON.parseArray(data, PunishRecordVoiceDTO.class);
+        return Objects.isNull(list) ? Collections.emptyList() : list
+                .stream().filter(e -> Objects.nonNull(e.getFilePath()))
+                .peek(e -> e.setFilePath(hostUrl + RENDER_URL + e.getFilePath()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -103,15 +109,11 @@ public class DriverPunishClientService extends DriverPunishService {
     public void exportExcel(DriverPunishQuery params, HttpServletResponse response) throws Exception {
         log.info("处罚列表导出，参数: {}", params.toString());
         String url = Dicts.getString("mp.transport.url") + PUNISH_EXPORT;
-        RequestBody body = RequestBody.create( MediaType.parse("application/json; charset=utf-8"), JSONObject.toJSONString(params));
-        Request okHttpRequest = new Request.Builder().url(url).post(body).build();
-        Call call = OK_HTTP_CLIENT.newCall(okHttpRequest);
         InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
-            Response okHttpResponse = call.execute();
-            if (okHttpResponse != null && okHttpResponse.isSuccessful() && Objects.nonNull(okHttpResponse.body())) {
-                inputStream = okHttpResponse.body().byteStream();
+            inputStream = OkHttpStreamUtil.postJson(url, JSONObject.toJSONString(params));
+            if (Objects.nonNull(inputStream)) {
                 outputStream = ExportExcelUtil.getOutputStream("司机处罚列表", response);
                 IoUtil.copy(inputStream, outputStream);
                 IoUtil.flush(outputStream);
@@ -125,5 +127,41 @@ public class DriverPunishClientService extends DriverPunishService {
         }
     }
 
+    /**
+     * 渲染行程录音
+     * @param filePath
+     * @param response
+     * @throws IOException
+     */
+    public void renderVideo(String filePath,HttpServletResponse response) throws IOException {
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
+            inputStream = OkHttpStreamUtil.execute(filePath);
+            if (Objects.nonNull(inputStream)) {
+                outputStream = response.getOutputStream();
+                IoUtil.copy(inputStream, outputStream);
+                IoUtil.flush(outputStream);
+            }
+        } catch (Exception e) {
+            log.error("渲染行程录音失败", e);
+            throw e;
+        } finally {
+            IoUtil.close(inputStream);
+            IoUtil.close(outputStream);
+        }
+    }
+
+
+    private String getDataString(OkResponseResult result) {
+        if (!result.isSuccessful()) {
+            throw new ServiceException(RestErrorCode.HTTP_SYSTEM_ERROR, result.getErrorMsg());
+        }
+        JSONObject responseBody = JSONObject.parseObject(result.getResponseBody());
+        if (Objects.isNull(responseBody) ||responseBody.getIntValue(CODE) != Constants.SUCCESS_CODE) {
+            throw new ServiceException(RestErrorCode.REST_FAIL_MP_MANAGE_API);
+        }
+        return responseBody.getString("data");
+    }
 
 }
