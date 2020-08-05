@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @Service
 public class DriverPunishClientService extends DriverPunishService {
 
-    private static final String RENDER_URL = "/driverPunish/renderVideo?filePath=";
+    private static final String RENDER_URL = "/driverPunish/renderVideo.json?filePath=";
     private static final String DO_AUDIT = "/driverPunish/examineDriverPunish";
     private static final String PUNISH_DETAIL = "/driverPunish/findDriverPunishDetail";
     private static final String PUNISH_EXPORT = "/driverPunish/export";
