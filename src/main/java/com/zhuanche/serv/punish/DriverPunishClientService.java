@@ -72,8 +72,7 @@ public class DriverPunishClientService extends DriverPunishService {
         Map<String, Object> paramMap = Maps.newHashMapWithExpectedSize(1);
         paramMap.put("punishId", punishId);
         OkResponseResult result = OkHttpUtil.getIntance().doGet(Dicts.getString("mp.transport.url") + PUNISH_DETAIL, null, paramMap, "查询申诉详情");
-        JSONObject jsonObject = JSONObject.parseObject(getDataString(result));
-        JSONObject data = jsonObject.getJSONObject("data");
+        JSONObject data = JSONObject.parseObject(getDataString(result));
         Map<String, Object> resultMap = new HashMap<>(4);
         resultMap.put("driverPunish", data.getJSONObject("driverPunish"));
         resultMap.put("rocordList", data.getJSONArray("rocordList"));
