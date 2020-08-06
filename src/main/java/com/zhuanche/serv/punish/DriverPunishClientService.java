@@ -40,6 +40,7 @@ public class DriverPunishClientService extends DriverPunishService {
     private static final String PUNISH_EXPORT = "/driverPunish/export";
     private static final String INIT_VIDEO = "/driverPunish/initVideoData";
     private static final String CODE = "code";
+    private static final String HTTP = "http:";
 
 
     /**
@@ -75,8 +76,7 @@ public class DriverPunishClientService extends DriverPunishService {
         JSONObject data = JSONObject.parseObject(getDataString(result));
         //生成可渲染的路径
         List<JSONObject> videoList = JSONObject.parseArray(data.getString("videoList"), JSONObject.class);
-        StringBuffer url = request.getRequestURL();
-        String hostUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).toString();
+        String hostUrl = getRequestHost(request);
         Optional.ofNullable(videoList).ifPresent(e-> e.forEach(jsonObject -> jsonObject.put("soundPath", getRenderFilePath(hostUrl, jsonObject.getString("soundPath")))));
 
         Map<String, Object> resultMap = new HashMap<>(4);
@@ -84,6 +84,15 @@ public class DriverPunishClientService extends DriverPunishService {
         resultMap.put("rocordList", data.getJSONArray("rocordList"));
         resultMap.put("orderVideoVOList", videoList);
         return resultMap;
+    }
+
+    private String getRequestHost(HttpServletRequest request) {
+        StringBuffer url = request.getRequestURL();
+        String s = url.delete(url.length() - request.getRequestURI().length(), url.length()).toString();
+        if (s.startsWith(HTTP)) {
+            s = "https" + s.substring(4);
+        }
+        return s;
     }
 
     /**
@@ -97,8 +106,7 @@ public class DriverPunishClientService extends DriverPunishService {
         paramMap.put("orderNo", orderNo);
         OkResponseResult result = OkHttpUtil.getIntance().doGet(Dicts.getString("mp.transport.url") + INIT_VIDEO, null, paramMap, "查询行程录音");
         String data = getDataString(result);
-        StringBuffer url = request.getRequestURL();
-        String hostUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).toString();
+        String hostUrl = getRequestHost(request);
         List<PunishRecordVoiceDTO> list = JSON.parseArray(data, PunishRecordVoiceDTO.class);
         return Objects.isNull(list) ? Collections.emptyList() : list
                 .stream().filter(e -> Objects.nonNull(e.getFilePath()))
