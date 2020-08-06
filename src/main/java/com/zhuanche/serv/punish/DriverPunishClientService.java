@@ -68,15 +68,21 @@ public class DriverPunishClientService extends DriverPunishService {
      * @param punishId
      * @return
      */
-    public Map<String, Object> getDriverPunishDetail(Integer punishId) {
+    public Map<String, Object> getDriverPunishDetail(Integer punishId, HttpServletRequest request) {
         Map<String, Object> paramMap = Maps.newHashMapWithExpectedSize(1);
         paramMap.put("punishId", punishId);
         OkResponseResult result = OkHttpUtil.getIntance().doGet(Dicts.getString("mp.transport.url") + PUNISH_DETAIL, null, paramMap, "查询申诉详情");
         JSONObject data = JSONObject.parseObject(getDataString(result));
+        //生成可渲染的路径
+        List<JSONObject> videoList = JSONObject.parseArray(data.getString("videoList"), JSONObject.class);
+        StringBuffer url = request.getRequestURL();
+        String hostUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).toString();
+        Optional.ofNullable(videoList).ifPresent(e-> e.forEach(jsonObject -> jsonObject.put("soundPath", getRenderFilePath(hostUrl, jsonObject.getString("soundPath")))));
+
         Map<String, Object> resultMap = new HashMap<>(4);
         resultMap.put("driverPunish", data.getJSONObject("driverPunish"));
         resultMap.put("rocordList", data.getJSONArray("rocordList"));
-        resultMap.put("orderVideoVOList", data.getJSONArray("videoList"));
+        resultMap.put("orderVideoVOList", videoList);
         return resultMap;
     }
 
@@ -96,8 +102,12 @@ public class DriverPunishClientService extends DriverPunishService {
         List<PunishRecordVoiceDTO> list = JSON.parseArray(data, PunishRecordVoiceDTO.class);
         return Objects.isNull(list) ? Collections.emptyList() : list
                 .stream().filter(e -> Objects.nonNull(e.getFilePath()))
-                .peek(e -> e.setFilePath(hostUrl + RENDER_URL + e.getFilePath()))
+                .peek(e -> e.setFilePath(getRenderFilePath(hostUrl, e.getPath())))
                 .collect(Collectors.toList());
+    }
+
+    private static String getRenderFilePath(String hostUrl, String filePath) {
+        return hostUrl + RENDER_URL + filePath;
     }
 
     /**

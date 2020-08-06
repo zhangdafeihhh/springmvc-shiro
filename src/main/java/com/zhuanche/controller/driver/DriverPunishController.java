@@ -140,12 +140,12 @@ public class DriverPunishController extends BaseController {
      * @return
      */
     @RequestMapping("/getDriverPunishDetail")
-    public AjaxResponse getDriverPunishDetail(Integer punishId) {
+    public AjaxResponse getDriverPunishDetail(Integer punishId, HttpServletRequest request) {
         if (Objects.isNull(punishId)) {
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
         try {
-            return AjaxResponse.success(driverPunishService.getDriverPunishDetail(punishId));
+            return AjaxResponse.success(driverPunishService.getDriverPunishDetail(punishId, request));
         }  catch (ServiceException e) {
             log.error("司机处罚审核查询失败", e);
             return AjaxResponse.failMsg(e.getErrorCode(), e.getMessage());
