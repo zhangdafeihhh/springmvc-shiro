@@ -15,6 +15,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -97,10 +98,10 @@ public class DriverPunishController extends BaseController {
 
     /**
      * 根据订单查询司机录音
-     *
      * @param params
      * @return
      */
+    @RequiresPermissions(value = {"punishTripVideo"})
     @GetMapping(value = "/initVideoData")
     public AjaxResponse initVideoData(DriverPunishDto params, HttpServletRequest request) {
         if (Objects.isNull(params.getOrderNo())) {
@@ -120,13 +121,13 @@ public class DriverPunishController extends BaseController {
      * @param response
      * @return
      */
+    @RequiresPermissions(value = {"punishTripVideo"})
     @RequestMapping("/renderVideo")
     public AjaxResponse render(@RequestParam(name = "filePath") String filePath, HttpServletResponse response) {
-
         try {
             driverPunishService.renderVideo(filePath, response);
         } catch (IOException e) {
-            return AjaxResponse.failMsg(RestErrorCode.HTTP_FORBIDDEN,"渲染失败");
+            return AjaxResponse.failMsg(RestErrorCode.HTTP_FORBIDDEN, "渲染失败");
         }
         return AjaxResponse.success(null);
     }

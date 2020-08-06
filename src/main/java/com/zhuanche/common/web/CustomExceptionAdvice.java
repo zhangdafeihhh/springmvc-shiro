@@ -1,29 +1,10 @@
 package com.zhuanche.common.web;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.security.SecureRandom;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.le.config.dict.Dicts;
-import com.sq.monitor.pojo.dto.dingding.DingTextDTO;
-import com.sq.monitor.utils.DingDingUtil;
-import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.util.IPUtil;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 import org.apache.http.HttpStatus;
+import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +20,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.alibaba.fastjson.JSON;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.security.SecureRandom;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 /**
  * 对异常进行捕获，进行统一返回
  * @author zhaoyali
@@ -69,7 +62,7 @@ public class CustomExceptionAdvice {
 		}
     	if (bindingResult!=null && bindingResult.hasErrors() ) { 
 	    	List<ObjectError> errors = bindingResult.getAllErrors();
-	    	List<String> errorTexts = new ArrayList<String>( errors.size() );
+	    	List<String> errorTexts = new ArrayList<>(errors.size());
 	    	for(ObjectError error : errors) {
 	    		String fieldname = "";
 	    		if( error instanceof FieldError) {
@@ -77,7 +70,7 @@ public class CustomExceptionAdvice {
 	    		}
 	    		errorTexts.add(  fieldname +"："+ error.getDefaultMessage() );
 	    	}
-    	    message = errorTexts.stream().collect(Collectors.joining("，"));
+    	    message = String.join("，", errorTexts);
     	}
     	logger.info( "[PARAM_VERIFY_ERROR] "+ message );
         return AjaxResponse.failMsg( RestErrorCode.HTTP_PARAM_INVALID,  message );
@@ -87,21 +80,21 @@ public class CustomExceptionAdvice {
 	@ResponseBody
 	public AjaxResponse handleConstraintViolationException(ConstraintViolationException e, HttpServletRequest request, HttpServletResponse response){
 		Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-		String errorMsg = violations.stream().map(violation -> violation.getMessage()).collect(Collectors.toList()).toString();
+		String errorMsg = violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.toList()).toString();
 		return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, errorMsg);
 	}
-	
-	/**用户shiro授权不通过时**/
-	@ExceptionHandler(UnauthorizedException.class)
+
+	/**
+	 * 用户shiro授权不通过时
+	 **/
+	@ExceptionHandler({UnauthorizedException.class, UnauthenticatedException.class})
 	@ResponseBody
 	public AjaxResponse handleUnauthorizedException(Exception ex, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Boolean isAjax = (Boolean) request.getAttribute("X_IS_AJAX");
-		if(  isAjax  ) {
-			AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
-			return ajaxResponse;
-		}else {
-			response.sendRedirect( homepageUrl );
-			//return "unauthorized_content";//------------返回禁止访问的错误页
+		if (isAjax) {
+			return  AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
+		} else {
+			response.sendRedirect(homepageUrl);
 			return null;
 		}
 	}
@@ -112,7 +105,6 @@ public class CustomExceptionAdvice {
 		int ExceptionId = random.nextInt(2100000000);
 		String exceptionMessage = ex.getMessage() + " (ExceptionId: "+ExceptionId+")";
 		logger.error(exceptionMessage, ex );
-
 		int dingding_alerm_switch = Dicts.getInt("dingding_alerm_switch", 0);
 		String dingding_token_url = Dicts.getString("dingding_token_url", "https://oapi.dingtalk.com/robot/send?access_token=747d5c066ec3b79c229721eff222aa1dd63a813be5e810dd934b1c284097ab39");
 		int dingding_alerm_timeout = Dicts.getInt("dingding_alerm_timeout", 3000);
