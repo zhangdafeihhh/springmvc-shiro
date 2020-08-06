@@ -102,7 +102,7 @@ public class DriverPunishClientService extends DriverPunishService {
         List<PunishRecordVoiceDTO> list = JSON.parseArray(data, PunishRecordVoiceDTO.class);
         return Objects.isNull(list) ? Collections.emptyList() : list
                 .stream().filter(e -> Objects.nonNull(e.getFilePath()))
-                .peek(e -> e.setFilePath(getRenderFilePath(hostUrl, e.getPath())))
+                .peek(e -> e.setFilePath(getRenderFilePath(hostUrl, e.getFilePath())))
                 .collect(Collectors.toList());
     }
 
