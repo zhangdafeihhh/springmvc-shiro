@@ -1,5 +1,6 @@
 package com.zhuanche.serv.deiver;
 
+import co.elastic.apm.shaded.bytebuddy.implementation.bytecode.Throw;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.enums.CarInfoAuditEnum;
 import com.zhuanche.common.exception.ServiceException;
@@ -2401,7 +2402,7 @@ public class CarBizCarInfoTempService {
             });
             return carBizCarInfoAuditMapper.insertBatch(carBizCarInfoAudits);
         }catch (Exception e) {
-            return 0;
+             throw new ServiceException(400, e.getMessage());
         }
     }
 

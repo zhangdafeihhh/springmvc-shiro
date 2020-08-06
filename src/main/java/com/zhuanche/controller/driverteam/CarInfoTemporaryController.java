@@ -1,5 +1,6 @@
 package com.zhuanche.controller.driverteam;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
@@ -634,8 +635,9 @@ public class CarInfoTemporaryController extends BaseController {
         try {
             return AjaxResponse.success(carBizCarInfoTempService.flushData());
         } catch (Exception e) {
-            e.printStackTrace();
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            log.info("刷新数据响应结果:" + JSON.toJSONString(ajaxResponse));
+            return ajaxResponse;
         }
     }
 
