@@ -4,9 +4,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.entity.driver.DriverPunishDto;
-import com.zhuanche.entity.driver.PunishRecordVoiceDTO;
-import com.zhuanche.serv.third.MpManageRestClient;
-import com.zhuanche.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import mapper.driver.ex.DriverPunishExMapper;
 
@@ -60,16 +57,6 @@ public class DriverPunishService {
         return pageInfo;
     }
 
-    public DriverPunishDto getDetail(Integer punishId) {
-        if (punishId != null) {
-            DriverPunishDto driverPunishDto = driverPunishExMapper.getDetail(punishId);
-            if (driverPunishDto.getCreateDate() != null) {
-                driverPunishDto.setCreateDateStr(DateUtils.formatDateTime(driverPunishDto.getCreateDate()));
-            }
-            return driverPunishDto;
-        }
-        return null;
-    }
 
 
 
