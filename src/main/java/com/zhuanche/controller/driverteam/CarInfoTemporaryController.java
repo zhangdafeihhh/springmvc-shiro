@@ -560,6 +560,7 @@ public class CarInfoTemporaryController extends BaseController {
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
         Integer userId = user.getId();
         carBizCarInfoTemp.setUpdateBy(userId);
+        //---驾驶证图片
         carBizCarInfoTemp.setVehicleDrivingLicense(StringUtils.isBlank(vehicleDrivingLicense)?null:vehicleDrivingLicense);
         carBizCarInfoTemp.setCarPhotograph(StringUtils.isBlank(carPhotograph)?null:carPhotograph);
 

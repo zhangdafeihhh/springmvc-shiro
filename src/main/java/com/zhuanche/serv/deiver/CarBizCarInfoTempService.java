@@ -2438,6 +2438,9 @@ public class CarBizCarInfoTempService {
         CarBizCarInfoAudit carBizCarInfoAudit = carBizCarInfoAuditMapper.selectAuditStatusByCarTempId(carBizCarInfoTempDTO.getCarId());
 
         Pair<String, String> pair = CarInfoAuditEnum.getOperationInfo(carBizCarInfoAudit.getStatusCode());
+        if (Objects.isNull(pair)) {
+            throw new ServiceException(400, "不存在此审核状态code,数据错误carId:"+ carBizCarInfoTempDTO.getCarId());
+        }
         String operation =  pair.getLeft();
         if (Objects.equals(operation, "query")) {
             carBizCarInfoTempDTO.getOperationInfos().add(new CarBizCarInfoTempDTO.OperationInfo("return", "返回"));

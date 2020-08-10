@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 /**
  * 车辆审核状态枚举
- *
+ * <p>
  * Created by jiamingku on 2020/7/31.
  */
 public enum CarInfoAuditEnum {
@@ -49,7 +49,7 @@ public enum CarInfoAuditEnum {
     }
 
     public static Pair<String, String> getOperationInfo(Integer statusCode) {
-        CarInfoAuditEnum carInfoAuditEnum =  Stream.of(CarInfoAuditEnum.values()).filter( e-> Objects.equals(e.getStatusCode(), statusCode)).findFirst().orElse(null);
+        CarInfoAuditEnum carInfoAuditEnum = Stream.of(CarInfoAuditEnum.values()).filter(e -> Objects.equals(e.getStatusCode(), statusCode)).findFirst().orElse(null);
 
         if (Objects.isNull(carInfoAuditEnum)) {
             return null;
