@@ -8,6 +8,7 @@ import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.exception.ServiceException;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.*;
 import com.zhuanche.dto.mdbcarmanage.CarBizCarInfoTempDTO;
@@ -404,6 +405,14 @@ public class CarInfoTemporaryController extends BaseController {
         Integer userId = user.getId();
         carBizCarInfoTemp.setUpdateBy(userId);
         carBizCarInfoTemp.setCreateBy(userId);
+
+        if (StringUtils.isBlank(vehicleDrivingLicense)) {
+            throw new ServiceException(400, "行驶证图片url地址必须传递");
+        }
+        if (StringUtils.isBlank(carPhotograph)) {
+            throw new ServiceException(400, "车辆图片url地址必须传递");
+        }
+
         carBizCarInfoTemp.setVehicleDrivingLicense(StringUtils.isBlank(vehicleDrivingLicense)?null:vehicleDrivingLicense);
         carBizCarInfoTemp.setCarPhotograph(StringUtils.isBlank(carPhotograph)?null:carPhotograph);
 
@@ -561,9 +570,16 @@ public class CarInfoTemporaryController extends BaseController {
         Integer userId = user.getId();
         carBizCarInfoTemp.setUpdateBy(userId);
         //---驾驶证图片
+
+        if (StringUtils.isBlank(vehicleDrivingLicense)) {
+            throw new ServiceException(400, "行驶证图片url地址必须传递");
+        }
+        if (StringUtils.isBlank(carPhotograph)) {
+            throw new ServiceException(400, "车辆图片url地址必须传递");
+        }
+
         carBizCarInfoTemp.setVehicleDrivingLicense(StringUtils.isBlank(vehicleDrivingLicense)?null:vehicleDrivingLicense);
         carBizCarInfoTemp.setCarPhotograph(StringUtils.isBlank(carPhotograph)?null:carPhotograph);
-
 
         return carBizCarInfoTempService.update(carBizCarInfoTemp, opType);
     }
