@@ -228,8 +228,8 @@ public class CarBizCarInfoTempService {
             return AjaxResponse.success(RestErrorCode.SUCCESS);
         }catch (Exception e){
             e.printStackTrace();
-            log.error("修改出现异常,修改Id:"+entity.getCarId());
-            return AjaxResponse.success(RestErrorCode.HTTP_SYSTEM_ERROR);
+            log.error("修改出现异常,修改Id:"+entity.getCarId()+"msg:"+ e.getMessage(), e);
+            return AjaxResponse.failMsg(400, e.getMessage());
         }
     }
 
@@ -2412,14 +2412,11 @@ public class CarBizCarInfoTempService {
      * @param carBizCarInfoTempDTOs 列表对象
      */
     public void buildAuditStatusInfo(List<CarBizCarInfoTempDTO> carBizCarInfoTempDTOs) {
-        carBizCarInfoTempDTOs.forEach(carBizCarInfoTempDTO -> {
-            Optional.ofNullable(carBizCarInfoAuditMapper.selectAuditStatusByCarTempId(carBizCarInfoTempDTO.getCarId())).ifPresent(auditInfo -> {
-                carBizCarInfoTempDTO.setStatusDesc(auditInfo.getStatusDesc());
-                Optional.ofNullable(CarInfoAuditEnum.getOperationInfo(auditInfo.getStatusCode())).ifPresent(pair ->{
-                    carBizCarInfoTempDTO.getOperationInfos().add(new CarBizCarInfoTempDTO.OperationInfo(pair.getLeft(), pair.getRight()));
-                });
-            });
-        });
+        carBizCarInfoTempDTOs.forEach(carBizCarInfoTempDTO -> Optional.ofNullable(carBizCarInfoAuditMapper.selectAuditStatusByCarTempId(carBizCarInfoTempDTO.getCarId())).ifPresent(auditInfo -> {
+            carBizCarInfoTempDTO.setStatusDesc(auditInfo.getStatusDesc());
+            Optional.ofNullable(CarInfoAuditEnum.getOperationInfo(auditInfo.getStatusCode())).ifPresent(pair -> carBizCarInfoTempDTO.getOperationInfos().
+                    add(new CarBizCarInfoTempDTO.OperationInfo(pair.getLeft(), pair.getRight())));
+        }));
     }
 
     /**
@@ -2430,10 +2427,8 @@ public class CarBizCarInfoTempService {
      * @param carBizCarInfoTempDTO 列表对象
      */
     public void buildCarAuditStatusInfoListAndOpsList(CarBizCarInfoTempDTO carBizCarInfoTempDTO) {
-
         // 1.
         carBizCarInfoTempDTO.setCarBizCarInfoAuditList(carBizCarInfoAuditMapper.selectAuditStatusListByCarTempId(carBizCarInfoTempDTO.getCarId()));
-
         // 2.
         CarBizCarInfoAudit carBizCarInfoAudit = carBizCarInfoAuditMapper.selectAuditStatusByCarTempId(carBizCarInfoTempDTO.getCarId());
 

@@ -121,6 +121,7 @@ public class CarInfoTemporaryController extends BaseController {
         PageHelper.startPage(page, pageSize,true);
         List<CarBizCarInfoTemp> carBizCarInfoTempList = null;
         try{
+            log.info("查询车辆临时表数据,请求参数:{}", JSON.toJSONString(params));
             carBizCarInfoTempList = carBizCarInfoTempService.queryForPageObject(params);
             PageInfo<CarBizCarInfoTemp> pageInfo = new PageInfo<>(carBizCarInfoTempList);
             total = pageInfo.getTotal();
@@ -132,6 +133,13 @@ public class CarInfoTemporaryController extends BaseController {
             return AjaxResponse.success(pageDto);
         }else{
             for (CarBizCarInfoTemp carBizCarInfoTemp:carBizCarInfoTempList) {
+                /*
+                 * add by mingku.jia
+                 * 1.查询城市名字-car_biz_car_info_temp中cityId直接获取名字
+                 * 2.供应商名字->car_biz_car_info_temp中supplierId直接获取名字
+                 *  3.车辆的模型名字->car_biz_car_info_temp(car_model_id)->在rentcar.car_biz_model;
+                 *  4.获取品牌的名字->car_biz_car_info_temp(car_model_id)->在去获取mp-driver.driver_vehicle(品牌id)->mp-driver.driver_brand.
+                 */
                 Map<String, Object> result = super.querySupplierName(carBizCarInfoTemp.getCityId(), carBizCarInfoTemp.getSupplierId());
                 carBizCarInfoTemp.setCityName((String)result.get("cityName"));
                 carBizCarInfoTemp.setSupplierName((String)result.get("supplierName"));
@@ -407,10 +415,10 @@ public class CarInfoTemporaryController extends BaseController {
         carBizCarInfoTemp.setCreateBy(userId);
 
         if (StringUtils.isBlank(vehicleDrivingLicense)) {
-            throw new ServiceException(400, "行驶证图片url地址必须传递");
+            return AjaxResponse.failMsg(500, "行驶证图片url地址必须传递");
         }
         if (StringUtils.isBlank(carPhotograph)) {
-            throw new ServiceException(400, "车辆图片url地址必须传递");
+            return AjaxResponse.failMsg(500, "车辆图片url地址必须传递");
         }
 
         carBizCarInfoTemp.setVehicleDrivingLicense(StringUtils.isBlank(vehicleDrivingLicense)?null:vehicleDrivingLicense);
@@ -572,10 +580,10 @@ public class CarInfoTemporaryController extends BaseController {
         //---驾驶证图片
 
         if (StringUtils.isBlank(vehicleDrivingLicense)) {
-            throw new ServiceException(400, "行驶证图片url地址必须传递");
+            return AjaxResponse.failMsg(500, "行驶证图片url地址必须传递");
         }
         if (StringUtils.isBlank(carPhotograph)) {
-            throw new ServiceException(400, "车辆图片url地址必须传递");
+            return AjaxResponse.failMsg(500, "车辆图片url地址必须传递");
         }
 
         carBizCarInfoTemp.setVehicleDrivingLicense(StringUtils.isBlank(vehicleDrivingLicense)?null:vehicleDrivingLicense);
