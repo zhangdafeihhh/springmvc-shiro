@@ -2060,7 +2060,7 @@ public class IntegerCityController {
                 logger.info("子单绑定主单成功");
                 this.noticeAssign(orderNo);
                 ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1,
-                        new BasicThreadFactory.Builder().namingPattern("bing-master-order-%d").daemon(true).build());
+                        new BasicThreadFactory.Builder().namingPattern("bing-master-order-%d").daemon(false).build());
                 Future<String> future = executorService.submit(new Callable<String>() {
                     @Override
                     public String call() throws Exception {
@@ -2328,7 +2328,7 @@ public class IntegerCityController {
                         logger.error("====调用派单改派接口异常==" + e);
                     }
 
-                    ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1, new BasicThreadFactory.Builder().namingPattern("order-update-%d").daemon(true).build());
+                    ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1, new BasicThreadFactory.Builder().namingPattern("order-update-%d").daemon(false).build());
                     Future<String> future = executorService.submit(new Callable<String>() {
                         @Override
                         public String call() throws Exception {
