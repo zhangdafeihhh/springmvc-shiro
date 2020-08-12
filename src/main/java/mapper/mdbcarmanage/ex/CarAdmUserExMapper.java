@@ -39,4 +39,9 @@ public interface CarAdmUserExMapper {
 
     List<CarAdmUser> queryAllAccountByPhone(@Param("phone") String phone);
 
+    /**根据创建人查询创建的所有子账号*/
+    List<CarAdmUser> queryByCreateUserId(@Param("createUserId") Integer createUserId);
+
+    /**批量更改子账号*/
+    int batchUpdate(@Param("userIdList") List<Integer> userIdList);
 }

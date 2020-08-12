@@ -18,6 +18,8 @@ import com.zhuanche.entity.mdbcarmanage.DriverTelescopeUser;
 import mapper.mdbcarmanage.ex.DriverTelescopeUserExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,6 +75,8 @@ public class UserManagementService{
 
 	@Autowired
 	private RedisSessionDAO        redisSessionDAO;
+
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	/**一、增加一个用户**/
 	public AjaxResponse addUser( CarAdmUser user ) {
@@ -82,6 +86,13 @@ public class UserManagementService{
 		if(po!=null) {
 			return AjaxResponse.fail(RestErrorCode.ACCOUNT_EXIST );
 		}
+		/**手机号验证*/
+		List<CarAdmUser> admUsers = carAdmUserExMapper.queryAllAccountByPhone(user.getPhone());
+
+		if(CollectionUtils.isNotEmpty(admUsers)){
+			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST);
+		}
+
 		if( StringUtils.isEmpty(user.getUserName()) ) {
 			user.setUserName("");
 		}
@@ -139,6 +150,20 @@ public class UserManagementService{
 		userForUpdate.setUserId(userId);
 		userForUpdate.setStatus(100);
 		carAdmUserMapper.updateByPrimaryKeySelective(userForUpdate);
+		/**同步批量更改创建的子账号*/
+		List<CarAdmUser> userList = carAdmUserExMapper.queryByCreateUserId(userId);
+		if(CollectionUtils.isNotEmpty(userList)){
+			try {
+				List<Integer> userIdList = new ArrayList<>();
+				userList.forEach(u->{
+					userIdList.add(u.getUserId());
+				});
+				carAdmUserExMapper.batchUpdate(userIdList);
+			} catch (Exception e) {
+				logger.error("批量更新一次",e);
+			}
+		}
+
 		redisSessionDAO.clearRelativeSession(null, null , userId);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
@@ -166,6 +191,14 @@ public class UserManagementService{
 		if( rawuser==null ) {
 			return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST );
 		}
+
+		/**手机号验证*/
+		List<CarAdmUser> admUsers = carAdmUserExMapper.queryAllAccountByPhone(newUser.getPhone());
+
+		if(CollectionUtils.isNotEmpty(admUsers)){
+			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST);
+		}
+
 		//可以修改的字段
 		if( StringUtils.isEmpty(newUser.getUserName()) ) {
 			newUser.setUserName("");

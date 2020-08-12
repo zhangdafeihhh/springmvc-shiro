@@ -118,4 +118,10 @@
         </foreach>
     </select>
 
+
+    <delete id="deleteByGroupId" parameterType="java.lang.Integer" >
+        delete from car_relate_group
+        where group_id = #{groupId,jdbcType=INTEGER}
+    </delete>
+
 </mapper>

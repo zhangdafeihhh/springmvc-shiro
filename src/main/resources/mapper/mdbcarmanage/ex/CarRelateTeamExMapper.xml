@@ -259,4 +259,15 @@
         select team_id from car_relate_team where driver_id = #{driverId}
     </select>
 
+    <insert id="batchInsertDriverIds">
+        INSERT  INTO car_relate_team (team_id,driver_id) VALUES
+        <foreach collection="driverIdList" item="driverId" separator=",">
+            (#{teamId},#{driverId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByTeamId">
+    delete from car_relate_team
+    where team_id = #{teamId,jdbcType=INTEGER}
+    </delete>
 </mapper>

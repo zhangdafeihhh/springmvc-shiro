@@ -578,6 +578,15 @@ public class CarDriverTeamService{
 							} catch (Exception e) {
 								logger.info("司机driverId={},修改,调用清除接口异常={}", carRelateGroup.getDriverId(), e.getMessage());
 							}
+							/**删除班组下的司机同时更新到车队下*/
+							List<Integer> groupDriverIds = carRelateGroupExMapper.queryDriverIdsByGroupId(carRelateGroup.getGroupId());
+							if(CollectionUtils.isNotEmpty(groupDriverIds) && paramDto.getOpenCloseFlag() == 2){
+								int code = carRelateTeamExMapper.batchInsertDriverIds(existsTeam.getpId(),groupDriverIds);
+								if(code > 0){
+									/**删除班组下的司机*/
+									carRelateGroupExMapper.deleteByGroupId(carRelateGroup.getGroupId());
+								}
+							}
 							//班组下更新到车队下
 							this.asyncDutyService.processingData(carRelateGroup.getDriverId(), existsTeam.getpId().toString(), "", 0);
 						}
@@ -595,6 +604,16 @@ public class CarDriverTeamService{
 							} catch (Exception e) {
 								logger.info("司机driverId={},修改,调用清除接口异常={}", carRelateTeam.getDriverId(), e.getMessage());
 							}
+
+							/**删除车队下的司机*/
+							if(paramDto.getOpenCloseFlag() == 2){
+								try {
+									carRelateTeamExMapper.deleteByTeamId(carRelateTeam.getTeamId());
+								} catch (Exception e) {
+									logger.error("========删除异常====",e);
+								}
+							}
+
 							//车队下的司机更新到加盟商
 							this.asyncDutyService.processingData(carRelateTeam.getDriverId(), "", "", 0);
 						}

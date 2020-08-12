@@ -33,4 +33,6 @@ public interface CarRelateGroupExMapper {
     List<Integer> queryDriverIdsByGroupId(@Param("groupId") Integer groupId);
 
     List<CarRelateGroup> queryDriverGroupRelationListByDriverIdSet(List<Integer> driverList);
+
+    int deleteByGroupId(@Param("groupId")Integer groupId);
 }

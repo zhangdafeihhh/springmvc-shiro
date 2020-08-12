@@ -70,4 +70,15 @@ public interface CarRelateTeamExMapper {
     List<CarRelateTeam> queryByDriverIdList(@Param("driverIdSet")Set<Integer> driverIdSet);
 
     Integer getTeamIdByDriverId(@Param("driverId") Integer driverId);
+
+    /**批量添加司机*/
+    int batchInsertDriverIds(@Param("teamId") Integer teamId,@Param("driverIdList") List<Integer> driverIdList);
+
+    /**
+     * 根据车队ID删除
+     * @param teamId
+     * @return
+     */
+    int deleteByTeamId(@Param("teamId") Integer teamId);
+
 }
