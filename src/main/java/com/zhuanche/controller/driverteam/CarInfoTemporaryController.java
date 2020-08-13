@@ -199,10 +199,8 @@ public class CarInfoTemporaryController extends BaseController {
     @RequestMapping(value = "/fileDownloadCarInfo",method =  RequestMethod.GET)
 	@RequiresPermissions(value = { "SupplierCarEntry_download" } )
     @RequestFunction(menu = CAR_JOIN_APPLY_TEMPLATE_DOWNLOAD)
-    public void fileDownloadCarInfo(HttpServletRequest request,
-                                    HttpServletResponse response) {
-        String path = request.getRealPath("/") + File.separator + "upload"
-                + File.separator + "IMPORTCARINFO.xlsx";
+    public void fileDownloadCarInfo(HttpServletRequest request, HttpServletResponse response) {
+        String path = request.getRealPath("/") + File.separator + "upload" + File.separator + "IMPORTCARINFO.xlsx";
         super.fileDownload(request,response,path);
     }
 
@@ -237,20 +235,16 @@ public class CarInfoTemporaryController extends BaseController {
         Map<String,Object> params = Maps.newHashMap();
         params.put("carId",carId);
         CarBizCarInfoTemp carBizCarInfoTemp = carBizCarInfoTempService.queryForObject(params);
-
-
         if(carBizCarInfoTemp != null){
             Map<String, Object> result = super.querySupplierName(carBizCarInfoTemp.getCityId(), carBizCarInfoTemp.getSupplierId());
             carBizCarInfoTemp.setCityName((String)result.get("cityName"));
             carBizCarInfoTemp.setSupplierName((String)result.get("supplierName"));
-
             Integer carModelId = carBizCarInfoTemp.getCarModelId();
             if(carModelId != null){
                 CarBizModel carBizModel = carBizModelService.selectByPrimaryKey(carBizCarInfoTemp.getCarModelId());
                 if(carBizModel!=null){
                     carBizCarInfoTemp.setModeName(carBizModel.getModelName());
                 }
-
                 DriverVehicle driverVehicle = driverVehicleService.queryByModelId(carBizCarInfoTemp.getCarModelId());
                 if(driverVehicle != null){
                     Long brandId =   driverVehicle.getBrandId();
@@ -262,16 +256,12 @@ public class CarInfoTemporaryController extends BaseController {
                         }
                     }
                 }
-
             }
-
         }else{
             return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
         }
         CarBizCarInfoTempDTO carBizCarInfoTempDTO = BeanUtil.copyObject(carBizCarInfoTemp, CarBizCarInfoTempDTO.class);
-
         carBizCarInfoTempService.buildCarAuditStatusInfoListAndOpsList(carBizCarInfoTempDTO);
-
         return AjaxResponse.success(carBizCarInfoTempDTO);
     }
 
@@ -527,7 +517,7 @@ public class CarInfoTemporaryController extends BaseController {
                                     @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId,
                                     @RequestParam(value = "vehicleDrivingLicense",required = false) String vehicleDrivingLicense,
                                     @RequestParam(value = "carPhotograph",required = false) String carPhotograph, String opType) {
-        log.info("修改Id:"+carId);
+        log.info("修改Id:"+carId +"当前提交类型:"+ opType);
         CarBizCarInfoTemp carBizCarInfoTemp = new CarBizCarInfoTemp();
         carBizCarInfoTemp.setCarId(carId);
         carBizCarInfoTemp.setLicensePlates(licensePlates);
@@ -585,10 +575,8 @@ public class CarInfoTemporaryController extends BaseController {
         if (StringUtils.isBlank(carPhotograph)) {
             return AjaxResponse.failMsg(500, "车辆图片url地址必须传递");
         }
-
         carBizCarInfoTemp.setVehicleDrivingLicense(StringUtils.isBlank(vehicleDrivingLicense)?null:vehicleDrivingLicense);
         carBizCarInfoTemp.setCarPhotograph(StringUtils.isBlank(carPhotograph)?null:carPhotograph);
-
         return carBizCarInfoTempService.update(carBizCarInfoTemp, opType);
     }
 
@@ -662,6 +650,22 @@ public class CarInfoTemporaryController extends BaseController {
         } catch (Exception e) {
             AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
             log.info("刷新数据响应结果:" + JSON.toJSONString(ajaxResponse));
+            return ajaxResponse;
+        }
+    }
+
+    /**
+     * 刷新数据
+     */
+    @ResponseBody
+    @RequestMapping(value = "/flushData1",method = RequestMethod.POST)
+    public AjaxResponse flushData1(String string) {
+        log.info("刷新数据-将临时表中不存在审核状态记录的数据刷新成为初始化状态");
+        try {
+            throw new NullPointerException("a ");
+        } catch (Exception e) {
+            AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            log.error("刷新数据响应结果:" + JSON.toJSONString(ajaxResponse));
             return ajaxResponse;
         }
     }
