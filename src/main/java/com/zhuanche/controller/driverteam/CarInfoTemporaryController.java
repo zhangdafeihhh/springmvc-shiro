@@ -468,7 +468,7 @@ public class CarInfoTemporaryController extends BaseController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/update", method =  RequestMethod.POST )
+    @RequestMapping(value = "/update", method = {RequestMethod.POST, RequestMethod.GET} )
     @RequestFunction(menu = CAR_JOIN_APPLY_UPDATE)
     public AjaxResponse updateCarInfo(@Verify(param = "carId",rule="required") Integer carId,
                                     @Verify(param = "licensePlates",rule="required") String licensePlates,
