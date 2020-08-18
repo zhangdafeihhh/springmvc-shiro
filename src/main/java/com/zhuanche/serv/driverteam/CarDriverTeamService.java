@@ -585,10 +585,10 @@ public class CarDriverTeamService{
 							/**删除班组下的司机同时更新到车队下*/
 							List<Integer> groupDriverIds = carRelateGroupExMapper.queryDriverIdsByGroupId(carRelateGroup.getGroupId());
 							if(CollectionUtils.isNotEmpty(groupDriverIds) && paramDto.getOpenCloseFlag() == 2){
-								int code = carRelateTeamExMapper.batchInsertDriverIds(existsTeam.getpId(),groupDriverIds);
+								/**删除班组下的司机 先删除 线上有唯一约束*/
+								int code = carRelateGroupExMapper.deleteByGroupId(carRelateGroup.getGroupId());
 								if(code > 0){
-									/**删除班组下的司机*/
-									carRelateGroupExMapper.deleteByGroupId(carRelateGroup.getGroupId());
+									carRelateTeamExMapper.batchInsertDriverIds(existsTeam.getpId(),groupDriverIds);
 								}
 							}
 							//班组下更新到车队下
