@@ -642,7 +642,7 @@ public class CarInfoTemporaryController extends BaseController {
      * 刷新数据
      */
     @ResponseBody
-    @RequestMapping(value = "/flushData",method = RequestMethod.POST)
+    @RequestMapping(value = "/flushData",method = {RequestMethod.POST, RequestMethod.GET})
     public AjaxResponse flushData(String string) {
         log.info("刷新数据-将临时表中不存在审核状态记录的数据刷新成为初始化状态");
         try {
