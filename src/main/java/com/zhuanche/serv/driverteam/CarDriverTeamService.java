@@ -370,9 +370,13 @@ public class CarDriverTeamService{
 			}else{
 				//当前车队信息
 				CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(driverTeamRequest.getTeamId());
-				//设置登录用户城市和供应商数据权限
-				driverTeamRequest.setCityIds(citySupplierTeamCommonService.setIntegerShiftString(WebSessionUtil.getCurrentLoginUser().getCityIds()));
-				driverTeamRequest.setSupplierIds(citySupplierTeamCommonService.setIntegerShiftString(WebSessionUtil.getCurrentLoginUser().getSupplierIds()));
+				//设置登录用户城市和供应商数据权限 ---此处应该是查询当前的合作商的
+				Set<String> setCities = new HashSet<>();
+				setCities.add(driverTeamRequest.getCityId());
+				Set<String> setSuppliers =  new HashSet<>();
+				setSuppliers.add(driverTeamRequest.getSupplierId());
+				driverTeamRequest.setCityIds(setCities);
+				driverTeamRequest.setSupplierIds(setSuppliers);
 				//查询车队上级供应商级别下司机列表
 				List<CarDriverInfoDTO> limitsDrivers = carBizDriverInfoExMapper.queryListByLimits(driverTeamRequest);
 				if(Check.NuNCollection(limitsDrivers)){

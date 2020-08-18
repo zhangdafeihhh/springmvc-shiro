@@ -160,6 +160,9 @@ public class IntegerCityController {
 
     private static final String SPLIT = ",";
 
+
+    private static ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(4,
+            new BasicThreadFactory.Builder().namingPattern("bing-master-order-%d").daemon(true).build());
     /**
      * 订单查询 wiki：http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=31813392
      *
@@ -2059,8 +2062,6 @@ public class IntegerCityController {
             if (jsonResult.get(Constants.CODE) != null && jsonResult.getInteger(Constants.CODE) == 0) {
                 logger.info("子单绑定主单成功");
                 this.noticeAssign(orderNo);
-                ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1,
-                        new BasicThreadFactory.Builder().namingPattern("bing-master-order-%d").daemon(false).build());
                 Future<String> future = executorService.submit(new Callable<String>() {
                     @Override
                     public String call() throws Exception {
@@ -2328,7 +2329,6 @@ public class IntegerCityController {
                         logger.error("====调用派单改派接口异常==" + e);
                     }
 
-                    ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(1, new BasicThreadFactory.Builder().namingPattern("order-update-%d").daemon(false).build());
                     Future<String> future = executorService.submit(new Callable<String>() {
                         @Override
                         public String call() throws Exception {
