@@ -190,14 +190,14 @@ public class CarBizCarInfoTempService {
                     had = 1;
                     carDriver.setServiceCity(entity.getCities());
                     carDriver.setSupplierId(entity.getSupplierId());
-                    carDriver.setTeamid("");
+                    carDriver.setTeamid(null);
                     carDriver.setGroupIds("");
                 }
                 if (entity.getOldSupplierId() != null && !"".equals(entity.getOldSupplierId()) && !entity.getSupplierId().equals(entity.getOldSupplierId())) {
                     // 车辆是否更改供应商，更改，则修改司机
                     had = 1;
                     carDriver.setSupplierId(entity.getSupplierId());
-                    carDriver.setTeamid("");
+                    carDriver.setTeamid(null);
                     carDriver.setGroupIds("");
                 }
                 if (!entity.getLicensePlates().equals(entity.getOldLicensePlates())) {
