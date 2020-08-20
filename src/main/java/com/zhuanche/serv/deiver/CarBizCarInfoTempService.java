@@ -156,7 +156,7 @@ public class CarBizCarInfoTempService {
                     .remark("sass系统添加车辆,初始化待提交状态")
                     .createDate(new Date())
                     .updateDate(new Date())
-                    .createUser(carBizCarInfoTemp.getCreateBy().toString()).build();
+                    .createUser(WebSessionUtil.getCurrentLoginUser().getName()).build();
             code = carBizCarInfoAuditMapper.insert(carBizCarInfoAudit);
             return code > 0 ?  AjaxResponse.success(RestErrorCode.SUCCESS): AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }else{
