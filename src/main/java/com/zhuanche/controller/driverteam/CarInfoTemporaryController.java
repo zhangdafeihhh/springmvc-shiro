@@ -137,8 +137,8 @@ public class CarInfoTemporaryController extends BaseController {
                  * add by mingku.jia
                  * 1.查询城市名字-car_biz_car_info_temp中cityId直接获取名字
                  * 2.供应商名字->car_biz_car_info_temp中supplierId直接获取名字
-                 *  3.车辆的模型名字->car_biz_car_info_temp(car_model_id)->在rentcar.car_biz_model;
-                 *  4.获取品牌的名字->car_biz_car_info_temp(car_model_id)->在去获取mp-driver.driver_vehicle(品牌id)->mp-driver.driver_brand.
+                 * 3.车辆的模型名字->car_biz_car_info_temp(car_model_id)->在rentcar.car_biz_model;
+                 * 4.获取品牌的名字->car_biz_car_info_temp(car_model_id)->在去获取mp-driver.driver_vehicle(品牌id)->mp-driver.driver_brand.
                  */
                 Map<String, Object> result = super.querySupplierName(carBizCarInfoTemp.getCityId(), carBizCarInfoTemp.getSupplierId());
                 carBizCarInfoTemp.setCityName((String)result.get("cityName"));
@@ -650,22 +650,6 @@ public class CarInfoTemporaryController extends BaseController {
         } catch (Exception e) {
             AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
             log.info("刷新数据响应结果:" + JSON.toJSONString(ajaxResponse));
-            return ajaxResponse;
-        }
-    }
-
-    /**
-     * 刷新数据
-     */
-    @ResponseBody
-    @RequestMapping(value = "/flushData1",method = RequestMethod.POST)
-    public AjaxResponse flushData1(String string) {
-        log.info("刷新数据-将临时表中不存在审核状态记录的数据刷新成为初始化状态");
-        try {
-            throw new NullPointerException("a ");
-        } catch (Exception e) {
-            AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-            log.error("刷新数据响应结果:" + JSON.toJSONString(ajaxResponse));
             return ajaxResponse;
         }
     }

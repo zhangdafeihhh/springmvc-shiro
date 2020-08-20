@@ -1907,6 +1907,7 @@ public class CarBizCarInfoTempService {
                         /**
                          * 插入数的时候初始化状态表
                          * add by mingku.jia
+                         *  SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
                          */
                         CarBizCarInfoAudit carBizCarInfoAudit = CarBizCarInfoAudit.builder().carBizCarInfoTempId(carBizCarInfo.getCarId())
                                 .statusCode(CarInfoAuditEnum.STATUS_1.getStatusCode())
@@ -1914,7 +1915,7 @@ public class CarBizCarInfoTempService {
                                 .remark("sass系统添加车辆, 导入初始化")
                                 .createDate(new Date())
                                 .updateDate(new Date())
-                                .createUser(carBizCarInfo.getCreateBy().toString()).build();
+                                .createUser(WebSessionUtil.getCurrentLoginUser().getName()).build();
                         carBizCarInfoAuditMapper.insert(carBizCarInfoAudit);
                     } catch (Exception e) {
                         log.info("导入车辆保存  error：" + e);
@@ -2392,7 +2393,6 @@ public class CarBizCarInfoTempService {
         System.out.println("carIdList = " + carIdList);
         return result;
     }
-
 
     public int batchInsertCarInfoAudit(List<Integer> carIdList) {
         try {
