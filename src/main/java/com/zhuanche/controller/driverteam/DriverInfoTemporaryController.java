@@ -243,8 +243,8 @@ public class DriverInfoTemporaryController extends BaseController {
             }
             return carBizDriverInfoTempService.importDriverInfo(file.getInputStream(),prefix,cityId,supplierId,teamId,groupId,response);
         } catch (IOException e) {
-            e.printStackTrace();
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            log.info("导入异常",e);
+             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
 
