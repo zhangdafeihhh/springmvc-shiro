@@ -1,5 +1,6 @@
 package com.zhuanche.util.excel;
 
+import com.alibaba.excel.support.ExcelTypeEnum;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.dateUtil.DateUtil;
 import org.apache.poi.hssf.usermodel.*;
@@ -553,6 +554,17 @@ public class ExportExcelUtil<T> {
         workbook.write(out);
         out.flush();
         out.close();
+    }
+
+    public static OutputStream getOutputStream(String fileName, HttpServletResponse response) throws Exception {
+        if (!fileName.contains(ExcelTypeEnum.XLSX.getValue())) {
+            fileName = fileName + ExcelTypeEnum.XLSX.getValue();
+        }
+        fileName = URLEncoder.encode(fileName, "UTF-8");
+        response.setContentType("application/vnd.ms-excel");
+        response.setCharacterEncoding("utf8");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        return response.getOutputStream();
     }
 
 }
