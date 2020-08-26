@@ -70,7 +70,7 @@ public class IntegerCityReadyOrderServiceImpl implements IntegerCityReadyOrderSe
             if (code == 0) {
                 JSONObject jsonData = jsonObject.getJSONObject(Constants.DATA);
                 if (jsonData != null && jsonData.get(Constants.DATA) != null) {
-                    /**去重后返回所有的线路id和名称*/
+                    /**3.去重后返回所有的线路id和名称*/
                     return this.response(jsonData);
                 }
             }

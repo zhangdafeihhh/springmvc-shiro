@@ -785,6 +785,12 @@ public class IntegerCityController {
                 isSameRider, riderName, riderPhone, riderCount, boardingTime, boardingCityId, boardingGetOnX, boardingGetOnY, boardingGetOffCityId,
                 boardingGetOffX, boardingGetOffY, offlineIntercityServiceType, specialRequirement));
         try {
+            /**校验预约用车时间在当前时间30分钟*/
+            if(!verifyBoardingTime(boardingTime)){
+                logger.info("预约用车时间只能在当前时间30分钟后");
+                String beforeHalf = DateUtil.beforeHalfHour(new Date(),30,DateUtil.TIME_FORMAT);
+                return AjaxResponse.fail(RestErrorCode.VERIFY_BOARDING_TIME,beforeHalf);
+            }
             /**1.根据横纵坐标获取围栏，根据围栏获取路线*/
             AjaxResponse res = this.verifyLine(boardingCityId, boardingGetOnX, boardingGetOnY,
                     boardingGetOffCityId, boardingGetOffX, boardingGetOffY);
@@ -1045,6 +1051,21 @@ public class IntegerCityController {
         return AjaxResponse.success(null);
     }
 
+
+    /**
+     * 校验录单时间是否在当前时间的30分钟前 如果是返回false
+     * @param boardingTime
+     * @return
+     */
+    private boolean verifyBoardingTime(String boardingTime){
+       String beforeHalf = DateUtil.beforeHalfHour(new Date(),30,DateUtil.TIME_FORMAT);
+       double res = DateUtil.getResBetweenTime(beforeHalf,boardingTime,DateUtil.TIME_FORMAT);
+
+       if(res < 0){
+           return false;
+       }
+       return true;
+    }
 
     /**
      * 获取线路
@@ -1406,13 +1427,21 @@ public class IntegerCityController {
                                   String bookingEndAddr,
                                   String carGroup,
                                   String bookingStartShortAddr,
-                                  String bookingEndShortAddr) {
+                                  String bookingEndShortAddr,
+                                  @Verify(param = "specialRequirement", rule = "max(30)") String specialRequirement) {
 
         logger.info(MessageFormat.format("编辑订单入参:orderNo{0},reserveName{1},reservePhone{2},isSameRider{3},riderName{4},riderPhone{5}," +
                         "riderCount:{6},boardingTime{7},boardingCityId{8},boardingGetOnX{9},boardingGetOnY{10},boardingGetOffCityId{11}," +
                         "boardingGetOffX:{12},boardingGetOffY:{13},offlineIntercityServiceType:{14}", orderNo, reserveName, reservePhone, isSameRider, riderName, riderPhone, riderCount,
                 boardingTime, boardingCityId, boardingGetOnX, boardingGetOnY, boardingGetOffCityId, boardingGetOffX, boardingGetOffY, mainOrderNo,
                 status, startCityName, endCityName, bookingStartAddr, bookingEndAddr, carGroup, bookingStartShortAddr, bookingEndShortAddr, offlineIntercityServiceType));
+
+        /**校验预约用车时间在当前时间30分钟*/
+        if(!verifyBoardingTime(boardingTime)){
+            logger.info("预约用车时间只能在当前时间30分钟后");
+            String beforeHalf = DateUtil.beforeHalfHour(new Date(),30,DateUtil.TIME_FORMAT);
+            return AjaxResponse.fail(RestErrorCode.VERIFY_BOARDING_TIME,beforeHalf);
+        }
 
 
         if (Constants.INTER_CITY_CHARTER_TYPE.equals(offlineIntercityServiceType)) {
@@ -1715,6 +1744,10 @@ public class IntegerCityController {
             list.add("bookingEndShortAddr=" + bookingEndShortAddr);
         }
 
+        if(StringUtils.isNotEmpty(specialRequirement)){
+            map.put("specialRequirement", specialRequirement);
+            list.add("specialRequirement=" + specialRequirement);
+        }
         map.put("supplierId", supplierId);
         list.add("supplierId=" + supplierId);
 

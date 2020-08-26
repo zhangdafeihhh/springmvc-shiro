@@ -346,6 +346,8 @@ public final class RestErrorCode{
 	@ResultMessage("该订单车型与司机的车型不一致,无法指派")
 	public static final int DIFF_GROUP_ID = 50924;
 
+	@ResultMessage("预约用车时间只能在{0}之后")
+	public static final int VERIFY_BOARDING_TIME = 50926;
 
 	//------------------------------------------------
 
