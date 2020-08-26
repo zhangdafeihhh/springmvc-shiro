@@ -340,6 +340,12 @@ public final class RestErrorCode{
 	@ResultMessage("当前司机不可用")
 	public static final int HAS_ORDER_DRIVER_ID = 50920;
 
+	@ResultMessage("您指派的司机不是您旗下司机")
+	public static final int HAS_DRIVER_PERMISSION = 50922;
+
+	@ResultMessage("该订单车型与司机的车型不一致,无法指派")
+	public static final int DIFF_GROUP_ID = 50924;
+
 
 	//------------------------------------------------
 

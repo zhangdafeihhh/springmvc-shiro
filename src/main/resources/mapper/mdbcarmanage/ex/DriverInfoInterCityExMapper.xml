@@ -66,6 +66,9 @@
       </foreach>
     </if>
 
+    <if test="teamId!=null and teamId!=''">
+      and t.team_id = #{teamId}
+    </if>
 
     UNION
     SELECT t.city_id as cityId,t.city_name as cityName, t.group_id as groupId, t.supplier_name as supplierName,t.id,t.driver_name as driverName,t.license_plates as licensePlates,t.driver_id as driverId,
@@ -106,6 +109,10 @@
       <foreach collection="supplierIds" item="item" open="(" separator="," close=")">
         #{item}
       </foreach>
+    </if>
+
+    <if test="teamId!=null and teamId!=''">
+      and t.team_id = #{teamId}
     </if>
 
     GROUP BY t.driver_id

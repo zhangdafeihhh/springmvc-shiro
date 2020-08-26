@@ -18,7 +18,8 @@ public interface DriverInfoInterCityExMapper {
                                          @Param("driverPhone")String driverPhone,
                                          @Param("licensePlates")String licensePlates,
                                          @Param("cityIds")Set<Integer> cityIds,
-                                         @Param("supplierIds")Set<Integer> supplierIds);
+                                         @Param("supplierIds")Set<Integer> supplierIds,
+                                         @Param("teamId")Integer teamId);
 
     DriverInfoInterCity getByDriverId(@Param("driverId") Integer driverId);
 

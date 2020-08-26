@@ -470,7 +470,8 @@ public class IntegerCityController {
                                         String riderPhone,
                                         String distributorId,
                                         String bookingDateSort,
-                                        Integer offlineIntercityServiceType) {
+                                        Integer offlineIntercityServiceType,
+                                        String ruleIdBatch) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
@@ -486,7 +487,11 @@ public class IntegerCityController {
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate, endCreateDate,
                 beginCostStartDate, beginCostEndDate, riderPhone, distributorId, bookingDateSort, offlineIntercityServiceType);
 
-        map = this.wrestQueryParam(map);
+        if(StringUtils.isNotEmpty(ruleIdBatch)){
+            map.put("ruleIdBatch",ruleIdBatch);
+        }else {
+            map = this.wrestQueryParam(map);
+        }
 
         if (map == null) {
             return AjaxResponse.success(null);
@@ -1903,6 +1908,7 @@ public class IntegerCityController {
                                     String driverName,
                                     String driverPhone,
                                     String license,
+                                    Integer teamId,
                                     @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                     @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
 
@@ -1927,7 +1933,7 @@ public class IntegerCityController {
         }
 
         Page page = PageHelper.startPage(pageNum, pageSize);
-        List<MainOrderDetailDTO> interCityList = infoInterCityExMapper.queryDriver(cityId, supplierId, driverName, driverPhone, license, cityIds, supplierIds);
+        List<MainOrderDetailDTO> interCityList = infoInterCityExMapper.queryDriver(cityId, supplierId, driverName, driverPhone, license, cityIds, supplierIds,teamId);
 
         for (MainOrderDetailDTO detailDTO : interCityList) {
             if (StringUtils.isNotEmpty(detailDTO.getMainOrder())) {
@@ -2029,6 +2035,10 @@ public class IntegerCityController {
             return AjaxResponse.fail(RestErrorCode.HAS_ORDER_DRIVER_ID);
         }
 
+        if(!verifyHasPermission(driverId)){
+            logger.info("您指派的司机不是您旗下司机,driverId:" + driverId);
+            return AjaxResponse.fail(RestErrorCode.HAS_DRIVER_PERMISSION);
+        }
         Map<String, Object> map = Maps.newHashMap();
         List<String> listParam = new ArrayList<>();
         map.put("businessId", Common.BUSSINESSID);
@@ -2051,6 +2061,11 @@ public class IntegerCityController {
 
         /**根据driverId获取groupId*/
         Integer newGroupId = carBizCarInfoExMapper.groupIdByDriverId(driverId);
+
+        if(newGroupId !=null && !groupId.equals(newGroupId)){
+            logger.info("该订单车型与司机的车型不一致，无法指派");
+            return AjaxResponse.fail(RestErrorCode.DIFF_GROUP_ID);
+        }
         if (newGroupId != null && newGroupId > 0) {
             map.put("carGroupId", newGroupId);
             listParam.add("carGroupId=" + newGroupId);
@@ -2248,6 +2263,43 @@ public class IntegerCityController {
         return true;
     }
 
+
+    /**
+     * 校验司机是否是当前用户权限下的
+     * @param driverId
+     * @return
+     */
+    private boolean verifyHasPermission(Integer driverId){
+        boolean bl = false;
+        DriverInfoInterCity driverInfo = infoInterCityExMapper.getByDriverId(driverId);
+        if(driverInfo == null){
+            logger.info("司机信息为空");
+            return bl;
+        }
+
+
+        if(WebSessionUtil.isSupperAdmin()){
+            bl = true;
+        }else {
+            SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+            Set<Integer> cities = loginUser.getCityIds();
+            Set<Integer>  suppliers = loginUser.getSupplierIds();
+
+            if(CollectionUtils.isNotEmpty(suppliers)){
+                if(suppliers.contains(driverInfo.getSupplierId())){
+                    bl = true;
+                }
+            }else if(CollectionUtils.isNotEmpty(cities)){
+                if(cities.contains(driverInfo.getCityId())){
+                    bl  = true;
+                }
+            }else {
+                bl = true;
+            }
+        }
+        return bl;
+
+    }
 
     /**
      * 改派

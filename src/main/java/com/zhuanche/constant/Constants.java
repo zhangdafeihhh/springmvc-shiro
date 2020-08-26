@@ -228,4 +228,12 @@ public final class Constants {
 
 	/**验证是添加or编辑*/
 	public static final Integer ADD = 1;
+
+
+	/**线路id*/
+	public static final String RULEID = "ruleId";
+
+	/**线路名称*/
+	public static final String LINENAME = "lineName";
+
  }
