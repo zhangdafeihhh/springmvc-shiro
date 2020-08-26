@@ -176,6 +176,7 @@ public class DriverPunishClientService extends DriverPunishService {
         }
         JSONObject responseBody = JSONObject.parseObject(result.getResponseBody());
         if (Objects.isNull(responseBody) ||responseBody.getIntValue(CODE) != Constants.SUCCESS_CODE) {
+            log.error("rest result business exception, {}", JSONObject.toJSONString(responseBody));
             throw new ServiceException(RestErrorCode.REST_FAIL_MP_MANAGE_API);
         }
         return responseBody.getString("data");
