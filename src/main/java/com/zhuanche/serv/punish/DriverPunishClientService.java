@@ -151,6 +151,8 @@ public class DriverPunishClientService extends DriverPunishService {
      * @throws IOException
      */
     public void renderVideo(String filePath,HttpServletResponse response) throws IOException {
+        //支持范围请求
+        response.addHeader("Accept-Ranges","bytes");
         InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
