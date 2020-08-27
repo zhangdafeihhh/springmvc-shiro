@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -151,23 +152,25 @@ public class DriverPunishClientService extends DriverPunishService {
      * @throws IOException
      */
     public void renderVideo(String filePath,HttpServletResponse response) throws IOException {
-        InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
-            inputStream = OkHttpStreamUtil.execute(filePath);
-            if (Objects.nonNull(inputStream)) {
+            byte[] fileBytes = OkHttpStreamUtil.executeForBytes(filePath);
+            if (Objects.nonNull(fileBytes)) {
                 //支持范围请求
-                response.addHeader("Content-Range", "bytes");
+                int fileLength = fileBytes.length;
+                response.addHeader("Accept-Ranges","bytes");
+                response.addHeader("Content-Length",""+ fileLength);
+                response.addHeader("Content-Range", "bytes 0-" + fileLength);
                 response.addHeader("Content-Type", "audio/mpeg");
-                outputStream = response.getOutputStream();
-                IoUtil.copy(inputStream, outputStream);
-                IoUtil.flush(outputStream);
+                response.addHeader("Content-Length",""+ fileLength);
+                outputStream = new BufferedOutputStream(response.getOutputStream());
+                outputStream.write(fileBytes);
+                outputStream.flush();
             }
         } catch (Exception e) {
             log.error("渲染行程录音失败", e);
             throw e;
         } finally {
-            IoUtil.close(inputStream);
             IoUtil.close(outputStream);
         }
     }
