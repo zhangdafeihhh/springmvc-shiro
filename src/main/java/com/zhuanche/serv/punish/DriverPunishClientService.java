@@ -17,6 +17,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.OkHttpStreamUtil;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 public class DriverPunishClientService extends DriverPunishService {
 
     private static final String RENDER_URL = "/driverPunish/renderVideo.json?filePath=";
+    private static final String ALI_YUN_CS_COM = "aliyuncs.com";
     private static final String DO_AUDIT = "/driverPunish/examineDriverPunish";
     private static final String PUNISH_DETAIL = "/driverPunish/findDriverPunishDetail";
     private static final String PUNISH_EXPORT = "/driverPunish/export";
@@ -110,12 +112,18 @@ public class DriverPunishClientService extends DriverPunishService {
         String hostUrl = getRequestHost(request);
         List<PunishRecordVoiceDTO> list = JSON.parseArray(data, PunishRecordVoiceDTO.class);
         return Objects.isNull(list) ? Collections.emptyList() : list
-                .stream().filter(e -> Objects.nonNull(e.getFilePath()))
+                .stream().filter(e -> StringUtils.isNotBlank(e.getFilePath()))
                 .peek(e -> e.setFilePath(getRenderFilePath(hostUrl, e.getFilePath())))
                 .collect(Collectors.toList());
     }
 
     private static String getRenderFilePath(String hostUrl, String filePath) {
+        if (StringUtils.isBlank(filePath)) {
+            return filePath;
+        }
+        if(filePath.contains(ALI_YUN_CS_COM)){
+            return filePath;
+        }
         return hostUrl + RENDER_URL + filePath;
     }
 
