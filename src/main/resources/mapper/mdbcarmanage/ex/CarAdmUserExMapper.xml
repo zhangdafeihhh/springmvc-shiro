@@ -31,8 +31,7 @@
     select 
     <include refid="Base_Column_List" />
     from car_adm_user
-    where account = #{account} 
-    limit 1
+    where account = #{account}
   </select>
   
   <!-- 查询用户列表 -->
