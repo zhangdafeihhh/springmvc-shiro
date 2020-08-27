@@ -157,8 +157,8 @@ public class DriverPunishClientService extends DriverPunishService {
             inputStream = OkHttpStreamUtil.execute(filePath);
             if (Objects.nonNull(inputStream)) {
                 //支持范围请求
-                response.addHeader("Content-Length",""+ inputStream.available());
-                response.addHeader("Content-Range", "bytes 0-" + inputStream.available());
+                response.addHeader("Content-Range", "bytes");
+                response.addHeader("Content-Type", "audio/mpeg");
                 outputStream = response.getOutputStream();
                 IoUtil.copy(inputStream, outputStream);
                 IoUtil.flush(outputStream);
