@@ -35,6 +35,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
 	@Override
     @SuppressWarnings("unchecked")
 	public V get(K key) throws CacheException {
+        log.info("shiro redis cache get {}", key);
         try {
         	return (V) redisTemplate.opsForValue().get(  cachename+(String)key );
         } catch (Throwable t) {
@@ -51,6 +52,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
     @Override
     @SuppressWarnings("unchecked")
 	public V put(K key, V value) throws CacheException {
+        log.info("shiro redis cache put {},{}", key, value);
         try {
             V previousValue = (V) redisTemplate.opsForValue().getAndSet(cachename + key, (Serializable) value);
             redisTemplate.expire(cachename + key, expireSeconds, TimeUnit.SECONDS);
@@ -71,6 +73,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
     @Override
     @SuppressWarnings("unchecked")
 	public V remove(K key) throws CacheException {
+        log.info("shiro redis cache remove {}", key);
         try {
             V value = (V) redisTemplate.opsForValue().get(cachename + key);
             redisTemplate.delete(cachename + key);
@@ -87,13 +90,14 @@ public class RedisCache<K, V> implements Cache<K, V> {
     @Override
     public void clear() throws CacheException {
         try {
+            log.info("shiro redis cache clear");
             Set<K> keys = this.keys();
         	if(keys==null || keys.size()==0 ) {
                 return ;
         	}
             keys.forEach(key-> redisTemplate.delete((String)key));
             redisTemplate.delete(keyListKey);
-            log.info("clear success size:{}", keys.size());
+            log.info("shiro redis clear success size:{}", keys.size());
             keys.clear();
         } catch (Throwable t) {
             throw new CacheException(t);
