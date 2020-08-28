@@ -20,7 +20,6 @@ import com.zhuanche.dto.DriverDailyReportDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams;
 import com.zhuanche.serv.DriverDailyReportExService;
-import com.zhuanche.shiro.cache.RedisCache;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
