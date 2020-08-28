@@ -779,7 +779,7 @@ public class IntegerCityController {
                                                  @Verify(param = "carGroup", rule = "required") Integer carGroup,
                                                  @Verify(param = "bookingStartShortAddr", rule = "required") String bookingStartShortAddr,
                                                  @Verify(param = "bookingEndShortAddr", rule = "required") String bookingEndShortAddr,
-                                                 @Verify(param = "specialRequirement", rule = "max(30)") String specialRequirement) {
+                                                 @Verify(param = "specialRequirement", rule = "maxLength(30)") String specialRequirement) {
         logger.info(MessageFormat.format("handOperateAddOrderSetp1手动录入订单步骤1入参,{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}," +
                         "{10},{11},{12},{13},{14},{15}", reserveName, reservePhone,
                 isSameRider, riderName, riderPhone, riderCount, boardingTime, boardingCityId, boardingGetOnX, boardingGetOnY, boardingGetOffCityId,
@@ -1007,8 +1007,11 @@ public class IntegerCityController {
                 sb.append("groupIds=" + carGroup).append(SYSMOL);
             }
             /**特殊需求*/
-            map.put("specialRequirement",specialRequirement);
-            sb.append("specialRequirement=" + specialRequirement).append(SYSMOL);
+            if(StringUtils.isNotEmpty(specialRequirement)){
+                map.put("specialRequirement",specialRequirement);
+                sb.append("specialRequirement=" + specialRequirement).append(SYSMOL);
+            }
+
 
             List<String> list = this.list(sb.toString());
             Collections.sort(list);
