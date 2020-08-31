@@ -1044,6 +1044,9 @@ public class IntegerCityController {
                 } else if (returnCode != null && Constants.ORDER_RETURN_CODE.equals(returnCode)) {
                     logger.info("有一笔进行中的订单");
                     return AjaxResponse.fail(RestErrorCode.HAS_SUB_ORDER);
+                } else if(returnCode != null && Constants.ORDER_INTER_CODE.equals(returnCode)){
+                    logger.info("您有未支付的订单，请先完成支付");
+                    return AjaxResponse.fail(RestErrorCode.HAS_PAY_NOT_ORDER);
                 }
             }
         } catch (Exception e) {
@@ -2098,7 +2101,7 @@ public class IntegerCityController {
         /**根据driverId获取groupId*/
         Integer newGroupId = carBizCarInfoExMapper.groupIdByDriverId(driverId);
 
-        if(newGroupId !=null && !groupId.equals(newGroupId)){
+        if(newGroupId !=null && !groupId.equals(newGroupId.toString())){
             logger.info("该订单车型与司机的车型不一致，无法指派");
             return AjaxResponse.fail(RestErrorCode.DIFF_GROUP_ID);
         }

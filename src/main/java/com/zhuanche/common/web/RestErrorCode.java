@@ -298,8 +298,13 @@ public final class RestErrorCode{
 	@ResultMessage("有一笔进行中的订单")
 	public static final int HAS_SUB_ORDER = 50021;
 
+	@ResultMessage("您有未支付的订单，请先完成支付")
+	public static final int HAS_PAY_NOT_ORDER = 50022;
+
+
 	@ResultMessage("绑定主单失败")
 	public static final int BIND_MAIN_FAILED = 50100;
+
 	@ResultMessage("改派订单失败")
 	public static final int CHANGE_MAIN_FAILED = 50101;
 

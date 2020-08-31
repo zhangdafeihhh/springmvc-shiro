@@ -171,6 +171,7 @@ public final class Constants {
 	/**订单*/
 	public static final Integer ORDER_RETURN_CODE = 249;
 
+	public static final Integer ORDER_INTER_CODE = 219;
 
 	public static final String MEMO = "memo";
 
