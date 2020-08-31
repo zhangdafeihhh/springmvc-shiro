@@ -16,28 +16,30 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class RedisCache<K, V> implements Cache<K, V> {
+    private static final int MAX_LENGTH = 1000000;
     /**
      *  缓存名称
      */
     private String cachename;
     private RedisTemplate<String, Serializable> redisTemplate;
-    private int expireSeconds = 3600;
-    private String keyListKey;
+    private int expireSeconds;
+    private String keySetKey;
 
 	public RedisCache(String cachename, RedisTemplate<String, Serializable> redisTemplate, int expireSeconds) {
 		super();
 		this.cachename = cachename;
 		this.redisTemplate = redisTemplate;
 		this.expireSeconds = expireSeconds;
-        this.keyListKey = "shiro.list.key." + cachename;
+        this.keySetKey = "shiro.set.key" + cachename;
 	}
 
 	@Override
     @SuppressWarnings("unchecked")
 	public V get(K key) throws CacheException {
-        log.info("shiro redis cache get {}", key);
         try {
-        	return (V) redisTemplate.opsForValue().get(  cachename+(String)key );
+            V value = (V) redisTemplate.opsForValue().get(cachename + key);
+            log.info("shiro redis cache get {}, value:{}", key, value);
+            return value;
         } catch (Throwable t) {
             throw new CacheException(t);
         }
@@ -56,7 +58,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
         try {
             V previousValue = (V) redisTemplate.opsForValue().getAndSet(cachename + key, (Serializable) value);
             redisTemplate.expire(cachename + key, expireSeconds, TimeUnit.SECONDS);
-            redisTemplate.opsForList().leftPush(keyListKey, cachename + key);
+            redisTemplate.opsForZSet().add(keySetKey, cachename + key, System.currentTimeMillis());
             return previousValue;
         } catch (Throwable t) {
             throw new CacheException(t);
@@ -75,9 +77,10 @@ public class RedisCache<K, V> implements Cache<K, V> {
 	public V remove(K key) throws CacheException {
         log.info("shiro redis cache remove {}", key);
         try {
+            checkCorrect();
             V value = (V) redisTemplate.opsForValue().get(cachename + key);
             redisTemplate.delete(cachename + key);
-            redisTemplate.opsForList().remove(keyListKey, 0, cachename + key);
+            redisTemplate.opsForZSet().remove(keySetKey, cachename + key);
         	return value;
         } catch (Throwable t) {
             throw new CacheException(t);
@@ -96,7 +99,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
                 return ;
         	}
             keys.forEach(key-> redisTemplate.delete((String)key));
-            redisTemplate.delete(keyListKey);
+            redisTemplate.delete(keySetKey);
             log.info("shiro redis clear success size:{}", keys.size());
             keys.clear();
         } catch (Throwable t) {
@@ -107,7 +110,8 @@ public class RedisCache<K, V> implements Cache<K, V> {
     @Override
     public int size() {
         try {
-            int size = Math.toIntExact(redisTemplate.opsForList().size(keyListKey));
+            log.info("shiro redis cache size");
+            int size = Math.toIntExact(redisTemplate.opsForZSet().size(keySetKey));
             log.info("shiro redis cache size:{}", size);
             return size;
         } catch (Throwable t) {
@@ -123,7 +127,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
             if (size == 0) {
                 return null;
             }
-            return redisTemplate.opsForList().range(keyListKey, 0, size - 1)
+            return redisTemplate.opsForZSet().range(keySetKey, 0, size - 1)
                     .stream().map(e -> (K) e).collect(Collectors.toSet());
         } catch (Throwable t) {
             throw new CacheException(t);
@@ -150,4 +154,21 @@ public class RedisCache<K, V> implements Cache<K, V> {
             throw new CacheException(t);
         }
     }
+
+    private void checkCorrect(){
+        int size = Math.toIntExact(redisTemplate.opsForZSet().size(keySetKey));
+        if (size > MAX_LENGTH) {
+            redisTemplate.delete(keySetKey);
+        }
+
+        //清理已过期的集合元素
+        Set<Serializable> expiredElement = redisTemplate.opsForZSet().rangeByScore(keySetKey, 0, System.currentTimeMillis() - expireSeconds * 1000);
+        Optional.ofNullable(expiredElement).ifPresent(keys->{
+            keys.forEach(key->{
+                log.info("shiro redis cache clear expired key:{}", key);
+                redisTemplate.opsForZSet().remove(keySetKey, key);
+            });
+        });
+    }
+
 }
