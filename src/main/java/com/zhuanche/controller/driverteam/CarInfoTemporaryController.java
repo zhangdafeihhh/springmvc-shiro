@@ -1,5 +1,6 @@
 package com.zhuanche.controller.driverteam;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
@@ -7,6 +8,7 @@ import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.exception.ServiceException;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.*;
 import com.zhuanche.dto.mdbcarmanage.CarBizCarInfoTempDTO;
@@ -23,6 +25,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.excel.ExportExcelUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
@@ -118,6 +121,7 @@ public class CarInfoTemporaryController extends BaseController {
         PageHelper.startPage(page, pageSize,true);
         List<CarBizCarInfoTemp> carBizCarInfoTempList = null;
         try{
+            log.info("查询车辆临时表数据,请求参数:{}", JSON.toJSONString(params));
             carBizCarInfoTempList = carBizCarInfoTempService.queryForPageObject(params);
             PageInfo<CarBizCarInfoTemp> pageInfo = new PageInfo<>(carBizCarInfoTempList);
             total = pageInfo.getTotal();
@@ -129,6 +133,13 @@ public class CarInfoTemporaryController extends BaseController {
             return AjaxResponse.success(pageDto);
         }else{
             for (CarBizCarInfoTemp carBizCarInfoTemp:carBizCarInfoTempList) {
+                /*
+                 * add by mingku.jia
+                 * 1.查询城市名字-car_biz_car_info_temp中cityId直接获取名字
+                 * 2.供应商名字->car_biz_car_info_temp中supplierId直接获取名字
+                 * 3.车辆的模型名字->car_biz_car_info_temp(car_model_id)->在rentcar.car_biz_model;
+                 * 4.获取品牌的名字->car_biz_car_info_temp(car_model_id)->在去获取mp-driver.driver_vehicle(品牌id)->mp-driver.driver_brand.
+                 */
                 Map<String, Object> result = super.querySupplierName(carBizCarInfoTemp.getCityId(), carBizCarInfoTemp.getSupplierId());
                 carBizCarInfoTemp.setCityName((String)result.get("cityName"));
                 carBizCarInfoTemp.setSupplierName((String)result.get("supplierName"));
@@ -153,6 +164,10 @@ public class CarInfoTemporaryController extends BaseController {
             }
         }
         List<CarBizCarInfoTempDTO> carBizCarInfoTempDTOList = BeanUtil.copyList(carBizCarInfoTempList,CarBizCarInfoTempDTO.class);
+
+        if (CollectionUtils.isNotEmpty(carBizCarInfoTempDTOList)) {
+            carBizCarInfoTempService.buildAuditStatusInfo(carBizCarInfoTempDTOList);
+        }
         PageDTO pageDto = new PageDTO(page,pageSize,(int)total,carBizCarInfoTempDTOList);
         return AjaxResponse.success(pageDto);
 	}
@@ -184,10 +199,8 @@ public class CarInfoTemporaryController extends BaseController {
     @RequestMapping(value = "/fileDownloadCarInfo",method =  RequestMethod.GET)
 	@RequiresPermissions(value = { "SupplierCarEntry_download" } )
     @RequestFunction(menu = CAR_JOIN_APPLY_TEMPLATE_DOWNLOAD)
-    public void fileDownloadCarInfo(HttpServletRequest request,
-                                    HttpServletResponse response) {
-        String path = request.getRealPath("/") + File.separator + "upload"
-                + File.separator + "IMPORTCARINFO.xlsx";
+    public void fileDownloadCarInfo(HttpServletRequest request, HttpServletResponse response) {
+        String path = request.getRealPath("/") + File.separator + "upload" + File.separator + "IMPORTCARINFO.xlsx";
         super.fileDownload(request,response,path);
     }
 
@@ -222,20 +235,16 @@ public class CarInfoTemporaryController extends BaseController {
         Map<String,Object> params = Maps.newHashMap();
         params.put("carId",carId);
         CarBizCarInfoTemp carBizCarInfoTemp = carBizCarInfoTempService.queryForObject(params);
-
-
         if(carBizCarInfoTemp != null){
             Map<String, Object> result = super.querySupplierName(carBizCarInfoTemp.getCityId(), carBizCarInfoTemp.getSupplierId());
             carBizCarInfoTemp.setCityName((String)result.get("cityName"));
             carBizCarInfoTemp.setSupplierName((String)result.get("supplierName"));
-
             Integer carModelId = carBizCarInfoTemp.getCarModelId();
             if(carModelId != null){
                 CarBizModel carBizModel = carBizModelService.selectByPrimaryKey(carBizCarInfoTemp.getCarModelId());
                 if(carBizModel!=null){
                     carBizCarInfoTemp.setModeName(carBizModel.getModelName());
                 }
-
                 DriverVehicle driverVehicle = driverVehicleService.queryByModelId(carBizCarInfoTemp.getCarModelId());
                 if(driverVehicle != null){
                     Long brandId =   driverVehicle.getBrandId();
@@ -247,13 +256,12 @@ public class CarInfoTemporaryController extends BaseController {
                         }
                     }
                 }
-
             }
-
         }else{
             return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
         }
         CarBizCarInfoTempDTO carBizCarInfoTempDTO = BeanUtil.copyObject(carBizCarInfoTemp, CarBizCarInfoTempDTO.class);
+        carBizCarInfoTempService.buildCarAuditStatusInfoListAndOpsList(carBizCarInfoTempDTO);
         return AjaxResponse.success(carBizCarInfoTempDTO);
     }
 
@@ -395,8 +403,17 @@ public class CarInfoTemporaryController extends BaseController {
         Integer userId = user.getId();
         carBizCarInfoTemp.setUpdateBy(userId);
         carBizCarInfoTemp.setCreateBy(userId);
+
+        if (StringUtils.isBlank(vehicleDrivingLicense)) {
+            return AjaxResponse.failMsg(500, "行驶证图片url地址必须传递");
+        }
+        if (StringUtils.isBlank(carPhotograph)) {
+            return AjaxResponse.failMsg(500, "车辆图片url地址必须传递");
+        }
+
         carBizCarInfoTemp.setVehicleDrivingLicense(StringUtils.isBlank(vehicleDrivingLicense)?null:vehicleDrivingLicense);
         carBizCarInfoTemp.setCarPhotograph(StringUtils.isBlank(carPhotograph)?null:carPhotograph);
+
         return carBizCarInfoTempService.add(carBizCarInfoTemp);
     }
 
@@ -451,7 +468,7 @@ public class CarInfoTemporaryController extends BaseController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/update", method =  RequestMethod.POST )
+    @RequestMapping(value = "/update", method = {RequestMethod.POST, RequestMethod.GET} )
     @RequestFunction(menu = CAR_JOIN_APPLY_UPDATE)
     public AjaxResponse updateCarInfo(@Verify(param = "carId",rule="required") Integer carId,
                                     @Verify(param = "licensePlates",rule="required") String licensePlates,
@@ -499,8 +516,8 @@ public class CarInfoTemporaryController extends BaseController {
                                     @Verify(param = "oldCity",rule="required") Integer oldCity,
                                     @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId,
                                     @RequestParam(value = "vehicleDrivingLicense",required = false) String vehicleDrivingLicense,
-                                    @RequestParam(value = "carPhotograph",required = false) String carPhotograph) {
-        log.info("修改Id:"+carId);
+                                    @RequestParam(value = "carPhotograph",required = false) String carPhotograph, String opType) {
+        log.info("修改Id:"+carId +"当前提交类型:"+ opType);
         CarBizCarInfoTemp carBizCarInfoTemp = new CarBizCarInfoTemp();
         carBizCarInfoTemp.setCarId(carId);
         carBizCarInfoTemp.setLicensePlates(licensePlates);
@@ -550,9 +567,17 @@ public class CarInfoTemporaryController extends BaseController {
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
         Integer userId = user.getId();
         carBizCarInfoTemp.setUpdateBy(userId);
+        //---驾驶证图片
+
+        if (StringUtils.isBlank(vehicleDrivingLicense)) {
+            return AjaxResponse.failMsg(500, "行驶证图片url地址必须传递");
+        }
+        if (StringUtils.isBlank(carPhotograph)) {
+            return AjaxResponse.failMsg(500, "车辆图片url地址必须传递");
+        }
         carBizCarInfoTemp.setVehicleDrivingLicense(StringUtils.isBlank(vehicleDrivingLicense)?null:vehicleDrivingLicense);
         carBizCarInfoTemp.setCarPhotograph(StringUtils.isBlank(carPhotograph)?null:carPhotograph);
-        return carBizCarInfoTempService.update(carBizCarInfoTemp);
+        return carBizCarInfoTempService.update(carBizCarInfoTemp, opType);
     }
 
     /**
@@ -613,5 +638,39 @@ public class CarInfoTemporaryController extends BaseController {
         }
     }
 
+    /**
+     * 刷新数据
+     */
+    @ResponseBody
+    @RequestMapping(value = "/flushData",method = {RequestMethod.POST, RequestMethod.GET})
+    public AjaxResponse flushData(String string) {
+        log.info("刷新数据-将临时表中不存在审核状态记录的数据刷新成为初始化状态");
+        try {
+            return AjaxResponse.success(carBizCarInfoTempService.flushData());
+        } catch (Exception e) {
+            AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            log.info("刷新数据响应结果:" + JSON.toJSONString(ajaxResponse));
+            return ajaxResponse;
+        }
+    }
 
+    /**
+     * 上传车辆图片,回写临时表的地址
+     *
+     * @param request       请求对象
+     * @param multipartFile 文件对象
+     * @return  包含图片路径
+     */
+    @ResponseBody
+    @RequestMapping(value = "/uploadImage",method = RequestMethod.POST)
+    public AjaxResponse uploadImage(HttpServletRequest request, MultipartFile multipartFile) {
+        // uploadType = car / drivingLicense
+        log.info("上传图片类型[{}], 车辆id[{}]", request.getParameter("uploadType"), request.getParameter("carId"));
+        try {
+            return AjaxResponse.success(carBizCarInfoTempService.uploadImage(request.getParameter("uploadType"), request.getParameter("carId"), multipartFile));
+        } catch (Exception e) {
+            log.error("uploadImage exception :"+ e.getMessage(), e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
 }

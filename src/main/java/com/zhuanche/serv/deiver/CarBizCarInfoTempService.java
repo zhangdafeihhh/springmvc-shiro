@@ -1,10 +1,17 @@
 package com.zhuanche.serv.deiver;
 
+import co.elastic.apm.shaded.bytebuddy.implementation.bytecode.Throw;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.enums.CarInfoAuditEnum;
+import com.zhuanche.common.exception.ServiceException;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.dto.mdbcarmanage.CarBizCarInfoTempDTO;
 import com.zhuanche.entity.driver.DriverBrand;
+import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoAudit;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
+import com.zhuanche.entity.rentcar.CarBizCarInfo;
 import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
@@ -15,6 +22,8 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.MyRestTemplate;
+import mapper.mdbcarmanage.CarBizCarInfoAuditMapper;
 import mapper.mdbcarmanage.CarBizCarInfoTempMapper;
 import mapper.mdbcarmanage.ex.CarBizCarInfoTempExMapper;
 import mapper.mdbcarmanage.ex.CarBizDriverInfoTempExMapper;
@@ -22,7 +31,12 @@ import mapper.rentcar.CarBizModelMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
+import org.apache.commons.fileupload.MultipartStream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.ibatis.annotations.Param;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -30,11 +44,16 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author wzq
@@ -54,6 +73,13 @@ public class CarBizCarInfoTempService {
 
     @Autowired
     private CarBizCarInfoTempMapper carBizCarInfoTempMapper;
+
+    @Autowired
+    @Qualifier("wwwApiTemplate")
+    private MyRestTemplate wwwApiTemplate;
+
+    @Autowired
+    private CarBizCarInfoAuditMapper carBizCarInfoAuditMapper;
 
     @Autowired
     private CarBizDriverInfoTempExMapper carBizDriverInfoTempExMapper;
@@ -108,9 +134,10 @@ public class CarBizCarInfoTempService {
     }
 
     /**
-     * 新增
-     * @param carBizCarInfoTemp
-     * @return
+     * 新增车辆信息到临时表,并且维护状态信息列表
+     *
+     * @param carBizCarInfoTemp 车辆实体
+     * @return  返回成功结果
      */
     public AjaxResponse add(CarBizCarInfoTemp carBizCarInfoTemp) {
         String license = carBizCarInfoTemp.getLicensePlates();
@@ -121,8 +148,17 @@ public class CarBizCarInfoTempService {
             return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_EXIST);
         }
         int code =  carBizCarInfoTempMapper.insertSelective(carBizCarInfoTemp);
+
         if(code > 0 ){
-            return AjaxResponse.success(RestErrorCode.SUCCESS);
+            CarBizCarInfoAudit carBizCarInfoAudit = CarBizCarInfoAudit.builder().carBizCarInfoTempId(carBizCarInfoTemp.getCarId())
+                    .statusCode(CarInfoAuditEnum.STATUS_1.getStatusCode())
+                    .statusDesc(CarInfoAuditEnum.STATUS_1.getStatusDesc())
+                    .remark("sass系统添加车辆,初始化待提交状态")
+                    .createDate(new Date())
+                    .updateDate(new Date())
+                    .createUser(WebSessionUtil.getCurrentLoginUser().getName()).build();
+            code = carBizCarInfoAuditMapper.insert(carBizCarInfoAudit);
+            return code > 0 ?  AjaxResponse.success(RestErrorCode.SUCCESS): AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }else{
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
@@ -133,7 +169,11 @@ public class CarBizCarInfoTempService {
      * @param entity
      * @return
      */
-    public AjaxResponse update(CarBizCarInfoTemp entity) {
+    public AjaxResponse update(CarBizCarInfoTemp entity, String opThype) {
+        if (StringUtils.isBlank(opThype)) {
+            throw new IllegalArgumentException("操作类型不存在,请重新输入");
+        }
+
         try{
             if (!entity.getLicensePlates().equals(entity.getOldLicensePlates())) {
                 Map<String, Object> resultCar = this.checkLicensePlates(entity.getLicensePlates());
@@ -150,14 +190,14 @@ public class CarBizCarInfoTempService {
                     had = 1;
                     carDriver.setServiceCity(entity.getCities());
                     carDriver.setSupplierId(entity.getSupplierId());
-                    carDriver.setTeamid("");
+                    carDriver.setTeamid(null);
                     carDriver.setGroupIds("");
                 }
                 if (entity.getOldSupplierId() != null && !"".equals(entity.getOldSupplierId()) && !entity.getSupplierId().equals(entity.getOldSupplierId())) {
                     // 车辆是否更改供应商，更改，则修改司机
                     had = 1;
                     carDriver.setSupplierId(entity.getSupplierId());
-                    carDriver.setTeamid("");
+                    carDriver.setTeamid(null);
                     carDriver.setGroupIds("");
                 }
                 if (!entity.getLicensePlates().equals(entity.getOldLicensePlates())) {
@@ -170,11 +210,26 @@ public class CarBizCarInfoTempService {
                     carBizDriverInfoTempExMapper.update(carDriver);
                 }
             }
+
+            /**
+             * add by mingku.jia 提交审核记录日志审核信息
+             */
+            if (Objects.equals(opThype, "submit")) {
+                CarBizCarInfoAudit carBizCarInfoAudit = CarBizCarInfoAudit.builder().carBizCarInfoTempId(entity.getCarId())
+                        .statusCode(CarInfoAuditEnum.STATUS_2.getStatusCode())
+                        .statusDesc(CarInfoAuditEnum.STATUS_2.getStatusDesc())
+                        .remark("sass系统,提交车辆审核")
+                        .createDate(new Date())
+                        .updateDate(new Date())
+                        .createUser(WebSessionUtil.getCurrentLoginUser().getName()).build();
+                carBizCarInfoAuditMapper.insert(carBizCarInfoAudit);
+            }
+
             return AjaxResponse.success(RestErrorCode.SUCCESS);
         }catch (Exception e){
             e.printStackTrace();
-            log.error("修改出现异常,修改Id:"+entity.getCarId());
-            return AjaxResponse.success(RestErrorCode.HTTP_SYSTEM_ERROR);
+            log.error("修改出现异常,修改Id:"+entity.getCarId()+"msg:"+ e.getMessage(), e);
+            return AjaxResponse.failMsg(400, e.getMessage());
         }
     }
 
@@ -1849,6 +1904,19 @@ public class CarBizCarInfoTempService {
                 if (isTrue && carBizCarInfo != null) {
                     try {
                         carBizCarInfoTempMapper.insertSelective(carBizCarInfo);
+                        /**
+                         * 插入数的时候初始化状态表
+                         * add by mingku.jia
+                         *  SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
+                         */
+                        CarBizCarInfoAudit carBizCarInfoAudit = CarBizCarInfoAudit.builder().carBizCarInfoTempId(carBizCarInfo.getCarId())
+                                .statusCode(CarInfoAuditEnum.STATUS_1.getStatusCode())
+                                .statusDesc(CarInfoAuditEnum.STATUS_1.getStatusDesc())
+                                .remark("sass系统添加车辆, 导入初始化")
+                                .createDate(new Date())
+                                .updateDate(new Date())
+                                .createUser(WebSessionUtil.getCurrentLoginUser().getName()).build();
+                        carBizCarInfoAuditMapper.insert(carBizCarInfoAudit);
                     } catch (Exception e) {
                         log.info("导入车辆保存  error：" + e);
                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2286,5 +2354,142 @@ public class CarBizCarInfoTempService {
 
     public void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType) {
         carBizCarInfoTempExMapper.updateDriverCooperationTypeBySupplierId(supplierId, cooperationType);
+    }
+
+    private final String SCNT= "sCnt";
+    private final String TCNT = "tCnt";
+    private final int groupSize = 500;
+    /**
+     * 1.分组
+     * 2.批量插入
+     * @return
+     */
+    public Map<String, Integer> flushData() {
+        Map<String, Integer> result = new HashMap<>();
+        result.put(SCNT,0);
+        result.put(TCNT,0);
+        List<Integer> carIdList = carBizCarInfoTempExMapper.selectAllNoAuditStatusCarId();
+        if(Objects.isNull(carIdList)) {
+            return result;
+        }
+        result.put(TCNT, carIdList.size());
+        String key= "groupData";
+        HashMap<String, List<List<Integer>>> map = new HashMap<>();
+        Optional.ofNullable(carIdList).ifPresent(origin -> {
+            int block = (origin.size() + groupSize -1) / groupSize;
+            List<List<Integer>>  carIdGroup=  IntStream.range(0,block).boxed().map(i->{
+                int start = i*groupSize;
+                int end = Math.min(start + groupSize, origin.size());
+                return origin.subList(start,end);
+            }).collect(Collectors.toList());
+            map.put(key, carIdGroup);
+        });
+
+        List<List<Integer>> idList = map.getOrDefault(key, null);
+        idList.forEach(list -> {
+            int count = batchInsertCarInfoAudit(list);
+            result.put(SCNT, result.get(SCNT) + count);
+        });
+        System.out.println("carIdList = " + carIdList);
+        return result;
+    }
+
+    public int batchInsertCarInfoAudit(List<Integer> carIdList) {
+        try {
+            List<CarBizCarInfoAudit> carBizCarInfoAudits = new ArrayList<>();
+            carIdList.forEach(carId -> {
+                carBizCarInfoAudits.add(CarBizCarInfoAudit.init(carId));
+            });
+            return carBizCarInfoAuditMapper.insertBatch(carBizCarInfoAudits);
+        }catch (Exception e) {
+             throw new ServiceException(400, e.getMessage());
+        }
+    }
+
+    /**
+     * 绑定司机审核信息
+     *
+     * @param carBizCarInfoTempDTOs 列表对象
+     */
+    public void buildAuditStatusInfo(List<CarBizCarInfoTempDTO> carBizCarInfoTempDTOs) {
+        carBizCarInfoTempDTOs.forEach(carBizCarInfoTempDTO -> Optional.ofNullable(carBizCarInfoAuditMapper.selectAuditStatusByCarTempId(carBizCarInfoTempDTO.getCarId())).ifPresent(auditInfo -> {
+            carBizCarInfoTempDTO.setStatusDesc(auditInfo.getStatusDesc());
+            Optional.ofNullable(CarInfoAuditEnum.getOperationInfo(auditInfo.getStatusCode())).ifPresent(pair -> carBizCarInfoTempDTO.getOperationInfos().
+                    add(new CarBizCarInfoTempDTO.OperationInfo(pair.getLeft(), pair.getRight())));
+        }));
+    }
+
+    /**
+     * 绑定司机审核信息列表
+     * 1.设置审核list
+     * 2.设置操作信息列表
+     * 2.1 获取当前状态信息
+     * @param carBizCarInfoTempDTO 列表对象
+     */
+    public void buildCarAuditStatusInfoListAndOpsList(CarBizCarInfoTempDTO carBizCarInfoTempDTO) {
+        // 1.
+        carBizCarInfoTempDTO.setCarBizCarInfoAuditList(carBizCarInfoAuditMapper.selectAuditStatusListByCarTempId(carBizCarInfoTempDTO.getCarId()));
+        // 2.
+        CarBizCarInfoAudit carBizCarInfoAudit = carBizCarInfoAuditMapper.selectAuditStatusByCarTempId(carBizCarInfoTempDTO.getCarId());
+
+        Pair<String, String> pair = CarInfoAuditEnum.getOperationInfo(carBizCarInfoAudit.getStatusCode());
+        if (Objects.isNull(pair)) {
+            throw new ServiceException(400, "不存在此审核状态code,数据错误carId:"+ carBizCarInfoTempDTO.getCarId());
+        }
+        String operation =  pair.getLeft();
+        if (Objects.equals(operation, "query")) {
+            carBizCarInfoTempDTO.getOperationInfos().add(new CarBizCarInfoTempDTO.OperationInfo("return", "返回"));
+        } else if (Objects.equals(operation, "update")) {
+            carBizCarInfoTempDTO.getOperationInfos().add(new CarBizCarInfoTempDTO.OperationInfo("save", "保存"));
+            carBizCarInfoTempDTO.getOperationInfos().add(new CarBizCarInfoTempDTO.OperationInfo("submit", "提交"));
+            carBizCarInfoTempDTO.getOperationInfos().add(new CarBizCarInfoTempDTO.OperationInfo("return", "返回"));
+        }
+    }
+
+    private final String picturePath = "/upload/public";
+
+    /**
+     * 上传文件
+     *
+     * @param type 上传类型
+     * @param multipartFile 文件
+     * @return 文件的真实路径
+     */
+    public String uploadImage(String type, String carId, MultipartFile multipartFile) {
+        if (StringUtils.isBlank(carId)) {
+            throw new IllegalArgumentException("没有传递车辆id信息");
+        }
+        String path = uploadToImageServer(type, multipartFile);
+        carBizCarInfoTempMapper.updateImageInfo(Integer.valueOf(carId), type, path);
+        return path;
+    }
+
+    public String uploadToImageServer(String type,  MultipartFile multipartFile) {
+        String path = "";
+        if(StringUtils.isBlank(type)) {
+            throw new IllegalArgumentException("上传图片没有执行类型");
+        }
+
+        if (multipartFile == null || multipartFile.getSize() == 0) {
+            throw new IllegalArgumentException("文件能为空");
+        }
+
+        try (InputStream in = multipartFile.getInputStream()) {
+            ContentBody contentBody = new InputStreamBody(in, multipartFile.getOriginalFilename());
+            Map<String, Object> param = new HashMap();
+            param.put(multipartFile.getOriginalFilename(), contentBody);
+            param.put("create_uid", WebSessionUtil.getCurrentLoginUser().getId());
+            String result = wwwApiTemplate.postMultipartData(picturePath, String.class, param);
+            if (result == null) {
+                throw new IllegalArgumentException("上传图片服务器没有获取到返回结果,请重新上传");
+            }
+            JSONObject response = JSONObject.parseObject(result);
+            if (response.getIntValue("code") == 1) {
+                path = response.getJSONArray("data").getJSONObject(0).getString("path");
+            }
+        } catch (Exception e) {
+            throw new ServiceException(500, e.getMessage(), e);
+        }
+        return path;
     }
 }
