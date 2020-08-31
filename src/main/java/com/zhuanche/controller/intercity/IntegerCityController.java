@@ -2074,10 +2074,7 @@ public class IntegerCityController {
             return AjaxResponse.fail(RestErrorCode.HAS_ORDER_DRIVER_ID);
         }
 
-        if(!verifyHasPermission(driverId)){
-            logger.info("您指派的司机不是您旗下司机,driverId:" + driverId);
-            return AjaxResponse.fail(RestErrorCode.HAS_DRIVER_PERMISSION);
-        }
+       
         Map<String, Object> map = Maps.newHashMap();
         List<String> listParam = new ArrayList<>();
         map.put("businessId", Common.BUSSINESSID);
