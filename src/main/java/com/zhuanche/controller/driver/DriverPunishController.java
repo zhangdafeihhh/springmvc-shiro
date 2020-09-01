@@ -10,6 +10,7 @@ import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.driver.DriverPunishDto;
 import com.zhuanche.serv.punish.DriverPunishClientService;
 import com.zhuanche.serv.punish.query.DriverPunishQuery;
+import com.zhuanche.shiro.cache.RedisCacheManager;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
@@ -43,6 +44,8 @@ public class DriverPunishController extends BaseController {
 
     @Resource
     private DriverPunishClientService driverPunishService;
+    @Resource
+    private RedisCacheManager redisCacheManager;
 
 
     @RequestMapping("/getDriverPunishList")
@@ -154,6 +157,18 @@ public class DriverPunishController extends BaseController {
             log.error("司机处罚审核查询失败", e);
             return AjaxResponse.failMsg(e.getErrorCode(), e.getMessage());
         }
+    }
+
+    /**
+     *  todo 修复完数据后删除代码
+     */
+    @RequestMapping("/clearCache")
+    public AjaxResponse export(String key) {
+        key = StringUtils.isBlank(key) ? "shiro.list.key.mp-manage-shiro-activeSessionCache" : key;
+        Long size = redisCacheManager.getRedisTemplate().opsForList().size("shiro.list.key.mp-manage-shiro-activeSessionCache");
+        log.info("shiro.list.key.mp-manage-shiro-activeSessionCache size:{}", size);
+        redisCacheManager.getRedisTemplate().delete(key);
+        return AjaxResponse.success(key);
     }
 
     @RequestMapping("/exportDriverPunishList")

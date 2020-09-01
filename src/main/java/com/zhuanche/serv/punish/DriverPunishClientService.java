@@ -44,6 +44,10 @@ public class DriverPunishClientService extends DriverPunishService {
     private static final String INIT_VIDEO = "/driverPunish/initVideoData";
     private static final String CODE = "code";
     private static final String HTTP = "http:";
+    private static final Set<String> IGNORE_MSG = new HashSet<String>(){{
+        add("没有需求车管审核的记录");
+    }};
+    public static final String MSG = "msg";
 
 
     /**
@@ -190,6 +194,11 @@ public class DriverPunishClientService extends DriverPunishService {
         }
         JSONObject responseBody = JSONObject.parseObject(result.getResponseBody());
         if (Objects.isNull(responseBody) ||responseBody.getIntValue(CODE) != Constants.SUCCESS_CODE) {
+            if (IGNORE_MSG.contains(responseBody.getString(MSG))) {
+                log.warn("rest result business exception, {}", JSONObject.toJSONString(responseBody));
+                return responseBody.getString("data");
+            }
+
             log.error("rest result business exception, {}", JSONObject.toJSONString(responseBody));
             throw new ServiceException(RestErrorCode.REST_FAIL_MP_MANAGE_API);
         }
