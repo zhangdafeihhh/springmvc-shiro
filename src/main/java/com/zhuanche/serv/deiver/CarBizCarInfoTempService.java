@@ -170,6 +170,7 @@ public class CarBizCarInfoTempService {
      * @return
      */
     public AjaxResponse update(CarBizCarInfoTemp entity, String opThype) {
+        log.info("执行车辆更新-类型[{}], 参数{[]}", opThype, entity);
         if (StringUtils.isBlank(opThype)) {
             throw new IllegalArgumentException("操作类型不存在,请重新输入");
         }
