@@ -2076,7 +2076,7 @@ public class IntegerCityController {
         }
 
 
-        if( mainOrderNo == null){
+        if( StringUtils.isEmpty(mainOrderNo)){
             boolean hasMain = verifyHasMainOrder(driverId);
             if(!hasMain){
                 logger.info("=====该司机两小时内已存在服务中的主单=====");
