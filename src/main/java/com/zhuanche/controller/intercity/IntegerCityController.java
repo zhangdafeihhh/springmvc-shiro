@@ -118,8 +118,8 @@ public class IntegerCityController {
     @Value("${driver.businessId}")
     private String driverBusinessId;
 
-    @Value("${bus.query.orderId.url}")
-    private String busOrderUrl;
+    @Value("${car.rest.url}")
+    private String carRestUrl;
 
     @Autowired
     private DriverInfoInterCityExMapper infoInterCityExMapper;
@@ -2250,7 +2250,7 @@ public class IntegerCityController {
             }
             map.put("sign", sign);
             logger.info("==============查询订单主单入参========" + JSONObject.toJSONString(map));
-            JSONObject jsonResult = MpOkHttpUtil.okHttpGetBackJson(busOrderUrl + "/order/carpool/driver/getDriverCrossServiceMainOrderList",map,0,"查询司机的主单号");
+            JSONObject jsonResult = MpOkHttpUtil.okHttpGetBackJson(carRestUrl + "/order/carpool/driver/getDriverCrossServiceMainOrderList",map,0,"查询司机的主单号");
 
             logger.info("=============查询结果======" + jsonResult.toString());
 
