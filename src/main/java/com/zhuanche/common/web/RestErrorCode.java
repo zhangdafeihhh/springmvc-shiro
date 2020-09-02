@@ -298,8 +298,13 @@ public final class RestErrorCode{
 	@ResultMessage("有一笔进行中的订单")
 	public static final int HAS_SUB_ORDER = 50021;
 
+	@ResultMessage("您有未支付的订单，请先完成支付")
+	public static final int HAS_PAY_NOT_ORDER = 50022;
+
+
 	@ResultMessage("绑定主单失败")
 	public static final int BIND_MAIN_FAILED = 50100;
+
 	@ResultMessage("改派订单失败")
 	public static final int CHANGE_MAIN_FAILED = 50101;
 
@@ -339,6 +344,19 @@ public final class RestErrorCode{
 
 	@ResultMessage("当前司机不可用")
 	public static final int HAS_ORDER_DRIVER_ID = 50920;
+
+	@ResultMessage("您指派的司机不是您旗下司机")
+	public static final int HAS_DRIVER_PERMISSION = 50922;
+
+	@ResultMessage("该订单车型与司机的车型不一致,无法指派")
+	public static final int DIFF_GROUP_ID = 50924;
+
+	@ResultMessage("预约用车时间只能在{0}之后")
+	public static final int VERIFY_BOARDING_TIME = 50926;
+
+
+	@ResultMessage("该司机两小时内已存在服务中的主单")
+	public static final int HAS_SERVICE_ORDER = 50928;
 
 
 	//------------------------------------------------

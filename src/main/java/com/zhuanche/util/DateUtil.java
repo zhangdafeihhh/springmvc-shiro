@@ -239,7 +239,32 @@ public class DateUtil {
 		}
 		return result;
 	}
-	
+
+
+	/***
+	 * 两个时间之间的分钟数 可正可负
+	 * @param time1
+	 * @param time2
+	 * @param formate
+	 * @return
+	 */
+	public static double getResBetweenTime(String time1,String time2,String formate){
+		if(null==formate){
+			formate = "yyyy-MM-dd HH:mm:ss";
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat(formate);
+		Double result = 0.0;
+		try {
+			Date date1 = sdf.parse(time1);
+			Date date2 = sdf.parse(time2);
+			result = (double)((date2.getTime()-date1.getTime())/1000/60);
+		} catch (Exception e) {
+		}
+		return result;
+	}
+
+
+
 	/***
 	 * 计算两个时间段之间的日期数组
 	 * @param start_time

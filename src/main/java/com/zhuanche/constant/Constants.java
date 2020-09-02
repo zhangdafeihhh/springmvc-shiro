@@ -171,6 +171,7 @@ public final class Constants {
 	/**订单*/
 	public static final Integer ORDER_RETURN_CODE = 249;
 
+	public static final Integer ORDER_INTER_CODE = 219;
 
 	public static final String MEMO = "memo";
 
@@ -228,4 +229,12 @@ public final class Constants {
 
 	/**验证是添加or编辑*/
 	public static final Integer ADD = 1;
+
+
+	/**线路id*/
+	public static final String RULEID = "ruleId";
+
+	/**线路名称*/
+	public static final String LINENAME = "lineName";
+
  }

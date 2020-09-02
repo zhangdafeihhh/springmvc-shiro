@@ -51,6 +51,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @description: 车队设置
@@ -586,7 +588,19 @@ public class CarDriverTeamService{
 							List<Integer> groupDriverIds = carRelateGroupExMapper.queryDriverIdsByGroupId(carRelateGroup.getGroupId());
 							if(CollectionUtils.isNotEmpty(groupDriverIds) && paramDto.getOpenCloseFlag() == 2){
 								/**删除班组下的司机 先删除 线上有唯一约束*/
-								int code = carRelateGroupExMapper.deleteByGroupId(carRelateGroup.getGroupId());
+								int code = 0;
+								ReentrantLock lock = new ReentrantLock();
+								lock.lock();
+								try {
+									 code = carRelateGroupExMapper.deleteByGroupId(carRelateGroup.getGroupId());
+									logger.info("====批量删除success===" + code);
+									Thread.sleep(1000);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}finally {
+									lock.unlock();
+								}
+
 								if(code > 0){
 									carRelateTeamExMapper.batchInsertDriverIds(existsTeam.getpId(),groupDriverIds);
 								}
