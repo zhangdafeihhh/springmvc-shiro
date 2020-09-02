@@ -117,9 +117,7 @@ public class IntegerCityController {
 
     @Value("${driver.businessId}")
     private String driverBusinessId;
-
-    @Value("${car.rest.url}")
-    private String carRestUrl;
+    
 
     @Autowired
     private DriverInfoInterCityExMapper infoInterCityExMapper;
