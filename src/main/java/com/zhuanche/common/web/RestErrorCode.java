@@ -356,7 +356,7 @@ public final class RestErrorCode{
 
 
 	@ResultMessage("该司机两小时内已存在服务中的主单")
-	public static final int HAS_ORDER_DRIVER_ID = 50928;
+	public static final int HAS_SERVICE_ORDER = 50928;
 
 
 	//------------------------------------------------
