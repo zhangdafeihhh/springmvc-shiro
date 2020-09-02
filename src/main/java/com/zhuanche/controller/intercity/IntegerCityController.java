@@ -2106,11 +2106,7 @@ public class IntegerCityController {
 
         /**根据driverId获取groupId*/
         Integer newGroupId = carBizCarInfoExMapper.groupIdByDriverId(driverId);
-
-        if(newGroupId !=null && !groupId.equals(newGroupId.toString())){
-            logger.info("该订单车型与司机的车型不一致，无法指派");
-            return AjaxResponse.fail(RestErrorCode.DIFF_GROUP_ID);
-        }
+        
         if (newGroupId != null && newGroupId > 0) {
             map.put("carGroupId", newGroupId);
             listParam.add("carGroupId=" + newGroupId);
