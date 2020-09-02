@@ -42,6 +42,7 @@ public interface CarBizCarInfoTempExMapper {
      */
     CarBizCarInfoTemp selectBylicensePlates(Map<String,Object> params);
 
+    List<Integer> selectAllNoAuditStatusCarId();
     /**
      * 查询未绑定车牌号
      * @param map

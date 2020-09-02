@@ -531,6 +531,18 @@
       </if>
     </trim>
   </insert>
+
+  <update id="updateImageInfo">
+    update car_biz_car_info_temp
+    <if test="type != null and type == 'car'">
+      set car_photograph = #{value}
+    </if>
+    <if test="type != null and type == 'drivingLicense'">
+      set vehicle_driving_license = #{value}
+    </if>
+    where car_id = #{carId}
+
+  </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp" >
     update car_biz_car_info_temp
     <set >

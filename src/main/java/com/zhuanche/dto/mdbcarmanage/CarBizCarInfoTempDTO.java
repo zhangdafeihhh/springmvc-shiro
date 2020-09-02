@@ -1,6 +1,11 @@
 package com.zhuanche.dto.mdbcarmanage;
 
+import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoAudit;
+import lombok.Data;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class CarBizCarInfoTempDTO {
     private Integer carId;
@@ -288,6 +293,57 @@ public class CarBizCarInfoTempDTO {
     private String vehicletec;
 
     private String vehiclesafe;
+
+    /**
+     * 审核状态列
+     */
+    private String statusDesc;
+
+    @Data
+    public static class OperationInfo {
+        /** 操作code*/
+        private String carInfoOpsCode;
+
+        /** 操作描述,查看,修改*/
+        private String carInfoOpsDesc;
+
+        public OperationInfo(String carInfoOpsCode, String carInfoOpsDesc) {
+            this.carInfoOpsCode = carInfoOpsCode;
+            this.carInfoOpsDesc = carInfoOpsDesc;
+        }
+    }
+
+
+    private List<OperationInfo> operationInfos = new ArrayList<>();
+
+    public List<OperationInfo> getOperationInfos() {
+        return operationInfos;
+    }
+
+    public void setOperationInfos(List<OperationInfo> operationInfos) {
+        this.operationInfos = operationInfos;
+    }
+
+    /**
+     * 车辆审批状态日志
+     */
+    private List<CarBizCarInfoAudit> carBizCarInfoAuditList;
+
+    public List<CarBizCarInfoAudit> getCarBizCarInfoAuditList() {
+        return carBizCarInfoAuditList;
+    }
+
+    public void setCarBizCarInfoAuditList(List<CarBizCarInfoAudit> carBizCarInfoAuditList) {
+        this.carBizCarInfoAuditList = carBizCarInfoAuditList;
+    }
+
+    public String getStatusDesc() {
+        return statusDesc;
+    }
+
+    public void setStatusDesc(String statusDesc) {
+        this.statusDesc = statusDesc;
+    }
 
     private Long newBrandId = null;
     private String newBrandName = null;
