@@ -118,6 +118,9 @@ public class IntegerCityController {
     @Value("${driver.businessId}")
     private String driverBusinessId;
 
+    @Value("${bus.query.orderId.url}")
+    private String busOrderUrl;
+
     @Autowired
     private DriverInfoInterCityExMapper infoInterCityExMapper;
 
@@ -2074,6 +2077,12 @@ public class IntegerCityController {
             return AjaxResponse.fail(RestErrorCode.HAS_ORDER_DRIVER_ID);
         }
 
+        boolean hasMain = verifyHasMainOrder(driverId);
+
+        if(!hasMain){
+            logger.info("=====该司机两小时内已存在服务中的主单=====");
+            return AjaxResponse.fail(RestErrorCode.HAS_ORDER_DRIVER_ID);
+        }
        
         Map<String, Object> map = Maps.newHashMap();
         List<String> listParam = new ArrayList<>();
@@ -2220,6 +2229,56 @@ public class IntegerCityController {
 
     }
 
+
+    /**
+     * 校验司机有主单号且是服务中
+     * @param driverId
+     * @return
+     */
+    private boolean verifyHasMainOrder(Integer driverId){
+        final boolean[] bl = {true};
+
+        try {
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("driverId", driverId);
+            map.put("businessId", Common.BUSSINESSID);
+            Date beforeDate = DateUtils.afterNHoursDate(new Date(), -Constants.VERIFY_HOUR);
+            map.put("bookingStartTime", beforeDate.getTime());
+            map.put("bookingEndTime", System.currentTimeMillis());
+
+            String sign = null;
+            try {
+                sign = MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(map, Common.MAIN_ORDER_KEY));
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+            map.put("sign", sign);
+            logger.info("==============查询订单主单入参========" + JSONObject.toJSONString(map));
+            JSONObject jsonResult = MpOkHttpUtil.okHttpGetBackJson(busOrderUrl + "/order/carpool/driver/getDriverCrossServiceMainOrderList",map,0,"查询司机的主单号");
+
+            logger.info("=============查询结果======" + jsonResult.toString());
+
+            if(jsonResult != null && jsonResult.get(Constants.CODE) != null){
+                Integer code = jsonResult.getIntValue(Constants.CODE);
+                if(code == 0){
+                    JSONArray jsonData = jsonResult.getJSONArray(Constants.DATA);
+                    jsonData.forEach(json ->{
+                        JSONObject jsonEach = (JSONObject) json;
+                        if(jsonEach != null && jsonEach.get("mainOrderNo") != null){
+                            Integer status = jsonEach.get("status") == null ? 60 : jsonEach.getInteger("status");
+                            if(status < 44){
+                                logger.info("===当前主单号=====" + jsonEach.get("mainOrderNo").toString() + ",状态：" + status);
+                                bl[0] = false;
+                            }
+                        }
+                    });
+                }
+            }
+        } catch (Exception e) {
+            logger.info("查询异常",e);
+        }
+        return bl[0];
+    }
 
     /**
      * 验证司机前后两个小时有没有订单-通过派单接口

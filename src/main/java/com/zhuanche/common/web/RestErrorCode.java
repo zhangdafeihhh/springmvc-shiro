@@ -354,6 +354,11 @@ public final class RestErrorCode{
 	@ResultMessage("预约用车时间只能在{0}之后")
 	public static final int VERIFY_BOARDING_TIME = 50926;
 
+
+	@ResultMessage("该司机两小时内已存在服务中的主单")
+	public static final int HAS_ORDER_DRIVER_ID = 50928;
+
+
 	//------------------------------------------------
 
 	//-------------------金融商品--start-------------------------
