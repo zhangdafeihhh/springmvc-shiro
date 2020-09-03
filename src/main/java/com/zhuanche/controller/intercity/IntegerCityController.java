@@ -2256,7 +2256,12 @@ public class IntegerCityController {
                 Integer code = jsonObject.getIntValue(Constants.CODE);
                 if (0 == code) {
                     JSONObject jsonData = jsonObject.getJSONObject(Constants.DATA);
-                    ruleId = jsonData.get("ruleId") == null ? 0 : jsonData.getInteger("ruleId");
+
+                    if (jsonData != null && jsonData.get(Constants.MEMO) != null) {
+                        JSONObject jsonMemo = jsonData.getJSONObject("memo");
+                        logger.info("=======获取memo数据=====" + JSONObject.toJSONString(jsonMemo));
+                        ruleId = jsonMemo.get(Constants.RULEID) != null ? jsonMemo.getInteger(Constants.RULEID) : 0;
+                    }
                 }
             }
         }catch (Exception e){
