@@ -1975,43 +1975,46 @@ public class IntegerCityController {
         Page page = PageHelper.startPage(pageNum, pageSize);
         List<MainOrderDetailDTO> interCityList = infoInterCityExMapper.queryDriver(cityId, supplierId, driverName, driverPhone, license, cityIds, supplierIds,teamId);
 
-        for (MainOrderDetailDTO detailDTO : interCityList) {
-            if (StringUtils.isNotEmpty(detailDTO.getMainOrder())) {
-                //剩余车位数
-                String url = "/order/carpool/getCrossCityMainOrder";
-                StringBuilder sb = new StringBuilder();
-                sb.append("businessId=" + Common.BUSSINESSID + "&mainOrderNo=" + detailDTO.getMainOrder()).append("&key=" + Common.MAIN_ORDER_KEY);
-                String sign = Base64.encodeBase64String(DigestUtils.md5(sb.toString()));
-                url += "?businessId=" + Common.BUSSINESSID + "&mainOrderNo=" + detailDTO.getMainOrder() + "&sign=" + sign;
-                JSONObject jsonResult = carRestTemplate.getForObject(url, JSONObject.class);
-                if (StringUtils.isNotBlank(jsonResult.toString())) {
-                    if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
-                        JSONObject jsonData = jsonResult.getJSONObject("data");
-                        Integer passengerNums = jsonData.getInteger("passengerNums");
-                        /**根据司机driverId获取最新的车型以及座位数*/
-                        Integer groupId = carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
-                        if (groupId == 0) {
-                            /**防止车管groupId为0的情况*/
-                            groupId = jsonData.getInteger("groupId");
+        if(CollectionUtils.isNotEmpty(interCityList)){
+            for (MainOrderDetailDTO detailDTO : interCityList) {
+                if (StringUtils.isNotEmpty(detailDTO.getMainOrder())) {
+                    //剩余车位数
+                    String url = "/order/carpool/getCrossCityMainOrder";
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("businessId=" + Common.BUSSINESSID + "&mainOrderNo=" + detailDTO.getMainOrder()).append("&key=" + Common.MAIN_ORDER_KEY);
+                    String sign = Base64.encodeBase64String(DigestUtils.md5(sb.toString()));
+                    url += "?businessId=" + Common.BUSSINESSID + "&mainOrderNo=" + detailDTO.getMainOrder() + "&sign=" + sign;
+                    JSONObject jsonResult = carRestTemplate.getForObject(url, JSONObject.class);
+                    if (StringUtils.isNotBlank(jsonResult.toString())) {
+                        if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
+                            JSONObject jsonData = jsonResult.getJSONObject("data");
+                            Integer passengerNums = jsonData.getInteger("passengerNums");
+                            /**根据司机driverId获取最新的车型以及座位数*/
+                            Integer groupId = carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
+                            if (groupId == 0) {
+                                /**防止车管groupId为0的情况*/
+                                groupId = jsonData.getInteger("groupId");
+                            }
+                            Integer maxSeat = seatCount(groupId);
+                            /**剩余座位数*/
+                            Integer remainSeat = maxSeat - passengerNums;
+                            if (remainSeat <= 0) {
+                                remainSeat = 0;
+                            }
+                            detailDTO.setRemainSeats(remainSeat);
                         }
-                        Integer maxSeat = seatCount(groupId);
-                        /**剩余座位数*/
-                        Integer remainSeat = maxSeat - passengerNums;
-                        if (remainSeat <= 0) {
-                            remainSeat = 0;
-                        }
-                        detailDTO.setRemainSeats(remainSeat);
                     }
+                } else {
+                    Integer groupId = carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
+                    if (groupId == 0) {
+                        /**防止车管groupId为0的情况*/
+                        groupId = 41;
+                    }
+                    detailDTO.setRemainSeats(seatCount(groupId));
                 }
-            } else {
-                Integer groupId = carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
-                if (groupId == 0) {
-                    /**防止车管groupId为0的情况*/
-                    groupId = 41;
-                }
-                detailDTO.setRemainSeats(seatCount(groupId));
             }
         }
+
         int total = (int) page.getTotal();
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, interCityList);
 
@@ -2256,7 +2259,12 @@ public class IntegerCityController {
                 Integer code = jsonObject.getIntValue(Constants.CODE);
                 if (0 == code) {
                     JSONObject jsonData = jsonObject.getJSONObject(Constants.DATA);
-                    ruleId = jsonData.get("ruleId") == null ? 0 : jsonData.getInteger("ruleId");
+
+                    if (jsonData != null && jsonData.get(Constants.MEMO) != null) {
+                        JSONObject jsonMemo = jsonData.getJSONObject("memo");
+                        logger.info("=======获取memo数据=====" + JSONObject.toJSONString(jsonMemo));
+                        ruleId = jsonMemo.get(Constants.RULEID) != null ? jsonMemo.getInteger(Constants.RULEID) : 0;
+                    }
                 }
             }
         }catch (Exception e){
