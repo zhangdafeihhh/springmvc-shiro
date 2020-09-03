@@ -2074,7 +2074,11 @@ public class IntegerCityController {
             logger.info("====当前司机已经有包车或者拼车单=====");
             return AjaxResponse.fail(RestErrorCode.HAS_ORDER_DRIVER_ID);
         }
-
+        
+        if(!verifyHasPermission(driverId)){
+            logger.info("您指派的司机不是您旗下司机,driverId:" + driverId);
+            return AjaxResponse.fail(RestErrorCode.HAS_DRIVER_PERMISSION);
+        }
 
         if( StringUtils.isEmpty(mainOrderNo)){
             boolean hasMain = verifyHasMainOrder(driverId);
