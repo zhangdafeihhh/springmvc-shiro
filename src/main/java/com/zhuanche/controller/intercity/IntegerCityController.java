@@ -2063,7 +2063,6 @@ public class IntegerCityController {
                                                  @Verify(param = "driverPhone", rule = "required") String driverPhone,
                                                  @Verify(param = "licensePlates", rule = "required") String licensePlates,
                                                  @Verify(param = "groupId", rule = "required") String groupId,
-                                                 @Verify(param = "ruleId",rule="required")Integer ruleId,
                                                  String crossCityStartTime,
                                                  String routeName) {
         logger.info("指派接口入参:mainOrderNo=" + mainOrderNo + ",orderNo:" + orderNo
@@ -2076,7 +2075,7 @@ public class IntegerCityController {
             return AjaxResponse.fail(RestErrorCode.HAS_ORDER_DRIVER_ID);
         }
 
-        if(!verifyLine(ruleId,driverId)){
+        if(!verifyLine(orderNo,driverId)){
             logger.info("您指派的司机不是您旗下司机,driverId:" + driverId);
             return AjaxResponse.fail(RestErrorCode.HAS_DRIVER_PERMISSION);
         }
@@ -2086,13 +2085,6 @@ public class IntegerCityController {
             return AjaxResponse.fail(RestErrorCode.HAS_DRIVER_PERMISSION);
         }
 
-        /*if( StringUtils.isEmpty(mainOrderNo)){
-            boolean hasMain = verifyHasMainOrder(driverId);
-            if(!hasMain){
-                logger.info("=====该司机两小时内已存在服务中的主单=====");
-                return AjaxResponse.fail(RestErrorCode.HAS_SERVICE_ORDER);
-            }
-        }*/
        
         Map<String, Object> map = Maps.newHashMap();
         List<String> listParam = new ArrayList<>();
@@ -2238,11 +2230,40 @@ public class IntegerCityController {
 
     /**
      * 查询匹配的线路
-     * @param ruleId
+     * @param orderNo
      * @param driverId
      * @return
      */
-    private boolean verifyLine(Integer ruleId,Integer driverId){
+    private boolean verifyLine(String  orderNo,Integer driverId) {
+
+        Integer ruleId = 0;
+        try {
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("bId", Common.BUSSINESSID);
+            map.put("orderNo", orderNo);
+            String sign = null;
+            try {
+                sign = MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(map, Common.MAIN_ORDER_KEY));
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+            map.put("sign", sign);
+            logger.info("==================获取订单详情入参：" + JSONObject.toJSONString(map));
+            /**wiki地址 http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=37123085*/
+            JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderByOrderNo", map, 0, "查询订单详情");
+
+            if (jsonObject != null && jsonObject.get(Constants.CODE) != null) {
+                Integer code = jsonObject.getIntValue(Constants.CODE);
+                if (0 == code) {
+                    JSONObject jsonData = jsonObject.getJSONObject(Constants.DATA);
+                    ruleId = jsonData.get("ruleId") == null ? 0 : jsonData.getInteger("ruleId");
+                }
+            }
+        }catch (Exception e){
+            logger.info(e.getMessage());
+        }
+
+        final Integer lineId = ruleId;
 
         logger.info("============验证线路是否适用指定合作商==========");
         final boolean[] bl = {false};
@@ -2277,7 +2298,7 @@ public class IntegerCityController {
                             JSONObject jsonEach = (JSONObject) json;
                             if(jsonEach != null && jsonEach.get("lineId") != null){
                                 Integer userLineId = jsonEach.get("lineId") == null ? 0 : jsonEach.getInteger("lineId");
-                                if(userLineId.equals(ruleId)){
+                                if(userLineId.equals(lineId)){
                                     logger.info("===线路匹配成功=====" + jsonEach.get("lineName").toString() );
                                     bl[0] = true;
                                 }
