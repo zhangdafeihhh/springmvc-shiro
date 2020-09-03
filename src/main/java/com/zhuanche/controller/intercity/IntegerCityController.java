@@ -2086,13 +2086,13 @@ public class IntegerCityController {
             return AjaxResponse.fail(RestErrorCode.HAS_DRIVER_PERMISSION);
         }
 
-        if( StringUtils.isEmpty(mainOrderNo)){
+        /*if( StringUtils.isEmpty(mainOrderNo)){
             boolean hasMain = verifyHasMainOrder(driverId);
             if(!hasMain){
                 logger.info("=====该司机两小时内已存在服务中的主单=====");
                 return AjaxResponse.fail(RestErrorCode.HAS_SERVICE_ORDER);
             }
-        }
+        }*/
        
         Map<String, Object> map = Maps.newHashMap();
         List<String> listParam = new ArrayList<>();
@@ -2306,6 +2306,7 @@ public class IntegerCityController {
             map.put("driverId", driverId);
             map.put("businessId", Common.BUSSINESSID);
             Date beforeDate = DateUtils.afterNHoursDate(new Date(), -Constants.VERIFY_HOUR);
+            /**TODO 注意 需要传的是用车时间而不是当前时间 下次再改吧*/
             map.put("bookingStartTime", beforeDate.getTime());
             map.put("bookingEndTime", System.currentTimeMillis());
 
