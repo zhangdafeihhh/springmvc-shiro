@@ -2063,6 +2063,7 @@ public class IntegerCityController {
                                                  @Verify(param = "driverPhone", rule = "required") String driverPhone,
                                                  @Verify(param = "licensePlates", rule = "required") String licensePlates,
                                                  @Verify(param = "groupId", rule = "required") String groupId,
+                                                 @Verify(param = "ruleId",rule="required")Integer ruleId,
                                                  String crossCityStartTime,
                                                  String routeName) {
         logger.info("指派接口入参:mainOrderNo=" + mainOrderNo + ",orderNo:" + orderNo
@@ -2074,7 +2075,12 @@ public class IntegerCityController {
             logger.info("====当前司机已经有包车或者拼车单=====");
             return AjaxResponse.fail(RestErrorCode.HAS_ORDER_DRIVER_ID);
         }
-        
+
+        if(!verifyLine(ruleId,driverId)){
+            logger.info("您指派的司机不是您旗下司机,driverId:" + driverId);
+            return AjaxResponse.fail(RestErrorCode.HAS_DRIVER_PERMISSION);
+        }
+
         if(!verifyHasPermission(driverId)){
             logger.info("您指派的司机不是您旗下司机,driverId:" + driverId);
             return AjaxResponse.fail(RestErrorCode.HAS_DRIVER_PERMISSION);
@@ -2229,6 +2235,63 @@ public class IntegerCityController {
 
     }
 
+
+    /**
+     * 查询匹配的线路
+     * @param ruleId
+     * @param driverId
+     * @return
+     */
+    private boolean verifyLine(Integer ruleId,Integer driverId){
+
+        logger.info("============验证线路是否适用指定合作商==========");
+        final boolean[] bl = {false};
+
+        DriverInfoInterCity driverInfo = infoInterCityExMapper.getByDriverId(driverId);
+        if(driverInfo == null){
+            logger.info("===司机信息为空===");
+            return bl[0];
+        }
+        Integer supplierId = driverInfo.getSupplierId();
+        if(supplierId == null || supplierId == 0){
+            logger.info("===司机无合作商===");
+            return bl[0];
+        }
+
+
+        try {
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("supplierId", supplierId);
+            map.put("status", 1);
+
+            logger.info("==============根据合作商id查询线路========" + JSONObject.toJSONString(map));
+            JSONObject jsonResult = MpOkHttpUtil.okHttpGetBackJson(configUrl + "/intercityCarUse/getLineListBySupplierId",map,0,"根据合作商id查询线路");
+            logger.info("=============查询结果======" + jsonResult.toString());
+
+            if(jsonResult != null && jsonResult.get(Constants.CODE) != null){
+                Integer code = jsonResult.getIntValue(Constants.CODE);
+                if(code == 0){
+                    JSONArray jsonData = jsonResult.getJSONArray(Constants.DATA);
+                    if(jsonData != null && jsonData.size() > 0){
+                        jsonData.forEach(json ->{
+                            JSONObject jsonEach = (JSONObject) json;
+                            if(jsonEach != null && jsonEach.get("lineId") != null){
+                                Integer userLineId = jsonEach.get("lineId") == null ? 0 : jsonEach.getInteger("lineId");
+                                if(userLineId.equals(ruleId)){
+                                    logger.info("===线路匹配成功=====" + jsonEach.get("lineName").toString() );
+                                    bl[0] = true;
+                                }
+                            }
+                        });
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            logger.info("查询异常",e);
+        }
+        return bl[0];
+    }
 
     /**
      * 校验司机有主单号且是服务中
