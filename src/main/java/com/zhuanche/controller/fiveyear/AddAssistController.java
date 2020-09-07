@@ -35,7 +35,7 @@ public class AddAssistController {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
-    private static final String URL = "https://monline.01zhuanche.com/otherViews/SQPartnerLikes/index.html?cityId=%d&cityName=%s&supplierName=%s&supplierId=%d&blessing=%s";
+    private static final String URL = "https://monline.01zhuanche.com/otherViews/SQPartnerLikes/index.html?cityId=%d&cityName=%s&supplierName=%s&supplierId=%d&blessing=%s&currentTime=%d";
 
 
     @Value("${qr.short.addr}")
@@ -53,7 +53,7 @@ public class AddAssistController {
         try {
             Map<String,Object> map = Maps.newHashMap();
 
-            map.put("url", String.format(URL,cityId,URLEncoder.encode(cityName,"utf-8"), URLEncoder.encode(supplierName,"utf-8"),supplierId,URLEncoder.encode(blessing,"utf-8")));
+            map.put("url", String.format(URL,cityId,URLEncoder.encode(cityName,"utf-8"), URLEncoder.encode(supplierName,"utf-8"),supplierId,URLEncoder.encode(blessing,"utf-8"),System.currentTimeMillis()));
             map.put("expired",0);
 
             logger.info("生成二维码短链入参" + JSONObject.toJSONString(map));
