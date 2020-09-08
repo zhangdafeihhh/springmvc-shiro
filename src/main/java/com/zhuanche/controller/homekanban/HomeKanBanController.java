@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.enums.PermissionLevelEnum;
+import com.zhuanche.common.util.CurrentSystemUtils;
 import com.zhuanche.common.util.RedisKeyUtils;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -33,8 +34,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.validation.constraints.Max;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -90,35 +89,32 @@ public class HomeKanBanController {
 	@Autowired
 	private DriverMeasureDayService driverMeasureDayService;
 
+	@Autowired
+	private CurrentSystemUtils systemUtils;
+
 	/** 日均运营车辆统计查询接口 **/
 	@RequestMapping("/operatingVehicleStatistics")
 	@ResponseBody
 	public AjaxResponse operatingVehicleStatistics(@Verify(param = "startDate", rule = "required") String startDate,
-			@Verify(param = "endDate", rule = "required") String endDate, String allianceId, String motorcadeId) {
+			@Verify(param = "endDate", rule = "required") String endDate,Integer cityId, String allianceId, String motorcadeId) {
 
 		// 如果加盟商ID为空，不允许传入车队ID
 		if (StringUtils.isNotBlank(motorcadeId) && StringUtils.isBlank(allianceId)) {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-		// 从大数据仓库获取统计数据
-		/*Map<String, Object> paramMap = Maps.newHashMap();
-		paramMap.put("startDate", startDate);
-		paramMap.put("endDate", endDate);
-		paramMap.put("allianceId", allianceId);
-		paramMap.put("motorcadeId", motorcadeId);*/
+
 		String key = null;
 
 		try {
 			//如果城市权限为空（说明是全国的权限），且数据权限为全国 则缓存一天数据。如果不是，缓存key值为当前登录用户+时间+allianceId+motorcadeId
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
 
 			key = "";
-			StringBuffer stringBuffer = new StringBuffer();
+			StringBuilder stringBuffer = new StringBuilder();
 
 
 			if(CollectionUtils.isEmpty(currentLoginUser.getCityIds()) && currentLoginUser.getLevel().equals(PermissionLevelEnum.ALL.getCode())){
-                //
                 key = RedisKeyUtils.VEHICLE_STATISTICS + stringBuffer.append(startDate).append(endDate).append(allianceId).append(motorcadeId).toString().replaceAll("null","");
                 List<Map> resultList = RedisCacheUtil.get(key,List.class);
                 if(RedisCacheUtil.exist(key) && resultList != null){
@@ -142,6 +138,7 @@ public class HomeKanBanController {
 			saas.setEndDate(endDate);
 			saas.setAllianceId(allianceId);
 			saas.setMotorcadeId(motorcadeId);
+			saas.setVisibleAllianceIds(systemUtils.supplierIds(cityId,allianceId));
 			List<Map> resultList = allianceIndexService.getCarOperateStatistics(saas);
 			if(CollectionUtils.isNotEmpty(resultList)){
 
@@ -162,25 +159,19 @@ public class HomeKanBanController {
 	@RequestMapping("/orderStatistics")
 	@ResponseBody
 	public AjaxResponse orderStatistics(@Verify(param = "startDate", rule = "required") String startDate,
-			@Verify(param = "endDate", rule = "required") String endDate, String allianceId, String motorcadeId) {
+			@Verify(param = "endDate", rule = "required") String endDate, Integer cityId,String allianceId, String motorcadeId) {
 
 		// 如果加盟商ID为空，不允许传入车队ID
 		if (StringUtils.isNotBlank(motorcadeId) && StringUtils.isBlank(allianceId)) {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-		/*// 从大数据仓库获取统计数据
-		Map<String, Object> paramMap = Maps.newHashMap();
-		paramMap.put("startDate", startDate);
-		paramMap.put("endDate", endDate);
-		paramMap.put("allianceId", allianceId);
-		paramMap.put("motorcadeId", motorcadeId);*/
 
 		String key = null;
 
 		try {
 			//如果城市权限为空（说明是全国的权限），且数据权限为全国 则缓存一天数据。如果不是，缓存key值为当前登录用户+时间+allianceId+motorcadeId
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
 
 			key = "";
 			StringBuffer stringBuffer = new StringBuffer();
@@ -208,11 +199,12 @@ public class HomeKanBanController {
 
 
 		try{
-			SAASIndexQuery saas = setVisibleData();
+ 			SAASIndexQuery saas = setVisibleData();
 			saas.setStartDate(startDate);
 			saas.setEndDate(endDate);
 			saas.setAllianceId(allianceId);
 			saas.setMotorcadeId(motorcadeId);
+			saas.setVisibleAllianceIds(systemUtils.supplierIds(cityId,allianceId));
 			List<Map> resultList = allianceIndexService.getOrderNumStatistic(saas);
 			if(CollectionUtils.isNotEmpty(resultList)){
 
@@ -232,19 +224,13 @@ public class HomeKanBanController {
 	@RequestMapping("/orderAndCiStatistics")
 	@ResponseBody
 	public AjaxResponse orderAndCiStatistics(@Verify(param = "startDate", rule = "required") String startDate,
-										@Verify(param = "endDate", rule = "required") String endDate, String allianceId, String motorcadeId) {
+										@Verify(param = "endDate", rule = "required") String endDate,Integer cityId, String allianceId, String motorcadeId) {
 
 		// 如果加盟商ID为空，不允许传入车队ID
 		if (StringUtils.isNotBlank(motorcadeId) && StringUtils.isBlank(allianceId)) {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-		/*// 从大数据仓库获取统计数据
-		Map<String, Object> paramMap = Maps.newHashMap();
-		paramMap.put("startDate", startDate);
-		paramMap.put("endDate", endDate);
-		paramMap.put("allianceId", allianceId);
-		paramMap.put("motorcadeId", motorcadeId);*/
 
 		String key = null;
 
@@ -272,6 +258,8 @@ public class HomeKanBanController {
 		} catch (Exception e) {
 			logger.error("缓存查询错误",e);
 		}
+
+
 		List<Map> orderList = new ArrayList<>();
 		List<Map> ciOrderList = new ArrayList<>();
 		Map<String,Object> map = new HashMap<>();
@@ -281,6 +269,7 @@ public class HomeKanBanController {
 			saas.setEndDate(endDate);
 			saas.setAllianceId(allianceId);
 			saas.setMotorcadeId(motorcadeId);
+			saas.setVisibleAllianceIds(systemUtils.supplierIds(cityId,allianceId));
 			orderList = allianceIndexService.getOrderNumStatistic(saas);
 			ciOrderList = allianceIndexService.getCiOrderNumStatistic(saas);
 			map.put("orderList",orderList);
@@ -299,7 +288,7 @@ public class HomeKanBanController {
 	@RequestMapping("/ciInstallStatisticsPercent")
 	@ResponseBody
 	public AjaxResponse ciInstallStatisticsPercent(@Verify(param = "startDate", rule = "required") String startDate,
-											 @Verify(param = "endDate", rule = "required") String endDate, String allianceId, String motorcadeId) {
+											 @Verify(param = "endDate", rule = "required") String endDate,Integer cityId, String allianceId, String motorcadeId) {
 
 		// 如果加盟商ID为空，不允许传入车队ID
 		if (StringUtils.isNotBlank(motorcadeId) && StringUtils.isBlank(allianceId)) {
@@ -367,11 +356,8 @@ public class HomeKanBanController {
 					visibleMotocadeIds = setToArray(teamIds);
 				}
 			}
-			List<String>  visibleList = null;
+			List<String>  visibleList = systemUtils.supplierIds(cityId,allianceId);
 			List<String>  visibleMotoIdsList = null;
-			if(visibleAllianceIds != null){
-				visibleList = Arrays.asList(visibleAllianceIds);
-			}
 			if(visibleMotocadeIds != null){
 				visibleMotoIdsList = Arrays.asList(visibleMotocadeIds);
 			}
@@ -410,20 +396,13 @@ public class HomeKanBanController {
 	@ResponseBody
 	public AjaxResponse serviceEvaluationRateStatistics(
 			@Verify(param = "startDate", rule = "required") String startDate,
-			@Verify(param = "endDate", rule = "required") String endDate, String allianceId, String motorcadeId) {
+			@Verify(param = "endDate", rule = "required") String endDate,Integer cityId, String allianceId, String motorcadeId) {
 
 		// 如果加盟商ID为空，不允许传入车队ID
 		if (StringUtils.isNotBlank(motorcadeId) && StringUtils.isBlank(allianceId)) {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-		/*// 从大数据仓库获取统计数据
-		Map<String, Object> paramMap = Maps.newHashMap();
-		paramMap.put("startDate", startDate);
-		paramMap.put("endDate", endDate);
-		paramMap.put("allianceId", allianceId);
-		paramMap.put("motorcadeId", motorcadeId);
-		return parseResult(statisticsEvaluationUrl, paramMap);*/
 
 
 		String key = null;
@@ -458,11 +437,13 @@ public class HomeKanBanController {
 
 
 		try{
+
 			SAASIndexQuery saas = setVisibleData();
 			saas.setStartDate(startDate);
 			saas.setEndDate(endDate);
 			saas.setAllianceId(allianceId);
 			saas.setMotorcadeId(motorcadeId);
+			saas.setVisibleAllianceIds(systemUtils.supplierIds(cityId,allianceId));
 			List<Map> resultList = allianceIndexService.getServiceNegativeRate(saas);
 			if(CollectionUtils.isNotEmpty(resultList)){
 
@@ -483,20 +464,13 @@ public class HomeKanBanController {
 	@ResponseBody
 	public AjaxResponse serviceAndCiEvaluationRateStatistics(
 			@Verify(param = "startDate", rule = "required") String startDate,
-			@Verify(param = "endDate", rule = "required") String endDate, String allianceId, String motorcadeId) {
+			@Verify(param = "endDate", rule = "required") String endDate,Integer cityId, String allianceId, String motorcadeId) {
 
 		// 如果加盟商ID为空，不允许传入车队ID
 		if (StringUtils.isNotBlank(motorcadeId) && StringUtils.isBlank(allianceId)) {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-		/*// 从大数据仓库获取统计数据
-		Map<String, Object> paramMap = Maps.newHashMap();
-		paramMap.put("startDate", startDate);
-		paramMap.put("endDate", endDate);
-		paramMap.put("allianceId", allianceId);
-		paramMap.put("motorcadeId", motorcadeId);
-		return parseResult(statisticsEvaluationUrl, paramMap);*/
 
 
 		String key = null;
@@ -538,6 +512,7 @@ public class HomeKanBanController {
 			saas.setEndDate(endDate);
 			saas.setAllianceId(allianceId);
 			saas.setMotorcadeId(motorcadeId);
+			saas.setVisibleAllianceIds(systemUtils.supplierIds(cityId,allianceId));
 			rateList = allianceIndexService.getServiceNegativeRate(saas);
 			ciRateList = allianceIndexService.getCiServiceBadEvaNumStatistic(saas);
 			map.put("rateList",rateList);
@@ -555,7 +530,7 @@ public class HomeKanBanController {
 	@RequestMapping("/onlineTimeStatistics")
 	@ResponseBody
 	public AjaxResponse onlineTimeStatistics(@Verify(param = "startDate", rule = "required") String startDate,
-			@Verify(param = "endDate", rule = "required") String endDate, String allianceId, String motorcadeId) {
+			@Verify(param = "endDate", rule = "required") String endDate,Integer cityId, String allianceId, String motorcadeId) {
 
 		// 如果加盟商ID为空，不允许传入车队ID
 		if (StringUtils.isNotBlank(motorcadeId) && StringUtils.isBlank(allianceId)) {
@@ -567,6 +542,7 @@ public class HomeKanBanController {
 		saas.setEndDate(endDate);
 		saas.setAllianceId(allianceId);
 		saas.setMotorcadeId(motorcadeId);
+		saas.setVisibleAllianceIds(systemUtils.supplierIds(cityId,allianceId));
 		if(startDate!=null && endDate!=null){
 			try{
 				Date searchStartDate = DateUtils.getDate1(startDate);
@@ -577,7 +553,6 @@ public class HomeKanBanController {
 					Date middleDate = DateUtils.addDays(searchStartDate,14);
 					try{
 						//第一次查询
-						//List<Map> resultList = new ArrayList<>();
 						saas.setStartDate(startDate);
 						saas.setEndDate(DateUtils.formatDateTime(middleDate));
 						List<Map> middleMap = allianceIndexService.getCarOnlineDuration(saas);
@@ -661,21 +636,14 @@ public class HomeKanBanController {
 				visibleMotocadeIds = setToArray(teamIds);
 			}
 		}
-		// 从大数据仓库获取统计数据
-		/*Map<String, Object> paramMap = Maps.newHashMap();
-		paramMap.put("allianceId", allianceId);
-		paramMap.put("motorcadeId", motorcadeId);
-		paramMap.put("orderByColumnCode", orderByColumnCode);
-		paramMap.put("orderByTypeCode", orderByTypeCode);
-		paramMap.put("topNum", topNum);
-		return parseResult(vehicleTopUrl, paramMap);*/
+
 		try{
 
 			List<String>  visibleList = null;
 			List<String>  visibleMotoIdsList = null;
-			if(visibleAllianceIds != null){
+			/*if(visibleAllianceIds != null){
 				visibleList = Arrays.asList(visibleAllianceIds);
-			}
+			}*/
 			if(visibleMotocadeIds != null){
 				visibleMotoIdsList = Arrays.asList(visibleMotocadeIds);
 			}
@@ -693,7 +661,7 @@ public class HomeKanBanController {
 	@RequestMapping("/coreIndicatorsStatistics")
 	@ResponseBody
 	public AjaxResponse coreIndicatorsStatistics(@Verify(param = "startDate", rule = "required") String startDate,
-			@Verify(param = "endDate", rule = "required") String endDate, String allianceId, String motorcadeId) {
+			@Verify(param = "endDate", rule = "required") String endDate, Integer cityId,String allianceId, String motorcadeId) {
 
 		// 如果加盟商ID为空，不允许传入车队ID
 		if (StringUtils.isNotBlank(motorcadeId) && StringUtils.isBlank(allianceId)) {
@@ -726,19 +694,14 @@ public class HomeKanBanController {
 			RedisCacheUtil.delete(key);
 		}
 
-
-
-
-
-
 		// 供应商信息
 		String[] visibleAllianceIds = null;
 		// 车队信息
 		String[] visibleMotocadeIds = null;
 		// 数据权限设置
-		if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取当前登录用户可见城市ID
+		if(WebSessionUtil.isSupperAdmin() == false){
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+			Set<Integer> cityIds = currentLoginUser.getCityIds();
 			// 如果城市id为空，代表可查全国所有数据
 			if(cityIds != null && cityIds.size() > 0){
 				Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
@@ -755,13 +718,10 @@ public class HomeKanBanController {
 				visibleMotocadeIds = setToArray(teamIds);
 			}
 		}
-		// 从大数据仓库获取统计数据
-		try {
-			List<String>  visibleList = null;
+ 		try {
+			List<String>  visibleList = systemUtils.supplierIds(cityId,allianceId);
 			List<String>  visibleMotoIdsList = null;
-			if(visibleAllianceIds != null){
-				visibleList = Arrays.asList(visibleAllianceIds);
-			}
+
 			if(visibleMotocadeIds != null){
 				visibleMotoIdsList = Arrays.asList(visibleMotocadeIds);
 			}
@@ -790,7 +750,7 @@ public class HomeKanBanController {
 	@RequestMapping("/countResponsibleComplaintRate")
 	@ResponseBody
 	public AjaxResponse countResponsibleComplaintRate(@Verify(param = "startDate", rule = "required") String startDate,
-												 @Verify(param = "endDate", rule = "required") String endDate, String allianceId) {
+												 @Verify(param = "endDate", rule = "required") String endDate,Integer cityId, String allianceId) {
 
 		String key = null;
 		try {
@@ -818,9 +778,8 @@ public class HomeKanBanController {
 			RedisCacheUtil.delete(key);
 		}
 
-		// 从大数据仓库获取统计数据
-		try {
-			String responsibleComplaintRate= driverMeasureDayService.getResponsibleComplaintRate(startDate,endDate, allianceId);
+ 		try {
+			String responsibleComplaintRate= driverMeasureDayService.getResponsibleComplaintRate(startDate,endDate,cityId, allianceId);
 			//获取有责投诉率
 			if(responsibleComplaintRate != null && !("").equals(responsibleComplaintRate)){
 				RedisCacheUtil.set(key,responsibleComplaintRate,3600*24);

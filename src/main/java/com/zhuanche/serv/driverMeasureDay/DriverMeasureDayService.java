@@ -1,5 +1,6 @@
 package com.zhuanche.serv.driverMeasureDay;
 
+import com.zhuanche.common.util.CurrentSystemUtils;
 import com.zhuanche.dto.IndexBiDriverMeasureDto;
 import com.zhuanche.dto.bigdata.BiDriverMeasureDayDto;
 import com.zhuanche.dto.bigdata.DisinfectPenetranceDTO;
@@ -29,8 +30,10 @@ public class DriverMeasureDayService {
     private BiDriverMeasureDayMapper driverMeasureDayMapper;
     @Autowired
     private BiDriverMeasureDayExtMapper biDriverMeasureDayExtMapper;
+    @Autowired
+    private CurrentSystemUtils systemUtils;
 
-    public String getResponsibleComplaintRate(String startDate, String endDate,  String allianceId){
+    public String getResponsibleComplaintRate(String startDate, String endDate,Integer cityId,  String allianceId){
         BiDriverMeasureDayDto params = new BiDriverMeasureDayDto();
         params.setStartDate(startDate);
         params.setEndDate(endDate);
@@ -38,8 +41,7 @@ public class DriverMeasureDayService {
             params.setSupplierId(Integer.valueOf(allianceId));
         }
         if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
-            //String suppliers = WebSessionUtil.getCurrentLoginUser().getSupplierIds().toString();
-            String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds().toArray(), ",");
+            String suppliers = StringUtils.join(systemUtils.supplierIds(cityId,allianceId), ",");
             params.setSupplierIds(suppliers);
         }else{
             params.setSupplierIds("");

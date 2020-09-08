@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 /**
  * @Author fanht
- * @Description
+ * @Description 首页看板添加城市选项
  * @Date 2020/9/7 上午11:18
  * @Version 1.0
  */
@@ -37,10 +37,10 @@ public class CurrentSystemUtils {
      * @param supplierId
      * @return
      */
-    public  String supplierIds(Integer cityId,String supplierId){
+    public  List<String> supplierIds(Integer cityId,String supplierId){
         try {
             if(StringUtils.isNotEmpty(supplierId)){
-                return supplierId;
+                return TransportUtils.strToList(supplierId,Constants.SEPERATER);
             }
 
             if(cityId != null && cityId > 0){
@@ -50,15 +50,16 @@ public class CurrentSystemUtils {
                 String supplis = supplierList.stream().map(e -> String.valueOf(e.getSupplierId())).collect(Collectors.joining(Constants.SEPERATER));
 
                 if(WebSessionUtil.isSupperAdmin()){
-                    return supplis;
+                    return TransportUtils.strToList(supplierId,Constants.SEPERATER);
                 }else {
                     Integer level = WebSessionUtil.getCurrentLoginUser().getLevel();
                     if(level.equals(PermissionLevelEnum.CITY.getCode()) ||
                          level.equals(PermissionLevelEnum.ALL.getCode())){
-                        return supplis;
+                        return TransportUtils.strToList(supplierId,Constants.SEPERATER);
                     }else {
                         Set<Integer> setSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
-                        return StringUtils.join(setSupplier.toArray(),Constants.SEPERATER);
+                        String supp = StringUtils.join(setSupplier.toArray(),Constants.SEPERATER);
+                        return TransportUtils.strToList(supp,Constants.SEPERATER);
                     }
                 }
 
@@ -75,15 +76,17 @@ public class CurrentSystemUtils {
                     if(level.equals(PermissionLevelEnum.CITY.getCode())){
                         List<CarBizSupplier> supplierList = supplierExMapper.queryByCityOrSupplierName(WebSessionUtil.getCurrentLoginUser().getCityIds(),null);
                         String supplis = supplierList.stream().map(e -> String.valueOf(e.getSupplierId())).collect(Collectors.joining(Constants.SEPERATER));
-                        return supplis;
+                        return TransportUtils.strToList(supplis,Constants.SEPERATER);
                     }else {
                         Set<Integer> setSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
-                        return StringUtils.join(setSupplier.toArray(),Constants.SEPERATER);
+                        String supp = StringUtils.join(setSupplier.toArray(),Constants.SEPERATER);
+                        return TransportUtils.strToList(supp,Constants.SEPERATER);
                     }
                 }
             }
         } catch (Exception e) {
             logger.info("查询权限异常",e);
+            throw new RuntimeException("获取合作商数据异常",e);
         }
         return null;
     }
