@@ -290,7 +290,7 @@ public class DriverInfoUpdateApplyController {
      * @param colorNew 新的颜色
      * @param idCardNoNew 新的绑定司机身份证号
      * @param driverNameNew 新的绑定司机名称
-     * @return
+     * @return AjaxResponse
      */
     @ResponseBody
     @RequestMapping(value = "/saveCarInfoUpdateApply")
@@ -303,12 +303,17 @@ public class DriverInfoUpdateApplyController {
                                                @Verify(param = "modelDetailNew", rule = "required") String modelDetailNew,
                                                @Verify(param = "carPurchaseDateNewStr", rule = "required") String carPurchaseDateNewStr,
                                                @Verify(param = "colorNew", rule = "required") String colorNew,
-                                               String idCardNoNew, String driverNameNew) {
+                                               String idCardNoNew, String driverNameNew,
+                                               @Verify(param = "vehicleDrivingLicenseNew", rule = "required") String vehicleDrivingLicenseNew,
+                                               @Verify(param = "vehiclePhotoNew", rule = "required") String vehiclePhotoNew) {
 
+        logger.info("司机换车申请licensePlates={} carModelIdNew={} modelDetailNew={} carPurchaseDateNewStr={},idCardNoNew={} vehicleDrivingLicenseNew={}" +
+                " vehiclePhotoNew={}" , licensePlates,carModelIdNew,modelDetailNew,carPurchaseDateNewStr,idCardNoNew,vehicleDrivingLicenseNew,vehiclePhotoNew);
         if((StringUtils.isNotEmpty(idCardNoNew) && StringUtils.isEmpty(driverNameNew))
                 || (StringUtils.isEmpty(idCardNoNew) && StringUtils.isNotEmpty(driverNameNew))){
             return AjaxResponse.fail(RestErrorCode.INFORMATION_NOT_COMPLETE);
         }
+
         //查询车牌号是否存在
         CarBizCarInfoDTO carBizCarInfoDTO = carBizCarInfoService.selectModelByLicensePlates(licensePlates);
         if(carBizCarInfoDTO==null){
@@ -317,8 +322,10 @@ public class DriverInfoUpdateApplyController {
         //是否存在已提交未审核的记录
         DriverInfoUpdateApplyDTO driverInfoUpdateApplyDTO = new DriverInfoUpdateApplyDTO();
         driverInfoUpdateApplyDTO.setLicensePlates(licensePlates);
-        driverInfoUpdateApplyDTO.setStatus(1);//已提交
-        driverInfoUpdateApplyDTO.setType(2);//业务类型(1-司机修改,2-车辆修改)
+        //已提交
+        driverInfoUpdateApplyDTO.setStatus(1);
+        //业务类型(1-司机修改,2-车辆修改)
+        driverInfoUpdateApplyDTO.setType(2);
         List<DriverInfoUpdateApplyDTO> driverInfoUpdateApplyDTOS = driverInfoUpdateService.queryDriverInfoUpdateList(driverInfoUpdateApplyDTO);
         if(driverInfoUpdateApplyDTOS!=null && driverInfoUpdateApplyDTOS.size()>0){
             return AjaxResponse.fail(RestErrorCode.UPDATE_APPLY_EXIST);
@@ -332,7 +339,8 @@ public class DriverInfoUpdateApplyController {
         driverInfoUpdateApply.setCityName(carBizCarInfoDTO.getCityName());
         driverInfoUpdateApply.setSupplierId(carBizCarInfoDTO.getSupplierId());
         driverInfoUpdateApply.setSupplierName(carBizCarInfoDTO.getSupplierName());
-
+        driverInfoUpdateApply.setVehicleDrivingLicenseNew(vehicleDrivingLicenseNew);
+        driverInfoUpdateApply.setVehiclePhotoGroupNew(vehiclePhotoNew);
         //老司机信息
         List<CarBizDriverInfoDTO> carBizDriverInfoDTOS = carBizDriverInfoService.queryDriverByLicensePlates(licensePlates);
         if(carBizDriverInfoDTOS!=null && carBizDriverInfoDTOS.size()>0){
@@ -342,7 +350,6 @@ public class DriverInfoUpdateApplyController {
             driverInfoUpdateApply.setDriverName(carBizDriverInfo.getName());
             driverInfoUpdateApply.setDriverPhone(carBizDriverInfo.getPhone());
             driverInfoUpdateApply.setIdCardNo(carBizDriverInfo.getIdCardNo());
-
             CarRelateTeam carRelateTeam = new CarRelateTeam();
             carRelateTeam.setDriverId(carBizDriverInfo.getDriverId());
             CarRelateTeam teamRelate = carRelateTeamExMapper.selectOneTeam(carRelateTeam);
@@ -351,17 +358,7 @@ public class DriverInfoUpdateApplyController {
                 driverInfoUpdateApply.setTeamId(teamRelate.getTeamId());
             }
         }
-        /*if(carBizCarInfoDTO.getDriverId()!=null && carBizCarInfoDTO.getDriverId()!=0){
-            CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(carBizCarInfoDTO.getDriverId());
-            if(carBizDriverInfo==null){
-                return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
-            }
-            //存在，加入
-            driverInfoUpdateApply.setDriverId(carBizDriverInfo.getDriverId());
-            driverInfoUpdateApply.setDriverName(carBizDriverInfo.getName());
-            driverInfoUpdateApply.setDriverPhone(carBizDriverInfo.getPhone());
-            driverInfoUpdateApply.setIdCardNo(carBizDriverInfo.getIdCardNo());
-        }*/
+
         if(carBizCarInfoDTO.getCarModelId()!=null){
             CarBizModel carBizModel = carBizModelService.selectByPrimaryKey(carBizCarInfoDTO.getCarModelId());
             if(carBizModel==null){
