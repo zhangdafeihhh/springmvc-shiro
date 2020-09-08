@@ -307,7 +307,8 @@ public class DriverInfoUpdateApplyController {
                                                @Verify(param = "engineNo", rule = "required")String engineNo,
                                                @Verify(param = "vehicleVinCode", rule = "required")String vehicleVinCode,
                                                @Verify(param = "vehicleDrivingLicenseNew", rule = "required") String vehicleDrivingLicenseNew,
-                                               @Verify(param = "vehiclePhotoNew", rule = "required") String vehiclePhotoNew) {
+                                               @Verify(param = "vehiclePhotoNew", rule = "required") String vehiclePhotoNew,
+                                               @Verify(param = "vehicleRegistrationDateNew", rule = "required") String vehicleRegistrationDateNew) {
 
         logger.info("司机换车申请licensePlates={} carModelIdNew={} modelDetailNew={} carPurchaseDateNewStr={},idCardNoNew={} vehicleDrivingLicenseNew={}" +
                 " vehiclePhotoNew={}" , licensePlates,carModelIdNew,modelDetailNew,carPurchaseDateNewStr,idCardNoNew,vehicleDrivingLicenseNew,vehiclePhotoNew);
@@ -345,6 +346,7 @@ public class DriverInfoUpdateApplyController {
         driverInfoUpdateApply.setVehiclePhotoGroupNew(vehiclePhotoNew);
         driverInfoUpdateApply.setEngineNo(engineNo);
         driverInfoUpdateApply.setVehicleVinCode(vehicleVinCode);
+        driverInfoUpdateApply.setVehicleRegistrationDateNew(vehicleRegistrationDateNew);
         //老司机信息
         List<CarBizDriverInfoDTO> carBizDriverInfoDTOS = carBizDriverInfoService.queryDriverByLicensePlates(licensePlates);
         if(carBizDriverInfoDTOS!=null && carBizDriverInfoDTOS.size()>0){
