@@ -7,10 +7,13 @@ import com.sq.common.okhttp.OkHttpUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.entity.driver.SupplierExtDto;
 import com.zhuanche.http.MpOkHttpUtil;
+import mapper.driver.ex.SupplierExtDtoExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +40,9 @@ public class AddAssistController {
     @Value("${domain.addr}")
     private String domainAddr;
 
+    @Autowired
+    private SupplierExtDtoExMapper supplierExtDtoExMapper;
+
 
     private static final String URL = "/otherViews/SQPartnerLikes/index.html?cityId=%d&cityName=%s&supplierName=%s&supplierId=%d&blessing=%s&currentTime=%d";
 
@@ -55,6 +61,12 @@ public class AddAssistController {
         String jsonResult = null;
         try {
             Map<String,Object> map = Maps.newHashMap();
+
+            SupplierExtDto dto = supplierExtDtoExMapper.selectBySupplierId(supplierId);
+
+            if(dto != null && StringUtils.isNotEmpty(dto.getSupplierShortName())){
+                supplierName = dto.getSupplierShortName();
+            }
 
             map.put("url", String.format(domainAddr+URL,cityId,URLEncoder.encode(cityName,"utf-8"), URLEncoder.encode(supplierName,"utf-8"),supplierId,URLEncoder.encode(blessing,"utf-8"),System.currentTimeMillis()));
             map.put("expired",0);
