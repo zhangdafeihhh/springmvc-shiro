@@ -195,8 +195,16 @@ public class UserManagementService{
 		/**手机号验证*/
 		List<CarAdmUser> admUsers = carAdmUserExMapper.queryAllAccountByPhone(newUser.getPhone());
 
+
+
 		if(CollectionUtils.isNotEmpty(admUsers)){
-			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST);
+
+			List<String>  accountList = admUsers.stream().map(i -> i.getAccount()).collect(Collectors.toList());
+
+			if(!accountList.contains(newUser.getAccount())){
+				return AjaxResponse.fail(RestErrorCode.PHONE_EXIST);
+			}
+
 		}
 
 		//可以修改的字段
