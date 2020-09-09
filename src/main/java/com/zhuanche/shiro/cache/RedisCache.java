@@ -37,9 +37,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
     @SuppressWarnings("unchecked")
 	public V get(K key) throws CacheException {
         try {
-            V value = (V) redisTemplate.opsForValue().get(cachename + key);
-            log.info("shiro redis cache get {}, value:{}", key, value);
-            return value;
+            return (V) redisTemplate.opsForValue().get(cachename + key);
         } catch (Throwable t) {
             throw new CacheException(t);
         }
@@ -54,7 +52,6 @@ public class RedisCache<K, V> implements Cache<K, V> {
     @Override
     @SuppressWarnings("unchecked")
 	public V put(K key, V value) throws CacheException {
-        log.info("shiro redis cache put {},{}", key, value);
         try {
             V previousValue = (V) redisTemplate.opsForValue().getAndSet(cachename + key, (Serializable) value);
             redisTemplate.expire(cachename + key, expireSeconds, TimeUnit.SECONDS);
@@ -110,7 +107,6 @@ public class RedisCache<K, V> implements Cache<K, V> {
     @Override
     public int size() {
         try {
-            log.info("shiro redis cache size");
             int size = Math.toIntExact(redisTemplate.opsForZSet().size(keySetKey));
             log.info("shiro redis cache size:{}", size);
             return size;

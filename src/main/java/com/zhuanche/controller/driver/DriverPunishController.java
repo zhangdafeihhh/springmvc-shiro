@@ -159,17 +159,6 @@ public class DriverPunishController extends BaseController {
         }
     }
 
-    /**
-     *  todo 修复完数据后删除代码
-     */
-    @RequestMapping("/clearCache")
-    public AjaxResponse export(String key) {
-        key = StringUtils.isBlank(key) ? "shiro.list.key.mp-manage-shiro-activeSessionCache" : key;
-        Long size = redisCacheManager.getRedisTemplate().opsForList().size("shiro.list.key.mp-manage-shiro-activeSessionCache");
-        log.info("shiro.list.key.mp-manage-shiro-activeSessionCache size:{}", size);
-        redisCacheManager.getRedisTemplate().delete(key);
-        return AjaxResponse.success(key);
-    }
 
     @RequestMapping("/exportDriverPunishList")
     public AjaxResponse export(DriverPunishQuery params, HttpServletResponse response){
