@@ -199,9 +199,9 @@ public class UserManagementService{
 
 		if(CollectionUtils.isNotEmpty(admUsers)){
 
-			List<String>  accountList = admUsers.stream().map(i -> i.getAccount()).collect(Collectors.toList());
+			List<String>  userIdList = admUsers.stream().map(i -> String.valueOf(i.getUserId())).collect(Collectors.toList());
 
-			if(!accountList.contains(newUser.getAccount())){
+			if(!userIdList.contains(newUser.getUserId().toString())){
 				return AjaxResponse.fail(RestErrorCode.PHONE_EXIST);
 			}
 
