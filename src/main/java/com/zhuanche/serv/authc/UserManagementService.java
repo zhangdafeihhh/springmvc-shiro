@@ -195,6 +195,8 @@ public class UserManagementService{
 		/**手机号验证*/
 		List<CarAdmUser> admUsers = carAdmUserExMapper.queryAllAccountByPhone(newUser.getPhone());
 
+
+
 		if(CollectionUtils.isNotEmpty(admUsers)){
 
 			List<String>  userIdList = admUsers.stream().map(i -> String.valueOf(i.getUserId())).collect(Collectors.toList());

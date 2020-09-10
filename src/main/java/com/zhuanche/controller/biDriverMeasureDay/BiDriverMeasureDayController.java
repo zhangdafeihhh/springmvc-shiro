@@ -1,5 +1,6 @@
 package com.zhuanche.controller.biDriverMeasureDay;
 
+import com.zhuanche.common.util.CurrentSystemUtils;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
@@ -35,7 +36,7 @@ public class BiDriverMeasureDayController extends BaseController {
     public AjaxResponse count(@Verify(param = "startDate", rule = "required") String startDate,
                               @Verify(param = "endDate", rule = "required") String endDate, String allianceId, String motorcadeId){
         try {
-            String result = driverMeasureDayService.getResponsibleComplaintRate(startDate,endDate, allianceId);
+            String result = driverMeasureDayService.getResponsibleComplaintRate(startDate,endDate,null, allianceId);
             return AjaxResponse.success(result);
         }
         catch (Exception e){
@@ -45,8 +46,8 @@ public class BiDriverMeasureDayController extends BaseController {
 
     @RequestMapping("/index")
     public AjaxResponse index(@Verify(param = "startDate", rule = "required") String startDate,
-                              @Verify(param = "endDate", rule = "required") String endDate
-            , @RequestParam(value = "allianceId",required = false) Integer allianceId
+                              @Verify(param = "endDate", rule = "required") String endDate,
+                              Integer cityId, @RequestParam(value = "allianceId",required = false) Integer allianceId
             ,  @RequestParam(value = "motorcadeId",required = false)Integer motorcadeId){
         try {
             BiDriverMeasureDayDto params = new BiDriverMeasureDayDto();
