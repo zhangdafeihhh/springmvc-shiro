@@ -50,12 +50,12 @@ public class CurrentSystemUtils {
                 String supplis = supplierList.stream().map(e -> String.valueOf(e.getSupplierId())).collect(Collectors.joining(Constants.SEPERATER));
 
                 if(WebSessionUtil.isSupperAdmin()){
-                    return TransportUtils.strToList(supplierId,Constants.SEPERATER);
+                    return TransportUtils.strToList(supplis,Constants.SEPERATER);
                 }else {
                     Integer level = WebSessionUtil.getCurrentLoginUser().getLevel();
                     if(level.equals(PermissionLevelEnum.CITY.getCode()) ||
                          level.equals(PermissionLevelEnum.ALL.getCode())){
-                        return TransportUtils.strToList(supplierId,Constants.SEPERATER);
+                        return TransportUtils.strToList(supplis,Constants.SEPERATER);
                     }else {
                         Set<Integer> setSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
                         String supp = StringUtils.join(setSupplier.toArray(),Constants.SEPERATER);
