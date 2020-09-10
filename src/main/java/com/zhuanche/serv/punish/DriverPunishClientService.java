@@ -90,6 +90,7 @@ public class DriverPunishClientService extends DriverPunishService {
         resultMap.put("driverPunish", data.getJSONObject("driverPunish"));
         resultMap.put("rocordList", data.getJSONArray("rocordList"));
         resultMap.put("orderVideoVOList", videoList);
+        log.info("司机处罚申诉详情:{}", JSONObject.toJSONString(resultMap));
         return resultMap;
     }
 
