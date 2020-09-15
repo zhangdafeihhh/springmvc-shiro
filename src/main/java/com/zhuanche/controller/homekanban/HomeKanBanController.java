@@ -602,7 +602,7 @@ public class HomeKanBanController {
 	 */
 	@RequestMapping("/vehicleTopStatistics")
 	@ResponseBody
-	public AjaxResponse vehicleTopStatistics(String allianceId, String motorcadeId,
+	public AjaxResponse vehicleTopStatistics(Integer cityId,String allianceId, String motorcadeId,
 			@Verify(param = "orderByColumnCode", rule = "required") String orderByColumnCode,
 			@Verify(param = "orderByTypeCode", rule = "required") String orderByTypeCode,
 			@Verify(param = "topNum", rule = "required|max(50)") String topNum) {
@@ -639,11 +639,8 @@ public class HomeKanBanController {
 
 		try{
 
-			List<String>  visibleList = null;
 			List<String>  visibleMotoIdsList = null;
-			/*if(visibleAllianceIds != null){
-				visibleList = Arrays.asList(visibleAllianceIds);
-			}*/
+			List<String>  visibleList = systemUtils.supplierIds(cityId,allianceId);
 			if(visibleMotocadeIds != null){
 				visibleMotoIdsList = Arrays.asList(visibleMotocadeIds);
 			}

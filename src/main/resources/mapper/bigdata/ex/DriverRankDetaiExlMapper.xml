@@ -17,15 +17,10 @@
     <where>
       data_date >= #{date,jdbcType=DATE}
       <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
-        <if test="allianceId != null and allianceId != ''">
-          and supplier_id = #{allianceId}
-        </if>
-        <if test="allianceId == null or allianceId == ''">
-          and supplier_id in
-          <foreach item="item" index="index" collection="visibleAllianceIds" open="(" separator="," close=")">
-            #{item}
-          </foreach>
-        </if>
+        and supplier_id in
+        <foreach item="item" index="index" collection="visibleAllianceIds" open="(" separator="," close=")">
+          #{item}
+        </foreach>
       </if>
       <if test="visibleAllianceIds == null or visibleAllianceIds.size ==0">
         <if test="allianceId != null and allianceId != ''">
