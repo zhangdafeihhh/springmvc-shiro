@@ -918,7 +918,7 @@ public class SupplierFeeController {
         }
 
         if(param.equals("0.00") || param.equals("0.0000")){
-            return true;
+            return false;
         }
 
         return false;
