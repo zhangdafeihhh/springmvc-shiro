@@ -41,7 +41,7 @@ public class DriverMeasureDayService {
             params.setSupplierId(Integer.valueOf(allianceId));
         }
         if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
-            String suppliers = WebSessionUtil.getCurrentLoginUser().getSupplierIds().toString();
+            String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds().toArray(), ",");
             params.setSupplierIds(suppliers);
         }else{
             params.setSupplierIds("");
