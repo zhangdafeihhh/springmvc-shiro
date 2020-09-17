@@ -536,7 +536,7 @@
         select
         supplier_id
         from car_biz_supplier
-        where status=1 
+        where status =1
         <if test="cityIds!=null and cityIds.size()>0">
             and supplier_city IN
             <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >

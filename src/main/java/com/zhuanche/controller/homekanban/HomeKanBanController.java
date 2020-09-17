@@ -7,6 +7,7 @@ import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.common.util.CurrentSystemUtils;
 import com.zhuanche.common.util.RedisKeyUtils;
+import com.zhuanche.common.util.TransportUtils;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -121,7 +122,9 @@ public class HomeKanBanController {
                     return  AjaxResponse.success(resultList);
                 }
             }else {
-                key = RedisKeyUtils.VEHICLE_STATISTICS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
+				String keyParam = this.keyParam(cityId,allianceId);
+
+                key = RedisKeyUtils.VEHICLE_STATISTICS + stringBuffer.append(keyParam).append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
                         .append(allianceId).append(motorcadeId).toString().replaceAll("null","");
                 List<Map> resultList = RedisCacheUtil.get(key,List.class);
                 if(RedisCacheUtil.exist(key) && resultList != null){
@@ -155,6 +158,17 @@ public class HomeKanBanController {
 
 	}
 
+	private String keyParam(Integer cityId,String allianceId){
+		String keyParam = "";
+		if(cityId == null){
+			List<String> strList =	systemUtils.supplierIds(cityId,allianceId);
+			if(!CollectionUtils.isEmpty(strList)){
+				keyParam = StringUtils.join(strList,Constants.SEPERATER);
+			}
+		}
+		return keyParam;
+	}
+
 	/** 订单数量统计 **/
 	@RequestMapping("/orderStatistics")
 	@ResponseBody
@@ -185,7 +199,9 @@ public class HomeKanBanController {
 					return  AjaxResponse.success(resultList);
 				}
 			}else {
-				key = RedisKeyUtils.ORDER_STATISTICS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
+				String keyParam = this.keyParam(cityId,allianceId);
+
+				key = RedisKeyUtils.ORDER_STATISTICS + stringBuffer.append(keyParam).append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
 						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
 				List<Map> resultList = RedisCacheUtil.get(key,List.class);
 				if(RedisCacheUtil.exist(key) && resultList != null){
@@ -248,7 +264,9 @@ public class HomeKanBanController {
 					return  AjaxResponse.success(resultList);
 				}
 			}else {
-				key = RedisKeyUtils.ORDER_STATISTICS_CI + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
+				String keyParam = this.keyParam(cityId,allianceId);
+
+				key = RedisKeyUtils.ORDER_STATISTICS_CI + stringBuffer.append(keyParam).append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
 						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
 				Map<String,Object> resultList = RedisCacheUtil.get(key,Map.class);
 				if(RedisCacheUtil.exist(key) && resultList != null){
@@ -313,7 +331,9 @@ public class HomeKanBanController {
 					return  AjaxResponse.success(resultList);
 				}
 			}else {
-				key = RedisKeyUtils.CORE_STATISTICS_CI + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
+				String keyParam = this.keyParam(cityId,allianceId);
+
+				key = RedisKeyUtils.CORE_STATISTICS_CI + stringBuffer.append(keyParam).append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
 						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
 				Map<String,Object> resultList = RedisCacheUtil.get(key,Map.class);
 				if(RedisCacheUtil.exist(key) && resultList != null){
@@ -423,7 +443,9 @@ public class HomeKanBanController {
 					return  AjaxResponse.success(resultList);
 				}
 			}else {
-				key = RedisKeyUtils.SERVICE_RATE_STATISTIS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
+				String keyParam = this.keyParam(cityId,allianceId);
+
+				key = RedisKeyUtils.SERVICE_RATE_STATISTIS + stringBuffer.append(keyParam).append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
 						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
 				List<Map> resultList = RedisCacheUtil.get(key,List.class);
 				if(RedisCacheUtil.exist(key) && resultList != null){
@@ -491,7 +513,9 @@ public class HomeKanBanController {
 					return  AjaxResponse.success(resultList);
 				}
 			}else {
-				key = RedisKeyUtils.SERVICE_RATE_STATISTIS_CI + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
+				String keyParam = this.keyParam(cityId,allianceId);
+
+				key = RedisKeyUtils.SERVICE_RATE_STATISTIS_CI + stringBuffer.append(keyParam).append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
 						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
 				Map<String,Object>  resultList = RedisCacheUtil.get(key,Map.class);
 				if(RedisCacheUtil.exist(key) && resultList != null){
@@ -679,7 +703,9 @@ public class HomeKanBanController {
 					return  AjaxResponse.success(saasCoreIndexDto);
 				}
 			}else {
-				key = RedisKeyUtils.CORE_STATISTICS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
+				String keyParam = this.keyParam(cityId,allianceId);
+
+				key = RedisKeyUtils.CORE_STATISTICS + stringBuffer.append(keyParam).append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
 						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
 				SAASCoreIndexDto saasCoreIndexDto = RedisCacheUtil.get(key,SAASCoreIndexDto.class);
 				if(RedisCacheUtil.exist(key) && saasCoreIndexDto != null){
@@ -756,14 +782,15 @@ public class HomeKanBanController {
 			key = "";
 			StringBuffer stringBuffer = new StringBuffer();
 			if(CollectionUtils.isEmpty(currentLoginUser.getCityIds()) && currentLoginUser.getLevel().equals(PermissionLevelEnum.ALL.getCode())){
-				//
 				key = RedisKeyUtils.RESPONSIBLE_RATE_STATISTICS + stringBuffer.append(startDate).append(endDate).append(cityId).append(allianceId).toString().replaceAll("null","");
 				String  responsibleComplaintRate = RedisCacheUtil.get(key,String.class);
 				if(RedisCacheUtil.exist(key) && responsibleComplaintRate != null && !("").equals(responsibleComplaintRate)){
 					return  AjaxResponse.success(responsibleComplaintRate);
 				}
 			}else {
-				key = RedisKeyUtils.RESPONSIBLE_RATE_STATISTICS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
+				String keyParam = this.keyParam(cityId,allianceId);
+
+				key = RedisKeyUtils.RESPONSIBLE_RATE_STATISTICS + stringBuffer.append(keyParam).append(currentLoginUser.getId()).append(startDate).append(endDate).append(cityId)
 						.append(allianceId).toString().replaceAll("null","");
 				String  responsibleComplaintRate = RedisCacheUtil.get(key,String.class);
 				if(RedisCacheUtil.exist(key) && responsibleComplaintRate != null && !("").equals(responsibleComplaintRate)){
