@@ -55,6 +55,7 @@ public class CurrentSystemUtils {
                     Integer level = WebSessionUtil.getCurrentLoginUser().getLevel();
                     if(level.equals(PermissionLevelEnum.CITY.getCode()) ||
                          level.equals(PermissionLevelEnum.ALL.getCode())){
+                        logger.info("=======合作商id集合：" + supplis + "=======");
                         return TransportUtils.strToList(supplis,Constants.SEPERATER);
                     }else {
                         Set<Integer> setSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
@@ -76,6 +77,7 @@ public class CurrentSystemUtils {
                     if(level.equals(PermissionLevelEnum.CITY.getCode())){
                         List<CarBizSupplier> supplierList = supplierExMapper.queryByCityOrSupplierName(WebSessionUtil.getCurrentLoginUser().getCityIds(),null);
                         String supplis = supplierList.stream().map(e -> String.valueOf(e.getSupplierId())).collect(Collectors.joining(Constants.SEPERATER));
+                        logger.info("=======合作商id集合：" + supplis + "=======");
                         return TransportUtils.strToList(supplis,Constants.SEPERATER);
                     }else {
                         Set<Integer> setSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
