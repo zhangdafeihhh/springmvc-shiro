@@ -344,8 +344,8 @@ public class DriverInfoUpdateApplyController {
         driverInfoUpdateApply.setSupplierName(carBizCarInfoDTO.getSupplierName());
         driverInfoUpdateApply.setVehicleDrivingLicenseNew(vehicleDrivingLicenseNew);
         driverInfoUpdateApply.setVehiclePhotoGroupNew(vehiclePhotoNew);
-        driverInfoUpdateApply.setEngineNo(engineNo);
-        driverInfoUpdateApply.setVehicleVinCode(vehicleVinCode);
+        driverInfoUpdateApply.setEngineNoNew(engineNo);
+        driverInfoUpdateApply.setVinCodeNew(vehicleVinCode);
         driverInfoUpdateApply.setVehicleRegistrationDateNew(vehicleRegistrationDateNew);
         //老司机信息
         List<CarBizDriverInfoDTO> carBizDriverInfoDTOS = carBizDriverInfoService.queryDriverByLicensePlates(licensePlates);

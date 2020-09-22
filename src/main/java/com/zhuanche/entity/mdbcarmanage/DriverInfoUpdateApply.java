@@ -223,12 +223,12 @@ public class DriverInfoUpdateApply implements Serializable {
     /**
      * 发动机编号
      */
-    private String engineNo;
+    private String engineNoNew;
 
     /**
      * 车架号
      */
-    private String vehicleVinCode;
+    private String vinCodeNew;
 
     private Long newBrandId;
 
@@ -585,20 +585,20 @@ public class DriverInfoUpdateApply implements Serializable {
         this.initiatorType = initiatorType;
     }
 
-    public String getEngineNo() {
-        return engineNo;
+    public String getEngineNoNew() {
+        return engineNoNew;
     }
 
-    public void setEngineNo(String engineNo) {
-        this.engineNo = engineNo;
+    public void setEngineNoNew(String engineNoNew) {
+        this.engineNoNew = engineNoNew;
     }
 
-    public String getVehicleVinCode() {
-        return vehicleVinCode;
+    public String getVinCodeNew() {
+        return vinCodeNew;
     }
 
-    public void setVehicleVinCode(String vehicleVinCode) {
-        this.vehicleVinCode = vehicleVinCode;
+    public void setVinCodeNew(String vinCodeNew) {
+        this.vinCodeNew = vinCodeNew;
     }
 
     public Long getNewBrandId() {
@@ -633,170 +633,4 @@ public class DriverInfoUpdateApply implements Serializable {
         this.newBrandNameNew = newBrandNameNew;
     }
 
-    @Override
-    public boolean equals(Object that) {
-        if (this == that) {
-            return true;
-        }
-        if (that == null) {
-            return false;
-        }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        DriverInfoUpdateApply other = (DriverInfoUpdateApply) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-                && (this.getDriverId() == null ? other.getDriverId() == null : this.getDriverId().equals(other.getDriverId()))
-                && (this.getDriverName() == null ? other.getDriverName() == null : this.getDriverName().equals(other.getDriverName()))
-                && (this.getLicensePlates() == null ? other.getLicensePlates() == null : this.getLicensePlates().equals(other.getLicensePlates()))
-                && (this.getIdCardNo() == null ? other.getIdCardNo() == null : this.getIdCardNo().equals(other.getIdCardNo()))
-                && (this.getCityId() == null ? other.getCityId() == null : this.getCityId().equals(other.getCityId()))
-                && (this.getCityName() == null ? other.getCityName() == null : this.getCityName().equals(other.getCityName()))
-                && (this.getSupplierId() == null ? other.getSupplierId() == null : this.getSupplierId().equals(other.getSupplierId()))
-                && (this.getSupplierName() == null ? other.getSupplierName() == null : this.getSupplierName().equals(other.getSupplierName()))
-                && (this.getTeamId() == null ? other.getTeamId() == null : this.getTeamId().equals(other.getTeamId()))
-                && (this.getTeamName() == null ? other.getTeamName() == null : this.getTeamName().equals(other.getTeamName()))
-                && (this.getDriverPhone() == null ? other.getDriverPhone() == null : this.getDriverPhone().equals(other.getDriverPhone()))
-                && (this.getCarModelId() == null ? other.getCarModelId() == null : this.getCarModelId().equals(other.getCarModelId()))
-                && (this.getCarModelName() == null ? other.getCarModelName() == null : this.getCarModelName().equals(other.getCarModelName()))
-                && (this.getCarPurchaseDate() == null ? other.getCarPurchaseDate() == null : this.getCarPurchaseDate().equals(other.getCarPurchaseDate()))
-                && (this.getModelDetail() == null ? other.getModelDetail() == null : this.getModelDetail().equals(other.getModelDetail()))
-                && (this.getColor() == null ? other.getColor() == null : this.getColor().equals(other.getColor()))
-                && (this.getIdCardNoNew() == null ? other.getIdCardNoNew() == null : this.getIdCardNoNew().equals(other.getIdCardNoNew()))
-                && (this.getDriverNameNew() == null ? other.getDriverNameNew() == null : this.getDriverNameNew().equals(other.getDriverNameNew()))
-                && (this.getDriverPhoneNew() == null ? other.getDriverPhoneNew() == null : this.getDriverPhoneNew().equals(other.getDriverPhoneNew()))
-                && (this.getCarModelIdNew() == null ? other.getCarModelIdNew() == null : this.getCarModelIdNew().equals(other.getCarModelIdNew()))
-                && (this.getCarModelNameNew() == null ? other.getCarModelNameNew() == null : this.getCarModelNameNew().equals(other.getCarModelNameNew()))
-                && (this.getCarPurchaseDateNew() == null ? other.getCarPurchaseDateNew() == null : this.getCarPurchaseDateNew().equals(other.getCarPurchaseDateNew()))
-                && (this.getModelDetailNew() == null ? other.getModelDetailNew() == null : this.getModelDetailNew().equals(other.getModelDetailNew()))
-                && (this.getColorNew() == null ? other.getColorNew() == null : this.getColorNew().equals(other.getColorNew()))
-                && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
-                && (this.getType() == null ? other.getType() == null : this.getType().equals(other.getType()))
-                && (this.getCreateId() == null ? other.getCreateId() == null : this.getCreateId().equals(other.getCreateId()))
-                && (this.getCreateName() == null ? other.getCreateName() == null : this.getCreateName().equals(other.getCreateName()))
-                && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
-                && (this.getUpdateId() == null ? other.getUpdateId() == null : this.getUpdateId().equals(other.getUpdateId()))
-                && (this.getUpdateName() == null ? other.getUpdateName() == null : this.getUpdateName().equals(other.getUpdateName()))
-                && (this.getOperateReason() == null ? other.getOperateReason() == null : this.getOperateReason().equals(other.getOperateReason()))
-                && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
-                && (this.getVehicleOwner() == null ? other.getVehicleOwner() == null : this.getVehicleOwner().equals(other.getVehicleOwner()))
-                && (this.getVehicleRegistrationDate() == null ? other.getVehicleRegistrationDate() == null : this.getVehicleRegistrationDate().equals(other.getVehicleRegistrationDate()))
-                && (this.getVehicleDrivingLicense() == null ? other.getVehicleDrivingLicense() == null : this.getVehicleDrivingLicense().equals(other.getVehicleDrivingLicense()))
-                && (this.getVehiclePhotoGroup() == null ? other.getVehiclePhotoGroup() == null : this.getVehiclePhotoGroup().equals(other.getVehiclePhotoGroup()))
-                && (this.getVehicleOwnerNew() == null ? other.getVehicleOwnerNew() == null : this.getVehicleOwnerNew().equals(other.getVehicleOwnerNew()))
-                && (this.getVehicleRegistrationDateNew() == null ? other.getVehicleRegistrationDateNew() == null : this.getVehicleRegistrationDateNew().equals(other.getVehicleRegistrationDateNew()))
-                && (this.getVehicleDrivingLicenseNew() == null ? other.getVehicleDrivingLicenseNew() == null : this.getVehicleDrivingLicenseNew().equals(other.getVehicleDrivingLicenseNew()))
-                && (this.getVehiclePhotoGroupNew() == null ? other.getVehiclePhotoGroupNew() == null : this.getVehiclePhotoGroupNew().equals(other.getVehiclePhotoGroupNew()))
-                && (this.getInitiatorType() == null ? other.getInitiatorType() == null : this.getInitiatorType().equals(other.getInitiatorType()))
-                && (this.getEngineNo() == null ? other.getEngineNo() == null : this.getEngineNo().equals(other.getEngineNo()))
-                && (this.getVehicleVinCode() == null ? other.getVehicleVinCode() == null : this.getVehicleVinCode().equals(other.getVehicleVinCode()));
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getDriverId() == null) ? 0 : getDriverId().hashCode());
-        result = prime * result + ((getDriverName() == null) ? 0 : getDriverName().hashCode());
-        result = prime * result + ((getLicensePlates() == null) ? 0 : getLicensePlates().hashCode());
-        result = prime * result + ((getIdCardNo() == null) ? 0 : getIdCardNo().hashCode());
-        result = prime * result + ((getCityId() == null) ? 0 : getCityId().hashCode());
-        result = prime * result + ((getCityName() == null) ? 0 : getCityName().hashCode());
-        result = prime * result + ((getSupplierId() == null) ? 0 : getSupplierId().hashCode());
-        result = prime * result + ((getSupplierName() == null) ? 0 : getSupplierName().hashCode());
-        result = prime * result + ((getTeamId() == null) ? 0 : getTeamId().hashCode());
-        result = prime * result + ((getTeamName() == null) ? 0 : getTeamName().hashCode());
-        result = prime * result + ((getDriverPhone() == null) ? 0 : getDriverPhone().hashCode());
-        result = prime * result + ((getCarModelId() == null) ? 0 : getCarModelId().hashCode());
-        result = prime * result + ((getCarModelName() == null) ? 0 : getCarModelName().hashCode());
-        result = prime * result + ((getCarPurchaseDate() == null) ? 0 : getCarPurchaseDate().hashCode());
-        result = prime * result + ((getModelDetail() == null) ? 0 : getModelDetail().hashCode());
-        result = prime * result + ((getColor() == null) ? 0 : getColor().hashCode());
-        result = prime * result + ((getIdCardNoNew() == null) ? 0 : getIdCardNoNew().hashCode());
-        result = prime * result + ((getDriverNameNew() == null) ? 0 : getDriverNameNew().hashCode());
-        result = prime * result + ((getDriverPhoneNew() == null) ? 0 : getDriverPhoneNew().hashCode());
-        result = prime * result + ((getCarModelIdNew() == null) ? 0 : getCarModelIdNew().hashCode());
-        result = prime * result + ((getCarModelNameNew() == null) ? 0 : getCarModelNameNew().hashCode());
-        result = prime * result + ((getCarPurchaseDateNew() == null) ? 0 : getCarPurchaseDateNew().hashCode());
-        result = prime * result + ((getModelDetailNew() == null) ? 0 : getModelDetailNew().hashCode());
-        result = prime * result + ((getColorNew() == null) ? 0 : getColorNew().hashCode());
-        result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
-        result = prime * result + ((getType() == null) ? 0 : getType().hashCode());
-        result = prime * result + ((getCreateId() == null) ? 0 : getCreateId().hashCode());
-        result = prime * result + ((getCreateName() == null) ? 0 : getCreateName().hashCode());
-        result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
-        result = prime * result + ((getUpdateId() == null) ? 0 : getUpdateId().hashCode());
-        result = prime * result + ((getUpdateName() == null) ? 0 : getUpdateName().hashCode());
-        result = prime * result + ((getOperateReason() == null) ? 0 : getOperateReason().hashCode());
-        result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
-        result = prime * result + ((getVehicleOwner() == null) ? 0 : getVehicleOwner().hashCode());
-        result = prime * result + ((getVehicleRegistrationDate() == null) ? 0 : getVehicleRegistrationDate().hashCode());
-        result = prime * result + ((getVehicleDrivingLicense() == null) ? 0 : getVehicleDrivingLicense().hashCode());
-        result = prime * result + ((getVehiclePhotoGroup() == null) ? 0 : getVehiclePhotoGroup().hashCode());
-        result = prime * result + ((getVehicleOwnerNew() == null) ? 0 : getVehicleOwnerNew().hashCode());
-        result = prime * result + ((getVehicleRegistrationDateNew() == null) ? 0 : getVehicleRegistrationDateNew().hashCode());
-        result = prime * result + ((getVehicleDrivingLicenseNew() == null) ? 0 : getVehicleDrivingLicenseNew().hashCode());
-        result = prime * result + ((getVehiclePhotoGroupNew() == null) ? 0 : getVehiclePhotoGroupNew().hashCode());
-        result = prime * result + ((getInitiatorType() == null) ? 0 : getInitiatorType().hashCode());
-        result = prime * result + ((getEngineNo() == null) ? 0 : getEngineNo().hashCode());
-        result = prime * result + ((getVehicleVinCode() == null) ? 0 : getVehicleVinCode().hashCode());
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", driverId=").append(driverId);
-        sb.append(", driverName=").append(driverName);
-        sb.append(", licensePlates=").append(licensePlates);
-        sb.append(", idCardNo=").append(idCardNo);
-        sb.append(", cityId=").append(cityId);
-        sb.append(", cityName=").append(cityName);
-        sb.append(", supplierId=").append(supplierId);
-        sb.append(", supplierName=").append(supplierName);
-        sb.append(", teamId=").append(teamId);
-        sb.append(", teamName=").append(teamName);
-        sb.append(", driverPhone=").append(driverPhone);
-        sb.append(", carModelId=").append(carModelId);
-        sb.append(", carModelName=").append(carModelName);
-        sb.append(", carPurchaseDate=").append(carPurchaseDate);
-        sb.append(", modelDetail=").append(modelDetail);
-        sb.append(", color=").append(color);
-        sb.append(", idCardNoNew=").append(idCardNoNew);
-        sb.append(", driverNameNew=").append(driverNameNew);
-        sb.append(", driverPhoneNew=").append(driverPhoneNew);
-        sb.append(", carModelIdNew=").append(carModelIdNew);
-        sb.append(", carModelNameNew=").append(carModelNameNew);
-        sb.append(", carPurchaseDateNew=").append(carPurchaseDateNew);
-        sb.append(", modelDetailNew=").append(modelDetailNew);
-        sb.append(", colorNew=").append(colorNew);
-        sb.append(", status=").append(status);
-        sb.append(", type=").append(type);
-        sb.append(", createId=").append(createId);
-        sb.append(", createName=").append(createName);
-        sb.append(", createTime=").append(createTime);
-        sb.append(", updateId=").append(updateId);
-        sb.append(", updateName=").append(updateName);
-        sb.append(", operateReason=").append(operateReason);
-        sb.append(", updateTime=").append(updateTime);
-        sb.append(", vehicleOwner=").append(vehicleOwner);
-        sb.append(", vehicleRegistrationDate=").append(vehicleRegistrationDate);
-        sb.append(", vehicleDrivingLicense=").append(vehicleDrivingLicense);
-        sb.append(", vehiclePhotoGroup=").append(vehiclePhotoGroup);
-        sb.append(", vehicleOwnerNew=").append(vehicleOwnerNew);
-        sb.append(", vehicleRegistrationDateNew=").append(vehicleRegistrationDateNew);
-        sb.append(", vehicleDrivingLicenseNew=").append(vehicleDrivingLicenseNew);
-        sb.append(", vehiclePhotoGroupNew=").append(vehiclePhotoGroupNew);
-        sb.append(", initiatorType=").append(initiatorType);
-        sb.append(", engineNo=").append(engineNo);
-        sb.append(", vehicleVinCode=").append(vehicleVinCode);
-        sb.append(", serialVersionUID=").append(serialVersionUID);
-        sb.append("]");
-        return sb.toString();
-    }
 }

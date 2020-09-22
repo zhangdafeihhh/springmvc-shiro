@@ -45,8 +45,8 @@
     <result column="vehicle_driving_license_new" jdbcType="VARCHAR" property="vehicleDrivingLicenseNew" />
     <result column="vehicle_photo_group_new" jdbcType="VARCHAR" property="vehiclePhotoGroupNew" />
     <result column="initiator_type" jdbcType="INTEGER" property="initiatorType" />
-    <result column="engine_no" jdbcType="VARCHAR" property="engineNo" />
-    <result column="vehicle_vin_code" jdbcType="VARCHAR" property="vehicleVinCode" />
+    <result column="engine_no_new" jdbcType="VARCHAR" property="engineNoNew" />
+    <result column="vin_code_new" jdbcType="VARCHAR" property="vinCodeNew" />
   </resultMap>
   <sql id="Base_Column_List">
     id, driver_id, driver_name, license_plates, id_card_no, city_id, city_name, supplier_id,
@@ -56,7 +56,7 @@
     `type`, create_id, create_name, create_time, update_id, update_name, operate_reason,
     update_time, vehicle_owner, vehicle_registration_date, vehicle_driving_license, vehicle_photo_group,
     vehicle_owner_new, vehicle_registration_date_new, vehicle_driving_license_new, vehicle_photo_group_new,
-    initiator_type, engine_no, vehicle_vin_code
+    initiator_type, engine_no_new, vin_code_new
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select
@@ -84,7 +84,7 @@
                                           vehicle_registration_date, vehicle_driving_license,
                                           vehicle_photo_group, vehicle_owner_new, vehicle_registration_date_new,
                                           vehicle_driving_license_new, vehicle_photo_group_new,
-                                          initiator_type, engine_no, vehicle_vin_code
+                                          initiator_type, engine_no_new, vin_code_new
     )
     values (#{id,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER}, #{driverName,jdbcType=VARCHAR},
             #{licensePlates,jdbcType=VARCHAR}, #{idCardNo,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER},
@@ -237,10 +237,10 @@
         initiator_type,
       </if>
       <if test="engineNo != null">
-        engine_no,
+        engine_no_new,
       </if>
       <if test="vehicleVinCode != null">
-        vehicle_vin_code,
+        vin_code_new,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -510,11 +510,11 @@
       <if test="initiatorType != null">
         initiator_type = #{initiatorType,jdbcType=INTEGER},
       </if>
-      <if test="engineNo != null">
-        engine_no = #{engineNo,jdbcType=VARCHAR},
+      <if test="engineNoNew != null">
+        engine_no_new = #{engineNoNew,jdbcType=VARCHAR},
       </if>
-      <if test="vehicleVinCode != null">
-        vehicle_vin_code = #{vehicleVinCode,jdbcType=VARCHAR},
+      <if test="vinCodeNew != null">
+       vin_code_new = #{vinCodeNew,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -563,8 +563,8 @@
         vehicle_driving_license_new = #{vehicleDrivingLicenseNew,jdbcType=VARCHAR},
         vehicle_photo_group_new = #{vehiclePhotoGroupNew,jdbcType=VARCHAR},
         initiator_type = #{initiatorType,jdbcType=INTEGER},
-        engine_no = #{engineNo,jdbcType=VARCHAR},
-        vehicle_vin_code = #{vehicleVinCode,jdbcType=VARCHAR}
+        engine_no_new = #{engineNoNew,jdbcType=VARCHAR},
+        vin_code_new = #{vehicleVinCode,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>
