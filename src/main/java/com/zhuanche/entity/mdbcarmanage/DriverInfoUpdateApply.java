@@ -230,6 +230,15 @@ public class DriverInfoUpdateApply implements Serializable {
      */
     private String vehicleVinCode;
 
+    private Long newBrandId;
+
+    private String newBrandName;
+
+
+    private Long newBrandIdNew;
+
+    private String newBrandNameNew;
+
     private static final long serialVersionUID = 1L;
 
     public Integer getId() {
@@ -590,6 +599,38 @@ public class DriverInfoUpdateApply implements Serializable {
 
     public void setVehicleVinCode(String vehicleVinCode) {
         this.vehicleVinCode = vehicleVinCode;
+    }
+
+    public Long getNewBrandId() {
+        return newBrandId;
+    }
+
+    public void setNewBrandId(Long newBrandId) {
+        this.newBrandId = newBrandId;
+    }
+
+    public String getNewBrandName() {
+        return newBrandName;
+    }
+
+    public void setNewBrandName(String newBrandName) {
+        this.newBrandName = newBrandName;
+    }
+
+    public Long getNewBrandIdNew() {
+        return newBrandIdNew;
+    }
+
+    public void setNewBrandIdNew(Long newBrandIdNew) {
+        this.newBrandIdNew = newBrandIdNew;
+    }
+
+    public String getNewBrandNameNew() {
+        return newBrandNameNew;
+    }
+
+    public void setNewBrandNameNew(String newBrandNameNew) {
+        this.newBrandNameNew = newBrandNameNew;
     }
 
     @Override
