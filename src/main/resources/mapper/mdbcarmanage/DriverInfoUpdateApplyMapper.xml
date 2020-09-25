@@ -236,10 +236,10 @@
       <if test="initiatorType != null">
         initiator_type,
       </if>
-      <if test="engineNo != null">
+      <if test="engineNoNew != null">
         engine_no_new,
       </if>
-      <if test="vehicleVinCode != null">
+      <if test="vinCodeNew != null">
         vin_code_new,
       </if>
     </trim>
@@ -373,11 +373,11 @@
       <if test="initiatorType != null">
         #{initiatorType,jdbcType=INTEGER},
       </if>
-      <if test="engineNo != null">
-        #{engineNo,jdbcType=VARCHAR},
+      <if test="engineNoNew != null">
+        #{engineNoNew,jdbcType=VARCHAR},
       </if>
-      <if test="vehicleVinCode != null">
-        #{vehicleVinCode,jdbcType=VARCHAR},
+      <if test="vinCodeNew != null">
+        #{vinCodeNew,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
