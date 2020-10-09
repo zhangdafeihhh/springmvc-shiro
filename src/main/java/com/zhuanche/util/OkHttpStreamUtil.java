@@ -1,6 +1,5 @@
 package com.zhuanche.util;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
@@ -17,8 +16,8 @@ public class OkHttpStreamUtil {
     private static final OkHttpClient OK_HTTP_CLIENT = new OkHttpClient() {{
         new Builder()
                 .connectTimeout(3, TimeUnit.SECONDS)
-                .readTimeout(3, TimeUnit.SECONDS)
-                .writeTimeout(3, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
                 .build();
     }};

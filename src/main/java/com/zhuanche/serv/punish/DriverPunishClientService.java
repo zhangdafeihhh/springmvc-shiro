@@ -171,15 +171,17 @@ public class DriverPunishClientService extends DriverPunishService {
             if (Objects.nonNull(fileBytes)) {
                 //支持范围请求
                 int fileLength = fileBytes.length;
-                response.addHeader("Accept-Ranges","bytes");
-                response.addHeader("Content-Length",""+ fileLength);
+                response.addHeader("Accept-Ranges", "bytes");
+                response.addHeader("Content-Length", "" + fileLength);
                 response.addHeader("Content-Range", "bytes 0-" + fileLength);
                 response.addHeader("Content-Type", "audio/mpeg");
-                response.addHeader("Content-Length",""+ fileLength);
+                response.addHeader("Content-Length", "" + fileLength);
                 outputStream = new BufferedOutputStream(response.getOutputStream());
                 outputStream.write(fileBytes);
                 outputStream.flush();
             }
+        } catch (IOException io) {
+            log.warn("渲染行程录音IOException", io);
         } catch (Exception e) {
             log.error("渲染行程录音失败", e);
             throw e;
