@@ -49,4 +49,10 @@ public interface DriverInfoInterCityExMapper {
                                @Param("driverPhone")String driverPhone,
                                @Param("licensePlates")String licensePlates);
 
+
+    List<DriverInfoInterCity> phoneQueryMainOrderDrivers(@Param("queryParam")String queryParam,
+                                                         @Param("cityIds")Set<Integer> cityIds,
+                                                         @Param("supplierIds")Set<Integer> supplierIds,
+                                                         @Param("teamId")Set<Integer> teamId);
+
 }

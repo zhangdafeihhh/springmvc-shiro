@@ -2,6 +2,8 @@ package com.zhuanche.serv.intercity;
 
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 
+import java.util.List;
+
 /**
  * @Author fanht
  * @Description
@@ -18,4 +20,6 @@ public interface MainOrderInterService {
     MainOrderInterCity queryMainOrder(String mainOrderNo);
 
     int updateMainOrderState(String mainOrderNo, Integer status, String phone);
+
+    List<MainOrderInterCity> phoneQueryByDriverId(Integer driverId);
 }

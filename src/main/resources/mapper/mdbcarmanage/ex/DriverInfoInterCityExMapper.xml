@@ -234,4 +234,43 @@
     and supplier_id = #{supplierId}
     AND (t.driver_name = #{queryParam} or t.driver_phone= #{queryParam} or t.license_plates=#{queryParam} )
   </select>
+
+
+  <select id="phoneQueryMainOrderDrivers" resultType="com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity">
+    SELECT t.city_id as cityId,t.city_name as cityName, t.group_id as groupId, t.supplier_name as supplierName,t.id,t.driver_name as driverName,t.license_plates as licensePlates,t.driver_id as driverId,
+    t.driver_phone as driverPhone
+    FROM driver_info_inter_city t
+    WHERE 1=1
+    <if test="queryParam!=null and queryParam!=''">
+      and (t.driver_name  = #{queryParam} or t.driver_phone = #{queryParam} or t.license_plates = #{queryParam})
+    </if>
+
+    <if test="cityIds != null and cityIds.size()>0">
+      and city_id in
+      <foreach collection="cityIds" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+
+
+    <if test="supplierIds != null and supplierIds.size()>0">
+      and supplier_id in
+      <foreach collection="supplierIds" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+
+
+    <if test="teamId != null and teamId.size()>0">
+      and team_id in
+      <foreach collection="teamId" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+
+
+    ORDER  BY  create_time desc
+  </select>
+
+
 </mapper>

@@ -6,6 +6,8 @@ import mapper.mdbcarmanage.ex.MainOrderInterCityExMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @Author fanht
  * @Description
@@ -36,5 +38,10 @@ public class MainOrderInterServiceImpl implements MainOrderInterService {
     @Override
     public int updateMainOrderState(String mainOrderNo,Integer status,String phone) {
         return exMapper.updateMainOrderState(mainOrderNo,status,phone);
+    }
+
+    @Override
+    public List<MainOrderInterCity> phoneQueryByDriverId(Integer driverId) {
+        return exMapper.phoneQueryByDriverId(driverId);
     }
 }
