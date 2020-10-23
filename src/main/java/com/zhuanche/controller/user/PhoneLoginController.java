@@ -206,7 +206,7 @@ public class PhoneLoginController {
             return AjaxResponse.success( map );
         }else {
             response.sendRedirect(homepageUrl);
-            return map;
+            return AjaxResponse.success(map);
         }
     }
 
