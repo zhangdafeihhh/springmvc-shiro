@@ -105,7 +105,8 @@
 				/updateLevel.json = anon
 				/permission/levelList.json = anon
 				/unauthorized.json=anon
-				/getMsgCode.json = anon
+				/phone/*.json = anon
+				/dologin.json = anon
 				/dologin.json = anon
 				/logout.html = logout
 				/** = user
