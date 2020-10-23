@@ -1,5 +1,6 @@
 package com.zhuanche.controller.user;
 
+import com.google.common.collect.Maps;
 import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
@@ -184,6 +185,7 @@ public class PhoneLoginController {
             return AjaxResponse.fail(RestErrorCode.USER_INVALID) ;
         }
         //F: 执行登录
+        Map<String,Object> map = Maps.newHashMap();
         try {
             //shiro登录  TODO 此处直接用查询出来的密码作为密码
             UsernamePasswordToken token = new UsernamePasswordToken( username, user.getPassword().toCharArray() );
@@ -191,7 +193,7 @@ public class PhoneLoginController {
             //记录登录用户的所有会话ID，以支持“系统管理”功能中的自动会话清理
             String sessionId =  (String)currentLoginUser.getSession().getId() ;
             redisSessionDAO.phoneSaveSessionIdOfLoginUser(username, sessionId);
-
+            map.put("sesssionId",sessionId);
             redisTemplate.delete(redis_login_key);
             redisTemplate.delete(redis_getmsgcode_key);
 
@@ -201,10 +203,10 @@ public class PhoneLoginController {
         //返回登录成功
         Boolean isAjax = (Boolean) request.getAttribute("X_IS_AJAX");
         if(  isAjax  ) {
-            return AjaxResponse.success( null );
+            return AjaxResponse.success( map );
         }else {
             response.sendRedirect(homepageUrl);
-            return null;
+            return map;
         }
     }
 
