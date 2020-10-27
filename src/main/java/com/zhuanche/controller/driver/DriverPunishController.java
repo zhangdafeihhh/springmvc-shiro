@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -36,7 +37,7 @@ import java.util.Set;
  */
 
 
-@RestController
+@Controller
 @RequestMapping("/driverPunish")
 public class DriverPunishController extends BaseController {
 
@@ -44,11 +45,10 @@ public class DriverPunishController extends BaseController {
 
     @Resource
     private DriverPunishClientService driverPunishService;
-    @Resource
-    private RedisCacheManager redisCacheManager;
 
 
     @RequestMapping("/getDriverPunishList")
+    @ResponseBody
     public AjaxResponse getDriverPunishList(DriverPunishDto params){
         if (Objects.isNull(params.getOrderNo()) && StringUtils.isBlank(params.getPhone()) && StringUtils.isBlank(params.getLicensePlates())) {
             if(params.getCityId() == null){
@@ -83,6 +83,7 @@ public class DriverPunishController extends BaseController {
      * @return
      */
     @PostMapping(value = "/examineDriverPunish")
+    @ResponseBody
     public AjaxResponse examineDriverPunish(Integer punishId, Integer status, String reason,String cgPictures) {
         if (Objects.isNull(punishId) || Objects.isNull(status)) {
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
@@ -106,6 +107,7 @@ public class DriverPunishController extends BaseController {
      */
     @RequiresPermissions(value = {"punishTripVideo"})
     @GetMapping(value = "/initVideoData")
+    @ResponseBody
     public AjaxResponse initVideoData(DriverPunishDto params, HttpServletRequest request) {
         if (Objects.isNull(params.getOrderNo())) {
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
@@ -147,6 +149,7 @@ public class DriverPunishController extends BaseController {
      * @return
      */
     @RequestMapping("/getDriverPunishDetail")
+    @ResponseBody
     public AjaxResponse getDriverPunishDetail(Integer punishId, HttpServletRequest request) {
         if (Objects.isNull(punishId)) {
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
