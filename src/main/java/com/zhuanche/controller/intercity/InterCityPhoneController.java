@@ -7,6 +7,7 @@ import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
@@ -156,20 +157,20 @@ public class InterCityPhoneController {
                                        Integer orderSource, String driverName, String driverPhone, String licensePlates,
                                        String reserveName, String reservePhone, String riderName, String orderNo,
                                        String mainOrderNo, String beginCreateDate, String endCreateDate, String beginCostStartDate,
-                                       String beginCostEndDate, String riderPhone) {
-        logger.info(MessageFormat.format("语音播报订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},orderState:" +
+                                       String beginCostEndDate, String riderPhone,@RequestParam(value = "status",defaultValue = "13") Integer status) {
+        logger.info(MessageFormat.format("手机端语音播报订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
-                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21},riderPhone:{22}", pageNum,
+                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21},riderPhone:{22},status:{23}", pageNum,
                 pageSize, cityId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone));
+                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone,status));
         Long currentTime = System.currentTimeMillis();
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
         Map<String, Object> map = Maps.newHashMap();
         map = this.getNoticeMap(pageNum, pageSize, cityId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource, driverName, driverPhone, licensePlates,
-                reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate, endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone, map);
+                reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate, endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone, status,map);
         String supplierIdBatch = "";
         if (!WebSessionUtil.isSupperAdmin()) {
             Set<Integer> suppliersSet = loginUser.getSupplierIds();
@@ -276,10 +277,11 @@ public class InterCityPhoneController {
                                              String beginCostStartDate,
                                              String beginCostEndDate,
                                              String riderPhone,
+                                             Integer status,
                                              Map<String, Object> map) {
         map.put("pageNo", 1);
         map.put("pageSize", 30);
-        map.put("status", 13);
+        map.put("status", status);
         map.put("pushDriverType", pushDriverType);
         map.put("orderType", orderSource);
         map.put("airportId", airportId);
