@@ -157,20 +157,20 @@ public class InterCityPhoneController {
                                        Integer orderSource, String driverName, String driverPhone, String licensePlates,
                                        String reserveName, String reservePhone, String riderName, String orderNo,
                                        String mainOrderNo, String beginCreateDate, String endCreateDate, String beginCostStartDate,
-                                       String beginCostEndDate, String riderPhone,@RequestParam(value = "status",defaultValue = "13") Integer status) {
+                                       String beginCostEndDate, String riderPhone, @RequestParam(value = "status", defaultValue = "13") Integer status) {
         logger.info(MessageFormat.format("手机端语音播报订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
                         "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21},riderPhone:{22},status:{23}", pageNum,
                 pageSize, cityId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone,status));
+                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone, status));
         Long currentTime = System.currentTimeMillis();
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
         Map<String, Object> map = Maps.newHashMap();
         map = this.getNoticeMap(pageNum, pageSize, cityId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource, driverName, driverPhone, licensePlates,
-                reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate, endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone, status,map);
+                reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate, endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone, status, map);
         String supplierIdBatch = "";
         if (!WebSessionUtil.isSupperAdmin()) {
             Set<Integer> suppliersSet = loginUser.getSupplierIds();
@@ -225,7 +225,6 @@ public class InterCityPhoneController {
         }
         return AjaxResponse.success(null);
     }
-
 
 
     /***
@@ -364,23 +363,19 @@ public class InterCityPhoneController {
                         for (int i = 0; i < arrayData.size(); i++) {
                             JSONObject resultObject = arrayData.getJSONObject(i);
                             if (resultObject.get("createDate") != null) {
-                                String createDate = resultObject.get("createDate").toString();
-                                Long createLong = DateUtils.getDate(createDate, "yyyy-MM-dd HH:mm:ss").getTime();
-                                if (currentTime - createLong <= 10000) {
-                                    String lineName = resultObject.get("lineName") == null ? "" : resultObject.get("lineName").toString();
-                                    String resultOrderNo = resultObject.get("orderNo") == null ? "" : resultObject.get("orderNo").toString();
-                                    String bookingDate = resultObject.get("bookingDate") == null ? "" : resultObject.get("bookingDate").toString();
-                                    String customerNumber = resultObject.get("factDriverId") == null ? "" : resultObject.get("factDriverId").toString();
-                                    Integer offlineIntercityServiceType = resultObject.get("offlineIntercityServiceType") == null ? 0 : resultObject.getInteger("offlineIntercityServiceType");
+                                String lineName = resultObject.get("lineName") == null ? "" : resultObject.get("lineName").toString();
+                                String resultOrderNo = resultObject.get("orderNo") == null ? "" : resultObject.get("orderNo").toString();
+                                String bookingDate = resultObject.get("bookingDate") == null ? "" : resultObject.get("bookingDate").toString();
+                                String customerNumber = resultObject.get("factDriverId") == null ? "" : resultObject.get("factDriverId").toString();
+                                Integer offlineIntercityServiceType = resultObject.get("offlineIntercityServiceType") == null ? 0 : resultObject.getInteger("offlineIntercityServiceType");
 
-                                    JSONObject objectNotice = new JSONObject();
-                                    objectNotice.put("lineName", lineName);
-                                    objectNotice.put("orderNo", resultOrderNo);
-                                    objectNotice.put("bookingDate", bookingDate);
-                                    objectNotice.put("customerNumber", customerNumber);
-                                    objectNotice.put("offlineIntercityServiceType", offlineIntercityServiceType);
-                                    arrayList.add(objectNotice);
-                                }
+                                JSONObject objectNotice = new JSONObject();
+                                objectNotice.put("lineName", lineName);
+                                objectNotice.put("orderNo", resultOrderNo);
+                                objectNotice.put("bookingDate", bookingDate);
+                                objectNotice.put("customerNumber", customerNumber);
+                                objectNotice.put("offlineIntercityServiceType", offlineIntercityServiceType);
+                                arrayList.add(objectNotice);
                             }
                         }
                         return arrayList;
@@ -396,6 +391,7 @@ public class InterCityPhoneController {
 
     /**
      * 查询司机列表
+     *
      * @param queryParam
      * @param pageNum
      * @param pageSize
@@ -404,8 +400,8 @@ public class InterCityPhoneController {
     @ResponseBody
     @RequestMapping("/queryDriverList")
     public AjaxResponse queryDriverList(String queryParam,
-                                    @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
-                                    @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+                                        @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+                                        @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
 
         logger.info(MessageFormat.format("手机端查询城际拼车司机入参：queryParam:{0},pageNum:{1},pageSize:{2}", queryParam,
                 pageNum, pageSize));
@@ -443,10 +439,10 @@ public class InterCityPhoneController {
      */
     @ResponseBody
     @RequestMapping("/queryDriver")
-    public AjaxResponse queryDriver(Integer driverId,@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+    public AjaxResponse queryDriver(Integer driverId, @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                     @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize) {
 
-        logger.info(MessageFormat.format("手机端查询城际拼车司机详情入参：driverId:{0}",driverId));
+        logger.info(MessageFormat.format("手机端查询城际拼车司机详情入参：driverId:{0}", driverId));
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
         Set<Integer> cityIds = new HashSet<>();
         Set<Integer> supplierIds = new HashSet<>();
@@ -463,8 +459,8 @@ public class InterCityPhoneController {
 
         List<MainOrderDetailDTO> interCityList = new ArrayList<>();
 
-        if(CollectionUtils.isNotEmpty(orderInterCityList)){
-            orderInterCityList.forEach(i ->{
+        if (CollectionUtils.isNotEmpty(orderInterCityList)) {
+            orderInterCityList.forEach(i -> {
                 MainOrderDetailDTO dto = new MainOrderDetailDTO();
                 dto.setMainOrder(i.getMainOrderNo());
                 dto.setDriverId(driverId);
@@ -474,7 +470,7 @@ public class InterCityPhoneController {
             });
         }
 
-        if(CollectionUtils.isNotEmpty(interCityList)){
+        if (CollectionUtils.isNotEmpty(interCityList)) {
             for (MainOrderDetailDTO detailDTO : interCityList) {
                 if (StringUtils.isNotEmpty(detailDTO.getMainOrder())) {
                     //剩余车位数
@@ -532,7 +528,6 @@ public class InterCityPhoneController {
         }
         return seatNum;
     }
-
 
 
 }
