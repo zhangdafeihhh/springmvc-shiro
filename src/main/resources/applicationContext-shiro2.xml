@@ -99,7 +99,6 @@
 		</property>
 		<property name="filterChainDefinitions">
 			<value>
-				/integerCity/*.json=anon
 				/interCItyPhoneController/*.json=anon
 				/resetPassword/*.json = anon
 				/nginx.html = anon
