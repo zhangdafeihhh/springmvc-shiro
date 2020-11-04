@@ -99,13 +99,15 @@
 		</property>
 		<property name="filterChainDefinitions">
 			<value>
+				/integerCity/*.json=anon
+				/interCItyPhoneController/*.json=anon
 				/resetPassword/*.json = anon
 				/nginx.html = anon
 				/login.json = anon
 				/updateLevel.json = anon
 				/permission/levelList.json = anon
 				/unauthorized.json=anon
-				/getMsgCode.json = anon
+				/phone/*.json = anon
 				/dologin.json = anon
 				/logout.html = logout
 				/** = user

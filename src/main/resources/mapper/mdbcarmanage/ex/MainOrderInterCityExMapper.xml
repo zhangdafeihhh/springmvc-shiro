@@ -98,6 +98,12 @@
   </update>
 
 
+  <select id="phoneQueryByDriverId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from main_order_inter_city
+    where driver_id = #{driverId} and status = 1 ORDER BY  create_time DESC
+  </select>
 
 
 </mapper>
