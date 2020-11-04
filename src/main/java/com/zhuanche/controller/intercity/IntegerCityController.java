@@ -450,7 +450,7 @@ public class IntegerCityController {
     public AjaxResponse orderWrestQuery(@Verify(param = "pageNum", rule = "required") Integer pageNum,
                                         @Verify(param = "pageSize", rule = "required") Integer pageSize,
                                         Integer cityId,
-                                        Integer orderState,
+                                        @RequestParam(value = "status", defaultValue = "13") Integer orderState,
                                         Integer pushDriverType,
                                         Integer serviceType,
                                         Integer orderType,
@@ -543,7 +543,7 @@ public class IntegerCityController {
                                               Integer offlineIntercityServiceType) {
         map.put("pageNo", pageNum);
         map.put("pageSize", pageSize);
-        map.put("status", 13);
+        map.put("status", orderState);
         map.put("pushDriverType", pushDriverType);
         map.put("orderType", orderSource);
         map.put("airportId", airportId);
