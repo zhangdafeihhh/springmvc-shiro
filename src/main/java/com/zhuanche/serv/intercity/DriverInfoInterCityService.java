@@ -6,6 +6,7 @@ import com.zhuanche.dto.mdbcarmanage.InterDriverTeamRelDto;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author fanht
@@ -23,5 +24,7 @@ public interface DriverInfoInterCityService {
 
     AjaxResponse queryDriverByParam(String queryPara,
                                     Integer supplierId);
+
+    List<DriverInfoInterCity> queryDrivers(Set<Integer> cities,Set<Integer> supplierIds);
 }
 

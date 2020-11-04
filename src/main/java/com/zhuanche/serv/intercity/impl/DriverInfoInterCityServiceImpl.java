@@ -159,4 +159,9 @@ public class DriverInfoInterCityServiceImpl implements DriverInfoInterCityServic
         }
         return  AjaxResponse.success(null);
     }
+
+    @Override
+    public List<DriverInfoInterCity> queryDrivers(Set<Integer> cities, Set<Integer> supplierIds) {
+        return exMapper.queryDrivers(cities,supplierIds);
+    }
 }

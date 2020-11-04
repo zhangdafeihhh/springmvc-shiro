@@ -1,7 +1,13 @@
 package com.zhuanche.entity.mdbcarmanage;
 
-import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
+import java.util.Date;
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class InterDriverLineRel {
     private Integer id;
 
