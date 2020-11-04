@@ -450,7 +450,7 @@ public class IntegerCityController {
     public AjaxResponse orderWrestQuery(@Verify(param = "pageNum", rule = "required") Integer pageNum,
                                         @Verify(param = "pageSize", rule = "required") Integer pageSize,
                                         Integer cityId,
-                                        @RequestParam(value = "status", defaultValue = "13") Integer orderState,
+                                        @RequestParam(value = "orderState", defaultValue = "13") Integer orderState,
                                         Integer pushDriverType,
                                         Integer serviceType,
                                         Integer orderType,
