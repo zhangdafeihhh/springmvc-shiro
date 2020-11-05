@@ -64,39 +64,47 @@ public class InterDriverLineRelServiceImpl implements InterDriverLineRelService 
         Set<Integer> setSupplierIds = WebSessionUtil.isSupperAdmin() ? null : WebSessionUtil.getCurrentLoginUser().getSupplierIds();
 
 
-        List<DriverInfoInterCity> driverLists = driverInfoInterCityService.queryDrivers(setCityIds, setSupplierIds);
-        JSONArray jsonDriver = new JSONArray();
-        if (CollectionUtils.isNotEmpty(driverLists)) {
-            driverLists.forEach(i -> {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("driverId", i.getDriverId());
-                jsonObject.put("driverNameLicense", i.getDriverName() + "/" + i.getLicensePlates());
-                jsonDriver.add(jsonObject);
-            });
+        try {
+            List<DriverInfoInterCity> driverLists = driverInfoInterCityService.queryDrivers(setCityIds, setSupplierIds);
+            JSONArray jsonDriver = new JSONArray();
+            if (CollectionUtils.isNotEmpty(driverLists)) {
+                driverLists.forEach(i -> {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("driverId", i.getDriverId());
+                    jsonObject.put("driverNameLicense", i.getDriverName() + "/" + i.getLicensePlates());
+                    jsonDriver.add(jsonObject);
+                });
+            }
+            dto.setJsonDriver(jsonDriver);
+        } catch (Exception e) {
+            log.error("查询异常",e);
         }
-        dto.setJsonDriver(jsonDriver);
 
         //调用大后台接口
         Map<String, Object> jsonRouteMap = Maps.newHashMap();
         jsonRouteMap.put("cityIds", setToString(setCityIds));
         jsonRouteMap.put("supplierIds", setToString(setSupplierIds));
 
-        String routeResult = MpOkHttpUtil.okHttpGet(configUrl + "/intercityCarUse/getLineNameByIds", jsonRouteMap, 0, null);
-        log.info("==============调用配置后台获取线路结果=========" + JSONObject.toJSONString(routeResult));
-        JSONArray jsonLine = new JSONArray();
+        try {
+            String routeResult = MpOkHttpUtil.okHttpGet(configUrl + "/intercityCarUse/getLineNameByIds", jsonRouteMap, 0, null);
+            log.info("==============调用配置后台获取线路结果=========" + JSONObject.toJSONString(routeResult));
+            JSONArray jsonLine = new JSONArray();
 
-        if (StringUtils.isNotEmpty(routeResult)) {
-            JSONArray jsonArray = JSONArray.parseArray(routeResult);
+            if (StringUtils.isNotEmpty(routeResult)) {
+                JSONArray jsonArray = JSONArray.parseArray(routeResult);
 
-            jsonArray.forEach(json -> {
-                JSONObject obj = (JSONObject) json;
-                JSONObject jsonObjLine = new JSONObject();
-                jsonObjLine.put("lineId", obj.get(""));
-                jsonObjLine.put("lineName", obj.getString("lineName"));
-                jsonLine.add(jsonObjLine);
-            });
+                jsonArray.forEach(json -> {
+                    JSONObject obj = (JSONObject) json;
+                    JSONObject jsonObjLine = new JSONObject();
+                    jsonObjLine.put("lineId", obj.get(""));
+                    jsonObjLine.put("lineName", obj.getString("lineName"));
+                    jsonLine.add(jsonObjLine);
+                });
+            }
+            dto.setJsonLine(jsonLine);
+        } catch (Exception e) {
+            log.error("调用大后台接口异常",e);
         }
-        dto.setJsonLine(jsonLine);
         return AjaxResponse.success(dto);
     }
 
@@ -112,29 +120,30 @@ public class InterDriverLineRelServiceImpl implements InterDriverLineRelService 
     }
 
     @Override
-    public int addOrUpdateDriverLineRel(Integer id,String driverIds,String lineIds) {
+    public int addOrUpdateDriverLineRel(Integer id,String driverIds,String lineIds,Integer userId) {
         InterDriverLineRel rel = new InterDriverLineRel();
         if (id!= null && id > 0) {
             rel.setId(id);
-            rel = updateDriverLineRel(driverIds,lineIds);
+            rel = updateDriverLineRel(driverIds,lineIds,userId);
             return exMapper.updateByPrimaryKeySelective(rel);
         }else {
-            rel = addDriverLineRel(driverIds,lineIds);
+            rel = addDriverLineRel(driverIds,lineIds,userId);
             return exMapper.insertSelective(rel);
         }
     }
 
-    public static InterDriverLineRel addDriverLineRel(String driverIds,String lineIds) {
+    public static InterDriverLineRel addDriverLineRel(String driverIds,String lineIds,Integer userId) {
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
-        return  InterDriverLineRel.builder().createId(loginUser.getId()).createName(loginUser.getLoginName())
+        return  InterDriverLineRel.builder().createId(loginUser.getId()).createName(loginUser.getLoginName()).userId(userId)
                 .createTime(new Date()).updateId(loginUser.getId()).updateName(loginUser.getLoginName()).updateTime(new Date())
                 .driverIds(driverIds).lineIds(lineIds).build();
     }
 
-    public static InterDriverLineRel updateDriverLineRel(String driverIds,String lineIds) {
+    public static InterDriverLineRel updateDriverLineRel(String driverIds,String lineIds,Integer userId) {
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
-        return InterDriverLineRel.builder().updateId(loginUser.getId()).updateName(loginUser.getLoginName()).updateTime(new Date()).driverIds(driverIds).lineIds(lineIds).build();
+        return InterDriverLineRel.builder().updateId(loginUser.getId()).userId(userId).updateName(loginUser.getLoginName())
+                .updateTime(new Date()).driverIds(driverIds).lineIds(lineIds).build();
     }
 }

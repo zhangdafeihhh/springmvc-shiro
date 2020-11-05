@@ -17,11 +17,11 @@
     id, user_id, driver_ids, line_ids, create_id, create_name, update_id, update_name, 
     create_time, update_time
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="queryDriverLineRelByUserId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
     from inter_driver_line_rel
-    where id = #{id,jdbcType=INTEGER}
+    where user_id = #{id,jdbcType=INTEGER}
   </select>
   <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.InterDriverLineRel" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >

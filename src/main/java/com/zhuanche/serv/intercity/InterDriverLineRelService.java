@@ -24,7 +24,8 @@ public interface InterDriverLineRelService {
      * @param id
      * @param driverIds
      * @param lineIds
+     * @param userId
      * @return
      */
-    int addOrUpdateDriverLineRel(Integer id,String driverIds,String lineIds);
+    int addOrUpdateDriverLineRel(Integer id,String driverIds,String lineIds,Integer userId);
 }

@@ -49,10 +49,13 @@ public class InterDriverLineRelController {
 
     @RequestMapping("/addOrUpdateDriverLineRel")
     @ResponseBody
-    public AjaxResponse addOrUpdateDriverLineRel(Integer id,String driverIds,String lineIds){
+    public AjaxResponse addOrUpdateDriverLineRel(Integer id,
+                                                 @Verify(param = "driverIds",rule = "required") String driverIds,
+                                                 @Verify(param = "lineIds",rule = "required") String lineIds,
+                                                 @Verify(param = "userId",rule = "required") Integer userId){
         log.info("更改or添加城际拼车司机和线路关系入参" + JSONObject.toJSON(id));
         try {
-            int code =  driverLineRelService.addOrUpdateDriverLineRel(id,driverIds,lineIds);
+            int code =  driverLineRelService.addOrUpdateDriverLineRel(id,driverIds,lineIds,userId);
             if(code  > 0){
                 return AjaxResponse.success(null);
             }
