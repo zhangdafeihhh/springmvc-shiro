@@ -67,7 +67,8 @@ public class DriverPunishClientService extends DriverPunishService {
         paramMap.put("updateUserId", currentLoginUser.getId());
         paramMap.put("updateUserName", currentLoginUser.getName());
         OkResponseResult result = OkHttpUtil.getIntance().doPost(Dicts.getString("mp.transport.url") + DO_AUDIT, null, paramMap, "司机申诉审核");
-        log.info("司机申诉审核结果:{}",getDataString(result));
+        getDataString(result);
+        log.info("司机申诉审核结果{}", result);
     }
 
 
@@ -196,15 +197,11 @@ public class DriverPunishClientService extends DriverPunishService {
             throw new ServiceException(RestErrorCode.HTTP_SYSTEM_ERROR, result.getErrorMsg());
         }
         JSONObject responseBody = JSONObject.parseObject(result.getResponseBody());
-        if (Objects.isNull(responseBody) ||responseBody.getIntValue(CODE) != Constants.SUCCESS_CODE) {
-            if (IGNORE_MSG.contains(responseBody.getString(MSG))) {
-                log.warn("rest result business exception, {}", JSONObject.toJSONString(responseBody));
-                return responseBody.getString("data");
-            }
-
-            log.error("rest result business exception, {}", JSONObject.toJSONString(responseBody));
-            throw new ServiceException(RestErrorCode.REST_FAIL_MP_MANAGE_API);
+        if (Objects.isNull(responseBody) || responseBody.getIntValue(CODE) != Constants.SUCCESS_CODE) {
+            log.warn("rest result business exception, {}", JSONObject.toJSONString(responseBody));
+            throw new ServiceException(RestErrorCode.REST_FAIL_MP_MANAGE_API, Optional.ofNullable(responseBody).map(e -> e.getString(MSG)).orElse("No result"));
         }
+        log.info("request result :{}", JSONObject.toJSONString(responseBody));
         return responseBody.getString("data");
     }
 
