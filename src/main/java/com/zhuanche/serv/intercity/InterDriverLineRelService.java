@@ -1,6 +1,7 @@
 package com.zhuanche.serv.intercity;
 
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.dto.mdbcarmanage.InterDriverLineRelDto;
 import com.zhuanche.entity.mdbcarmanage.InterDriverLineRel;
 
 /**
@@ -28,4 +29,11 @@ public interface InterDriverLineRelService {
      * @return
      */
     int addOrUpdateDriverLineRel(Integer id,String driverIds,String lineIds,Integer userId);
+
+    /**
+     * 查询选中用户的所有司机和线路
+     * @param userId
+     * @return
+     */
+    InterDriverLineRelDto queryAllLineAndDriver(Integer userId);
 }

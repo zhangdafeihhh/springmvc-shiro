@@ -64,4 +64,22 @@ public class InterDriverLineRelController {
         }
         return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
     }
+
+
+    /**
+     * 根据userId查询
+     * @param userId
+     * @return
+     */
+    @RequestMapping("/queryAllLineAndDriver")
+    @ResponseBody
+    public AjaxResponse queryAllLineAndDriver(@Verify(param = "userId",rule = "required") Integer userId){
+        log.info("根据userId查询所有的线路和司机关系入参:" + userId);
+        try {
+            return AjaxResponse.success(driverLineRelService.queryAllLineAndDriver(userId));
+        } catch (Exception e) {
+            log.error("查询异常",e);
+        }
+        return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+    }
 }
