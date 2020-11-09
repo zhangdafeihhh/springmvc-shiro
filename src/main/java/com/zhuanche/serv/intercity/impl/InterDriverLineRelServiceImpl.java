@@ -24,6 +24,8 @@ import mapper.mdbcarmanage.ex.InterDriverLineRelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,10 +39,10 @@ import java.util.stream.Collectors;
  * @Date 2020/11/3 上午11:30
  * @Version 1.0
  */
-@Log4j
 @Service
 public class InterDriverLineRelServiceImpl implements InterDriverLineRelService {
 
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private InterDriverLineRelExMapper exMapper;

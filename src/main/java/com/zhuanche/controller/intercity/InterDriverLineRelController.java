@@ -4,17 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.entity.mdbcarmanage.InterDriverLineRel;
-import com.zhuanche.serv.intercity.DriverInfoInterCityService;
 import com.zhuanche.serv.intercity.InterDriverLineRelService;
-import com.zhuanche.serv.intercity.MainOrderInterService;
 import lombok.extern.log4j.Log4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @Author fanht
@@ -24,9 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Controller
 @RequestMapping("/interDriverLineRel")
-@Log4j
 public class InterDriverLineRelController {
 
+
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private InterDriverLineRelService driverLineRelService;
