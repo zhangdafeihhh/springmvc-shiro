@@ -175,8 +175,8 @@ public class InterDriverLineRelServiceImpl implements InterDriverLineRelService 
     public int addOrUpdateDriverLineRel(Integer id, String driverIds, String lineIds, Integer userId) {
         InterDriverLineRel rel = new InterDriverLineRel();
         if (id != null && id > 0) {
-            rel.setId(id);
             rel = updateDriverLineRel(driverIds, lineIds, userId);
+            rel.setId(id);
             return exMapper.updateByPrimaryKeySelective(rel);
         } else {
             rel = addDriverLineRel(driverIds, lineIds, userId);
