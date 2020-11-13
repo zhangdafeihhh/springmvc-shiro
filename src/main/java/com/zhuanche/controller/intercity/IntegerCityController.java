@@ -19,6 +19,7 @@ import com.zhuanche.dto.mdbcarmanage.InterCityOrderDTO;
 import com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO;
 import com.zhuanche.entity.driver.SupplierExtDto;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
+import com.zhuanche.entity.mdbcarmanage.InterDriverLineRel;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.entity.mdbcarmanage.SupplierDistributor;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
@@ -35,6 +36,7 @@ import com.zhuanche.util.*;
 import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.driver.ex.YueAoTongPhoneConfigExMapper;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
+import mapper.mdbcarmanage.ex.InterDriverLineRelExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
@@ -156,6 +158,9 @@ public class IntegerCityController {
 
     @Autowired
     private CarBizSupplierExMapper carBizSupplierExMapper;
+
+    @Autowired
+    private InterDriverLineRelExMapper lineRelExMapper;
 
     private static final String SYSMOL = "&";
 
@@ -599,8 +604,14 @@ public class IntegerCityController {
      */
     private Map<String, Object> wrestQueryParam(Map<String, Object> map) {
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+
         String supplierIdBatch = "";
-        if (!WebSessionUtil.isSupperAdmin()) {
+        //配置表查询是否配置够
+        InterDriverLineRel lineRel = lineRelExMapper.queryDriverLineRelByUserId(loginUser.getId());
+        if(lineRel != null && StringUtils.isNotEmpty(lineRel.getLineIds())){
+            map.put("ruleIdBatch", lineRel.getLineIds());
+        }else {
+            if (!WebSessionUtil.isSupperAdmin()) {
             Set<Integer> suppliersSet = loginUser.getSupplierIds();
             if (suppliersSet != null && suppliersSet.size() > 0) {
                 StringBuilder supplierBuilder = new StringBuilder();
@@ -651,6 +662,7 @@ public class IntegerCityController {
                     return null;
                 }
 
+             }
             }
         }
 
@@ -3240,6 +3252,10 @@ public class IntegerCityController {
     private String getLineIdBySupplierIds(String supplierIdBatch) {
         if (StringUtils.isBlank(supplierIdBatch)) {
             return "";
+        }
+        InterDriverLineRel lineRel = lineRelExMapper.queryDriverLineRelByUserId(WebSessionUtil.getCurrentLoginUser().getId());
+        if(lineRel != null && StringUtils.isNotEmpty(lineRel.getLineIds())){
+            return lineRel.getLineIds();
         }
         try {
             String linesUrl = configUrl + "/intercityCarUse/getLineIdBySupplierIds";
