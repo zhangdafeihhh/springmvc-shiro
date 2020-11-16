@@ -1,8 +1,10 @@
 package com.zhuanche.controller.rentcar;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
+import com.google.common.collect.Maps;
 import com.zhuanche.bo.order.OrderEstimatedRouteBo;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
@@ -15,6 +17,7 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.*;
 import com.zhuanche.entity.driverOrderRecord.OrderTimeEntity;
 import com.zhuanche.entity.rentcar.*;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.order.DriverFeeDetailService;
 import com.zhuanche.serv.order.OrderService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
@@ -105,6 +108,8 @@ public class OrderController{
 	@Value("${kefu.trajectory.url}")
 	private String kfDomain;
 
+	@Value("${ordercost.server.api.base.url}")
+	private String orderUrl;
 
 	/**
 	    * 查询订单 列表
@@ -1111,11 +1116,16 @@ public class OrderController{
 			logger.info("order:Includemileage"+result.getIncludemileage());
 			logger.info("order:Includeminute"+result.getIncludeminute());
 		}
-		//E 设置
-		List<CarFactOrderInfo> pojoList = this.carFactOrderInfoService.selectByListPrimaryKey(Long.valueOf(orderId));
-		if (pojoList != null) {
-			for (int i = 0; i < pojoList.size(); i++) {
-				CarFactOrderInfo info = pojoList.get(i);
+		//E 设置  修改为调用接口 wiki http://inside-yapi.01zhuanche.com/project/88/interface/api/78750 fanht2020.11.12
+		//List<CarFactOrderInfo> pojoList = this.carFactOrderInfoService.selectByListPrimaryKey(Long.valueOf(orderId));
+		Map<String,Object> map = Maps.newHashMap();
+		map.put("orderId",orderId);
+		String orderResult = MpOkHttpUtil.okHttpGet(orderUrl +"/otherCost/getOtherCostByOrderId",map,0,null);
+		if(StringUtils.isNotEmpty(orderResult)){
+			JSONArray proJson = JSONArray.parseArray(orderResult);
+			proJson.forEach(i->{
+				JSONObject jsonOrder = (JSONObject) i;
+				CarFactOrderInfo info = JSON.toJavaObject(jsonOrder,CarFactOrderInfo.class);
 				if(info.getCostTypeName()!=null){
 					if (info.getCostTypeName().contains("停车")) {
 						result.setCostTypeNameTc(info.getCostTypeName());
@@ -1131,7 +1141,7 @@ public class OrderController{
 						result.setCostTypeNameYjPrice(info.getCost());
 					}
 				}
-			}
+			});
 		}
 		//F: 根据预约的车型id 设置车型的名字
 		String bookinggroupids=result.getBookinkGroupids();
