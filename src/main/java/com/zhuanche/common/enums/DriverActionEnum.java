@@ -79,6 +79,11 @@ public enum DriverActionEnum {
     PASSENGER_ABOARD(84, "服务中结束等待"),
     DRIVER_SHARE(85, "司机行程分享"),
     TIME_OUT_REMINDER(86, "预约单超时未出发提醒"),
+    FORCED_TO_COLLECT(87, "长时间不收车强制收车"),
+    FATIGUE_FORCED_TO_COLLECT(88, "疲劳驾驶强制收车"),
+    CLOSE_RECORD(89, "服务流程中关闭录音权限"),
+    CLOCK_IN(91, "上班打卡"),
+    CLOCK_OUT(92, "下班打卡")
     ;
 
     private int actionId;
