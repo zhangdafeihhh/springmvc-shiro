@@ -1447,7 +1447,7 @@ public class IntegerCityController {
                                   String carGroup,
                                   String bookingStartShortAddr,
                                   String bookingEndShortAddr,
-                                  @Verify(param = "specialRequirement", rule = "max(30)") String specialRequirement) {
+                                  @Verify(param = "specialRequirement", rule = "maxLength(30)") String specialRequirement) {
 
         logger.info(MessageFormat.format("编辑订单入参:orderNo{0},reserveName{1},reservePhone{2},isSameRider{3},riderName{4},riderPhone{5}," +
                         "riderCount:{6},boardingTime{7},boardingCityId{8},boardingGetOnX{9},boardingGetOnY{10},boardingGetOffCityId{11}," +
