@@ -48,8 +48,8 @@ public class InterDriverLineRelController {
     @RequestMapping("/addOrUpdateDriverLineRel")
     @ResponseBody
     public AjaxResponse addOrUpdateDriverLineRel(Integer id,
-                                                 @Verify(param = "driverIds",rule = "required") String driverIds,
-                                                 @Verify(param = "lineIds",rule = "required") String lineIds,
+                                                 @Verify(param = "driverIds",rule = "required|max(2000)") String driverIds,
+                                                 @Verify(param = "lineIds",rule = "required|max(2000)") String lineIds,
                                                  @Verify(param = "userId",rule = "required") Integer userId){
         log.info("更改or添加城际拼车司机和线路关系入参" + JSONObject.toJSON(id));
         try {

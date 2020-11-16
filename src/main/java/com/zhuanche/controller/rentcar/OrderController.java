@@ -14,6 +14,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.rentcar.*;
 import com.zhuanche.entity.driverOrderRecord.OrderTimeEntity;
 import com.zhuanche.entity.rentcar.*;
@@ -1118,30 +1119,35 @@ public class OrderController{
 		}
 		//E 设置  修改为调用接口 wiki http://inside-yapi.01zhuanche.com/project/88/interface/api/78750 fanht2020.11.12
 		//List<CarFactOrderInfo> pojoList = this.carFactOrderInfoService.selectByListPrimaryKey(Long.valueOf(orderId));
-		Map<String,Object> map = Maps.newHashMap();
-		map.put("orderId",orderId);
-		String orderResult = MpOkHttpUtil.okHttpGet(orderUrl +"/otherCost/getOtherCostByOrderId",map,0,null);
-		if(StringUtils.isNotEmpty(orderResult)){
-			JSONArray proJson = JSONArray.parseArray(orderResult);
-			proJson.forEach(i->{
-				JSONObject jsonOrder = (JSONObject) i;
-				CarFactOrderInfo info = JSON.toJavaObject(jsonOrder,CarFactOrderInfo.class);
-				if(info.getCostTypeName()!=null){
-					if (info.getCostTypeName().contains("停车")) {
-						result.setCostTypeNameTc(info.getCostTypeName());
-						result.setCostTypeNameTcPrice(info.getCost());
-					} else if (info.getCostTypeName().contains("高速")) {
-						result.setCostTypeNameGs(info.getCostTypeName());
-						result.setCostTypeNameGsPrice(info.getCost());
-					} else if (info.getCostTypeName().contains("机场")) {
-						result.setCostTypeNameJc(info.getCostTypeName());
-						result.setCostTypeNameJcPrice(info.getCost());
-					} else if (info.getCostTypeName().contains("食宿")) {
-						result.setCostTypeNameYj(info.getCostTypeName());
-						result.setCostTypeNameYjPrice(info.getCost());
+		try {
+			Map<String,Object> map = Maps.newHashMap();
+			map.put("orderId",orderId);
+			String orderResult = MpOkHttpUtil.okHttpGet(orderUrl +"/otherCost/getOtherCostByOrderId",map,0,null);
+			if(StringUtils.isNotEmpty(orderResult)){
+				JSONObject jsonData = JSONObject.parseObject(orderResult);
+				if(jsonData != null && jsonData.get(Constants.DATA) != null){
+					JSONObject jsonOrder = JSONObject.parseObject(jsonData.getString(Constants.DATA)) ;
+					CarFactOrderInfo info = JSON.toJavaObject(jsonOrder,CarFactOrderInfo.class);
+					if(info.getCostTypeName()!=null){
+						if (info.getCostTypeName().contains("停车")) {
+							result.setCostTypeNameTc(info.getCostTypeName());
+							result.setCostTypeNameTcPrice(info.getCost());
+						} else if (info.getCostTypeName().contains("高速")) {
+							result.setCostTypeNameGs(info.getCostTypeName());
+							result.setCostTypeNameGsPrice(info.getCost());
+						} else if (info.getCostTypeName().contains("机场")) {
+							result.setCostTypeNameJc(info.getCostTypeName());
+							result.setCostTypeNameJcPrice(info.getCost());
+						} else if (info.getCostTypeName().contains("食宿")) {
+							result.setCostTypeNameYj(info.getCostTypeName());
+							result.setCostTypeNameYjPrice(info.getCost());
+						}
 					}
 				}
-			});
+
+            }
+		} catch (Exception e) {
+			logger.info("调用订单接口异常",e);
 		}
 		//F: 根据预约的车型id 设置车型的名字
 		String bookinggroupids=result.getBookinkGroupids();
