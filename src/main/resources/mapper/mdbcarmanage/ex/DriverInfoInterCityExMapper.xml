@@ -272,5 +272,25 @@
     ORDER  BY  create_time desc
   </select>
 
+  <select id="queryDrivers" resultType="com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity">
+    SELECT t.id,t.city_name as cityName ,t.supplier_name as supplierName,
+    t.driver_id as driverId,t.driver_name as driverName,t.license_plates as licensePlates
+    FROM driver_info_inter_city t
+    WHERE  1= 1
+    <if test="cities!=null and cities.size()>0">
+      and t.city_id IN
+      <foreach collection="cities" separator="," open="(" close=")" item="cityId">
+        #{cityId}
+      </foreach>
+    </if>
+    <if test="supplierIds!=null and supplierIds.size()>0">
+      and t.supplier_id IN 
+      <foreach collection="supplierIds" separator="," open="(" close=")" item="supplierId">
+        #{supplierId}
+      </foreach>
+    </if>
+    ORDER BY t.create_time desc
+  </select>
+
 
 </mapper>

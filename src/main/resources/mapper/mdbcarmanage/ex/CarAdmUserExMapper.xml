@@ -123,7 +123,8 @@
 	  suppliers,
 	  team_id,
 	  group_ids,
-	  LEVEL
+	  LEVEL,
+	  account_type
     FROM
 	car_adm_user
 	where user_id = #{userId}

@@ -5,11 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.entity.mdbcarmanage.InterDriverLineRel;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.intercity.IntegerCityReadyOrderService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import mapper.mdbcarmanage.ex.InterDriverLineRelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +47,9 @@ public class IntegerCityReadyOrderServiceImpl implements IntegerCityReadyOrderSe
 
     @Value("${config.url}")
     private String configUrl;
+
+    @Autowired
+    private InterDriverLineRelExMapper lineRelExMapper;
 
 
     @Override
@@ -106,55 +111,63 @@ public class IntegerCityReadyOrderServiceImpl implements IntegerCityReadyOrderSe
 
 
     private Map<String,Object> getRuleIdBatch(Map<String,Object> map){
-        String supplierIdBatch = "";
-        if (!WebSessionUtil.isSupperAdmin()) {
-            SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-            Set<Integer> suppliersSet = loginUser.getSupplierIds();
-            /**如果是供应商级别*/
-            if (suppliersSet != null && suppliersSet.size() > 0) {
-                StringBuilder supplierBuilder = new StringBuilder();
-                for (Integer supplierId : suppliersSet) {
-                    supplierBuilder.append(supplierId).append(Constants.SEPERATER);
-                }
-                if (StringUtils.isNotEmpty(supplierBuilder.toString())) {
-                    supplierIdBatch = supplierBuilder.toString().substring(0, supplierBuilder.toString().length() - 1);
-                }
-                String lineIds = this.getLineIdBySupplierIds(supplierIdBatch);
-                if (StringUtils.isEmpty(lineIds)) {
-                    logger.info("=========该供应商未配置线路============");
-                    return null;
-                }
-                if (StringUtils.isNotBlank(lineIds)) {
-                    map.put("ruleIdBatch", lineIds);
-                } else {
-                    map.put("ruleIdBatch", "-1");
-                }
-            } else if (CollectionUtils.isNotEmpty(loginUser.getCityIds())) {
-                List<CarBizSupplier> querySupplierAllList = carBizSupplierExMapper.querySupplierAllList(loginUser.getCityIds(), null);
-                StringBuilder supplierBuilder = new StringBuilder();
-                querySupplierAllList.forEach(list -> {
-                    supplierBuilder.append(list.getSupplierId()).append(Constants.SEPERATER);
-                });
-                if (supplierBuilder.toString().length() > 0) {
-                    String allSupplier = supplierBuilder.toString();
-                    logger.info("获取所有的合作商id:" + allSupplier);
-                    String lineIds = this.getLineIdBySupplierIds(allSupplier.substring(0, allSupplier.length() - 1));
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        InterDriverLineRel lineRel = lineRelExMapper.queryDriverLineRelByUserId(loginUser.getId());
+        if(lineRel != null && StringUtils.isNotEmpty(lineRel.getLineIds())){
+            logger.info("查询到设置的线路id:" + lineRel.getLineIds());
+            map.put("ruleIdBatch", lineRel.getLineIds());
+        }else {
+            String supplierIdBatch = "";
+            if (!WebSessionUtil.isSupperAdmin()) {
+                Set<Integer> suppliersSet = loginUser.getSupplierIds();
+                /**如果是供应商级别*/
+                if (suppliersSet != null && suppliersSet.size() > 0) {
+                    StringBuilder supplierBuilder = new StringBuilder();
+                    for (Integer supplierId : suppliersSet) {
+                        supplierBuilder.append(supplierId).append(Constants.SEPERATER);
+                    }
+                    if (StringUtils.isNotEmpty(supplierBuilder.toString())) {
+                        supplierIdBatch = supplierBuilder.toString().substring(0, supplierBuilder.toString().length() - 1);
+                    }
+                    String lineIds = this.getLineIdBySupplierIds(supplierIdBatch);
                     if (StringUtils.isEmpty(lineIds)) {
-                        logger.info("=========该城市未配置线路=============");
+                        logger.info("=========该供应商未配置线路============");
                         return null;
                     }
-
                     if (StringUtils.isNotBlank(lineIds)) {
                         map.put("ruleIdBatch", lineIds);
                     } else {
                         map.put("ruleIdBatch", "-1");
                     }
-                } else {
-                    logger.info("=========该城市未配置线路============");
-                    return null;
+                } else if (CollectionUtils.isNotEmpty(loginUser.getCityIds())) {
+                    List<CarBizSupplier> querySupplierAllList = carBizSupplierExMapper.querySupplierAllList(loginUser.getCityIds(), null);
+                    StringBuilder supplierBuilder = new StringBuilder();
+                    querySupplierAllList.forEach(list -> {
+                        supplierBuilder.append(list.getSupplierId()).append(Constants.SEPERATER);
+                    });
+                    if (supplierBuilder.toString().length() > 0) {
+                        String allSupplier = supplierBuilder.toString();
+                        logger.info("获取所有的合作商id:" + allSupplier);
+                        String lineIds = this.getLineIdBySupplierIds(allSupplier.substring(0, allSupplier.length() - 1));
+                        if (StringUtils.isEmpty(lineIds)) {
+                            logger.info("=========该城市未配置线路=============");
+                            return null;
+                        }
+
+                        if (StringUtils.isNotBlank(lineIds)) {
+                            map.put("ruleIdBatch", lineIds);
+                        } else {
+                            map.put("ruleIdBatch", "-1");
+                        }
+                    } else {
+                        logger.info("=========该城市未配置线路============");
+                        return null;
+                    }
                 }
             }
         }
+
+
         return map;
     }
 
