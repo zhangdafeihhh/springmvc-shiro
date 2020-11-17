@@ -109,7 +109,7 @@ public class OrderController{
 	@Value("${kefu.trajectory.url}")
 	private String kfDomain;
 
-	@Value("${ordercost.server.api.base.url}")
+	@Value("${charge.url}")
 	private String orderUrl;
 
 	/**
