@@ -135,7 +135,8 @@ public class DriverPunishController extends BaseController {
         log.info("渲染录音文件, filePath:{}", filePath);
         try {
             driverPunishService.renderVideo(filePath, response);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            log.error("渲染失败",e);
             return AjaxResponse.failMsg(RestErrorCode.HTTP_FORBIDDEN, "渲染失败");
         }
         return AjaxResponse.success(null);
