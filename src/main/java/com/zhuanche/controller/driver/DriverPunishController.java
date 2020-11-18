@@ -128,6 +128,7 @@ public class DriverPunishController extends BaseController {
      */
     @RequiresPermissions(value = {"punishTripVideo"})
     @RequestMapping("/renderVideo")
+    @ResponseBody
     public AjaxResponse render(@RequestParam(name = "filePath") String filePath, HttpServletResponse response) {
         if (StringUtils.isBlank(filePath)) {
             return AjaxResponse.failMsg(RestErrorCode.HTTP_FORBIDDEN, "缺失路径");
