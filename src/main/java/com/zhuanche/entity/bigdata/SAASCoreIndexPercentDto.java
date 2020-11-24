@@ -26,6 +26,8 @@ public class SAASCoreIndexPercentDto {
     private String badEvaluateAllNumPercent; //差评单量
     private String badEvaluateNumPercent; //有效差评
     private String criticismRate;//差评率
+    //司机上线时长（分钟）
+    private String onlineDriverTime;
 
 
     public String getCompleteOrderAmountPerecnt() {
@@ -170,5 +172,13 @@ public class SAASCoreIndexPercentDto {
 
     public void setCriticismRate(String criticismRate) {
         this.criticismRate = criticismRate;
+    }
+
+    public String getOnlineDriverTime() {
+        return onlineDriverTime;
+    }
+
+    public void setOnlineDriverTime(String onlineDriverTime) {
+        this.onlineDriverTime = onlineDriverTime;
     }
 }
