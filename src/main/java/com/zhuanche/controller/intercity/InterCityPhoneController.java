@@ -46,7 +46,7 @@ import java.util.*;
 
 /**
  * @Author fanht
- * @Description
+ * @Description   手机抢单查询
  * @Date 2020/10/19 下午6:39
  * @Version 1.0
  */
@@ -124,7 +124,7 @@ public class InterCityPhoneController {
     private static final Integer MAX_LENGTH = 500;
 
     /**
-     * 语音播报最近30条数据
+     * 小程序上的红点
      *
      * @param pageNum
      * @param pageSize

@@ -177,6 +177,7 @@ public class InterCityUtils {
 
                     JSONObject jsonData = jsonResult.getJSONObject("data");
                     jsonRoute.put("supplierId", jsonData.getString("supplierId"));
+                    jsonRoute.put("lineId",jsonData.getInteger("lineId"));
 
                     logger.info("该坐标含有线路");
                 } else {
