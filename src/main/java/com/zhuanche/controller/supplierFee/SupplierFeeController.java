@@ -400,7 +400,7 @@ public class SupplierFeeController {
             Map<String,Object> map = getData(manage,listStr,titles);
             listStr = (List<String>) map.get("listStr");
 
-            listStr = this.getExtList(listStr,manage.getSupplierId());
+            listStr = this.getExtList(listStr,manage.getId());
 
             int length = (int) map.get("length");
             logger.info("headerList:" + JSONObject.toJSONString(headerList));
