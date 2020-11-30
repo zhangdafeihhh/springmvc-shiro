@@ -5,7 +5,6 @@ import com.alibaba.rocketmq.client.consumer.listener.ConsumeOrderlyContext;
 import com.alibaba.rocketmq.client.consumer.listener.ConsumeOrderlyStatus;
 import com.alibaba.rocketmq.client.consumer.listener.MessageListenerOrderly;
 import com.alibaba.rocketmq.common.message.MessageExt;
-import com.google.common.collect.Lists;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.controller.driver.YueAoTongPhoneConfig;
 import com.zhuanche.controller.intercity.InterCityUtils;
@@ -14,16 +13,13 @@ import com.zhuanche.entity.mdbcarmanage.InterDriverLineRel;
 import com.zhuanche.serv.supplier.SupplierRecordService;
 import mapper.driver.ex.YueAoTongPhoneConfigExMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
-import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.mdbcarmanage.ex.InterDriverLineRelExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 监听下单发短信
@@ -35,13 +31,7 @@ public class NewInterCityListener implements MessageListenerOrderly {
 
 
     @Autowired
-    private DriverInfoInterCityExMapper infoInterCityExMapper;
-
-    @Autowired
     private YueAoTongPhoneConfigExMapper yueAoTongPhoneConfigExMapper;
-
-    @Autowired
-    private CarAdmUserExMapper exMapper;
 
     @Autowired
     private SupplierRecordService recordService;
@@ -84,11 +74,12 @@ public class NewInterCityListener implements MessageListenerOrderly {
 
                 Integer startCityId =0;
                 Integer endCityId =0;
+                Integer ruleId = null;
 
                 if(jsonMemo!= null){
                      startCityId = jsonMemo.get("startCityId") == null ? 0:jsonMemo.getInteger("startCityId");
                      endCityId = jsonMemo.get("endCityId") == null ? 0:jsonMemo.getInteger("endCityId");
-
+                    ruleId = jsonMemo.get("ruleId") == null ? null : jsonMemo.getInteger("ruleId");
                 }
                 if(StringUtils.isNotBlank(status)) {
                     if (68 == serviceTypeId) {
@@ -115,6 +106,7 @@ public class NewInterCityListener implements MessageListenerOrderly {
                                 if (CollectionUtils.isNotEmpty(onList)) {
                                     String[] off = bookingEndPoint.split(";");
                                     Integer finalEndCityId = endCityId;
+                                    Integer finalRuleId1 = ruleId;
                                     onList.forEach(boardOn ->{
                                         if(off.length > 0){
                                             String[] offPoint = off[0].split(",");
@@ -123,12 +115,13 @@ public class NewInterCityListener implements MessageListenerOrderly {
                                                 String offY = offPoint[1];
                                                 List<String> offList= utils.hasBoardOffRoutRights(finalEndCityId, offX, offY);
                                                 if(CollectionUtils.isNotEmpty(offList)){
+                                                    Integer finalRuleId = finalRuleId1;
                                                     offList.forEach(boardOff ->{
                                                         String route = utils.hasRoute(boardOn, boardOff);
                                                         if (StringUtils.isNotEmpty(route)) {
                                                             if(StringUtils.isNotEmpty(orderType) &&  orderType.equals(LITTLE_PROGRAMME)){
                                                                 logger.info("========小程序乘客下单============发送短信start======");
-                                                                smallProSendMessage(route);
+                                                                smallProSendMessage(route, finalRuleId);
                                                             }else{
                                                                 logger.info("=======其他渠道下单====发送短信start====");
                                                                 sendMessage(route);
@@ -166,8 +159,7 @@ public class NewInterCityListener implements MessageListenerOrderly {
      * @return
      */
     private List<YueAoTongPhoneConfig>  queryOpePhone(String suppliers ) {
-            List<YueAoTongPhoneConfig> list = yueAoTongPhoneConfigExMapper.findBySupplierId(suppliers);
-           return list;
+        return yueAoTongPhoneConfigExMapper.findBySupplierId(suppliers);
     }
 
     /**
@@ -177,33 +169,27 @@ public class NewInterCityListener implements MessageListenerOrderly {
      * @return
      */
     private List<String>  querySupplierPhone(String suppliers ) {
-        List<String> list = recordService.listSupplierExtDto(suppliers);
-        return list;
+        return recordService.listSupplierExtDto(suppliers);
     }
 
 
     /**
      * 小程序发送短信
      * @param route
+     * @param ruleId
      */
-    private void smallProSendMessage(String route){
+    private void smallProSendMessage(String route,Integer ruleId){
         try {
-            JSONObject jsonSupplier = JSONObject.parseObject(route);
-            if(jsonSupplier.get("lineId") != null){
-                Integer lineId = jsonSupplier.getInteger("lineId");
-                List<InterDriverLineRel> driverLineLists = lineRelExMapper.queryDriversByLineId(lineId);
+            if(ruleId != null){
+                List<InterDriverLineRel> driverLineLists = lineRelExMapper.queryDriversByLineId(ruleId);
                 //优先取账号权限分级的  没有取后台的 都没设置则不发送
                 if(CollectionUtils.isNotEmpty(driverLineLists)){
                     List<Integer> userIdLists = new ArrayList<>();
-                    driverLineLists.forEach(i->{
-                        userIdLists.add(i.getUserId());
-                    });
+                    driverLineLists.forEach(i-> userIdLists.add(i.getUserId()));
                     //根据userId查询手机号
                     List<CarAdmUser> userList = admUserExMapper.queryUsers(userIdLists,null,null,null,200);
                     if(CollectionUtils.isNotEmpty(userList)){
-                        userList.forEach(i->{
-                            SmsSendUtil.send(i.getPhone(), "您有新的城际订单，请及时进行指派");
-                        });
+                        userList.forEach(i-> SmsSendUtil.send(i.getPhone(), "您有新的城际订单，请及时进行指派"));
                     }
                 }else {
                     sendMessage(route);
