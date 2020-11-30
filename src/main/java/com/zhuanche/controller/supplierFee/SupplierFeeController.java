@@ -15,6 +15,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.SupplierFeeManageDetailDto;
 import com.zhuanche.dto.mdbcarmanage.SupplierFeeManageDto;
+import com.zhuanche.entity.mdbcarmanage.SupplierFeeExt;
 import com.zhuanche.entity.mdbcarmanage.SupplierFeeManage;
 import com.zhuanche.entity.mdbcarmanage.SupplierFeeRecord;
 import com.zhuanche.serv.mdbcarmanage.service.SupplierFeeRecordService;
@@ -24,6 +25,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.SupplierFeeCsvUtils;
+import mapper.mdbcarmanage.ex.SupplierFeeExtExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -65,6 +67,9 @@ public class SupplierFeeController {
 
     @Autowired
     private SupplierFeeRecordService recordService;
+
+    @Autowired
+    private SupplierFeeExtExMapper extExMapper;
 
 
     @RequestMapping("/listSupplierFee")
@@ -394,6 +399,9 @@ public class SupplierFeeController {
             List<String> listStr = new ArrayList<>();
             Map<String,Object> map = getData(manage,listStr,titles);
             listStr = (List<String>) map.get("listStr");
+
+            listStr = this.getExtList(listStr,manage.getSupplierId());
+
             int length = (int) map.get("length");
             logger.info("headerList:" + JSONObject.toJSONString(headerList));
 
@@ -412,6 +420,29 @@ public class SupplierFeeController {
         return AjaxResponse.success(null);
     }
 
+
+    /**
+     * 动态扩充字段
+     * @param listStr
+     * @param supplierExtId
+     * @return
+     */
+    private List<String> getExtList(List<String> listStr,Integer supplierExtId){
+        try {
+            List<SupplierFeeExt> extList = extExMapper.queryBySupplierFeeId(supplierExtId);
+            if(CollectionUtils.isEmpty(extList)){
+                return listStr;
+            }
+            extList.forEach(i->{
+                listStr.add(i.getFieldName()+":" + i.getFieldValue());
+            });
+
+            return listStr;
+        } catch (Exception e) {
+            logger.error("查询异常",e);
+        }
+        return listStr;
+    }
 
     private Map<String,Object> getData(SupplierFeeManage manage,List<String> listStr,String title){
 
