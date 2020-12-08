@@ -19,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.swing.text.html.Option;
 import java.util.*;
 
 /**
@@ -81,68 +83,27 @@ public class NewInterCityListener implements MessageListenerOrderly {
                      endCityId = jsonMemo.get("endCityId") == null ? 0:jsonMemo.getInteger("endCityId");
                     ruleId = jsonMemo.get("ruleId") == null ? null : jsonMemo.getInteger("ruleId");
                 }
-                if(StringUtils.isNotBlank(status)) {
+                Optional<String> optional = Optional.ofNullable(status);
+                Integer finalRuleId = ruleId;
+                Integer finalStartCityId = startCityId;
+                Integer finalEndCityId = endCityId;
+                optional.ifPresent(n->{
                     if (68 == serviceTypeId) {
                         logger.info("===========mq监听发送短信开始===================bookingStartPoint:" + bookingStartPoint);
-
-
-                        InterCityUtils utils = new InterCityUtils();
-                        String[] on = bookingStartPoint.split(";");
-
-                        logger.info("=========获取坐标做的数据=====" + JSONObject.toJSONString(on));
-                        if(on.length >0 && startCityId>0 && endCityId>0 ) {
-                            String boardFirstAdd = on[0];
-                            if(StringUtils.isEmpty(boardFirstAdd)){
-                                continue;
-                            }
-                            String[] boardPoint = boardFirstAdd.split(",");
-
-
-                            if(boardPoint.length > 1){
-                                String x = boardPoint[0];
-                                String y = boardPoint[1];
-                                List<String> onList = utils.hasBoardRoutRights(startCityId, x, y);
-
-                                if (CollectionUtils.isNotEmpty(onList)) {
-                                    String[] off = bookingEndPoint.split(";");
-                                    Integer finalEndCityId = endCityId;
-                                    Integer finalRuleId1 = ruleId;
-                                    onList.forEach(boardOn ->{
-                                        if(off.length > 0){
-                                            String[] offPoint = off[0].split(",");
-                                            if(offPoint.length > 0){
-                                                String offX = offPoint[0];
-                                                String offY = offPoint[1];
-                                                List<String> offList= utils.hasBoardOffRoutRights(finalEndCityId, offX, offY);
-                                                if(CollectionUtils.isNotEmpty(offList)){
-                                                    Integer finalRuleId = finalRuleId1;
-                                                    offList.forEach(boardOff ->{
-                                                        String route = utils.hasRoute(boardOn, boardOff);
-                                                        if (StringUtils.isNotEmpty(route)) {
-                                                            if(StringUtils.isNotEmpty(orderType) &&  orderType.equals(LITTLE_PROGRAMME)){
-                                                                logger.info("========小程序乘客下单============发送短信start======");
-                                                                smallProSendMessage(route, finalRuleId);
-                                                            }else{
-                                                                logger.info("=======其他渠道下单====发送短信start====");
-                                                                sendMessage(route);
-                                                            }
-                                                        }
-                                                    });
-
-                                                }
-
-                                            }
-
-                                        }
-                                    });
-
-                                }
-                            }
-
+                        boolean bl = false;
+                        if(StringUtils.isNotEmpty(orderType) &&  orderType.equals(LITTLE_PROGRAMME)){
+                            logger.info("========小程序乘客下单============发送短信start======");
+                            bl = smallProSendMessage(finalRuleId);
+                            logger.info("========小程序乘客下单============发送短信end======");
                         }
-                        logger.info("===========mq发送短信结束==============");
+                        if(!bl){
+                            String[] on = bookingStartPoint.split(";");
+                            logger.info("=========获取坐标做的数据=====" + JSONObject.toJSONString(on));
+                            otherSendMessage(on, finalStartCityId, finalEndCityId, finalRuleId,bookingEndPoint);
+                            logger.info("===========mq发送短信结束==============");
+                        }
                     }
-                }
+                });
             }
         } catch (Exception e) {
             logger.error("NewInterCityListener exception:", e);
@@ -175,10 +136,10 @@ public class NewInterCityListener implements MessageListenerOrderly {
 
     /**
      * 小程序发送短信
-     * @param route
      * @param ruleId
      */
-    private void smallProSendMessage(String route,Integer ruleId){
+    private boolean smallProSendMessage(Integer ruleId){
+        boolean bl = false;
         try {
             if(ruleId != null){
                 List<InterDriverLineRel> driverLineLists = lineRelExMapper.queryDriversByLineId(ruleId);
@@ -190,13 +151,61 @@ public class NewInterCityListener implements MessageListenerOrderly {
                     List<CarAdmUser> userList = admUserExMapper.queryUsers(userIdLists,null,null,null,200);
                     if(CollectionUtils.isNotEmpty(userList)){
                         userList.forEach(i-> SmsSendUtil.send(i.getPhone(), "您有新的城际订单，请及时进行指派"));
+                        bl = true;
                     }
-                }else {
-                    sendMessage(route);
                 }
             }
         } catch (Exception e) {
             logger.error("发送短信异常",e);
+        }
+
+        return bl;
+    }
+
+    /**
+     * 1.小程序未发送短信 2.后台下单发送短信
+     * @param on
+     * @param startCityId
+     * @param endCityId
+     * @param ruleId
+     * @param bookingEndPoint
+     */
+    private void otherSendMessage(String[] on,Integer startCityId,Integer endCityId,Integer ruleId,String bookingEndPoint){
+        InterCityUtils utils = new InterCityUtils();
+        if(on.length >0 && startCityId>0 && endCityId>0 ) {
+            String boardFirstAdd = on[0];
+            if(StringUtils.isEmpty(boardFirstAdd)){
+                return;
+            }
+            String[] boardPoint = boardFirstAdd.split(",");
+            if(boardPoint.length > 1){
+                String x = boardPoint[0];
+                String y = boardPoint[1];
+                List<String> onList = utils.hasBoardRoutRights(startCityId, x, y);
+                if (CollectionUtils.isNotEmpty(onList)) {
+                    String[] off = bookingEndPoint.split(";");
+                    Integer finalEndCityId = endCityId;
+                    onList.forEach(boardOn ->{
+                        if(off.length > 0){
+                            String[] offPoint = off[0].split(",");
+                            if(offPoint.length > 0){
+                                String offX = offPoint[0];
+                                String offY = offPoint[1];
+                                List<String> offList= utils.hasBoardOffRoutRights(finalEndCityId, offX, offY);
+                                if(CollectionUtils.isNotEmpty(offList)){
+                                    offList.forEach(boardOff ->{
+                                        String route = utils.hasRoute(boardOn, boardOff);
+                                        if (StringUtils.isNotEmpty(route)) {
+                                            logger.info("=======下单====发送短信start====");
+                                            sendMessage(route);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    });
+                }
+            }
         }
     }
     /**
