@@ -997,6 +997,25 @@ public class OrderController{
 			result.setDriverPassengerPriceSeparate(Integer.parseInt(JSON.parseObject(orderInfoJson.getString("memo")).getString("isDriverPassengerPriceSeparate")));
 		}
 
+		try {
+			// 添加途经点
+			JSONObject keyValueMap = orderInfoJson.getJSONObject("keyValueMap");
+			if(keyValueMap!=null){
+				JSONObject firstPassingPoint = keyValueMap.getJSONObject("firstPassingPoint");
+				JSONObject secondPassingPoint = keyValueMap.getJSONObject("secondPassingPoint");
+				if(firstPassingPoint!=null){
+					String firstPassingPointAddr = firstPassingPoint.getString("bookingPassingPointAddr");
+					result.setFirstPassingPointAddr(firstPassingPointAddr);
+				}
+				if(secondPassingPoint!=null){
+					String secondPassingPointAddr = secondPassingPoint.getString("bookingPassingPointAddr");
+					result.setSecondPassingPointAddr(secondPassingPointAddr);
+				}
+			}
+		} catch (Exception e) {
+			logger.info("订单{}查询学生专车途经点解析异常{}", orderNo, e);
+		}
+
         //二、补全此订单的order_cost_detail
 		selectOrderCostDetailByOrderId(orderId, result);
 		//三、补全此订单的car_biz_order_ cost_detail_extension

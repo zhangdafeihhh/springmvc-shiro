@@ -451,12 +451,17 @@ public class CarFactOrderInfo extends BaseEntity {
 	/**实际乘车人车型名称**/
 	private String factBookingGroupName;
 
+	/**优惠券折扣*/
+	public String couponSettleAmout;
+
+	// 学生专车第一途经点
+	private String firstPassingPointAddr;
+	// 学生专车第二途经点
+	private String secondPassingPointAddr;
+
 	public BigDecimal getDriverInfoServiceFee() {
 		return driverInfoServiceFee;
 	}
-
-	/**优惠券折扣*/
-	public String couponSettleAmout;
 
 	public void setDriverInfoServiceFee(BigDecimal driverInfoServiceFee) {
 		this.driverInfoServiceFee = driverInfoServiceFee;
@@ -2285,5 +2290,21 @@ public class CarFactOrderInfo extends BaseEntity {
 
 	public void setCouponSettleAmout(String couponSettleAmout) {
 		this.couponSettleAmout = couponSettleAmout;
+	}
+
+	public String getFirstPassingPointAddr() {
+		return firstPassingPointAddr;
+	}
+
+	public void setFirstPassingPointAddr(String firstPassingPointAddr) {
+		this.firstPassingPointAddr = firstPassingPointAddr;
+	}
+
+	public String getSecondPassingPointAddr() {
+		return secondPassingPointAddr;
+	}
+
+	public void setSecondPassingPointAddr(String secondPassingPointAddr) {
+		this.secondPassingPointAddr = secondPassingPointAddr;
 	}
 }
