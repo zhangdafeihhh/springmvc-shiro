@@ -80,4 +80,17 @@ public class InterDriverLineRelController {
         }
         return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
     }
+
+    @RequestMapping("/updateSupplierLineRel")
+    @ResponseBody
+    public AjaxResponse updateSupplierLineRel(){
+        log.info("===========批量刷新线上加盟商账号指定的线路和司机=========start");
+        try {
+            driverLineRelService.updateSupplierLineRel();
+        } catch (Exception e) {
+            log.error("===添加异常==",e);
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
+        return AjaxResponse.success(null);
+    }
 }

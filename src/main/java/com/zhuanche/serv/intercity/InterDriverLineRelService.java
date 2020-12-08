@@ -36,4 +36,11 @@ public interface InterDriverLineRelService {
      * @return
      */
     InterDriverLineRelDto queryAllLineAndDriver(Integer userId);
+
+
+    /**
+     * 批量刷新线上加盟商账号指定的线路和司机
+     * @return
+     */
+    void updateSupplierLineRel();
 }

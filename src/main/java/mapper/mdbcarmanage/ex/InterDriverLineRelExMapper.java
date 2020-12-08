@@ -7,8 +7,12 @@ import java.util.List;
 
 public interface InterDriverLineRelExMapper {
 
-
-    InterDriverLineRel queryDriverLineRelByUserId(Integer id);
+    /**
+     * 根据userId查询
+     * @param userId
+     * @return
+     */
+    InterDriverLineRel queryDriverLineRelByUserId(@Param("userId") Integer userId);
 
 
     /**
