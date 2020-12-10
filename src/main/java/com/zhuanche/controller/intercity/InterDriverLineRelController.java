@@ -81,6 +81,10 @@ public class InterDriverLineRelController {
         return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
     }
 
+    /**
+     * 刷数据接口 仅适用线上数据
+     * @return
+     */
     @RequestMapping("/updateSupplierLineRel")
     @ResponseBody
     public AjaxResponse updateSupplierLineRel(){
