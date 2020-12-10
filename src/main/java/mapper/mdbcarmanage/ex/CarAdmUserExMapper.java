@@ -44,4 +44,10 @@ public interface CarAdmUserExMapper {
 
     /**批量更改子账号*/
     int batchUpdate(@Param("userIdList") List<Integer> userIdList);
+
+    /**
+     * 查询所有的加盟商级别的、有效的、创建人为管理员的
+     * @return
+     */
+    List<CarAdmUser> querySupplierLevelAccount();
 }

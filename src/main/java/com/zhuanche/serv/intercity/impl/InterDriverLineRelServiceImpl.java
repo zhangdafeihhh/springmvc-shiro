@@ -29,8 +29,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -70,7 +73,7 @@ public class InterDriverLineRelServiceImpl implements InterDriverLineRelService 
 
             return AjaxResponse.success(lineRel);
         } catch (Exception e) {
-            log.error("查询异常",e);
+            log.error("查询异常", e);
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
     }
@@ -115,7 +118,7 @@ public class InterDriverLineRelServiceImpl implements InterDriverLineRelService 
 
             dto.setJsonLine(jsonLines);
         } catch (Exception e) {
-            log.error("查询线路异常",e);
+            log.error("查询线路异常", e);
         }
 
         try {
@@ -137,6 +140,51 @@ public class InterDriverLineRelServiceImpl implements InterDriverLineRelService 
         return dto;
     }
 
+    @Override
+    @Transactional
+    public void updateSupplierLineRel() {
+        List<CarAdmUser> carAdmUserList = carAdmUserExMapper.querySupplierLevelAccount();
+        Optional.ofNullable(carAdmUserList).ifPresent(opt -> opt.forEach((CarAdmUser t) -> {
+            InterDriverLineRel lineRel = exMapper.queryDriverLineRelByUserId(t.getUserId());
+            if (lineRel == null || lineRel.getId() <= 0) {
+                InterDriverLineRelDto relDto = queryAllLineAndDriver(t.getUserId());
+                Optional.ofNullable(relDto).ifPresent(dto -> {
+                    try {
+                        Assert.notNull(dto.getJsonDriver(),"司机不能为空");
+                        Assert.notNull(dto.getJsonLine(),"线路不能为空");
+                        JSONArray jsonDriver = dto.getJsonDriver();
+                        JSONArray jsonLine = dto.getJsonLine();
+                        String[] strDriverId = {""};
+                        String[] strLine = {""};
+                        jsonDriver.forEach(j -> {
+                            JSONObject driver = (JSONObject) j;
+                            strDriverId[0] += driver.get("driverId") + Constants.SEPERATER;
+                        });
+                        jsonLine.forEach(l -> {
+                            JSONObject line = (JSONObject) l;
+                            strLine[0] += line.get("lineId") + Constants.SEPERATER;
+                        });
+                        InterDriverLineRel batchLine = InterDriverLineRel.builder().lineIds(strLine[0].substring(0, strLine[0].length() - 1))
+                                .driverIds(strDriverId[0].substring(0, strDriverId[0].length() - 1))
+                                .createId(WebSessionUtil.getCurrentLoginUser().getId())
+                                .createName(WebSessionUtil.getCurrentLoginUser().getLoginName())
+                                .userId(t.getUserId()).updateId(WebSessionUtil.getCurrentLoginUser().getId())
+                                .updateName(WebSessionUtil.getCurrentLoginUser().getLoginName()).createTime(new Date())
+                                .updateTime(new Date()).build();
+                        log.info("=========添加入参======" + JSONObject.toJSON(batchLine));
+                        try {
+                            exMapper.insertSelective(batchLine);
+                        } catch (Exception e) {
+                            log.error("======数据异常====", e);
+                        }
+                    } catch (Exception e) {
+                        log.error("异常",e);
+                    }
+                });
+            }
+        }));
+    }
+
 
     private JSONArray getLineNames(String supplierIds, JSONArray jsonLines) {
 
@@ -152,9 +200,9 @@ public class InterDriverLineRelServiceImpl implements InterDriverLineRelService 
                 jsonNames.put("lineIds", lineIds);
                 //wiki http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=43174850
                 String jsonLineName = MpOkHttpUtil.okHttpPost(configUrl + "/intercityCarUse/getLineNameByIds", jsonNames, 0, null);
-                if (StringUtils.isNotEmpty(jsonLineName) ) {
+                if (StringUtils.isNotEmpty(jsonLineName)) {
                     JSONObject linObj = JSONObject.parseObject(jsonLineName);
-                    if(linObj != null && linObj.get(Constants.DATA) != null){
+                    if (linObj != null && linObj.get(Constants.DATA) != null) {
                         JSONArray jsonArray = JSONArray.parseArray(linObj.get(Constants.DATA).toString());
                         jsonArray.forEach(json -> {
                             JSONObject obj = (JSONObject) json;
