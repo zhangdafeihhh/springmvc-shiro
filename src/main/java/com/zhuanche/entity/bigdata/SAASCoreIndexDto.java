@@ -22,6 +22,8 @@ public class SAASCoreIndexDto {
     private String badEvaluateNum; //有效差评
 
     private String badEvaluateAllNum; //差评单量
+    //司机上线时长（分钟）
+    private String onlineDriverTime;
 
     public String getRegistVehicleAmount() {
         return registVehicleAmount;
@@ -117,5 +119,13 @@ public class SAASCoreIndexDto {
 
     public void setBadEvaluateAllNum(String badEvaluateAllNum) {
         this.badEvaluateAllNum = badEvaluateAllNum;
+    }
+
+    public String getOnlineDriverTime() {
+        return onlineDriverTime;
+    }
+
+    public void setOnlineDriverTime(String onlineDriverTime) {
+        this.onlineDriverTime = onlineDriverTime;
     }
 }

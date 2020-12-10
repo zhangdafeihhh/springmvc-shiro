@@ -265,7 +265,8 @@
             IFNULL(FORMAT(sum(fact_end_amount),0),0) as incomeAmount,
             IFNULL(FORMAT(sum(fact_end_num)/sum(in_use_car_num),1),0) as orderPerVehicle,
             IFNULL(FORMAT(sum(fact_end_amount)/sum(in_use_car_num),0),0) as incomePerVehicle,
-            CONCAT(IFNULL(FORMAT(sum(bad_evaluate_num)*100/sum(order_cnt_notchannel),2),0),'%') as criticismRate
+            CONCAT(IFNULL(FORMAT(sum(bad_evaluate_num)*100/sum(order_cnt_notchannel),2),0),'%') as criticismRate,
+            IFNULL(sum(online_driver_time),0) as onlineDriverTime
         from bi_car_measure_day
         ]]>
     <where>

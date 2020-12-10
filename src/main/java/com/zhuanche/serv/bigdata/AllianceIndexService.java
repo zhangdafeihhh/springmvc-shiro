@@ -611,6 +611,16 @@ public class AllianceIndexService{
                            logger.info("全部加盟ci计算计算差评率百分比，分母为0",e);
                            p.setCriticismRatePercent("0%");
                        }
+
+                       //司机上线时长
+
+                       try {
+                           p.setOnlineDriverTime(saasCoreIndexDtoList.get(0).getOnlineDriverTime());
+                       } catch (Exception e) {
+                           logger.error("获取司机在线时长异常",e);
+                           p.setOnlineDriverTime("0.00");
+                       }
+
                    }
                }
            }
