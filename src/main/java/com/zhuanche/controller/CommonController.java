@@ -8,6 +8,7 @@ import com.le.config.dict.Dicts;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
@@ -356,7 +357,7 @@ public class CommonController {
     public AjaxResponse getTransportCitys(){
         List<CarBizCity> carBizCities = citySupplierTeamCommonService.queryCityList();
 
-        String authCityIdStr = Dicts.getString("driverMonitoring_authCityIdStr", "44,66,79,82,84,107,119,72,93,94,101,67,78,95,71,111,113,81,109,80,83");
+        String authCityIdStr = Dicts.getString("driverMonitoring_authCityIdStr", Constants.MONITOR_CITY);
         if(StringUtils.isNotEmpty(authCityIdStr)){
             List<Integer> cityIds = Arrays.asList(authCityIdStr.split(",")).stream().map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
             Iterator<CarBizCity> it = carBizCities.iterator();

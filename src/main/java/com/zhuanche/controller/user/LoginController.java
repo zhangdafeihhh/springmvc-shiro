@@ -9,6 +9,7 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.constants.SaasConst;
 import com.zhuanche.dto.AjaxLoginUserDTO;
 import com.zhuanche.dto.SaasPermissionDTO;
@@ -410,7 +411,7 @@ public class LoginController{
 
 
     public Set<String> getAuthCityId(){
-        String authCityIdStr = Dicts.getString("driverMonitoring_authCityIdStr", "44,66,79,82,84,107,119,72,93,94,101,67,78,95,71,111,113,81,109,80,83");
+        String authCityIdStr = Dicts.getString("driverMonitoring_authCityIdStr", Constants.MONITOR_CITY);
         String[] strArray = authCityIdStr.split(",");
         List<String> strList =  java.util.Arrays.asList(strArray);
         Set<String> authCityIdSet = new HashSet<>(strList);
