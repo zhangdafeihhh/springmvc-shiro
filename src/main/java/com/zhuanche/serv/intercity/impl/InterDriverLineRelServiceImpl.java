@@ -110,7 +110,8 @@ public class InterDriverLineRelServiceImpl implements InterDriverLineRelService 
                     listAll.forEach(i -> stringBuffer.append(i.getSupplierId()).append(Constants.SEPERATER));
                     jsonLines = getLineNames(stringBuffer.substring(0, stringBuffer.length() - 1), jsonLines);
                 }
-            } else if (carAdmUser.getLevel().equals(PermissionLevelEnum.SUPPLIER.getCode())) {
+            } else if (carAdmUser.getLevel().compareTo(PermissionLevelEnum.SUPPLIER.getCode())>= Constants.ZERO) {
+                //合作商、车队、班组都按照合作商级别处理
                 setSupplierIds = Arrays.stream(carAdmUser.getSuppliers().split(Constants.SEPERATER)).map(s -> Integer.valueOf(s.trim()))
                         .collect(Collectors.toSet());
                 jsonLines = getLineNames(carAdmUser.getSuppliers(), jsonLines);
