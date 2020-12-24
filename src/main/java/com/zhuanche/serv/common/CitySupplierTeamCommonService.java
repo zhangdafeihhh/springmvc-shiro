@@ -12,6 +12,7 @@ import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -434,15 +435,18 @@ public class CitySupplierTeamCommonService {
         List<Map<String, Object>> groupList = carDriverTeamExMapper.getGroupList(groupIds);
         Set<String> supplierIds = new HashSet<>();
         groupList.forEach(stringObjectMap -> supplierIds.add(stringObjectMap.get("supplier").toString()));
-        List<Map<String, Object>> supplierList = carBizSupplierExMapper.getSupplierList(supplierIds);
         List<String> result = new ArrayList<>();
-        groupList.forEach(stringObjectMap ->
-                supplierList.forEach(stringObjectMap1 -> {
-                    if (stringObjectMap.get("supplier").toString().equals(stringObjectMap1.get("supplierId").toString())){
-                        result.add(stringObjectMap1.get("supplierName").toString() + "-" + stringObjectMap.get("teamName").toString());
-                    }
-                })
-        );
+        if(CollectionUtils.isNotEmpty(supplierIds)){
+            List<Map<String, Object>> supplierList = carBizSupplierExMapper.getSupplierList(supplierIds);
+            groupList.forEach(stringObjectMap ->
+                    supplierList.forEach(stringObjectMap1 -> {
+                        if (stringObjectMap.get("supplier").toString().equals(stringObjectMap1.get("supplierId").toString())){
+                            result.add(stringObjectMap1.get("supplierName").toString() + "-" + stringObjectMap.get("teamName").toString());
+                        }
+                    })
+            );
+        }
+
         return result;
     }
     /**
