@@ -298,7 +298,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 
 			ArrayList<String> headList=new ArrayList();
 			if ("44".equals(cityId)) {
-				headList.add("司机姓名,司机手机,车牌号,订单号,评分,标签,评价内容,评分状态,申诉状态,回访状态");
+				headList.add("司机姓名,司机手机,车牌号,订单号,评分,标签,评价内容,评分状态,申诉状态,回访状态,合作商名称,评价时间");
 			}else {
 				headList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,评价时间,订单完成时间,评分状态,是否允许申诉,申诉状态,申诉时间");
 			}
@@ -389,6 +389,11 @@ public class MpOrderAppraisalController extends DriverQueryController{
 				}
 				sb.append(s.getCallbackStatus()==null || s.getCallbackStatus() == 0 ? "未回访" : "已回访");
 				sb.append(",");
+				//todo 临时添加 之后记得去掉 2020-12-25
+				DriverAppraisalAppeal appeal = appraisalMap.get(s.getAppraisalId());
+
+				sb.append(s.getCreateDate() == null ? "" : s.getCreateDate()).append(",");
+				sb.append(appeal.getSupplierName() == null ? "" : appeal.getSupplierName()).append(",");
 			}else {
 				sb.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
 				sb.append(",");
