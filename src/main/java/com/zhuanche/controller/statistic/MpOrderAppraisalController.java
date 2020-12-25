@@ -393,7 +393,12 @@ public class MpOrderAppraisalController extends DriverQueryController{
 				DriverAppraisalAppeal appeal = appraisalMap.get(s.getAppraisalId());
 
 				sb.append(s.getCreateDate() == null ? "" : s.getCreateDate()).append(",");
-				sb.append(appeal.getSupplierName() == null ? "" : appeal.getSupplierName()).append(",");
+
+				Optional.ofNullable(appeal).ifPresent(opt ->{
+					sb.append(appeal.getSupplierName() == null ? "" : appeal.getSupplierName()).append(",");
+				}
+				);
+
 			}else {
 				sb.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
 				sb.append(",");
