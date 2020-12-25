@@ -59,7 +59,8 @@
       appeal_status,
       create_time,
       callback_status ,
-      audit_time
+      audit_time,
+      supplier_name
   FROM
       driver_appraisal_appeal
   WHERE

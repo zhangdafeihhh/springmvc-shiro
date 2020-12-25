@@ -1,6 +1,7 @@
 package com.zhuanche.controller.statistic;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
@@ -392,13 +393,13 @@ public class MpOrderAppraisalController extends DriverQueryController{
 				//todo 临时添加 之后记得去掉 2020-12-25
 				DriverAppraisalAppeal appeal = appraisalMap.get(s.getAppraisalId());
 
-				sb.append(s.getCreateDate() == null ? "" : s.getCreateDate()).append(",");
 
-				Optional.ofNullable(appeal).ifPresent(opt ->{
+				log.info("appeal是否为空:" + appeal);
+
+				sb.append(s.getCreateDate() == null ? "" : DateUtils.formatDateTime_CN(s.getCreateDate())).append(",");
+				Optional.ofNullable(appeal).ifPresent(opt->{
 					sb.append(appeal.getSupplierName() == null ? "" : appeal.getSupplierName()).append(",");
-				}
-				);
-
+				});
 			}else {
 				sb.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
 				sb.append(",");
