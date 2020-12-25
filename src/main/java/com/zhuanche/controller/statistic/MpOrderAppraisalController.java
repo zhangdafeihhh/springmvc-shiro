@@ -223,7 +223,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 	@RequestFunction(menu = ORDER_RANK_EXPORT)
 	public void exportOrderAppraisal(
 			@Verify(param="cityId",rule="required")String cityId,
-			@Verify(param="supplierId",rule="required") String supplierId,
+			String supplierId,
 			String teamId,
 			String groupIds,
 			String driverName,
