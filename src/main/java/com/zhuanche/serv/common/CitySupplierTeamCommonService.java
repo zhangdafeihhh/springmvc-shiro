@@ -416,15 +416,17 @@ public class CitySupplierTeamCommonService {
         List<Map<String, Object>> teamList = carDriverTeamExMapper.getTeamList(teamIds);
         Set<String> supplierIds = new HashSet<>();
         teamList.forEach(stringObjectMap -> supplierIds.add(stringObjectMap.get("supplier").toString()));
-        List<Map<String, Object>> supplierList = carBizSupplierExMapper.getSupplierList(supplierIds);
         List<String> result = new ArrayList<>();
-        teamList.forEach(stringObjectMap ->
-            supplierList.forEach(stringObjectMap1 -> {
-                if (stringObjectMap.get("supplier").toString().equals(stringObjectMap1.get("supplierId").toString())){
-                    result.add(stringObjectMap1.get("supplierName").toString() + "-" + stringObjectMap.get("teamName").toString());
-                }
-            })
-        );
+        if(CollectionUtils.isNotEmpty(supplierIds)){
+            List<Map<String, Object>> supplierList = carBizSupplierExMapper.getSupplierList(supplierIds);
+            teamList.forEach(stringObjectMap ->
+                    supplierList.forEach(stringObjectMap1 -> {
+                        if (stringObjectMap.get("supplier").toString().equals(stringObjectMap1.get("supplierId").toString())){
+                            result.add(stringObjectMap1.get("supplierName").toString() + "-" + stringObjectMap.get("teamName").toString());
+                        }
+                    })
+            );
+        }
         return result;
     }
 
