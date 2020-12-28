@@ -1,7 +1,6 @@
 package com.zhuanche.controller.statistic;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
@@ -91,11 +90,11 @@ public class MpOrderAppraisalController extends DriverQueryController{
 		try {
 			//只能查询一个月的数据
 			if ((StringUtils.isEmpty(createDateBegin) && StringUtils.isEmpty(createDateEnd)) && StringUtils.isEmpty(orderFinishTimeBegin) && StringUtils.isEmpty(orderFinishTimeEnd)) {
-                log.info("【评价时间】范围或【完成日期】范围至少限定一个，支持跨度31天");
-                return AjaxResponse.fail(RestErrorCode.PARAMS_NOT, RestErrorCode.renderMsg(RestErrorCode.PARAMS_NOT));
-            }
+				log.info("【评价时间】范围或【完成日期】范围至少限定一个，支持跨度31天");
+				return AjaxResponse.fail(RestErrorCode.PARAMS_NOT, RestErrorCode.renderMsg(RestErrorCode.PARAMS_NOT));
+			}
 
-            if(StringUtils.isNotEmpty(orderFinishTimeBegin) && Constants.EROR_DATE.equals(orderFinishTimeBegin)){
+			if(StringUtils.isNotEmpty(orderFinishTimeBegin) && Constants.EROR_DATE.equals(orderFinishTimeBegin)){
 				log.info("orderFinishTimeBegin入参错误");
 				return AjaxResponse.fail(RestErrorCode.ORDER_PARAM_ERROR, RestErrorCode.renderMsg(RestErrorCode.ORDER_PARAM_ERROR));
 
@@ -118,16 +117,16 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			}
 			//如果选择了车队小组，先查询该车队小组下对应的DriverId
 			if (StringUtils.isNotEmpty(groupIds) || StringUtils.isNotEmpty(teamId)) {
-                String driverIds = super.queryAuthorityDriverIdsByTeamAndGroup(teamId, groupIds);
-                if (StringUtils.isBlank(driverIds)) {
-                    log.info("订单评价列表-有选择小组查询条件-该小组下没有司机groupId={},teamId={}", groupIds, teamId);
-                    return AjaxResponse.success(new PageDTO(page, pageSize, 0, new ArrayList()));
-                }
-                params.setDriverIds(driverIds);
-            }
+				String driverIds = super.queryAuthorityDriverIdsByTeamAndGroup(teamId, groupIds);
+				if (StringUtils.isBlank(driverIds)) {
+					log.info("订单评价列表-有选择小组查询条件-该小组下没有司机groupId={},teamId={}", groupIds, teamId);
+					return AjaxResponse.success(new PageDTO(page, pageSize, 0, new ArrayList()));
+				}
+				params.setDriverIds(driverIds);
+			}
 			if (appealStatus != null && appealStatus == 0) {
-                params.setIsAlreadyAppeal(0);
-            }
+				params.setIsAlreadyAppeal(0);
+			}
 			//整理权限
 			params = this.chuliParams(params);
 
@@ -136,7 +135,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 
 			Integer currentId = WebSessionUtil.getCurrentLoginUser().getId();
 
-			 queryKey = queryKey + currentId + JSON.toJSONString(params);
+			queryKey = queryKey + currentId + JSON.toJSONString(params);
 
 			//PageDTO redisPageDTO =  RedisCacheUtil.get(queryKey,PageDTO.class);
 
@@ -153,56 +152,56 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			long total = 0;
 			List<Integer> queryParam=null;
 			if ((appealStatus == null || appealStatus == 0) && (callbackStatus == null) ) {
-                //没有附表查询条件直接查询主表信息返回
-                params.setPage(page);
-                params.setPageSize(pageSize);
-                PageInfo<MpCarBizCustomerAppraisal> pageByparam = mpDriverCustomerAppraisalService.findPageByparam(params);
-                resultList = pageByparam.getList();
-                queryParam=resultList.stream().map(MpCarBizCustomerAppraisal::getAppraisalId).collect(Collectors.toList());
-                total = pageByparam.getTotal();
-                if(total==0){
-                	//删除查询条件
+				//没有附表查询条件直接查询主表信息返回
+				params.setPage(page);
+				params.setPageSize(pageSize);
+				PageInfo<MpCarBizCustomerAppraisal> pageByparam = mpDriverCustomerAppraisalService.findPageByparam(params);
+				resultList = pageByparam.getList();
+				queryParam=resultList.stream().map(MpCarBizCustomerAppraisal::getAppraisalId).collect(Collectors.toList());
+				total = pageByparam.getTotal();
+				if(total==0){
+					//删除查询条件
 					RedisCacheUtil.delete(queryKey);
 					return AjaxResponse.success(new PageDTO(page,pageSize,0,new ArrayList()));
 				}
-            } else {
-                List<Integer> mainTabIds = mpDriverCustomerAppraisalService.queryIds(params);
-                Set<Integer> slaveTabIds = appraisalAppealService.getAppraissalIdsByAppealStatus(appealStatus , callbackStatus);
-                //求并集
+			} else {
+				List<Integer> mainTabIds = mpDriverCustomerAppraisalService.queryIds(params);
+				Set<Integer> slaveTabIds = appraisalAppealService.getAppraissalIdsByAppealStatus(appealStatus , callbackStatus);
+				//求并集
 				mainTabIds.removeIf(o -> !slaveTabIds.contains(o));
 				if(mainTabIds.size()==0){
 					RedisCacheUtil.delete(queryKey);
 					return AjaxResponse.success(new PageDTO(page,pageSize,0,new ArrayList()));
 				}
 				int start = (page - 1) * pageSize;
-                int end = start + pageSize;
-                queryParam = mainTabIds.subList((start <= 0) ? 0 : start, end >= mainTabIds.size() ? mainTabIds.size() : end);
-                total = mainTabIds.size();
-                resultList = mpDriverCustomerAppraisalService.queryByIds(queryParam);
-            }
+				int end = start + pageSize;
+				queryParam = mainTabIds.subList((start <= 0) ? 0 : start, end >= mainTabIds.size() ? mainTabIds.size() : end);
+				total = mainTabIds.size();
+				resultList = mpDriverCustomerAppraisalService.queryByIds(queryParam);
+			}
 			//封装字段
 			List<DriverAppraisalAppeal> appeals = appraisalAppealService.queryBaseInfoByAppraisalIds(queryParam);
 			Map<Integer, DriverAppraisalAppeal> appealsMap = appeals.stream().collect(Collectors.toMap(o -> o.getAppraisalId(), O -> O));
 			resultList.forEach(o -> {
-                DriverAppraisalAppeal appeal = appealsMap.get(o.getAppraisalId());
-                if (appeal != null) {
-                    o.setAppealId(appeal.getId());
+				DriverAppraisalAppeal appeal = appealsMap.get(o.getAppraisalId());
+				if (appeal != null) {
+					o.setAppealId(appeal.getId());
 					if (Objects.nonNull(appeal.getCallbackStatus())) {
 						o.setCallbackStatus(appeal.getCallbackStatus());
 					}else {
 						o.setCallbackStatus(0);
 					}
 					//撤销状态不显示 申述时间
-                    if(appeal.getAppealStatus()!=4){
+					if(appeal.getAppealStatus()!=4){
 						o.setAppealTime(appeal.getCreateTime());
 					}
-                    o.setAppealStatus(appeal.getAppealStatus());
-                } else {
-                    //申诉表中没有表明未申诉
-                    o.setAppealStatus(0);
-                }
-                o.setDriverPhone(MobileOverlayUtil.doOverlayPhone(o.getDriverPhone()));
-            });
+					o.setAppealStatus(appeal.getAppealStatus());
+				} else {
+					//申诉表中没有表明未申诉
+					o.setAppealStatus(0);
+				}
+				o.setDriverPhone(MobileOverlayUtil.doOverlayPhone(o.getDriverPhone()));
+			});
 			log.info("订单评价列表 查询成功 耗时："+(System.currentTimeMillis()-startTime));
 			RedisCacheUtil.delete(queryKey);
 			return AjaxResponse.success(new PageDTO(page,pageSize,total, resultList));
@@ -224,7 +223,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 	@RequestFunction(menu = ORDER_RANK_EXPORT)
 	public void exportOrderAppraisal(
 			@Verify(param="cityId",rule="required")String cityId,
-			String supplierId,
+			@Verify(param="supplierId",rule="required") String supplierId,
 			String teamId,
 			String groupIds,
 			String driverName,
@@ -238,9 +237,9 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			String orderFinishTimeEnd,
 			Integer callbackStatus,
 			String evaluateScore,String sortName, String sortOrder,HttpServletRequest request,HttpServletResponse response){
-		     CsvUtils entity = new CsvUtils();
-		    String fileName = this.getFileName(request, "订单评分");
-		    long startTime=System.currentTimeMillis();
+		CsvUtils entity = new CsvUtils();
+		String fileName = this.getFileName(request, "订单评分");
+		long startTime=System.currentTimeMillis();
 		try {
 			//只能查询一个月的数据
 			if ((StringUtils.isEmpty(createDateBegin) && StringUtils.isEmpty(createDateEnd)) && StringUtils.isEmpty(orderFinishTimeBegin) && StringUtils.isEmpty(orderFinishTimeEnd)) {
@@ -299,7 +298,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 
 			ArrayList<String> headList=new ArrayList();
 			if ("44".equals(cityId)) {
-				headList.add("司机姓名,司机手机,车牌号,订单号,评分,标签,评价内容,评分状态,申诉状态,回访状态,合作商名称,评价时间");
+				headList.add("司机姓名,司机手机,车牌号,订单号,评分,标签,评价内容,评分状态,申诉状态,回访状态");
 			}else {
 				headList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,评价时间,订单完成时间,评分状态,是否允许申诉,申诉状态,申诉时间");
 			}
@@ -342,11 +341,11 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			String agent = request.getHeader("User-Agent").toUpperCase();
 			//IE浏览器和Edge浏览器
 			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {
-                fileName = URLEncoder.encode(fileName, "UTF-8");
-            } else {
+				fileName = URLEncoder.encode(fileName, "UTF-8");
+			} else {
 				//其他浏览器
-                fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
-            }
+				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+			}
 		} catch (UnsupportedEncodingException e) {
 			log.error("格式化导出文件名异常"+e);
 		}
@@ -390,15 +389,6 @@ public class MpOrderAppraisalController extends DriverQueryController{
 				}
 				sb.append(s.getCallbackStatus()==null || s.getCallbackStatus() == 0 ? "未回访" : "已回访");
 				sb.append(",");
-				//todo 临时添加 之后记得去掉 2020-12-25
-				DriverAppraisalAppeal appeal = appraisalMap.get(s.getAppraisalId());
-
-				log.info("appeal是否为空:" + appeal);
-
-				sb.append(s.getCreateDate() == null ? "" : DateUtils.formatDateTime_CN(s.getCreateDate())).append(",");
-				Optional.ofNullable(appeal).ifPresent(opt->{
-					sb.append(appeal.getSupplierName() == null ? "" : appeal.getSupplierName()).append(",");
-				});
 			}else {
 				sb.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
 				sb.append(",");
@@ -425,7 +415,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			}
 			list.add(sb.toString());
 		}
-			return list;
+		return list;
 	}
 
 	/**
