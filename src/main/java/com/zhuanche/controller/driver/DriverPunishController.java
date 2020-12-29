@@ -191,4 +191,18 @@ public class DriverPunishController extends BaseController {
         }
 
     }
+
+    /**
+     * 司机处罚类型
+     * @return
+     */
+    @RequestMapping("/getPunishTypeList")
+    public AjaxResponse getPunishTypeList() {
+        try {
+            return AjaxResponse.success(driverPunishService.getPunishTypeList());
+        }  catch (ServiceException e) {
+            log.error("司机处罚类型查询失败", e);
+            return AjaxResponse.failMsg(e.getErrorCode(), e.getMessage());
+        }
+    }
 }
