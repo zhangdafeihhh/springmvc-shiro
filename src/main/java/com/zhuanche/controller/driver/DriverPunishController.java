@@ -197,6 +197,7 @@ public class DriverPunishController extends BaseController {
      * @return
      */
     @RequestMapping("/getPunishTypeList")
+    @ResponseBody
     public AjaxResponse getPunishTypeList() {
         try {
             return AjaxResponse.success(driverPunishService.getPunishTypeList());
