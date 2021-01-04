@@ -12,6 +12,19 @@ import java.util.Set;
 public interface DriverInfoInterCityExMapper {
 
 
+    /**
+     * 查询司机
+     * @param cityId
+     * @param supplierId
+     * @param driverName
+     * @param driverPhone
+     * @param licensePlates
+     * @param cityIds
+     * @param supplierIds
+     * @param teamId
+     * @param teamIds
+     * @return
+     */
     List<MainOrderDetailDTO> queryDriver(@Param("cityId")Integer cityId,
                                          @Param("supplierId")Integer supplierId,
                                          @Param("driverName")String driverName,
@@ -19,7 +32,8 @@ public interface DriverInfoInterCityExMapper {
                                          @Param("licensePlates")String licensePlates,
                                          @Param("cityIds")Set<Integer> cityIds,
                                          @Param("supplierIds")Set<Integer> supplierIds,
-                                         @Param("teamId")Integer teamId);
+                                         @Param("teamId")Integer teamId,
+                                         @Param("teamIds")Set<Integer> teamIds);
 
     DriverInfoInterCity getByDriverId(@Param("driverId") Integer driverId);
 
