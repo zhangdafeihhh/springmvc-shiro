@@ -24,6 +24,10 @@ public class SAASCoreIndexDto {
     private String badEvaluateAllNum; //差评单量
     //司机上线时长（分钟）
     private String onlineDriverTime;
+    //端内毛差评率
+    private String probableNegativeRate;
+    //应答有责投诉率
+    private String ablityComplaintRate;
 
     public String getRegistVehicleAmount() {
         return registVehicleAmount;
@@ -127,5 +131,21 @@ public class SAASCoreIndexDto {
 
     public void setOnlineDriverTime(String onlineDriverTime) {
         this.onlineDriverTime = onlineDriverTime;
+    }
+
+    public String getProbableNegativeRate() {
+        return probableNegativeRate;
+    }
+
+    public void setProbableNegativeRate(String probableNegativeRate) {
+        this.probableNegativeRate = probableNegativeRate;
+    }
+
+    public String getAblityComplaintRate() {
+        return ablityComplaintRate;
+    }
+
+    public void setAblityComplaintRate(String ablityComplaintRate) {
+        this.ablityComplaintRate = ablityComplaintRate;
     }
 }
