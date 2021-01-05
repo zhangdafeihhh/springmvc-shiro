@@ -18,6 +18,7 @@ import com.zhuanche.util.OkHttpStreamUtil;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -165,7 +166,9 @@ public class DriverPunishClientService extends DriverPunishService {
      * @param response
      * @throws IOException
      */
+    @Async("syncTaskExecutor")
     public void renderVideo(String filePath,HttpServletResponse response) throws IOException {
+        log.info("====threadName==== 异步线程池执行该service方法===");
         OutputStream outputStream = null;
         try {
             byte[] fileBytes = OkHttpStreamUtil.executeForBytes(filePath);
