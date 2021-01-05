@@ -166,7 +166,6 @@ public class DriverPunishClientService extends DriverPunishService {
      * @param response
      * @throws IOException
      */
-    @Async("syncTaskExecutor")
     public void renderVideo(String filePath,HttpServletResponse response) throws IOException {
         log.info("====threadName==== 异步线程池执行该service方法===");
         OutputStream outputStream = null;
