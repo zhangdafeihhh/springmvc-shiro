@@ -127,13 +127,6 @@ public class SupplierAccountApplyService {
             //更新供应商扩展表账户信息
             SupplierExtDto supplierExtDto = new SupplierExtDto();
             supplierExtDto.setSupplierId(supplierId);
-/*
-            supplierExtDto.setSettlementAccount(settlementAccount);
-*/
-            supplierExtDto.setBankAccount(bankAccount);
-            supplierExtDto.setBankName(bankName);
-            supplierExtDto.setBankIdentify(bankIdentify);
-            supplierExtDto.setSettlementFullName(settlementFullName);
             supplierExtDto.setApplierStatus(status);
 
             int count = supplierExtDtoExMapper.selectCountBySupplierId(supplierId);
@@ -141,16 +134,20 @@ public class SupplierAccountApplyService {
 
             //如果是审核拒绝则不更新
             if(!status.equals(SupplierExtDto.opeStatus.REJERECT.getCode())){
-                if (count == 0) {
-                    supplierExtDtoMapper.insertSelective(supplierExtDto);
-                    logger.info("新增供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(supplierExtDto));
-                } else {
-
-                    supplierExtDtoExMapper.updateBySupplierId(supplierExtDto);
-                    logger.info("更新供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(supplierExtDto));
-                }
+                supplierExtDto.setBankAccount(bankAccount);
+                supplierExtDto.setBankName(bankName);
+                supplierExtDto.setBankIdentify(bankIdentify);
+                supplierExtDto.setSettlementFullName(settlementFullName);
             }
 
+            if (count == 0) {
+                supplierExtDtoMapper.insertSelective(supplierExtDto);
+                logger.info("新增供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(supplierExtDto));
+            } else {
+
+                supplierExtDtoExMapper.updateBySupplierId(supplierExtDto);
+                logger.info("更新供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(supplierExtDto));
+            }
 
             try {
                 SupplierCheckFail fail = new SupplierCheckFail();
