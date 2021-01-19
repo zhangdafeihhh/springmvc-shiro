@@ -12,6 +12,7 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.supplier.SupplierAccountApplyDTO;
 import com.zhuanche.entity.driver.SupplierAccountApply;
 import com.zhuanche.entity.driver.SupplierCheckFail;
+import com.zhuanche.entity.driver.SupplierExt;
 import com.zhuanche.entity.driver.SupplierExtDto;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
@@ -138,13 +139,18 @@ public class SupplierAccountApplyService {
             int count = supplierExtDtoExMapper.selectCountBySupplierId(supplierId);
             logger.info("供应商 申请修改信息审核 查询扩展表是否已存在={}", count);
 
-            if (count == 0) {
-                supplierExtDtoMapper.insertSelective(supplierExtDto);
-                logger.info("新增供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(supplierExtDto));
-            } else {
-                supplierExtDtoExMapper.updateBySupplierId(supplierExtDto);
-                logger.info("更新供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(supplierExtDto));
+            //如果是审核拒绝则不更新
+            if(!status.equals(SupplierExtDto.opeStatus.REJERECT.getCode())){
+                if (count == 0) {
+                    supplierExtDtoMapper.insertSelective(supplierExtDto);
+                    logger.info("新增供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(supplierExtDto));
+                } else {
+
+                    supplierExtDtoExMapper.updateBySupplierId(supplierExtDto);
+                    logger.info("更新供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(supplierExtDto));
+                }
             }
+
 
             try {
                 SupplierCheckFail fail = new SupplierCheckFail();

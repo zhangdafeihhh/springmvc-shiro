@@ -245,6 +245,23 @@ public class SupplierExtDto {
      */
     private String customerLineNumber;
 
+    public enum  opeStatus{
+        REJERECT(3);//审核驳回
+        private Integer code;
+
+        opeStatus(Integer code) {
+            this.code = code;
+        }
+
+        public Integer getCode() {
+
+            return code;
+        }
+
+        public void setCode(Integer code) {
+            this.code = code;
+        }
+    }
 
     public enum modelEnum{
         COOPERATEION_FREE(1,"自主"),
