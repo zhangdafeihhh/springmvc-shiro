@@ -183,11 +183,6 @@ public class DriverPunishClientService extends DriverPunishService {
                 outputStream.write(fileBytes);
                 outputStream.flush();
             }
-        } catch (IOException io) {
-            log.warn("渲染行程录音IOException", io);
-        } catch (Exception e) {
-            log.error("渲染行程录音失败", e);
-            throw e;
         } finally {
             IoUtil.close(outputStream);
         }
