@@ -9,6 +9,7 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.constants.SmsTempleConstants;
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersion;
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersionDetail;
 import com.zhuanche.serv.CarBizSupplierService;
@@ -150,29 +151,15 @@ public class SaasVersionController {
                         String contactPhone = entry.getKey();
                         String contactName = entry.getValue();
                         if(StringUtils.isNotBlank(contactName) && StringUtils.isNotBlank(contactPhone) && contactPhone.length() == 11){
-                            String smsContent = contactName +"老板您好，首约加盟商服务平台刚于"+ versionTakeEffectDate +"进行了"+ version +"版本更新，本次更新主要包括："+ versionSummary +"，访问版本记录可以查看完整更新说明，如有任何问题欢迎反馈。您的满意，我们的动力！";
-                            SmsSendUtil.send(contactPhone, smsContent);
+                            List listTemple = new ArrayList();
+                            listTemple.add(versionTakeEffectDate);
+                            listTemple.add(version);
+                            listTemple.add(versionSummary);
+                            SmsSendUtil.sendTemplate(contactPhone, SmsTempleConstants.registerTemple,list);
                             LOGGER.info("发送短信成功contactName={},contactPhone={}",contactName,contactPhone);
                         }
-
                     }
-
                 }
-
-//                List<Map<String,String>> contactsList = carBizSupplierService.findContactsByCityIdList(list);
-//                if(contactsList == null || contactsList.isEmpty()){
-//                    LOGGER.info("当前城市id没有对应联系人cityidList={}",list);
-//                    return AjaxResponse.success(null);
-//                }
-//                for (Map<String,String> map : contactsList){
-//                    String contactName = map.get("contactName");
-//                    String contactPhone = map.get("contactPhone");
-//                    if(StringUtils.isNotBlank(contactName) && StringUtils.isNotBlank(contactPhone) && contactPhone.length() == 11){
-//                        String smsContent = contactName +"老板您好，首约加盟商服务平台刚于"+ versionTakeEffectDate +"进行了"+ version +"版本更新，本次更新主要包括："+ versionSummary +"，访问版本记录可以查看完整更新说明，如有任何问题欢迎反馈。您的满意，我们的动力！";
-//                        SmsSendUtil.send(contactPhone, smsContent);
-//                        LOGGER.info("发送短信成功contactName={},contactPhone={}",contactName,contactPhone);
-//                    }
-//                }
 
             }
         }catch (Exception e){

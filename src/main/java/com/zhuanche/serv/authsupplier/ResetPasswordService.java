@@ -5,6 +5,7 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.constants.SmsTempleConstants;
 import com.zhuanche.controller.authsupplier.SendPhoneEnum;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.shiro.cache.RedisCache;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -74,16 +76,9 @@ public class ResetPasswordService {
 
         RedisCacheUtil.set(key,msgCode,2*60);
 
-        String content = "";
-
-        if(SendPhoneEnum.RESET_PASSWORD.getCode().equals(type)){
-
-            content = "尊敬的用户，您重置密码验证码为" + msgCode + ",有效期120秒";
-        }else if(SendPhoneEnum.UPDATE_PHONE.getCode().equals(type)){
-            content = "尊敬的用户，修改手机验证码为" + msgCode + ",有效期120秒";
-        }
-
-        SmsSendUtil.send(phone,content);
+        List list = new ArrayList();
+        list.add(msgCode);
+        SmsSendUtil.sendTemplate(phone, SmsTempleConstants.resetTemple,list);
 
         return AjaxResponse.success(null);
      }

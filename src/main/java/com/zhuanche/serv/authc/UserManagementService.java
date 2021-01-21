@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.constants.SmsTempleConstants;
 import com.zhuanche.dto.mdbcarmanage.CarAdmUserDto;
 import com.zhuanche.entity.mdbcarmanage.DriverTelescopeUser;
 import mapper.mdbcarmanage.ex.DriverTelescopeUserExMapper;
@@ -130,8 +131,11 @@ public class UserManagementService{
 		carAdmUserMapper.insertSelective(user);
 		
 		//短信通知
-		String text = user.getUserName() + "，您好！已为您成功开通“首约加盟商服务平台”管理员账号。登录账号为："+user.getAccount()+"，初始密码为："+initPassword+"（为保障账户安全，请您登录后进行密码修改）";
-    	SmsSendUtil.send( user.getPhone() , text);
+		List list = new ArrayList();
+		list.add(user.getUserName());
+		list.add(user.getAccount());
+		list.add(initPassword);
+		SmsSendUtil.sendTemplate(user.getPhone(), SmsTempleConstants.eyeRegisterTemple,list);
 
 		//兼容增加用户时要使用log,但是原来成功时返回值的data为null.这里适当改造了下。
 

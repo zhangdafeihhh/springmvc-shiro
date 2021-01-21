@@ -21,6 +21,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.constant.EnvUtils;
+import com.zhuanche.constants.SmsTempleConstants;
 import com.zhuanche.dto.driver.TelescopeDriver;
 import com.zhuanche.dto.rentcar.*;
 import com.zhuanche.entity.mdbcarmanage.*;
@@ -3912,8 +3913,13 @@ public class CarBizDriverInfoService {
             }
             try{
                 //短信通知
-                String text = telescopeDriver.getName() + "，您好！已为您成功开通“首汽约车司机端”千里眼管理账号。登录账号为："+telescopeDriver.getPhone()+"，初始密码为："+initPwd+"（为保障账户安全，请您登录后进行密码修改）";
-                SmsSendUtil.send(telescopeDriver.getPhone() , text);
+
+                List list = new ArrayList();
+                list.add(telescopeDriver.getName());
+                list.add(telescopeDriver.getPhone());
+                list.add(initPwd);
+
+                SmsSendUtil.sendTemplate(telescopeDriver.getPhone(), SmsTempleConstants.registerTemple,list);
             }catch (Exception e){
                 logger.error("开通千里眼账号短信通知异常：",e);
             }

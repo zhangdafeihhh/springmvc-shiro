@@ -10,6 +10,7 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constants.SmsTempleConstants;
 import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.dto.BaseDTO;
 import com.zhuanche.dto.busManage.BusCarDTO;
@@ -632,7 +633,12 @@ public class BusAssignmentController {
                 Boolean b=whetherSendSmsToCustomer(beforeBusOrder.getChannelsNum());
                 if (b==null || !b){
                     // 乘客
-                    SmsSendUtil.send(riderPhone, riderContext);
+                    List list = new ArrayList();
+                    list.add(bookingDate);
+                    list.add(driverName);
+                    list.add(afterDriverPhone);
+                    list.add(licensePlates);
+                    SmsSendUtil.sendTemplate(riderPhone, SmsTempleConstants.bashiTemple,list);
                 }
 
                 // 取消司机
