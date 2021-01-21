@@ -642,9 +642,13 @@ public class BusAssignmentController {
                 }
 
                 // 取消司机
-	            SmsSendUtil.send(beforeDriverPhone, beforeDriverContext);
+                List listCancle = new ArrayList();
+                listCancle.add(bookingDate);
+                listCancle.add(bookingStartAddr);
+                listCancle.add(bookingEndAddr);
+                SmsSendUtil.sendTemplate(beforeDriverPhone,SmsTempleConstants.bashiCancleTemple,listCancle);
 	            // 改派司机
-	            SmsSendUtil.send(afterDriverPhone, afterDriverContext);
+	            SmsSendUtil.sendTemplate(afterDriverPhone, SmsTempleConstants.bashiNoticeTemple,listCancle);
 			} else {
 				logger.info("巴士改派司机-大于等于24小时，无需发送短信: orderNo = " + beforeBusOrder.getOrderNo() + ", bookingDate = " + bookingDate);
 			}

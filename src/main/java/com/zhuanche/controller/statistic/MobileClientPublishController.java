@@ -7,6 +7,7 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constants.SmsTempleConstants;
 import com.zhuanche.dto.rentcar.CarSysMobileClientPublishDTO;
 import com.zhuanche.entity.rentcar.CarSysMobileClientPublish;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -25,7 +26,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Controller()
 @RequestMapping(value = "/mobileClientPublish")
@@ -119,7 +122,9 @@ public class MobileClientPublishController {
 			log.info("短信验证码发送用户userName:"+userName+"  手机号phone:"+user.getMobile()+"   ip:"+ip);
 			String code = getCode();
 			log.info("短信验证码发送用户userName:"+userName+"  手机号phone:"+user.getMobile()+"   验证码code:"+code);
-			SmsSendUtil.send(user.getMobile(), "验证码为："+code+" 验证码60秒内有效!");
+			List list = new ArrayList();
+			list.add(code);
+			SmsSendUtil.sendTemplate(user.getMobile(), SmsTempleConstants.driverTemple,list);
 			log.info("session中验证码放的key为:"+userName+"_"+VALIDATE_CODE);
 			WebSessionUtil.removeAttribute(userName+"_"+VALIDATE_CODE);
 			WebSessionUtil.setAttribute(userName+"_"+VALIDATE_CODE, code);

@@ -405,7 +405,10 @@ public class UserManagementService{
 			carAdmUserMapper.updateByPrimaryKeySelective(userForupdate);
 			//短信通知用户
 			String msg = "您账号"+ rawuser.getAccount() +"的登录密码已被管理员重置，新密码为："+newpass+"（为保障账户安全，请您登录后进行密码修改）";
-			SmsSendUtil.send(rawuser.getPhone(), msg);
+			List list = new ArrayList();
+			list.add(rawuser.getAccount());
+			list.add(newpass);
+			SmsSendUtil.sendTemplate(rawuser.getPhone(), SmsTempleConstants.manageResetTemple,list);
 		}else{//短信通知开关关闭的情况下，密码为初始密码
 			CarAdmUser userForupdate = new CarAdmUser();
 			userForupdate.setUserId(userId);

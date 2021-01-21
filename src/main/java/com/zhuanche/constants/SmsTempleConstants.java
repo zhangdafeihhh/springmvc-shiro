@@ -37,6 +37,17 @@ public class SmsTempleConstants {
     public static Integer bashiTemple;
 
 
+    /**管理员重置密码*/
+    public static Integer manageResetTemple;
+
+    /**司机发送模板*/
+    public static Integer driverTemple;
+    /**巴士取消*/
+    public static Integer bashiCancleTemple;
+    /**巴士发送短信*/
+    public static Integer bashiNoticeTemple;
+
+
     @Value("${login.temple}")
     public  void setLoginTemple(Integer loginTemple) {
         SmsTempleConstants.loginTemple = loginTemple;
@@ -58,15 +69,32 @@ public class SmsTempleConstants {
         SmsTempleConstants.interNoticeTemple = interNoticeTemple;
     }
     @Value("${inter.login.temple}")
-    public static void setInterLoginTemple(Integer interLoginTemple) {
+    public  void setInterLoginTemple(Integer interLoginTemple) {
         SmsTempleConstants.interLoginTemple = interLoginTemple;
     }
     @Value("${eye.register.temple}")
-    public static void setEyeRegisterTemple(Integer eyeRegisterTemple) {
+    public  void setEyeRegisterTemple(Integer eyeRegisterTemple) {
         SmsTempleConstants.eyeRegisterTemple = eyeRegisterTemple;
     }
     @Value("${bashi.temple}")
-    public static void setBashiTemple(Integer bashiTemple) {
+    public  void setBashiTemple(Integer bashiTemple) {
         SmsTempleConstants.bashiTemple = bashiTemple;
+    }
+
+    @Value("${manage.reset.temple}")
+    public  void setManageResetTemple(Integer manageResetTemple) {
+        SmsTempleConstants.manageResetTemple = manageResetTemple;
+    }
+    @Value("${driver.temple}")
+    public  void setDriverTemple(Integer driverTemple) {
+        SmsTempleConstants.driverTemple = driverTemple;
+    }
+    @Value("${bashi.cancle.temple}")
+    public  void setBashiCancleTemple(Integer bashiCancleTemple) {
+        SmsTempleConstants.bashiCancleTemple = bashiCancleTemple;
+    }
+    @Value("${bashi.notice.temple}")
+    public  void setBashiNoticeTemple(Integer bashiNoticeTemple) {
+        SmsTempleConstants.bashiNoticeTemple = bashiNoticeTemple;
     }
 }
