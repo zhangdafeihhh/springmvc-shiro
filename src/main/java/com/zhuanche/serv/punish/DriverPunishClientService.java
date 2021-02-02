@@ -17,6 +17,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.OkHttpStreamUtil;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ public class DriverPunishClientService extends DriverPunishService {
     private static final String PUNISH_DETAIL = "/driverPunish/findDriverPunishDetail";
     private static final String PUNISH_EXPORT = "/driverPunish/export";
     private static final String INIT_VIDEO = "/driverPunish/initVideoData";
+    private static final String PUNISH_TYPE_LIST = "/driverPunish/punishTypeList";
     private static final String CODE = "code";
     private static final String HTTP = "http:";
     private static final Set<String> IGNORE_MSG = new HashSet<String>(){{
@@ -183,11 +185,6 @@ public class DriverPunishClientService extends DriverPunishService {
                 outputStream.write(fileBytes);
                 outputStream.flush();
             }
-        } catch (IOException io) {
-            log.warn("渲染行程录音IOException", io);
-        } catch (Exception e) {
-            log.error("渲染行程录音失败", e);
-            throw e;
         } finally {
             IoUtil.close(outputStream);
         }
@@ -207,4 +204,15 @@ public class DriverPunishClientService extends DriverPunishService {
         return responseBody.getString("data");
     }
 
+    /**
+     * 司机处罚类型
+     * @return
+     */
+    public List<Map<String, Object>> getPunishTypeList() {
+        OkResponseResult result = OkHttpUtil.getIntance().doGet(Dicts.getString("mp.transport.url") + PUNISH_TYPE_LIST, null, "司机处罚类型");
+        String data = getDataString(result);
+        JSONArray jsonArray = JSONArray.fromObject(data);
+        List<Map<String, Object>> list = (List)jsonArray;
+        return list;
+    }
 }

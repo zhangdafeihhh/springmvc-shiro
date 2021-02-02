@@ -129,18 +129,16 @@ public class DriverPunishController extends BaseController {
     @RequiresPermissions(value = {"punishTripVideo"})
     @RequestMapping("/renderVideo")
     @ResponseBody
-    public AjaxResponse render(@RequestParam(name = "filePath") String filePath, HttpServletResponse response) {
+    public void render(@RequestParam(name = "filePath") String filePath, HttpServletResponse response) {
         if (StringUtils.isBlank(filePath)) {
-            return AjaxResponse.failMsg(RestErrorCode.HTTP_FORBIDDEN, "缺失路径");
+            return;
         }
         log.info("渲染录音文件, filePath:{}", filePath);
         try {
             driverPunishService.renderVideo(filePath, response);
         } catch (Exception e) {
-            log.error("渲染失败",e);
-            return AjaxResponse.failMsg(RestErrorCode.HTTP_FORBIDDEN, "渲染失败");
+            log.error("行程录音渲染失败",e);
         }
-        return AjaxResponse.success(null);
     }
 
 
@@ -190,5 +188,20 @@ public class DriverPunishController extends BaseController {
             return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, e.getMessage());
         }
 
+    }
+
+    /**
+     * 司机处罚类型
+     * @return
+     */
+    @RequestMapping("/getPunishTypeList")
+    @ResponseBody
+    public AjaxResponse getPunishTypeList() {
+        try {
+            return AjaxResponse.success(driverPunishService.getPunishTypeList());
+        }  catch (ServiceException e) {
+            log.error("司机处罚类型查询失败", e);
+            return AjaxResponse.failMsg(e.getErrorCode(), e.getMessage());
+        }
     }
 }
