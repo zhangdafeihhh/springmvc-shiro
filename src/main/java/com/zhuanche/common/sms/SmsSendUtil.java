@@ -126,6 +126,7 @@ public final class SmsSendUtil{
 	  String appsecret = properties.getProperty("short_message_appsecret");
 	  try {
 	  	  String params = JSONObject.toJSONString(param);
+	  	  log.info("==发送短信前入参=====" + params);
 		  Long timestamp = System.currentTimeMillis();
 		  String sha1 = "appkey=" + appkey + "&mobile=" + mobile + "&params=" + params + "&templetId=" + templateId
                   + "&timestamp=" + timestamp + "&appsecret=" + appsecret;

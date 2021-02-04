@@ -155,7 +155,7 @@ public class SaasVersionController {
                             listTemple.add(versionTakeEffectDate);
                             listTemple.add(version);
                             listTemple.add(versionSummary);
-                            SmsSendUtil.sendTemplate(contactPhone, SmsTempleConstants.registerTemple,listTemple);
+                            SmsSendUtil.sendTemplate(contactPhone, SmsTempleConstants.versionUpdateTemple,listTemple);
                             LOGGER.info("发送短信成功contactName={},contactPhone={}",contactName,contactPhone);
                         }
                     }

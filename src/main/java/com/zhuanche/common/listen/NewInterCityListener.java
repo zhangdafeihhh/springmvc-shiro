@@ -151,7 +151,7 @@ public class NewInterCityListener implements MessageListenerOrderly {
                     //根据userId查询手机号
                     List<CarAdmUser> userList = admUserExMapper.queryUsers(userIdLists,null,null,null,200);
                     if(CollectionUtils.isNotEmpty(userList)){
-                        userList.forEach(i-> SmsSendUtil.sendTemplate(i.getPhone(), SmsTempleConstants.interNoticeTemple,null));
+                        userList.forEach(i-> SmsSendUtil.sendTemplate(i.getPhone(), SmsTempleConstants.interNoticeTemple,Arrays.asList("小程序城际拼车")));
                         bl = true;
                     }
                 }
@@ -225,7 +225,7 @@ public class NewInterCityListener implements MessageListenerOrderly {
                 supplierPhone.forEach(str ->{
                     logger.info("=====获取到的供应商手机号======" + str + ",发送短信开始=====");
                     if(!sendMobile.contains(str)){
-                        SmsSendUtil.sendTemplate(str,SmsTempleConstants.interNoticeTemple,null);
+                        SmsSendUtil.sendTemplate(str,SmsTempleConstants.interNoticeTemple,Arrays.asList("后台发送短信"));
                         sendMobile.add(str);
                     }
                 });
@@ -242,7 +242,7 @@ public class NewInterCityListener implements MessageListenerOrderly {
                         }
                         logger.info("=====发送短信开始======" + phone);
                         if(!sendMobile.contains(phone)){
-                            SmsSendUtil.sendTemplate(phone,SmsTempleConstants.interNoticeTemple,null);
+                            SmsSendUtil.sendTemplate(phone,SmsTempleConstants.interNoticeTemple,Arrays.asList("后台发送"));
                             sendMobile.add(phone);
                         }
                     }
