@@ -3918,7 +3918,7 @@ public class CarBizDriverInfoService {
                 list.add(telescopeDriver.getName());
                 list.add(telescopeDriver.getPhone());
                 list.add(initPwd);
-
+                logger.info("千里眼开通入参:" + com.alibaba.fastjson.JSONObject.toJSON(list));
                 SmsSendUtil.sendTemplate(telescopeDriver.getPhone(), SmsTempleConstants.registerTemple,list);
             }catch (Exception e){
                 logger.error("开通千里眼账号短信通知异常：",e);
