@@ -135,7 +135,7 @@ public class UserManagementService{
 		list.add(user.getUserName());
 		list.add(user.getAccount());
 		list.add(initPassword);
-		SmsSendUtil.sendTemplate(user.getPhone(), SmsTempleConstants.eyeRegisterTemple,list);
+		SmsSendUtil.sendTemplate(user.getPhone(), SmsTempleConstants.registerTemple,list);
 
 		//兼容增加用户时要使用log,但是原来成功时返回值的data为null.这里适当改造了下。
 
