@@ -39,12 +39,12 @@ public class CarPoolMainOrderEntity{
     /**
      * 首单id
      */
-    private Integer firstOrderId;
+    private Long firstOrderId;
 
     /**
      * 尾单id
      */
-    private Integer lastOrderId;
+    private Long lastOrderId;
 
     /**
      * 司机首单开始服务长地址
@@ -192,19 +192,19 @@ public class CarPoolMainOrderEntity{
         this.finishOrderNum = finishOrderNum;
     }
 
-    public Integer getFirstOrderId() {
+    public Long getFirstOrderId() {
         return firstOrderId;
     }
 
-    public void setFirstOrderId(Integer firstOrderId) {
+    public void setFirstOrderId(Long firstOrderId) {
         this.firstOrderId = firstOrderId;
     }
 
-    public Integer getLastOrderId() {
+    public Long getLastOrderId() {
         return lastOrderId;
     }
 
-    public void setLastOrderId(Integer lastOrderId) {
+    public void setLastOrderId(Long lastOrderId) {
         this.lastOrderId = lastOrderId;
     }
 
