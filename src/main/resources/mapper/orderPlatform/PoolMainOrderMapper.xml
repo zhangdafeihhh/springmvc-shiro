@@ -10,8 +10,8 @@
 		<result column="status" jdbcType="INTEGER" property="status" />
 		<result column="order_total_num" jdbcType="INTEGER" property="orderTotalNum" />
 		<result column="finish_order_num" jdbcType="INTEGER" property="finishOrderNum" />
-		<result column="first_order_id" jdbcType="INTEGER" property="firstOrderId" />
-		<result column="last_order_id" jdbcType="INTEGER" property="lastOrderId" />
+		<result column="first_order_id" jdbcType="BIGINT" property="firstOrderId" />
+		<result column="last_order_id" jdbcType="BIGINT" property="lastOrderId" />
 		<result column="driver_start_long_addr" jdbcType="VARCHAR" property="driverStartLongAddr" />
 		<result column="driver_start_short_addr" jdbcType="VARCHAR" property="driverStartShortAddr" />
 		<result column="driver_start_point" jdbcType="VARCHAR" property="driverStartPoint" />
