@@ -9,6 +9,7 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constants.SmsTempleConstants;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.shiro.session.RedisSessionDAO;
 import com.zhuanche.util.NumberUtil;
@@ -30,7 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -105,15 +108,15 @@ public class PhoneLoginController {
         if(msgcode==null) {
             msgcode = NumberUtil.genRandomCode(6);
         }
-        String mobile   = user.getPhone();
-        String content  = "登录验证码为："+msgcode+"，请在"+msgcodeTimeoutMinutes+"分钟内进行登录。";
-        SmsSendUtil.send(mobile, content);
+        List list = new ArrayList();
+        list.add(msgcode);
+        SmsSendUtil.sendTemplate(user.getPhone(), SmsTempleConstants.loginTemple,list);
         //E: 写入缓存
         RedisCacheUtil.set(CACHE_PREFIX_MSGCODE_PHONE+username, msgcode,  msgcodeTimeoutMinutes * 60 );
         //返回结果
         Map<String,Object> result = new HashMap<String,Object>();
         result.put("timeout",  60 );//验证码有效的秒数
-        result.put("tipText", "短信验证码已成功发送至尾号为"+mobile.substring(7)+"的手机上。" );//成功信息
+        result.put("tipText", "短信验证码已成功发送至尾号为"+user.getPhone().substring(7)+"的手机上。" );//成功信息
         return AjaxResponse.success( result );
     }
 

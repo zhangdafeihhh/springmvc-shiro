@@ -16,6 +16,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.http.MpOkHttpUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -124,14 +125,16 @@ public final class SmsSendUtil{
 	  String appkey     = properties.getProperty("short_message_appkey");
 	  String appsecret = properties.getProperty("short_message_appsecret");
 	  try {
+	  	  String params = JSONObject.toJSONString(param);
+	  	  log.info("==发送短信前入参=====" + params);
 		  Long timestamp = System.currentTimeMillis();
-		  String sha1 = "appkey=" + appkey + "&mobile=" + mobile + "&params=" + param + "&templetId=" + templateId
+		  String sha1 = "appkey=" + appkey + "&mobile=" + mobile + "&params=" + params + "&templetId=" + templateId
                   + "&timestamp=" + timestamp + "&appsecret=" + appsecret;
 		  String md5Hex = DigestUtils.md5Hex(sha1).toUpperCase();
 		  Map<String,Object> maps = new HashMap();
 		  maps.put("templetId",templateId);
 		  maps.put("appkey",appkey);
-		  maps.put("params",param);
+		  maps.put("params",params);
 		  maps.put("mobile",mobile);
 		  maps.put("timestamp",timestamp);
 		  maps.put("sign",md5Hex);

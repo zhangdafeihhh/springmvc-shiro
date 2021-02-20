@@ -11,6 +11,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.constants.SaasConst;
+import com.zhuanche.constants.SmsTempleConstants;
 import com.zhuanche.dto.AjaxLoginUserDTO;
 import com.zhuanche.dto.SaasPermissionDTO;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
@@ -126,8 +127,9 @@ public class LoginController{
 			msgcode = NumberUtil.genRandomCode(6);
 		}
 		String mobile   = user.getPhone();
-		String content  = "登录验证码为："+msgcode+"，请在"+msgcodeTimeoutMinutes+"分钟内进行登录。";
-		SmsSendUtil.send(mobile, content);
+		List list = new ArrayList();
+		list.add(msgcode);
+		SmsSendUtil.sendTemplate(mobile, SmsTempleConstants.loginTemple,list);
 		//E: 写入缓存
 //		RedisCacheUtil.set(CACHE_PREFIX_MSGCODE_CONTROL+username, "Y",  60 );
 		RedisCacheUtil.set(CACHE_PREFIX_MSGCODE+username, msgcode,  msgcodeTimeoutMinutes * 60 );
