@@ -20,11 +20,12 @@
     <result column="business_volume" property="businessVolume" jdbcType="DECIMAL" />
     <result column="fin_ord_cnt" property="finOrdCnt" jdbcType="INTEGER" />
     <result column="bad_cnt" property="badCnt" jdbcType="INTEGER" />
+    <result column="travel_hour" property="travelHour" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, data_date, driver_id, driver_name, driver_phone, cooperation_type, license_plates, 
     city_id, supplier_id, driver_team_id, driver_group_id, car_group_id, up_online_time, 
-    down_online_time, all_time, business_volume, fin_ord_cnt, bad_cnt
+    down_online_time, all_time, business_volume, fin_ord_cnt, bad_cnt,travel_hour
   </sql>
   <select id="queryDayReport" resultMap="BaseResultMap" >
     select 

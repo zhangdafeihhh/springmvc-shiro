@@ -37,6 +37,8 @@ public class BiDriverBusinessInfoMonthReport {
 
     private Integer badCnt;
 
+    private BigDecimal travelHour;
+
     public Integer getId() {
         return id;
     }
@@ -171,5 +173,13 @@ public class BiDriverBusinessInfoMonthReport {
 
     public void setBadCnt(Integer badCnt) {
         this.badCnt = badCnt;
+    }
+
+    public BigDecimal getTravelHour() {
+        return travelHour;
+    }
+
+    public void setTravelHour(BigDecimal travelHour) {
+        this.travelHour = travelHour;
     }
 }

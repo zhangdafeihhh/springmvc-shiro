@@ -49,6 +49,8 @@ public class BiDriverBusinessInfoMonthReportDTO {
 
     private String carGroupName;
 
+    private BigDecimal travelHour;
+
     public Integer getId() {
         return id;
     }
@@ -231,5 +233,13 @@ public class BiDriverBusinessInfoMonthReportDTO {
 
     public void setCarGroupName(String carGroupName) {
         this.carGroupName = carGroupName;
+    }
+
+    public BigDecimal getTravelHour() {
+        return travelHour;
+    }
+
+    public void setTravelHour(BigDecimal travelHour) {
+        this.travelHour = travelHour;
     }
 }
