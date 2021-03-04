@@ -847,7 +847,7 @@ public class SupplierFeeController {
         footerList.add("开户行及账号:中国工商银行空港经济区空港第一支行 0302098009100096236");
         footerList.add("\n");
         footerList.add("邮寄地址:");
-        footerList.add("北京市朝阳区武圣东路松榆里37号楼 梦想加");
+        footerList.add("北京市朝阳区武圣东路松榆里37号楼 首开梦想加空间 首汽约车");
         footerList.add("合作商运营部收:13810675102");
         footerList.add("");
         return footerList;
