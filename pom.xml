@@ -450,6 +450,12 @@
 			<artifactId>hutool-core</artifactId>
 			<version>5.3.10</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.zhuanche</groupId>
+			<artifactId>mc-oss</artifactId>
+			<version>1.0.5-SNAPSHOT</version>
+		</dependency>
     </dependencies>
 
 	<!-- 多环境配置BEGIN -->

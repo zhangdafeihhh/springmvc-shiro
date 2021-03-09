@@ -1,5 +1,8 @@
 package com.zhuanche.entity.mdbcarmanage;
 
+import com.zhuanche.util.AliyunImgUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Date;
 
 public class CarBizCarInfoTemp {
@@ -966,10 +969,11 @@ public class CarBizCarInfoTemp {
     }
 
     public String getVehicleType() {
-        return vehicleType;
+        return AliyunImgUtils.transUrl(vehicleType);
     }
 
     public void setVehicleType(String vehicleType) {
+
         this.vehicleType = vehicleType;
     }
 
