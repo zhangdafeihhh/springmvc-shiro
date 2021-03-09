@@ -32,7 +32,6 @@ public  class AliyunImgUtils {
                 e.printStackTrace();
             }
         }
-
         return url;
 
     }
