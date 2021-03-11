@@ -1,5 +1,7 @@
 package com.zhuanche.entity.driver;
 
+import com.zhuanche.util.AliyunImgUtils;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -591,7 +593,7 @@ public class SupplierExtDto {
     }
 
     public String getBankPicUrl() {
-        return bankPicUrl;
+        return AliyunImgUtils.transUrl(bankPicUrl);
     }
 
     public void setBankPicUrl(String bankPicUrl) {
@@ -599,7 +601,7 @@ public class SupplierExtDto {
     }
 
     public String getOfficalSealUrl() {
-        return officalSealUrl;
+        return AliyunImgUtils.transUrl(bankPicUrl);
     }
 
     public void setOfficalSealUrl(String officalSealUrl) {
