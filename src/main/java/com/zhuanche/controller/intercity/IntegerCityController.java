@@ -231,15 +231,16 @@ public class IntegerCityController {
                                    String bookingDateSort,
                                    String isCrossDiscountReduction,
                                    Integer payFlag,
-                                   Integer offlineIntercityServiceType) {
+                                   Integer offlineIntercityServiceType,
+                                   Integer isCarpoolPayChannel) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},supplierId:{3},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
                         "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostEndDate{20},endCostEndDate{21},riderPhone:{22},distributorId:{23}," +
-                        "bookingDateSort:{24},payFlag:{25},offlineIntercityServiceType:{26}", pageNum,
+                        "bookingDateSort:{24},payFlag:{25},offlineIntercityServiceType:{26},isCarpoolPayChannel{27}", pageNum,
                 pageSize, cityId, supplierId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone, distributorId, lineBeforeName, bookingDateSort, payFlag, offlineIntercityServiceType));
+                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone, distributorId, lineBeforeName, bookingDateSort, payFlag, offlineIntercityServiceType,isCarpoolPayChannel));
         Map<String, Object> map = Maps.newHashMap();
         if (StringUtils.isNotEmpty(lineBeforeName) || StringUtils.isNotEmpty(lineAfterName)) {
             String ruleBatch = this.ruleBatch(lineBeforeName, lineAfterName);
@@ -258,6 +259,10 @@ public class IntegerCityController {
         String teamIdBatch = this.teamIdBatch();
         if(StringUtils.isNotEmpty(teamIdBatch())){
             map.put("teamIdBatch",teamIdBatch);
+        }
+        //是否是供应商收款
+        if(StringUtils.isNotEmpty(isCarpoolPayChannel+"")){
+            map.put("isCarpoolPayChannel",isCarpoolPayChannel);
         }
         /**添加排序字段*/
         JSONArray arraySort = this.arraySort(bookingDateSort);
@@ -899,7 +904,9 @@ public class IntegerCityController {
             String estimatedAmount = jsonEst.getString("estimatedAmount");
             String estimatedKey = jsonEst.getString("estimatedKey");
             String pingSettleType = jsonEst.get("pingSettleType") == null ? null : jsonEst.getString("pingSettleType");
+            String carpoolPayChannelId = jsonEst.get("carpoolPayChannelId") == null ? null : jsonEst.getString("carpoolPayChannelId");
             logger.info("获取到预估金额:" + estimatedAmount);
+            logger.info("获取支付id:" + carpoolPayChannelId);
             /**判断预估价是否大于0*/
             BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
             if (bigDecimal.compareTo(BigDecimal.ZERO) != 1) {
@@ -922,6 +929,12 @@ public class IntegerCityController {
                 /**付款人标识 0-预订人付款，1-乘车人付款，2-门童代人叫车乘车人是自己且乘车人付款，-1-机构付款*/
                 map.put("payFlag", "1");
                 sb.append("payFlag=1").append(SYSMOL);
+            }
+
+            /**支付id*/
+            if(StringUtils.isNotEmpty(carpoolPayChannelId)){
+                map.put("carpoolPayChannelId", carpoolPayChannelId);
+                sb.append("carpoolPayChannelId="+carpoolPayChannelId).append(SYSMOL);
             }
             /**业务线ID*/
             map.put("businessId", Common.BUSSINESSID);
@@ -1637,6 +1650,7 @@ public class IntegerCityController {
         /**获取预估金额*/
         String estimatedAmount = jsonEst.getString("estimatedAmount");
         String estimatedKey = jsonEst.getString("estimatedKey");
+        String carpoolPayChannelId = jsonEst.get("carpoolPayChannelId") == null ? null : jsonEst.getString("carpoolPayChannelId");
 
         logger.info("获取到预估金额:" + estimatedAmount);
         /**判断预估价是否大于0*/
@@ -1648,6 +1662,13 @@ public class IntegerCityController {
 
         Map<String, Object> map = Maps.newHashMap();
         List<String> list = new ArrayList<>();
+
+        //支付id
+        if(StringUtils.isNotEmpty(carpoolPayChannelId)){
+            map.put("carpoolPayChannelId", carpoolPayChannelId);
+            list.add("carpoolPayChannelId="+carpoolPayChannelId);
+        }
+
         /**城际包车、拼车*/
         map.put("offlineIntercityServiceType", offlineIntercityServiceType);
         list.add("offlineIntercityServiceType=" + offlineIntercityServiceType);
@@ -3264,7 +3285,14 @@ public class IntegerCityController {
                                     logger.info(carpoolingKeyStr);
                                     if (carpoolingKeyStr.indexOf(Constants.SHORT_STOKE) > 0) {
                                         String[] poolingArr = carpoolingKeyStr.split("-");
-                                        if (poolingArr.length > 0) {
+                                        if(poolingArr.length>=7){
+                                            chargeJson.put("estimatedAmount", poolingArr[0]);
+                                            if(!Objects.isNull(poolingArr[6])){
+                                                chargeJson.put("carpoolPayChannelId", poolingArr[6]);
+                                            }
+                                            logger.info("=============含有支付预估价拼接参数==========" + chargeJson);
+                                            return AjaxResponse.success(chargeJson);
+                                        }else{
                                             chargeJson.put("estimatedAmount", poolingArr[0]);
                                             logger.info("=============预估价拼接参数==========" + chargeJson);
                                             return AjaxResponse.success(chargeJson);
